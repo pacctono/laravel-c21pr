@@ -18,3 +18,24 @@ Route::get('/', function () {
 Auth::routes();
 
 Route::get('/home', 'HomeController@index')->name('home');
+
+Route::get('/usuarios', 'UserController@index')
+    ->name('users');
+
+Route::get('/usuarios/{user}', 'UserController@show')
+    ->where('user', '[0-9]+')
+    ->name('users.show');
+
+Route::get('/usuarios/nuevo', 'UserController@create')
+    ->name('users.create');
+
+Route::post('/usuarios', 'UserController@store');
+
+Route::get('/usuarios/{user}/editar', 'UserController@edit')
+    ->name('users.edit');
+
+Route::put('/usuarios/{user}', 'UserController@update');
+
+Route::delete('/usuarios/{user}', 'UserController@destroy')
+    ->name('users.destroy');
+

@@ -55,12 +55,12 @@ crossorigin="anonymous" -->
                         @else
                             <li class="nav-item dropdown">
                                 <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
-                                #'1'#'{!! Auth::user()->is_admin !!}'#{{ Auth::user()->name }} <span class="caret"></span>
+                                {{ Auth::user()->name }} <span class="caret"></span>
                                 </a>
 
                                 <div class="dropdown-menu" aria-labelledby="navbarDropdown">
 
-                                @if ("1" == "{{ Auth::user()->is_admin }}")
+                                @if (1 == Auth::user()->is_admin)
                                     <a class="dropdown-item" href="{{ route('users') }}"
                                        onclick="event.preventDefault();
                                                      document.getElementById('usuarios-form').submit();">
@@ -73,7 +73,7 @@ crossorigin="anonymous" -->
                                         {{ __('Logout') }}
                                     </a>
 
-                                @if ("1" == "{{ Auth::user()->is_admin }}")
+                                @if (1 == Auth::user()->is_admin)
                                     <form id="usuarios-form" action="{{ route('users') }}" method="GET" style="display: none;">
                                         @csrf
                                     </form>

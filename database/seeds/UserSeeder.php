@@ -52,5 +52,23 @@ class UserSeeder extends Seeder
             'password' => bcrypt('1234567'),
         ]);
 
+        User::create([
+            'name' => 'Pablo Antonio Caraballo',
+            'email' => 'pablo@udo.edu.ve',
+            'password' => bcrypt('1234567'),
+        ]);
+
+        User::create([
+            'name' => 'Yanet Matilde Correa',
+            'email' => 'yanet@c21pr.com',
+            'password' => bcrypt('1234567'),
+        ]);
+
+        User::create([
+            'name' => 'Ermes Alirio Mendoza Carrero',
+            'email' => 'ermes@c21pr.com',
+            'password' => bcrypt('1234567'),
+        ]);
+
     }
 }

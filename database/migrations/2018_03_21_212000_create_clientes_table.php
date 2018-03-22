@@ -17,12 +17,16 @@ class CreateClientesTable extends Migration
             $table->increments('id');
             $table->string('name', 160);
             $table->string('telefono', 10);
+            $table->unsignedInteger('veces_telefono')->nullable();
             $table->unsignedInteger('user_id')->nullable();
             $table->foreign('user_id')->references('id')->on('users');
             $table->string('email', 160)->nullable();
+            $table->unsignedInteger('veces_email')->nullable();
             $table->string('direccion', 160)->nullable();
-            $table->string('deseo', 10);
-            $table->string('propiedad', 10);
+            $table->unsignedInteger('deseo_id');
+            $table->foreign('deseo_id')->references('id')->on('deseos');
+            $table->unsignedInteger('propiedad_id');
+            $table->foreign('propiedad_id')->references('id')->on('propiedads');
             $table->unsignedInteger('zona_id')->nullable();
             $table->foreign('zona_id')->references('id')->on('zonas');
             $table->unsignedInteger('precio_id')->nullable();

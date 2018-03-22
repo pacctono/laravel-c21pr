@@ -2,7 +2,7 @@
 
 @section('content')
     <div class="card">
-        <h4 class="card-header">Editar usuario</h4>
+        <h4 class="card-header">Editar asesor</h4>
         <div class="card-body">
             @if ($errors->any())
             <div class="alert alert-danger">
@@ -29,9 +29,9 @@
                 <label for="password">Contraseña:</label>
                 <input type="password" name="password" id=password placeholder="Mayor a 6 caracteres">
                 <br>
-                <button class="btn btn-primary">Actualizar Usuario</button>
+                <button class="btn btn-primary">Actualizar Asesor</button>
                 <!-- a href="{{ action('UserController@index') }}">Regresar al listado de usuarios</a -->
-                <a href="{{ url('/usuarios') }}" class="btn btn-link">Regresar al listado de usuarios</a>
+                <a href="{{ url('/usuarios') }}" class="btn btn-link">Regresar al listado de asesores</a>
             </form>
         </div>
     </div>

@@ -20,14 +20,14 @@
     <!-- Styles -->
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
     <!-- Bootstrap core CSS -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap
+    <!-- link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap
 .min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" 
-crossorigin="anonymous">
+crossorigin="anonymous" -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/open-iconic/1.1.1/font
 /css/open-iconic-bootstrap.css" integrity="sha256-CNwnGWPO03a1kOlAsGaH5g8P3dFaqFqqGFV/1nkX5OU=
 " crossorigin="anonymous" />
     <!-- Custom styles for this template -->
-    <link href="{{ asset('css/style.css') }}" rel="stylesheet">
+    <!-- link href="{{ asset('css/style.css') }}" rel="stylesheet" -->
 </head>
 <body>
     <div id="app">
@@ -43,7 +43,7 @@ crossorigin="anonymous">
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
                     <!-- Left Side Of Navbar -->
                     <ul class="navbar-nav mr-auto">
-
+                        <li><h2>Sistema de Control de Llamadas</h2></li>
                     </ul>
 
                     <!-- Right Side Of Navbar -->
@@ -55,16 +55,29 @@ crossorigin="anonymous">
                         @else
                             <li class="nav-item dropdown">
                                 <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
-                                    {{ Auth::user()->name }} <span class="caret"></span>
+                                #'1'#'{!! Auth::user()->is_admin !!}'#{{ Auth::user()->name }} <span class="caret"></span>
                                 </a>
 
                                 <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+
+                                @if ("1" == "{{ Auth::user()->is_admin }}")
+                                    <a class="dropdown-item" href="{{ route('users') }}"
+                                       onclick="event.preventDefault();
+                                                     document.getElementById('usuarios-form').submit();">
+                                        {{ __('Ver asesores') }}
+                                    </a>
+                                @endif
                                     <a class="dropdown-item" href="{{ route('logout') }}"
                                        onclick="event.preventDefault();
                                                      document.getElementById('logout-form').submit();">
                                         {{ __('Logout') }}
                                     </a>
 
+                                @if ("1" == "{{ Auth::user()->is_admin }}")
+                                    <form id="usuarios-form" action="{{ route('users') }}" method="GET" style="display: none;">
+                                        @csrf
+                                    </form>
+                                @endif
                                     <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
                                         @csrf
                                     </form>

@@ -17,7 +17,7 @@ class UserController extends Controller
 
         //dd($users);
 
-        $title = 'Listado de usuarios';
+        $title = 'Listado de asesores';
 
         return view('users.index', compact('title', 'users'));
     }

@@ -29,4 +29,9 @@ class User extends Authenticatable
     protected $casts = [
         'is_admin' => 'boolean'
     ];
+
+    public function clientes()    // user_id
+    {
+        return $this->hasMany(Cliente::class); // Si llave foranea, diferente a esperada, usamos 2do parametro.
+    }
 }

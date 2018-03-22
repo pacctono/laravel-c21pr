@@ -17,7 +17,8 @@ class DatabaseSeeder extends Seeder
             'origens',
             'propiedads',
             'resultados',
-            'zonas'
+            'zonas',
+            'clientes'
         ]);
 
         // $this->call(UsersTableSeeder::class);
@@ -28,6 +29,7 @@ class DatabaseSeeder extends Seeder
         $this->call(PropiedadSeeder::class);
         $this->call(ResultadoSeeder::class);
         $this->call(ZonaSeeder::class);
+        $this->call(ClienteSeeder::class);
     }
 
     protected function truncateTables(array $tables)

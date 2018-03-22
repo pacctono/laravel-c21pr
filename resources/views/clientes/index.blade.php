@@ -5,11 +5,11 @@
         <h1 class="pb-1">{{ $title }}</h1>
 
         <p>
-            <a href="{{ route('users.create') }}" class="btn btn-primary">Crear asesor</a>
+            <a href="{{ route('clientes.create') }}" class="btn btn-primary">Crear Cliente</a>
         </p>
     </div>
 
-    @if ($users->isNotEmpty())
+    @if ($clientes->isNotEmpty())
     <table class="table">
         <thead class="thead-dark">
         <tr>
@@ -20,17 +20,17 @@
         </tr>
         </thead>
         <tbody>
-        @foreach ($users as $user)
+        @foreach ($clientes as $cliente)
         <tr>
-            <th scope="row">{{ $user->id }}</th>
-            <td>{{ $user->name }}</td>
-            <td>{{ $user->email }}</td>
+            <th scope="row">{{ $cliente->id }}</th>
+            <td>{{ $cliente->name }}</td>
+            <td>{{ $cliente->email }}</td>
             <td>
-                <form action="{{ route('users.destroy', $user) }}" method="POST">
+                <form action="{{ route('clientes.destroy', $cliente) }}" method="POST">
                     {{ csrf_field() }}
                     {{ method_field('DELETE' )}}
-                    <a href="{{ route('users.show', $user) }}" class="btn btn-link"><span class="oi oi-eye"></span></a>
-                    <a href="{{ route('users.edit', $user) }}" class="btn btn-link"><span class="oi oi-pencil"></span></a>
+                    <a href="{{ route('clientes.show', $cliente) }}" class="btn btn-link"><span class="oi oi-eye"></span></a>
+                    <a href="{{ route('clientes.edit', $cliente) }}" class="btn btn-link"><span class="oi oi-pencil"></span></a>
                     <button class="btn btn-link"><span class="oi-trash"></span></button>
                 </form>
             </td>
@@ -39,7 +39,7 @@
         </tbody>
     </table>
     @else
-        <p>No hay asesores registrados.</p>
+        <p>No hay clientes registrados.</p>
     @endif
 
 @endsection

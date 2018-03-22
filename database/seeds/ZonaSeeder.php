@@ -17,10 +17,6 @@ class ZonaSeeder extends Seeder
         ]);
     
         Zona::create([
-            'descripcion' => 'Nueva Barcelona',
-        ]);
-    
-        Zona::create([
             'descripcion' => 'Lechería',
         ]);
     

@@ -21,10 +21,13 @@
                 <!-- input name="_method" type="hidden" value="PUT" -->
 
                 <label for="name">Nombre:</label>
-                <input type="text" name="name" id="name" placeholder="Pedro Perez" value="{{ old('name', $user->name) }}">
+                <input type="text" maxlength="30" required name="name" id="name" placeholder="Pedro Perez" value="{{ old('name', $user->name) }}">
+                <br>
+                <label for="telefono">Teléfono:</label>
+                0<input type="text" size="10" maxlength="10" minlength="10" required name="telefono" id="telefono" placeholder="xxxyyyyyyy" value="{{ old('telefono', $user->telefono) }}">
                 <br>
                 <label for="email">Correo electrónico:</label>
-                <input type="email" name="email" id="email" placeholder="pedro@example.com" value="{{ old('email', $user->email) }}">
+                <input type="email" maxlength="30" required name="email" id="email" placeholder="pedro@example.com" value="{{ old('email', $user->email) }}">
                 <br>
                 <label for="password">Contraseña:</label>
                 <input type="password" name="password" id=password placeholder="Mayor a 6 caracteres">

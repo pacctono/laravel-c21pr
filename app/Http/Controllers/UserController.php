@@ -37,11 +37,12 @@ class UserController extends Controller
 //        $data = request()->all();   // all() ---> only(campos requeridos separados por ,)
         $data = request()->validate([   // Si ocurre error, laravel nos envia al url anterior.
             'name' => 'required',
+            'telefono' => 'required',
             'email' => ['required', 'email', 'unique:users,email'],   // 'required|email|...'
-            'password' => ['required'],
-            'telefono' => ''
+            'password' => ['required']
         ], [
             'name.required' => 'El campo nombre es obligatorio',
+            'telefono.required' => 'El teléfono debe ser suministrado',
             'email.required' => 'El correo electrónico es obligatorio suministrarlo',
             'email.email' => 'Debe suministrar un correo elctrónico válido',
             'email.unique' => 'Ese correo electrónico está siendo usado por otro usuario',
@@ -52,9 +53,9 @@ class UserController extends Controller
 
         User::create([
             'name' => $data['name'],
-            'email' => $data['email'],
-            'password' => bcrypt($data['password']),
             'telefono' => $data['telefono'],
+            'email' => $data['email'],
+            'password' => bcrypt($data['password'])
         ]);
 
         //return redirect('usuarios');
@@ -70,12 +71,13 @@ class UserController extends Controller
     {
         $data = request()->validate([   // Si ocurre error, laravel nos envia al url anterior.
             'name' => 'required',
+            'telefono' => 'required',
 //            'email' => ['required', 'email', 'unique:users,email,'.$user->id],   // 'required|email|...'
             'email' => ['required', 'email', Rule::unique('users')->ignore($user->id)],    // 'email' 2do par no es necesario.
-            'password' => 'nullable|min:7',
-            'telefono' => ''
+            'password' => 'nullable|min:7'
         ], [
             'name.required' => 'El campo nombre es obligatorio',
+            'telefono.required' => 'El teléfono debe ser suministrado',
             'email.required' => 'El correo electrónico es obligatorio suministrarlo',
             'email.email' => 'Debe suministrar un correo elctrónico válido',
             'email.unique' => 'Ese correo electrónico está siendo usado por otro usuario',

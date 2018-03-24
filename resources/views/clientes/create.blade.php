@@ -14,21 +14,21 @@
     </div>
     @endif
 
-    <form method="POST" action="{{ url('/home') }}">
+    <form method="POST" action="{{ url('clientes') }}">
         {!! csrf_field() !!}
 
         <div class="row">
             <div class="form-group col-md-4">
-                <label for="nombre">Nombre:</label>
-                <input type="text" required size="30" maxlength="30" name="nombre" id="nombre" placeholder="Pedro Perez" value="{{ old('nombre') }}">
+                <label for="name">Nombre:</label>
+                <input type="text" required size="30" maxlength="30" name="name" id="name" placeholder="Pedro Perez" value="{{ old('nombre') }}">
             </div>
         </div>
 
         <div class="row">
             <div class="form-group col-md-4">
-                <label for="telefono-1">Teléfono:</label>
-                <input type="text" size="3" maxlength="3" name="telefono-1" id="telefono-1" placeholder="4xx" value="{{ old('telefono-1') }}">
-                <input type="text" size="7" maxlength="7" name="telefono-2" id="telefono-2" placeholder="1234567" value="{{ old('telefono-2') }}">
+                <label for="telefono">Teléfono:</label>
+                <input type="text" size="3" maxlength="3" name="ddn" id="ddn" value="{{ old('telefono') }}">
+                <input type="text" size="7" maxlength="7" name="telefono" id="telefono" placeholder="1234567" value="{{ old('telefono') }}">
             </div>
         </div>
 
@@ -39,12 +39,80 @@
             </div>
         </div>
 
+        <div class="form-group col-md-4">
+            <label for="direccion">Dirección:</label>
+            <textarea cols="5" rows="4" maxlength="190" class="form-control" name="direccion" id="direccion" placeholder="Calle, Casa, Apto, Edificio, Barrio, Ciudad" value="{{ old('direccion') }}"></textarea>
+        </div>
+
         <div class="row">
             <div class="form-group col-md-4">
-                <label for="direccion-1">Dirección:</label>
-                <input type="text" size="30" maxlength="30" name="direccion-1" id="direccion-1" placeholder="Edificio, apartamento o casa" value="{{ old('direccion-1') }}">
-                <input type="text" size="30" maxlength="30" name="direccion-2" id="direccion-2" placeholder="Urbanización, Ciudad" value="{{ old('direccion-2') }}">
+            <label for="deseo">Desea:</label>
+                <select name="deseo_id" id="deseo">
+                @foreach ($deseos as $deseo)
+                  <option value="{{ $deseo->id }}">{{ $deseo->descripcion }}</option>
+                @endforeach
+                </select>
             </div>
+        </div>
+
+        <div class="row">
+            <div class="form-group col-md-4">
+            <label for="propiedad">Propiedad:</label>
+                <select name="propiedad_id" id="propiedad">
+                @foreach ($propiedades as $propiedad)
+                  <option value="{{ $propiedad->id }}">{{ $propiedad->descripcion }}</option>
+                @endforeach
+                </select>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="form-group col-md-4">
+            <label for="zona">Zona:</label>
+                <select name="zona_id" id="zona">
+                @foreach ($zonas as $zona)
+                  <option value="{{ $zona->id }}">{{ $zona->descripcion }}</option>
+                @endforeach
+                </select>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="form-group col-md-4">
+            <label for="precio">Precio:</label>
+                <select name="precio_id" id="precio">
+                @foreach ($precios as $precio)
+                  <option value="{{ $precio->id }}">{{ $precio->descripcion }}</option>
+                @endforeach
+                </select>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="form-group col-md-4">
+            <label for="origen">Origen:</label>
+                <select name="origen_id" id="origen">
+                @foreach ($origenes as $origen)
+                  <option value="{{ $origen->id }}">{{ $origen->descripcion }}</option>
+                @endforeach
+                </select>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="form-group col-md-4">
+            <label for="resultado">Resultado:</label>
+                <select name="resultado_id" id="resultado">
+                @foreach ($resultados as $resultado)
+                  <option value="{{ $resultado->id }}">{{ $resultado->descripcion }}</option>
+                @endforeach
+                </select>
+            </div>
+        </div>
+
+        <div class="form-group col-md-4">
+            <label for="observaciones">Observaciones:</label>
+            <textarea cols="5" rows="5" maxlength="190" class="form-control" name="observaciones" id="observaciones" placeholder="Coloque aqui las observaciones que tuvo de la conversación con el cliente." value="{{ old('observaciones') }}"></textarea>
         </div>
 
         <div class="row">

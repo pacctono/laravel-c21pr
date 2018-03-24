@@ -4,6 +4,7 @@
     <div class="card">
         <h4 class="card-header">Asesor: {{ $user->name }}</h4>
         <div class="card-body">
+            <p>Telefono del asesor: 0{{ substr($user->telefono, 0, 3) }}-{{ substr($user->telefono, 3) }}</p>
             <p>Correo del asesor: {{ $user->email }}</p>
 
             <p>

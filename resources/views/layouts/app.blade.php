@@ -90,7 +90,12 @@ crossorigin="anonymous" -->
         </nav>
 
         <main class="py-4">
+        @auth
             @yield('content')
+        @endauth
+        @if ('auth' == substr($view_name, 0, 4))
+            @yield('content')
+        @endif
         </main>
     </div>
 </body>

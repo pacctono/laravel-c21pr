@@ -16,6 +16,7 @@ class CreateClientesTable extends Migration
         Schema::create('clientes', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name', 160);
+            $table->unsignedInteger('veces_name')->default(0);
             $table->string('telefono', 10)->nullable();
             $table->unsignedInteger('veces_telefono')->default(0);
             $table->unsignedInteger('user_id');
@@ -36,6 +37,9 @@ class CreateClientesTable extends Migration
             $table->unsignedInteger('resultado_id');
             $table->foreign('resultado_id')->references('id')->on('resultados');
             $table->string('observaciones', 190)->nullable();
+            $table->unsignedInteger('user_actualizo')->nullable();
+            $table->unsignedInteger('user_borro')->nullable();
+            $table->timestamp('borrado_en')->nullable();
             $table->timestamps();
         });
     }

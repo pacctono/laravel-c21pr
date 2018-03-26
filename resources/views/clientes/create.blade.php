@@ -27,7 +27,16 @@
         <div class="row">
             <div class="form-group col-md-4">
                 <label for="telefono">Teléfono:</label>
-                <input type="text" size="3" maxlength="3" name="ddn" id="ddn" value="{{ old('telefono') }}">
+                <select name="ddn" id="ddn">
+                  <option value="">ddn</option>
+                @foreach ($ddns as $ddn)
+                @if (old('ddn', '414') == $ddn->ddn)
+                  <option value="{{ $ddn->ddn }}" selected>{{ $ddn->ddn }}</option>
+                @else
+                  <option value="{{ $ddn->ddn }}">{{ $ddn->ddn }}</option>
+                @endif
+                @endforeach
+                </select>
                 <input type="text" size="7" maxlength="7" name="telefono" id="telefono" placeholder="1234567" value="{{ old('telefono') }}">
             </div>
         </div>
@@ -48,6 +57,7 @@
             <div class="form-group col-md-4">
             <label for="deseo">Desea:</label>
                 <select name="deseo_id" id="deseo">
+                  <option value="">Qué desea hacer?</option>
                 @foreach ($deseos as $deseo)
                   <option value="{{ $deseo->id }}">{{ $deseo->descripcion }}</option>
                 @endforeach
@@ -59,6 +69,7 @@
             <div class="form-group col-md-4">
             <label for="propiedad">Propiedad:</label>
                 <select name="propiedad_id" id="propiedad">
+                  <option value="">Qué propiedad?</option>
                 @foreach ($propiedades as $propiedad)
                   <option value="{{ $propiedad->id }}">{{ $propiedad->descripcion }}</option>
                 @endforeach
@@ -70,6 +81,7 @@
             <div class="form-group col-md-4">
             <label for="zona">Zona:</label>
                 <select name="zona_id" id="zona">
+                  <option value="">Qué zona?</option>
                 @foreach ($zonas as $zona)
                   <option value="{{ $zona->id }}">{{ $zona->descripcion }}</option>
                 @endforeach
@@ -81,6 +93,7 @@
             <div class="form-group col-md-4">
             <label for="precio">Precio:</label>
                 <select name="precio_id" id="precio">
+                  <option value="">Qué precio?</option>
                 @foreach ($precios as $precio)
                   <option value="{{ $precio->id }}">{{ $precio->descripcion }}</option>
                 @endforeach
@@ -92,6 +105,7 @@
             <div class="form-group col-md-4">
             <label for="origen">Origen:</label>
                 <select name="origen_id" id="origen">
+                  <option value="">Cómo supo de nosotros?</option>
                 @foreach ($origenes as $origen)
                   <option value="{{ $origen->id }}">{{ $origen->descripcion }}</option>
                 @endforeach
@@ -103,6 +117,7 @@
             <div class="form-group col-md-4">
             <label for="resultado">Resultado:</label>
                 <select name="resultado_id" id="resultado">
+                  <option value="">Cuál fue el resultado?</option>
                 @foreach ($resultados as $resultado)
                   <option value="{{ $resultado->id }}">{{ $resultado->descripcion }}</option>
                 @endforeach

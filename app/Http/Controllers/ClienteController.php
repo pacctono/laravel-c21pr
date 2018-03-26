@@ -9,8 +9,11 @@ use App\Precio;
 use App\Propiedad;
 use App\Resultado;
 use App\Zona;
+use App\Venezueladdn;
+use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;        // PC
+use Carbon\Carbon;                          // PC
 
 class ClienteController extends Controller
 {
@@ -21,19 +24,20 @@ class ClienteController extends Controller
      */
     public function index()
     {
-        $clientes = Cliente::all();
-
-        //dd(request()->path());
-
         $title = 'Listado de clientes';
         $ruta = request()->path();
 
         if (!(Auth::check())) {
             return redirect('login');
         }
-        if (1 != Auth::user()->is_admin) {
-            return redirect('/clientes/create');
+        if (1 == Auth::user()->is_admin) {
+            $clientes = Cliente::whereNull('user_borro')->orderBy('created_at')->paginate(10);
+        } else {
+            $clientes = User::find(Auth::user()->id)->clientes()->whereNull('user_borro')->orderBy('created_at')->paginate(10);
+            //return redirect('/clientes/create');
         }
+
+        //dd(Auth::user()->id);
 
         return view('clientes.index', compact('title', 'clientes', 'ruta'));
     }
@@ -45,14 +49,18 @@ class ClienteController extends Controller
      */
     public function create()
     {
+        if (!(Auth::check())) {
+            return redirect('login');
+        }
         $deseos = Deseo::all();
         $origenes = Origen::all();
         $precios = Precio::all();
         $propiedades = Propiedad::all();
         $resultados = Resultado::all();
         $zonas = Zona::all();
+        $ddns = Venezueladdn::distinct()->get(['ddn'])->all();
 
-        return view('clientes.create', compact('deseos', 'origenes', 'precios', 'propiedades', 'resultados', 'zonas'));
+        return view('clientes.create', compact('deseos', 'origenes', 'precios', 'propiedades', 'resultados', 'zonas', 'ddns'));
     }
 
     /**
@@ -66,8 +74,8 @@ class ClienteController extends Controller
         //dd($request);
         $data = request()->validate([   // Si ocurre error, laravel nos envia al url anterior.
             'name' => 'required',
+            'ddn' => '',
             'telefono' => '',
-            'user_id' => '',
             'email' => ['email'],
             'direccion' => '',
             'deseo_id' => 'required',
@@ -92,11 +100,24 @@ class ClienteController extends Controller
         //$data['user_id'] = intval($data['user_id']);
         //dd($data);
 
+        if ('' != $data['ddn'] and '' != $data['telefono']) {
+            $data['telefono'] = $data['ddn'] . $data['telefono'];
+        } else {
+            $data['telefono'] = '';
+        }
+        unset($data['ddn']);
+        $data['veces_name'] = Cliente::ofVeces($data['name'], 'name') + 1;
+        $data['veces_telefono'] = Cliente::ofVeces($data['telefono'], 'telefono') + 1;
+        $data['veces_email'] = Cliente::ofVeces($data['email'], 'email') + 1;
+
         Cliente::create([
             'name' => $data['name'],
+            'veces_name' => $data['veces_name'],
             'telefono' => $data['telefono'],
+            'veces_telefono' => $data['veces_telefono'],
             'user_id' => Auth::user()->id,
             'email' => $data['email'],
+            'veces_email' => $data['veces_email'],
             'direccion' => $data['direccion'],
             'deseo_id' => $data['deseo_id'],
             'propiedad_id' => $data['propiedad_id'],
@@ -119,7 +140,20 @@ class ClienteController extends Controller
      */
     public function show(Cliente $cliente)
     {
-        //
+        if (!(Auth::check())) {
+            return redirect('login');
+        }
+        if (1 == Auth::user()->is_admin) {
+            return view('clientes.show', compact('cliente'));
+        }
+        if ($cliente->user_borro != null) {
+            return redirect('/clientes');
+        }
+        if ($cliente->user->id == Auth::user()->id) {
+            return view('clientes.show', compact('cliente'));
+        } else {
+            return redirect('/clientes');
+        }
     }
 
     /**
@@ -130,7 +164,23 @@ class ClienteController extends Controller
      */
     public function edit(Cliente $cliente)
     {
-        //
+        if (!(Auth::check())) {
+            return redirect('login');
+        }
+        if ($cliente->user_borro != null) {
+            return redirect('/clientes');
+        }
+
+        $ddns = Venezueladdn::distinct()->get(['ddn'])->all();
+
+        if (1 == Auth::user()->is_admin) {
+            return view('clientes.edit', ['cliente' => $cliente, 'ddns' => $ddns]);
+        }
+        if ($cliente->user->id == Auth::user()->id) {
+            return view('clientes.edit', ['cliente' => $cliente, 'ddns' => $ddns]);
+        } else {
+            return redirect('/clientes');
+        }
     }
 
     /**
@@ -142,7 +192,51 @@ class ClienteController extends Controller
      */
     public function update(Request $request, Cliente $cliente)
     {
-        //
+        $data = request()->validate([   // Si ocurre error, laravel nos envia al url anterior.
+            'name' => 'required',
+            'ddn' => '',
+            'telefono' => '',
+            'email' => ['email'],
+            'direccion' => '',
+            'observaciones' => '',
+        ], [
+            'name.required' => 'El campo nombre es obligatorio.',
+            'email.email' => 'Debe suministrar un correo elctrónico válido.',
+        ]);
+
+        //dd($data);
+
+        if ('' != $data['ddn'] and '' != $data['telefono']) {
+            $data['telefono'] = $data['ddn'] . $data['telefono'];
+        } else {
+            $data['telefono'] = null;
+        }
+        unset($data['ddn']);
+
+        foreach (['telefono', 'email', 'direccion', 'observaciones'] as $col) {
+            if ('' == $data[$col] or $data[$col] == null) {
+                unset($data[$col]);
+            }
+        }
+/*        if ('' == $data['telefono'] or $data['telefono'] == null) {
+            unset($data['telefono']);
+        }
+        if ('' == $data['email'] or $data['email'] == null) {
+            unset($data['email']);
+        }
+        if ('' == $data['direccion'] or $data['direccion'] == null) {
+            unset($data['direccion']);
+        }
+        if ('' == $data['observaciones'] or $data['observaciones'] == null) {
+            unset($data['observaciones']);
+        }*/
+        $data['user_actualizo'] = Auth::user()->id;
+
+        //dd($data);
+
+        $cliente->update($data);
+
+        return redirect()->route('clientes.show', ['cliente' => $cliente]);
     }
 
     /**
@@ -153,6 +247,25 @@ class ClienteController extends Controller
      */
     public function destroy(Cliente $cliente)
     {
-        //
+        if (!(Auth::check())) {
+            return redirect('login');
+        }
+
+        if (1 != Auth::user()->is_admin) {
+            return redirect('/clientes');
+        }
+        if ($cliente->user_borro != null) {
+            return redirect()->route('clientes.show', ['cliente' => $cliente]);
+        }
+
+        $data['user_borro'] = Auth::user()->id;
+        //$data['borrado_en'] = Carbon::now();
+        $data['borrado_en'] = new Carbon();
+
+        //dd($data);
+
+        $cliente->update($data);
+
+        return redirect()->route('clientes.index');
     }
 }

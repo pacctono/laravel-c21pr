@@ -12,6 +12,7 @@ use Faker\Generator as Faker;
 $factory->define(App\Cliente::class, function (Faker $faker) {
     return [
         'name' => $faker->name,
+        'veces_name' => 1,
         'telefono' => $faker->unique()->isbn10,
         'veces_telefono' => 1,
         'user_id' => $faker->numberBetween(1, User::count()),
@@ -25,6 +26,6 @@ $factory->define(App\Cliente::class, function (Faker $faker) {
         'origen_id' => $faker->numberBetween(1, Origen::count()),
         'resultado_id' => $faker->numberBetween(1, Resultado::count()),
         'observaciones' => $faker->sentence(7, false),
-        'created_at' => $faker->dateTimeThisMonth('now'),
+        'created_at' => $faker->dateTimeThisYear('now'),
     ];
 });

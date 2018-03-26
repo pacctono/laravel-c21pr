@@ -17,7 +17,7 @@
             <th scope="col">Nombre</th>
             <th scope="col">Telefono</th>
             <th scope="col">Correo</th>
-            <th scope="col">Dirección</th>
+            <th scope="col">Contactado</th>
             <th scope="col">Acciones</th>
         </tr>
         </thead>
@@ -28,21 +28,27 @@
             <td>{{ $cliente->name }}</td>
             <td>{{ $cliente->telefono }}</td>
             <td>{{ $cliente->email }}</td>
-            <td>{{ $cliente->direccion }}</td>
+            <td>
+                {{ $cliente->ofDiaSemana($cliente->created_at->format('w')) }}
+                {{ $cliente->created_at->format('d/m/Y') }}
+            </td>
             <td>
                 <a href="{{ route('clientes.show', $cliente) }}" class="btn btn-link"><span class="oi oi-eye"></span></a>
-                <!-- form action="{-- route('clientes.destroy', $cliente) --}" method="POST">
+                <a href="{{ route('clientes.edit', $cliente) }}" class="btn btn-link"><span class="oi oi-pencil"></span></a>
+
+                @if (1 == Auth::user()->is_admin)
+                <form action="{{ route('clientes.destroy', $cliente) }}" method="POST">
                     {{ csrf_field() }}
                     {{ method_field('DELETE' )}}
-                    <a href="{{ route('clientes.show', $cliente) }}" class="btn btn-link"><span class="oi oi-eye"></span></a>
-                    <a href="{{ route('clientes.edit', $cliente) }}" class="btn btn-link"><span class="oi oi-pencil"></span></a>
                     <button class="btn btn-link"><span class="oi-trash"></span></button>
-                </form -->
+                </form>
+                @endif
             </td>
         </tr>
         @endForeach
         </tbody>
     </table>
+    {{ $clientes->links() }}
     @else
         <p>No hay clientes registrados.</p>
     @endif

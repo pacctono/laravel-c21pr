@@ -133,7 +133,7 @@
         <div class="row">
             <div class="form-group col-md-4">
                 <button type="submit" class="btn btn-success">Agregar cliente</button>
-                <!-- a href="{{ url('/clientes') }}" class="btn btn-link">Regresar al listado de clientes</a -->
+                <a href="{{ url('/clientes') }}" class="btn btn-link">Regresar al listado de clientes</a>
             </div>
         </div>
     </form>

@@ -44,7 +44,16 @@ Route::delete('/usuarios/{user}', 'UserController@destroy')
     ->name('users.destroy')
     ->middleware('admin');
 
+Route::get('/clientes/orden/{orden}', 'ClienteController@index')
+    ->name('clientes.orden');
+
 Route::resource('clientes', 'ClienteController');
+
+Route::get('/clientes/orden/{orden}', 'ClienteController@index')
+    ->name('clientes.orden');
+
+//Route::get('/clientes/filtrar/{filtro}', 'ClienteController@filtro')
+//    ->name('clientes.filtro');
 
 //Route::get('/home', 'ClienteController@create')
 //    ->name('clientes.create');

@@ -37,17 +37,19 @@
             <p>Resultado: {{ $cliente->resultado->descripcion }}</p>
             <p>Observaciones: {{ $cliente->observaciones }}</p>
             @if ($cliente->user_borro != null)
-                <p>Este cliente fue borrado por {{ $cliente->userBorro->name }} el {{ $cliente->borrado_en }}.
+                <p>Este cliente fue borrado por {{ $cliente->userBorro->name }}
+                    el {{ $diaSemana[$cliente->created_at->format('w')] }}, {{ $cliente->borrado_en->format('d/m/Y') }}.
                 </p>
             @endif
             @if ($cliente->user_actualizo != null)
-                <p>Este cliente fue actualizado por {{ $cliente->userActualizo->name }} el {{ $cliente->updated_at->format('d/m/Y') }}.
+                <p>Este cliente fue actualizado por {{ $cliente->userActualizo->name }}
+                    el {{ $diaSemana[$cliente->created_at->format('w')] }}, {{ $cliente->updated_at->format('d/m/Y') }}.
                 </p>
             @endif
 
             <p>
                 <!-- a href="{{ action('ClienteController@index') }}">Regresar al listado de usuarios</a -->
-                <a href="{{ url('/clientes') }}" class="btn btn-link">Regresar al listado de clientes</a>
+                <a href="{{ route('clientes.index') }}" class="btn btn-link">Regresar al listado de clientes</a>
             </p>
         </div>
     </div>

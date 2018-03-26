@@ -12,8 +12,8 @@ class Cliente extends Model
         'zona_id', 'precio_id', 'origen_id', 'resultado_id', 'observaciones',
         'user_actualizo', 'user_borro', 'borrado_en'
     ];
-    protected static $diaSemana = [
-        'Domingo', 'Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado'
+    protected $dates = [
+        'created_at', 'updated_at', 'borrado_en'
     ];
 
     public function user()    // user_id
@@ -65,12 +65,12 @@ class Cliente extends Model
     {
         return $query->whereBetween('created_at', [$fechaDesde, $fechaHasta]);
     }
-
+/*
     public function scopeOfDiaSemana($query, $indDia)
     {
-        return $this->diaSemana($indDia);
+        return $this->diaSemana[$indDia];
     }
-
+ */
     public function scopeOfUsuario($query, $user)
     {
         return $query->where('user_id', $user);

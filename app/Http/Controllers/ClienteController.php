@@ -17,29 +17,64 @@ use Carbon\Carbon;                          // PC
 
 class ClienteController extends Controller
 {
+    protected $diaSemana = [
+        'Domingo', 'Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado'
+    ];
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index($orden = null)
     {
         $title = 'Listado de clientes';
         $ruta = request()->path();
+        $diaSemana = $this->diaSemana;
 
         if (!(Auth::check())) {
             return redirect('login');
         }
+
+        if ('' == $orden or $orden == null) {
+            $orden = 'id';
+        }
         if (1 == Auth::user()->is_admin) {
-            $clientes = Cliente::whereNull('user_borro')->orderBy('created_at')->paginate(10);
+            $clientes = Cliente::orderBy($orden)->paginate(10);
         } else {
-            $clientes = User::find(Auth::user()->id)->clientes()->whereNull('user_borro')->orderBy('created_at')->paginate(10);
+            $clientes = User::find(Auth::user()->id)->clientes()->whereNull('user_borro')->orderBy($orden)->paginate(10);
             //return redirect('/clientes/create');
         }
-
+    
         //dd(Auth::user()->id);
 
-        return view('clientes.index', compact('title', 'clientes', 'ruta'));
+        return view('clientes.index', compact('title', 'clientes', 'ruta', 'diaSemana'));
+    }
+
+    public function filtro($filtro)
+    {
+        $title = 'Listado de clientes';
+        $ruta = request()->path();
+        $diaSemana = [
+            'Domingo', 'Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado'
+        ];
+
+        if (!(Auth::check())) {
+            return redirect('login');
+        }
+
+        if ('' == $filtro or $filtro == null) {
+            $filtro = 'created_at';
+        }
+        if (1 == Auth::user()->is_admin) {
+            $clientes = Cliente::whereNull('user_borro')->orderBy($filtro)->paginate(10);
+        } else {
+            $clientes = User::find(Auth::user()->id)->clientes()->whereNull('user_borro')->orderBy($filtro)->paginate(10);
+            //return redirect('/clientes/create');
+        }
+    
+        //dd(Auth::user()->id);
+
+        return view('clientes.index', compact('title', 'clientes', 'ruta', 'diaSemana'));
     }
 
     /**
@@ -140,17 +175,19 @@ class ClienteController extends Controller
      */
     public function show(Cliente $cliente)
     {
+        $diaSemana = $this->diaSemana;
+
         if (!(Auth::check())) {
             return redirect('login');
         }
         if (1 == Auth::user()->is_admin) {
-            return view('clientes.show', compact('cliente'));
+            return view('clientes.show', compact('cliente', 'diaSemana'));
         }
         if ($cliente->user_borro != null) {
             return redirect('/clientes');
         }
         if ($cliente->user->id == Auth::user()->id) {
-            return view('clientes.show', compact('cliente'));
+            return view('clientes.show', compact('cliente', 'diaSemana'));
         } else {
             return redirect('/clientes');
         }

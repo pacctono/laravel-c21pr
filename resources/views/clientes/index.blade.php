@@ -14,10 +14,26 @@
         <thead class="thead-dark">
         <tr>
             <!-- th scope="col">#</th -->
-            <th scope="col">Nombre</th>
-            <th scope="col">Telefono</th>
-            <th scope="col">Correo</th>
-            <th scope="col">Contactado</th>
+            <th scope="col">
+                <a href="{{ route('clientes.orden', 'name') }}" class="btn btn-link">
+                    Nombre
+                </a>
+            </th>
+            <th scope="col">
+                <a href="{{ route('clientes.orden', 'telefono') }}" class="btn btn-link">
+                    Telefono
+                </a>
+            </th>
+            <th scope="col">
+                <a href="{{ route('clientes.orden', 'email') }}" class="btn btn-link">
+                    Correo
+                </a>
+            </th>
+            <th scope="col">
+                <a href="{{ route('clientes.orden', 'created_at') }}" class="btn btn-link">
+                    Contactado
+                </a>
+            </th>
             <th scope="col">Acciones</th>
         </tr>
         </thead>
@@ -29,8 +45,11 @@
             <td>{{ $cliente->telefono }}</td>
             <td>{{ $cliente->email }}</td>
             <td>
-                {{ $cliente->ofDiaSemana($cliente->created_at->format('w')) }}
+                {{ $diaSemana[$cliente->created_at->format('w')] }}
                 {{ $cliente->created_at->format('d/m/Y') }}
+                @if ('' != $cliente->user_borro and $cliente->user_borro != null)
+                    [B]
+                @endif
             </td>
             <td>
                 <a href="{{ route('clientes.show', $cliente) }}" class="btn btn-link"><span class="oi oi-eye"></span></a>

@@ -10,7 +10,7 @@
     </div>
 
     @if ($clientes->isNotEmpty())
-    <table class="table">
+    <table class="table table-striped table-hover table-bordered">
         <thead class="thead-dark">
         <tr>
             <!-- th scope="col">#</th -->
@@ -45,18 +45,18 @@
             <td>{{ $cliente->telefono }}</td>
             <td>{{ $cliente->email }}</td>
             <td>
-                {{ $diaSemana[$cliente->created_at->format('w')] }}
+                {{ $diaSemana[$cliente->created_at->dayOfWeek] }}
                 {{ $cliente->created_at->format('d/m/Y') }}
                 @if ('' != $cliente->user_borro and $cliente->user_borro != null)
                     [B]
                 @endif
             </td>
-            <td>
+            <td class="d-flex align-items-end">
                 <a href="{{ route('clientes.show', $cliente) }}" class="btn btn-link"><span class="oi oi-eye"></span></a>
                 <a href="{{ route('clientes.edit', $cliente) }}" class="btn btn-link"><span class="oi oi-pencil"></span></a>
 
                 @if (1 == Auth::user()->is_admin)
-                <form action="{{ route('clientes.destroy', $cliente) }}" method="POST">
+                <form action="{{ route('clientes.destroy', $cliente) }}" method="POST" class="form-inline mt-0 mt-md-0">
                     {{ csrf_field() }}
                     {{ method_field('DELETE' )}}
                     <button class="btn btn-link"><span class="oi-trash"></span></button>

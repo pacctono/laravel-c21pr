@@ -111,7 +111,7 @@ class ClienteController extends Controller
             'name' => 'required',
             'ddn' => '',
             'telefono' => '',
-            'email' => ['email'],
+            'email' => ['sometimes', 'nullable', 'email'],
             'direccion' => '',
             'deseo_id' => 'required',
             'propiedad_id' => 'required',
@@ -233,7 +233,7 @@ class ClienteController extends Controller
             'name' => 'required',
             'ddn' => '',
             'telefono' => '',
-            'email' => ['email'],
+            'email' => ['sometimes', 'nullable', 'email'],
             'direccion' => '',
             'observaciones' => '',
         ], [

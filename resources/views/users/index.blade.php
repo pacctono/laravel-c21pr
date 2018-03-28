@@ -10,7 +10,7 @@
     </div>
 
     @if ($users->isNotEmpty())
-    <table class="table">
+    <table class="table table-striped table-hover table-bordered">
         <thead class="thead-dark">
         <tr>
             <th scope="col">#</th>

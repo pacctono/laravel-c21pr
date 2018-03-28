@@ -26,56 +26,32 @@
           <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarCollapse">
-        @auth
-          <ul class="navbar-nav mr-auto col-md-10">
-          @if ('home' == substr($view_name, 0, 4))
+          <ul class="navbar-nav mr-auto">
             <li class="nav-item active">
-          @else
-            <li class="nav-item">
-          @endif
-                <a class="nav-link" href="/home">Home <!-- span class="sr-only">(current)</span --></a>
+              <a class="nav-link" href="/home">Home <span class="sr-only">(current)</span></a>
             </li>
-          @if ('clientes' == substr($view_name, 0, 8))
-            <li class="nav-item active">
-          @else
             <li class="nav-item">
-          @endif
               <a class="nav-link" href="/clientes">Clientes</a>
             </li>
-          @if (1 == Auth::user()->is_admin)
-            @if ('users' == substr($view_name, 0, 5))
-            <li class="nav-item active">
-            @else
+            @if (1 == Auth::user()->is_admin)
             <li class="nav-item">
-            @endif
               <a class="nav-link" href="/usuarios">Asesores</a>
             </li>
-          @else
+            @else
             <li class="nav-item">
               <a class="nav-link disabled" href="#">Asesores</a>
             </li>
-          @endif
+            @endif
           </ul>
-          @endauth
-          <ul class="navbar-nav ml-auto col-md-2">
+          <ul class="navbar-nav mr-auto">
           @guest
             <li class="nav-item">
               <a class="nav-link" href="{{ route('login') }}">{{ __('Login') }}</a>
             </li>
           @else
             <li class="nav-item">
-              <div class="dropdown">
-                <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
-                  {{ Auth::user()->name }}
-                </button>
-                <div class="dropdown-menu">
-                  <a class="dropdown-item" href="#">Logout</a>
-                </div>
-              </div>
+              <a class="nav-link" href="{{ route('logout') }}">{{ Auth::user()->name }}</a>
             </li>
-              <!-- form id="logout-form" action="{{ route('logout') }}" method="POST" class="form-inline mt-2 mt-md-0">
-                <button class="btn btn-outline-success my-2 my-sm-0" type="submit">{{ Auth::user()->name }}</button>
-              </form -->
           @endguest
           </ul>
         </div>
@@ -85,10 +61,13 @@
     <!-- Begin page content -->
     <main role="main" class="container">
         <div class="row mt-3">
-            <div class="col-md-12">
+            <div class="col-8">
             @auth
               @yield('content')
             @endauth
+            @if ('auth' == substr($view_name, 0, 4))
+              @yield('content')
+            @endif
             </div>
         </div>
      </main>

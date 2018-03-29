@@ -50,9 +50,12 @@
             @endif
               <a class="nav-link" href="/usuarios">Asesores</a>
             </li>
-          @else
+            @if ('turnos' == substr($view_name, 0, 6))
+            <li class="nav-item active">
+            @else
             <li class="nav-item">
-              <a class="nav-link disabled" href="#">Asesores</a>
+            @endif
+              <a class="nav-link" href="/turnos">Turnos</a>
             </li>
           @endif
           </ul>

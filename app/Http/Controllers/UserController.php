@@ -14,9 +14,7 @@ class UserController extends Controller
     {
         //$users = DB::table('users')->get();
         $users = User::all();
-
         //dd($users);
-
         $title = 'Listado de asesores';
 
         return view('users.index', compact('title', 'users'));
@@ -29,7 +27,8 @@ class UserController extends Controller
 
     public function create()
     {
-        return view('users.create');
+        $title = 'Crear asesor';
+        return view('users.create', compact('title'));
     }
 
     public function store()
@@ -64,7 +63,8 @@ class UserController extends Controller
 
     public function edit(User $user)
     {
-        return view('users.edit', ['user' => $user]);
+        $title = 'Editar asesor';
+        return view('users.edit', ['user' => $user, 'title' => $title]);
     }
 
     public function update(User $user)

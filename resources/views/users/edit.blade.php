@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="card col-md-8">
-    <h4 class="card-header">Editar asesor</h4>
+    <h4 class="card-header">{{ $title }}</h4>
     <div class="card-body">
         @if ($errors->any())
         <div class="alert alert-danger">

@@ -49,10 +49,23 @@ Route::get('/clientes/orden/{orden}', 'ClienteController@index')
 
 Route::resource('clientes', 'ClienteController');
 
-Route::get('/clientes/orden/{orden}', 'ClienteController@index')
-    ->name('clientes.orden');
+Route::get('/turnos', 'TurnoController@index')
+    ->name('turnos');
 
-//Route::get('/clientes/filtrar/{filtro}', 'ClienteController@filtro')
+Route::get('/turnos/crear/{semana}', 'TurnoController@crear')
+    ->name('turnos.crear');
+
+Route::post('/turnos', 'TurnoController@store');
+
+Route::get('/turnos/{turno}/editar', 'TurnoController@editar')
+    ->name('turnos.editar');
+
+Route::put('/turnos/{turno}', 'TurnoController@update');
+
+Route::delete('/turnos/{turno}', 'TurnoController@destroy')
+    ->name('turnos.destroy');
+
+    //Route::get('/clientes/filtrar/{filtro}', 'ClienteController@filtro')
 //    ->name('clientes.filtro');
 
 //Route::get('/home', 'ClienteController@create')

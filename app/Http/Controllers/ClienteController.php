@@ -87,6 +87,8 @@ class ClienteController extends Controller
         if (!(Auth::check())) {
             return redirect('login');
         }
+
+        $title = 'Crear cliente';
         $deseos = Deseo::all();
         $origenes = Origen::all();
         $precios = Precio::all();
@@ -95,7 +97,9 @@ class ClienteController extends Controller
         $zonas = Zona::all();
         $ddns = Venezueladdn::distinct()->get(['ddn'])->all();
 
-        return view('clientes.create', compact('deseos', 'origenes', 'precios', 'propiedades', 'resultados', 'zonas', 'ddns'));
+        return view('clientes.create', compact(
+            'title', 'deseos', 'origenes', 'precios',
+            'propiedades', 'resultados', 'zonas', 'ddns'));
     }
 
     /**
@@ -208,16 +212,13 @@ class ClienteController extends Controller
             return redirect('/clientes');
         }
 
+        $title = 'Editar cliente';
         $ddns = Venezueladdn::distinct()->get(['ddn'])->all();
 
-        if (1 == Auth::user()->is_admin) {
-            return view('clientes.edit', ['cliente' => $cliente, 'ddns' => $ddns]);
+        if ((1 == Auth::user()->is_admin) or ($cliente->user->id == Auth::user()->id)) {
+            return view('clientes.edit', ['cliente' => $cliente, 'title' => $title, 'ddns' => $ddns]);
         }
-        if ($cliente->user->id == Auth::user()->id) {
-            return view('clientes.edit', ['cliente' => $cliente, 'ddns' => $ddns]);
-        } else {
-            return redirect('/clientes');
-        }
+        return redirect('/clientes');
     }
 
     /**

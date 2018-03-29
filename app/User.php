@@ -35,6 +35,11 @@ class User extends Authenticatable
         return $this->hasMany(Cliente::class); // Si llave foranea, diferente a esperada, usamos 2do parametro.
     }
 
+    public function turnos()    // user_id
+    {
+        return $this->hasMany(Turno::class); // Si llave foranea, diferente a esperada, usamos 2do parametro.
+    }
+
     public function scopeOfAdmin($query)
     {
         return $query->where('is_admin', 1);

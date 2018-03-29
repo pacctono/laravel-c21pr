@@ -18,6 +18,6 @@ class Admin
         if (1 == auth()->user()->is_admin) {
             return $next($request);
         }
-        return redirect('home')->with('error', 'No puedes acceder esa página.');
+        return redirect('home')->with('error', ['No puedes acceder esa página.']);
     }
 }

@@ -63,19 +63,21 @@
               <a class="nav-link" href="{{ route('login') }}">{{ __('Login') }}</a>
             </li>
           @else
-            <li class="nav-item">
-              <div class="dropdown">
-                <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
-                  {{ Auth::user()->name }}
-                </button>
-                <div class="dropdown-menu">
-                  <a class="dropdown-item" href="#">Logout</a>
-                </div>
+            <li class="nav-item dropdown">
+              <button type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown">
+                {{ Auth::user()->name }}
+              </button>
+              <div class="dropdown-menu">
+                <a class="dropdown-item active" href="{{ route('logout') }}"
+                    onclick="event.preventDefault();
+                    document.getElementById('logout-form').submit();">
+                  Logout
+                </a>
+                <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                  @csrf
+                </form>
               </div>
             </li>
-              <!-- form id="logout-form" action="{{ route('logout') }}" method="POST" class="form-inline mt-2 mt-md-0">
-                <button class="btn btn-outline-success my-2 my-sm-0" type="submit">{{ Auth::user()->name }}</button>
-              </form -->
           @endguest
           </ul>
         </div>

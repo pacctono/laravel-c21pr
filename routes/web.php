@@ -65,6 +65,10 @@ Route::put('/turnos/{turno}', 'TurnoController@update');
 Route::delete('/turnos/{turno}', 'TurnoController@destroy')
     ->name('turnos.destroy');
 
+Route::get('/turnos/orden/{orden}', 'TurnoController@index')
+    ->name('turnos.orden');
+
+
     //Route::get('/clientes/filtrar/{filtro}', 'ClienteController@filtro')
 //    ->name('clientes.filtro');
 

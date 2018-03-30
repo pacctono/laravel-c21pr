@@ -15,101 +15,130 @@
     </div>
     @endif
 
-    <table class="table table-striped table-hover table-bordered">
-        <thead class="thead-dark">
-        <tr>
-            <th scope="col">Turno</th>
-            @foreach ($diaSemana as $dia)
-                <th scope="col">{{ $dia }}</th>
-            @endforeach
-        </tr>
-        </thead>
-        <tbody>
-        <tr>
-            <th scope="col">Mañana</th>
-            @foreach ($diaSemana as $dia)
-                <td>
-                    <select name="{{ $dia }}Am" id="{{ $dia }}Am">
-                      <option value="">mañana {{ $dia }}</option>
-                        @foreach ($users as $user)
-                        @if (old("{{ $dia }}Am") == $user->id)
-                          <option value="{{ $user->id }}" selected>{{ $user->name }}</option>
-                        @else
-                          <option value="{{ $user->id }}">{{ $user->name }}</option>
-                        @endif
-                        @endforeach
-                    </select>
-                </td>
-            @endforeach
-        </tr>
-        <tr>
-            <th scope="col">Tarde</th>
-            @foreach ($diaSemana as $dia)
-              @if ('Sabado' != $dia)
-                <td>
-                    <select name="{{ $dia }}Pm" id="{{ $dia }}Pm">
-                      <option value="">tarde {{ $dia }}</option>
-                        @foreach ($users as $user)
-                        @if (old("{{ $dia }}Pm") == $user->id)
-                          <option value="{{ $user->id }}" selected>{{ $user->name }}</option>
-                        @else
-                          <option value="{{ $user->id }}">{{ $user->name }}</option>
-                        @endif
-                        @endforeach
-                    </select>
-                </td>
-              @endif
-            @endforeach
-        </tr>
-        </tbody>
+    <form method="POST" action="{{ url('/turnos') }}">
+        {!! csrf_field() !!}
 
-        <thead class="thead-dark">
-        <tr>
-            <th scope="col">Turno</th>
-            @foreach ($diaSemana as $dia)
-                <th scope="col">{{ $dia }}</th>
-            @endforeach
-        </tr>
-        </thead>
-        <tbody>
-        <tr>
-            <th scope="col">Mañana</th>
-            @foreach ($diaSemana as $dia)
-                <td>
-                    <select name="{{ $dia }}Am" id="{{ $dia }}Am">
-                      <option value="">mañana {{ $dia }}</option>
-                        @foreach ($users as $user)
-                        @if (old("{{ $dia }}Am") == $user->id)
-                          <option value="{{ $user->id }}" selected>{{ $user->name }}</option>
-                        @else
-                          <option value="{{ $user->id }}">{{ $user->name }}</option>
-                        @endif
+        <table class="table table-striped table-bordered">
+            <thead class="thead-dark">
+            <tr>
+                <th scope="col">Turno</th>
+                @for ($d = 0; $d < 3; $d++)
+                    <th scope="col">{{ $diaSemana[$d] }}</th>
+                    @if ('Miercoles' == $diaSemana[$d])
+                        @break;
+                    @endif
+                @endfor
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <th scope="col">Mañana</th>
+                @for ($d = 0; $d < 3; $d++)
+                    <td>
+                        <select required name="u{{ $d }}" id="u{{ $d }}">
+                            <option value="">mañana {{ $diaSemana[$d] }}</option>
+                            @foreach ($users as $user)
+                            @if (old("u{{ $d }}") == $user->id)
+                            <option value="{{ $user->id }}" selected>{{ $user->name }}</option>
+                            @else
+                            <option value="{{ $user->id }}">{{ $user->name }}</option>
+                            @endif
+                            @endforeach
+                            <option value="999">Feriado</option>
+                        </select>
+                        <input type="hidden" name="f{{ $d }}" value="{{ $dia[$d] }} 08">
+                    </td>
+                @endfor
+            </tr>
+            <tr>
+                <th scope="col">Tarde</th>
+                @for ($d = 0; $d < 3; $d++)
+                @if ('Sabado' != $diaSemana[$d])
+                    <td>
+                        <select required name="u{{ 3+$d }}" id="u{{ 3+$d }}">
+                            <option value="">tarde {{ $diaSemana[$d] }}</option>
+                            @foreach ($users as $user)
+                            @if (old("u{{ 3+$d }}") == $user->id)
+                            <option value="{{ $user->id }}" selected>{{ $user->name }}</option>
+                            @else
+                            <option value="{{ $user->id }}">{{ $user->name }}</option>
+                            @endif
+                            @endforeach
+                            <option value="999">Feriado</option>
+                        </select>
+                        <input type="hidden" name="f{{ 3+$d }}" value="{{ $dia[$d] }} 12">
+                    </td>
+                @endif
+                @endfor
+            </tr>
+            </tbody>
+
+            <thead class="thead-dark">
+            <tr>
+                <th scope="col">Turno</th>
+                @for ($d = 3; $d < 6; $d++)
+                    <th scope="col">{{ $diaSemana[$d] }}</th>
+                @endfor
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <th scope="col">Mañana</th>
+                @for ($d = 3; $d < 6; $d++)
+                    <td>
+                        <select required name="u{{ 3+$d }}" id="u{{ 3+$d }}">
+                            <option value="">mañana {{ $diaSemana[$d] }}</option>
+                            @foreach ($users as $user)
+                            @if (old("u{{ 3+$d }}") == $user->id)
+                            <option value="{{ $user->id }}" selected>{{ $user->name }}</option>
+                            @else
+                            <option value="{{ $user->id }}">{{ $user->name }}</option>
+                            @endif
+                            @endforeach
+                            <option value="999">Feriado</option>
+                        </select>
+                        <input type="hidden" name="f{{ 3+$d }}" value="{{ $dia[$d] }} 08">
+                    </td>
+                @endfor
+            </tr>
+            <tr>
+                <th scope="col">Tarde</th>
+                @for ($d = 3; $d < 6; $d++)
+                @if ('Sabado' != $diaSemana[$d])
+                    <td>
+                        <select required name="u{{ 6+$d }}" id="u{{ 6+$d }}">
+                            <option value="">tarde {{ $diaSemana[$d] }}</option>
+                            @foreach ($users as $user)
+                            @if (old("u{{ 6+$d }}") == $user->id)
+                            <option value="{{ $user->id }}" selected>{{ $user->name }}</option>
+                            @else
+                            <option value="{{ $user->id }}">{{ $user->name }}</option>
+                            @endif
+                            @endforeach
+                            <option value="999">Feriado</option>
+                        </select>
+                        <input type="hidden" name="f{{ 6+$d }}" value="{{ $dia[$d] }} 12">
+                    </td>
+                @endif
+                @endfor
+            </tr>
+            <tr>
+                <td colspan="2"><button type="submit" class="btn btn-primary">Crear Turno</button></td>
+                <td colspan="2">Crear y preparar 
+                    <select name="semana" id="semana">
+                        <option value="">Semana</option>
+                        @foreach ($semanas as $semana)
+                            <option value="{{ $loop->iteration }}">
+                                {{ $diaSemana[$semana->dayOfWeek] }}
+                                {{ $semana->format('d/m/Y') }}
+                            </option>
                         @endforeach
                     </select>
                 </td>
-            @endforeach
-        </tr>
-        <tr>
-            <th scope="col">Tarde</th>
-            @foreach ($diaSemana as $dia)
-              @if ('Sabado' != $dia)
-                <td>
-                    <select name="{{ $dia }}Pm" id="{{ $dia }}Pm">
-                      <option value="">tarde {{ $dia }}</option>
-                        @foreach ($users as $user)
-                        @if (old("{{ $dia }}Pm") == $user->id)
-                          <option value="{{ $user->id }}" selected>{{ $user->name }}</option>
-                        @else
-                          <option value="{{ $user->id }}">{{ $user->name }}</option>
-                        @endif
-                        @endforeach
-                    </select>
-                </td>
-              @endif
-            @endforeach
-        </tr>
-        </tbody>
-    </table>    
+            </tr>
+            </tbody>
+        </table> 
+    </form>   
     </div>
 </div>
 

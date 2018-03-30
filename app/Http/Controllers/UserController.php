@@ -6,16 +6,26 @@ use App\User;
 use Illuminate\Validation\Rule;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
 
 class UserController extends Controller
 {
 
-    public function index()
+    public function index($orden = null)
     {
+        if (!(Auth::check())) {
+            return redirect('login');
+        }
+
         //$users = DB::table('users')->get();
-        $users = User::all();
-        //dd($users);
         $title = 'Listado de asesores';
+
+        if ('' == $orden or $orden == null) {
+            $orden = 'id';
+        }
+        $users = User::orderBy($orden)->paginate(10);
+        //dd($users);
 
         return view('users.index', compact('title', 'users'));
     }

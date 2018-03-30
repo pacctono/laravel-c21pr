@@ -40,6 +40,7 @@
         @endForeach
         </tbody>
     </table>
+    {{ $users->links() }}
     @else
         <p>No hay asesores registrados.</p>
     @endif

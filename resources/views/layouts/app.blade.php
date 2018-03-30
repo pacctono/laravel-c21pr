@@ -42,22 +42,20 @@
           @endif
               <a class="nav-link" href="/clientes">Clientes</a>
             </li>
-          @if (1 == Auth::user()->is_admin)
-            @if ('users' == substr($view_name, 0, 5))
+          @if ('users' == substr($view_name, 0, 5))
             <li class="nav-item active">
-            @else
+          @else
             <li class="nav-item">
-            @endif
+          @endif
               <a class="nav-link" href="/usuarios">Asesores</a>
             </li>
-            @if ('turnos' == substr($view_name, 0, 6))
+          @if ('turnos' == substr($view_name, 0, 6))
             <li class="nav-item active">
-            @else
+          @else
             <li class="nav-item">
-            @endif
+          @endif
               <a class="nav-link" href="/turnos">Turnos</a>
             </li>
-          @endif
           </ul>
           @endauth
           <ul class="navbar-nav ml-auto col-md-2">

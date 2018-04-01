@@ -44,10 +44,11 @@ Route::delete('/usuarios/{user}', 'UserController@destroy')
     ->name('users.destroy')
     ->middleware('admin');
 
+Route::pattern('clientes', '[0-9]+');               // Para no crear conflictos con el resource cliente
+Route::resource('clientes', 'ClienteController');
+
 Route::get('/clientes/orden/{orden}', 'ClienteController@index')
     ->name('clientes.orden');
-
-Route::resource('clientes', 'ClienteController');
 
 Route::get('/turnos', 'TurnoController@index')
     ->name('turnos');
@@ -69,7 +70,7 @@ Route::get('/turnos/orden/{orden}', 'TurnoController@index')
     ->name('turnos.orden');
 
 
-    //Route::get('/clientes/filtrar/{filtro}', 'ClienteController@filtro')
+//Route::get('/clientes/filtrar/{filtro}', 'ClienteController@filtro')
 //    ->name('clientes.filtro');
 
 //Route::get('/home', 'ClienteController@create')

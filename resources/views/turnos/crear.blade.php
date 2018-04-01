@@ -15,7 +15,7 @@
     </div>
     @endif
 
-    <form method="POST" action="{{ url('/turnos') }}">
+    <form method="POST" action="{{ url('/turnos') }}" id="forma-crear-turnos">
         {!! csrf_field() !!}
 
         <table class="table table-striped table-bordered">
@@ -123,13 +123,18 @@
                 @endfor
             </tr>
             <tr>
-                <td colspan="2"><button type="submit" class="btn btn-primary">Crear Turno</button></td>
+                <td colspan="2">
+                    <button type="submit" class="btn btn-primary" id="crear-turnos">
+                        Crear Turno
+                    </button>
+                </td>
                 <td colspan="2">Crear y preparar 
-                    <select name="semana" id="semana">
+                    <select name="semana" id="semana"
+                        onchange="document.getElementById('crear-turnos').click();">
                         <option value="">Semana</option>
                         @foreach ($semanas as $semana)
                             <option value="{{ $loop->iteration }}">
-                                {{ $diaSemana[$semana->dayOfWeek] }}
+                                {{ $diaSemana[$semana->dayOfWeek - 1] }}
                                 {{ $semana->format('d/m/Y') }}
                             </option>
                         @endforeach

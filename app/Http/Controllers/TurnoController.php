@@ -66,11 +66,10 @@ class TurnoController extends Controller
         $title .= $fecha->format('d/m/Y');
 
         $users = User::get(['id', 'name']);
-        for ($d = $semana+1; $d < 10; $d++) {
+        for ($d = $semana+1; $d < 11; $d++) {
             $semanas[$d] = (new Carbon('next monday'))->addWeeks($d);
         }
-
-        //dd($dia, $fecha);
+        //dd($semanas);
         return view('turnos.crear', compact('title', 'diaSemana', 'dia', 'users', 'semanas'));
     }
 

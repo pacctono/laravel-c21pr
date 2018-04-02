@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="card col-8">
+    <div class="card col-10">
         <h4 class="card-header">{{ $title }}</h4>
         <div class="card-body">
         @if ($errors->any())
@@ -15,31 +15,75 @@
         </div>
         @endif
 
-        <form method="POST" action="{{ url('/usuarios') }}">
+        <form method="POST" class="form-horizontal" action="{{ url('/usuarios') }}">
             {!! csrf_field() !!}
 
-            <div class="form-group d-flex align-items-end">
-                <label for="name">Nombre:</label>
-                <input type="text" maxlength="30" required name="name" class="form-control" id="name" placeholder="Pedro Perez" value="{{ old('name') }}">
+            <div class="form-group d-flex">
+                <label class="control-label col-sm-4" for="cedula">Cedula de identidad:</label>
+                <input type="text" class="form-control col-sm-2" size="8" maxlength="8" minlength="7" required name="cedula" id="cedula" placeholder="87654321" value="{{ old('cedula') }}">
             </div>
 
-            <div class="form-group d-flex align-items-end">
-                <label for="telefono">Telefono:</label>
-                0<input type="text" size="10" maxlength="10" minlength="10" required name="telefono" class="form-control" id="telefono" placeholder="xxxyyyyyyy" value="{{ old('telefono') }}">
+            <div class="form-group d-flex">
+                <label class="control-label col-sm-4" for="name">Nombre:</label>
+                <input type="text" class="form-control col-sm-5" size="30" maxlength="30" required name="name" id="name" placeholder="Pedro Perez" value="{{ old('name') }}">
             </div>
 
-            <div class="form-group d-flex align-items-end">
-                <label for="email">Correo electrónico:</label>
-                <input type="email" maxlength="30" required name="email" class="form-control" id="email" placeholder="pedro@example.com" value="{{ old('email') }}">
+            <div class="form-group d-flex">
+                <label class="control-label col-sm-4" for="telefono">Teléfono:</label>
+                0<select class="form-control col-sm-1" name="ddn" id="ddn">
+                  <option value="">ddn</option>
+                @foreach ($ddns as $ddn)
+                @if (old('ddn', '414') == $ddn->ddn)
+                  <option value="{{ $ddn->ddn }}" selected>{{ $ddn->ddn }}</option>
+                @else
+                  <option value="{{ $ddn->ddn }}">{{ $ddn->ddn }}</option>
+                @endif
+                @endforeach
+                </select>
+                <input type="text" class="form-control col-sm-2" size="7" maxlength="7" minlength="7" required name="telefono" id="telefono" placeholder="1234567" value="{{ old('telefono') }}">
             </div>
 
-            <div class="form-group d-flex align-items-end">
-                <label for="password">Contraseña:</label>
-                <input type="password" required name="password" class="form-control" id=password placeholder="Mayor a 6 caracteres">
+            <div class="form-group d-flex">
+                <label class="control-label col-sm-4" for="email">Correo electrónico personal:</label>
+                <input type="email" class="form-control col-sm-5" size="30" maxlength="30" required name="email" id="email" placeholder="pedro@example.com" value="{{ old('email') }}">
             </div>
-            <button type="submit" class="btn btn-primary">Crear Usuario</button>
-            <!-- a href="{{ action('UserController@index') }}">Regresar al listado de usuarios</a -->
-            <a href="{{ url('/usuarios') }}" class="btn btn-link">Regresar al listado de usuarios</a>
+
+            <div class="form-group d-flex">
+                <label class="control-label col-sm-4" for="fecha_nacimiento">Fecha de nacimiento:</label>
+                <input type="date" class="form-control col-sm-2" name="fecha_nacimiento" id="fecha_nacimiento"
+                        min="{{ now()->addYears(-120)->format('d/m/Y') }}" max="{{ now()->addYears(-18)->format('d/m/Y') }}"
+                        value="{{ old('fecha_nacimiento') }}">
+            </div>
+
+            <div class="form-group d-flex">
+                <label class="control-label col-sm-4" for="email_c21">Correo electrónico C21:</label>
+                <input type="email" class="form-control col-sm-5" size="30" maxlength="30" required name="email_c21"  id="email_c21" placeholder="pedro@c21.com" value="{{ old('email_c21') }}">
+            </div>
+
+            <div class="form-group d-flex">
+                <label class="control-label col-sm-4" for="licencia_mls">Licencia MLS:</label>
+                <input type="text" class="form-control col-sm-2" required size="6" maxlength="6"
+                    minlength="7" required name="licencia_mls" id="licencia_mls" placeholder="111111"
+                    value="{{ old('licencia_mls') }}">
+            </div>
+
+            <div class="form-group d-flex">
+                <label class="control-label col-sm-4" for="fecha_ingreso">Fecha de ingreso:</label>
+                <input type="date" class="form-control col-sm-3" required name="fecha_ingreso" id="fecha_ingreso"
+                        min="{{ now()->addYears(-3)->format('d/m/Y') }}" max="{{ now()->format('d/m/Y') }}"
+                        value="{{ old('fecha_ingreso') }}">
+            </div>
+
+            <div class="form-group d-flex">
+                <label class="control-label col-sm-4" for="password">Contraseña:</label>
+                <input type="password" class="form-control col-sm-2" required name="password" id=password
+                        placeholder="Mayor a 6 cars">
+            </div>
+            <div class="form-group d-flex">
+                <button type="submit" class="btn btn-primary col-sm-4">Crear Usuario</button>
+                <!-- a href="{{ action('UserController@index') }}">Regresar al listado de usuarios</a -->
+                <a href="{{ url('/usuarios') }}" class="btn btn-link col-sm-4">Regresar al listado de usuarios</a>
+            </div>
         </form>
         </div>
     </div>

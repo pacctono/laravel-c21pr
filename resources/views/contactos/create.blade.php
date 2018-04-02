@@ -15,7 +15,7 @@
     </div>
     @endif
 
-    <form method="POST" action="{{ url('clientes') }}">
+    <form method="POST" action="{{ url('contactos') }}">
         {!! csrf_field() !!}
 
         <div class="row">
@@ -144,13 +144,13 @@
 
         <div class="form-group d-flex align-items-end">
             <label for="observaciones">Observaciones:</label>
-            <textarea cols="5" rows="5" maxlength="190" class="form-control" name="observaciones" id="observaciones" placeholder="Coloque aqui las observaciones que tuvo de la conversación con el cliente.">{{ old('observaciones') }}</textarea>
+            <textarea cols="5" rows="5" maxlength="190" class="form-control" name="observaciones" id="observaciones" placeholder="Coloque aqui las observaciones que tuvo de la conversación con el contacto inicial.">{{ old('observaciones') }}</textarea>
         </div>
 
         <div class="row">
             <div class="form-group d-flex align-items-end">
-                <button type="submit" class="btn btn-success">Agregar cliente</button>
-                <a href="{{ url('/clientes') }}" class="btn btn-link">Regresar al listado de contactos iniciales</a>
+                <button type="submit" class="btn btn-success">Agregar contacto inicial</button>
+                <a href="{{ url('/contactos') }}" class="btn btn-link">Regresar al listado de contactos iniciales</a>
             </div>
         </div>
     </form>

@@ -35,12 +35,12 @@
           @endif
                 <a class="nav-link" href="/home">Home <!-- span class="sr-only">(current)</span --></a>
             </li>
-          @if ('clientes' == substr($view_name, 0, 8))
+          @if ('contactos' == substr($view_name, 0, 9))
             <li class="nav-item active">
           @else
             <li class="nav-item">
           @endif
-              <a class="nav-link" href="/clientes">Clientes</a>
+              <a class="nav-link" href="/contactos">Contactos</a>
             </li>
           @if ('users' == substr($view_name, 0, 5))
             <li class="nav-item active">

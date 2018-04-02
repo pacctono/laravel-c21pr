@@ -1,5 +1,6 @@
 <?php
-use App\Cliente;
+
+use App\Contacto;
 use App\User;
 use App\Deseo;
 use App\Propiedad;
@@ -9,7 +10,8 @@ use App\Origen;
 use App\Resultado;
 use Faker\Generator as Faker;
 
-$factory->define(Cliente::class, function (Faker $faker) {
+$factory->define(Contacto::class, function (Faker $faker) {
+    $fecha_contacto = $faker->dateTimeThisYear('now');
     return [
         'cedula' => $faker->randomNumber(8),
         'name' => $faker->name,
@@ -27,6 +29,7 @@ $factory->define(Cliente::class, function (Faker $faker) {
         'origen_id' => $faker->numberBetween(1, Origen::count()),
         'resultado_id' => $faker->numberBetween(1, Resultado::count()),
         'observaciones' => $faker->sentence(7, false),
-        'created_at' => $faker->dateTimeThisYear('now'),
+        'fecha_evento' => $faker->datetimeInInterval($fecha_contacto, '+ 10 days'),
+        'created_at' => $fecha_contacto,
     ];
 });

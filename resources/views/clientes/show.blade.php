@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="card">
-    <h4 class="card-header">Cliente: {{ $cliente->name }}</h4>
+    <h4 class="card-header">Contacto inicial: {{ $cliente->name }}</h4>
     <div class="card-body">
         <p>Este nombre ha contactado: <spam class="alert-info">{{ $cliente->veces_name }}
         @if (1 >= $cliente->veces_name)
@@ -11,7 +11,7 @@
                 veces.
             @endif
         </spam></p>
-        <p>Telefono del cliente: <spam class="alert-info">
+        <p>Telefono de contacto: <spam class="alert-info">
             0{{ substr($cliente->telefono, 0, 3) }}-{{ substr($cliente->telefono, 3) }}
         </spam></p>
         <p>Este telefono ha contactado: <spam class="alert-info">{{ $cliente->veces_telefono }}
@@ -21,7 +21,7 @@
                 veces.
             @endif
         </spam></p>
-        <p>Correo del cliente: <spam class="alert-info">{{ $cliente->email }}
+        <p>Correo de contacto: <spam class="alert-info">{{ $cliente->email }}
         </spam></p>
         <p>Este correo ha contactado: <spam class="alert-info">{{ $cliente->veces_email }}
             @if (1 >= $cliente->veces_email)

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\User;
+use App\Venezueladdn;
 use Illuminate\Validation\Rule;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -38,7 +39,9 @@ class UserController extends Controller
     public function create()
     {
         $title = 'Crear asesor';
-        return view('users.create', compact('title'));
+        $ddns = Venezueladdn::distinct()->get(['ddn'])->all();
+
+        return view('users.create', compact('title', 'ddns'));
     }
 
     public function store()
@@ -74,7 +77,9 @@ class UserController extends Controller
     public function edit(User $user)
     {
         $title = 'Editar asesor';
-        return view('users.edit', ['user' => $user, 'title' => $title]);
+        $ddns = Venezueladdn::distinct()->get(['ddn'])->all();
+
+        return view('users.edit', ['user' => $user, 'title' => $title, 'ddns' => $ddns]);
     }
 
     public function update(User $user)

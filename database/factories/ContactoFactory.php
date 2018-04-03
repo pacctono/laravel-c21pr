@@ -8,15 +8,21 @@ use App\Zona;
 use App\Precio;
 use App\Origen;
 use App\Resultado;
+use App\Venezueladdn;
+use Illuminate\Support\Facades\DB;
 use Faker\Generator as Faker;
 
 $factory->define(Contacto::class, function (Faker $faker) {
     $fecha_contacto = $faker->dateTimeThisYear('now');
+    $ddns = DB::table('venezueladdns')->distinct()->pluck('ddn')->all();
+    $ddn = $faker->randomElement($ddns);
+    $telefono = $ddn . $faker->unique()->randomNumber(7, true);
+
     return [
         'cedula' => $faker->randomNumber(8),
         'name' => $faker->name,
         'veces_name' => 1,
-        'telefono' => $faker->unique()->isbn10,
+        'telefono' => $telefono,
         'veces_telefono' => 1,
         'user_id' => $faker->numberBetween(1, User::count()),
         'email' => $faker->unique()->safeEmail,

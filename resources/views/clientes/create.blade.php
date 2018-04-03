@@ -15,11 +15,11 @@
     </div>
     @endif
 
-    <form method="POST" action="{{ url('clientes') }}">
+    <form method="POST" class="form-horizontal" action="{{ url('clientes') }}">
         {!! csrf_field() !!}
 
         <div class="row">
-            <div class="form-group d-flex align-items-end">
+            <div class="form-group d-flex">
                 <label for="cedula">Cedula:</label>
                 <input type="number" size="8" maxlength="8" minlength="7" name="name" id="name" placeholder="12345678" value="{{ old('cedula') }}">
                 &nbsp;
@@ -29,7 +29,7 @@
         </div>
 
         <div class="row">
-            <div class="form-group d-flex align-items-end">
+            <div class="form-group d-flex">
                 <label for="telefono">Teléfono:</label>
                 <select name="ddn" id="ddn">
                   <option value="">ddn</option>
@@ -48,13 +48,13 @@
             </div>
         </div>
 
-        <div class="form-group d-flex align-items-end">
+        <div class="form-group d-flex">
             <label for="direccion">Dirección:</label>
             <textarea cols="5" rows="4" maxlength="190" class="form-control" name="direccion" id="direccion" placeholder="Calle, Casa, Apto, Edificio, Barrio, Ciudad">{{ old('direccion') }}</textarea>
         </div>
 
         <div class="row">
-            <div class="form-group d-flex align-items-end">
+            <div class="form-group d-flex">
                 <label for="deseo">Desea:</label>
                 <select name="deseo_id" id="deseo">
                   <option value="">Qué desea hacer?</option>
@@ -82,7 +82,7 @@
         </div>
 
         <div class="row">
-            <div class="form-group d-flex align-items-end">
+            <div class="form-group d-flex">
             <label for="zona">Zona:</label>
                 <select name="zona_id" id="zona">
                   <option value="">Qué zona?</option>
@@ -110,7 +110,7 @@
         </div>
 
         <div class="row">
-            <div class="form-group d-flex align-items-end">
+            <div class="form-group d-flex">
             <label for="origen">Origen:</label>
                 <select name="origen_id" id="origen">
                   <option value="">Cómo supo de nosotros?</option>
@@ -142,13 +142,13 @@
             </div>
         </div>
 
-        <div class="form-group d-flex align-items-end">
+        <div class="form-group d-flex">
             <label for="observaciones">Observaciones:</label>
             <textarea cols="5" rows="5" maxlength="190" class="form-control" name="observaciones" id="observaciones" placeholder="Coloque aqui las observaciones que tuvo de la conversación con el cliente.">{{ old('observaciones') }}</textarea>
         </div>
 
         <div class="row">
-            <div class="form-group d-flex align-items-end">
+            <div class="form-group d-flex">
                 <button type="submit" class="btn btn-success">Agregar cliente</button>
                 <a href="{{ url('/clientes') }}" class="btn btn-link">Regresar al listado de contactos iniciales</a>
             </div>

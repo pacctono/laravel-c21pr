@@ -48,11 +48,13 @@ class UserController extends Controller
     {
 //        $data = request()->all();   // all() ---> only(campos requeridos separados por ,)
         $data = request()->validate([   // Si ocurre error, laravel nos envia al url anterior.
+            'cedula' => ['sometimes', 'nullable', 'digits_between:7,8'],
             'name' => 'required',
             'telefono' => 'required',
             'email' => ['required', 'email', 'unique:users,email'],   // 'required|email|...'
             'password' => ['required']
         ], [
+            'cedula.digits_between' => 'La cedula de ideintidad debe contener 7 u 8 digitos',
             'name.required' => 'El campo nombre es obligatorio',
             'telefono.required' => 'El teléfono debe ser suministrado',
             'email.required' => 'El correo electrónico es obligatorio suministrarlo',

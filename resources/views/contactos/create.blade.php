@@ -15,22 +15,25 @@
     </div>
     @endif
 
-    <form method="POST" action="{{ url('contactos') }}">
+    <form method="POST" class="form align-items-end-horizontal" action="{{ url('contactos') }}">
         {!! csrf_field() !!}
 
         <div class="row">
-            <div class="form-group d-flex align-items-end">
-                <label for="cedula">Cedula:</label>
-                <input type="number" size="8" maxlength="8" minlength="7" name="name" id="name" placeholder="12345678" value="{{ old('cedula') }}">
+            <div class="form-group d-flex">
+                <label class="control-label col-sm-2" for="cedula">Cedula:</label>
+                <input type="text" class="form-control col-sm-3" size="8" maxlength="8" minlength="7" 
+                        name="cedula" id="cedula" placeholder="12345678" value="{{ old('cedula') }}">
                 &nbsp;
-                <label for="name">Nombre:</label>
-                <input type="text" required size="30" maxlength="30" name="name" id="name" placeholder="Pedro Perez" value="{{ old('name') }}">
+                <label class="control-label col-sm-2" for="name">Nombre:</label>
+                <input type="text" class="form-control col-sm-5" required size="30" maxlength="30" 
+                        name="name" id="name" placeholder="Pedro Perez" value="{{ old('name') }}">
             </div>
         </div>
 
         <div class="row">
-            <div class="form-group d-flex align-items-end">
-                <label for="telefono">Teléfono:</label>
+            <div class="form-group d-flex">
+              <label class="control-label col-sm-2" for="telefono">Teléfono:</label>
+              <div class="form-control col-sm-3">
                 <select name="ddn" id="ddn">
                   <option value="">ddn</option>
                 @foreach ($ddns as $ddn)
@@ -41,21 +44,25 @@
                 @endif
                 @endforeach
                 </select>
-                <input type="text" size="7" maxlength="7" name="telefono" id="telefono" placeholder="1234567" value="{{ old('telefono') }}">
-                &nbsp;
-                <label for="email">Correo electrónico:</label>
-                <input type="email" size="30" maxlength="30" name="email" id="email" placeholder="pedro@example.com" value="{{ old('email') }}">
+                <input type="text" size="7" maxlength="7" name="telefono" id="telefono" 
+                        placeholder="1234567" value="{{ old('telefono') }}">
+              </div>
+                <label class="control-label col-sm-2" for="email">Correo electrónico:</label>
+                <input type="email" class="form-control col-sm-5" size="30" maxlength="30" name="email" 
+                        id="email" placeholder="pedro@example.com" value="{{ old('email') }}">
             </div>
         </div>
 
-        <div class="form-group d-flex align-items-end">
-            <label for="direccion">Dirección:</label>
-            <textarea cols="5" rows="4" maxlength="190" class="form-control" name="direccion" id="direccion" placeholder="Calle, Casa, Apto, Edificio, Barrio, Ciudad">{{ old('direccion') }}</textarea>
+        <div class="form-group d-flex">
+            <label class="control-label col-sm-2" for="direccion">Dirección:</label>
+            <textarea class="form-control col-sm-10" cols="5" rows="4" maxlength="190" name="direccion" 
+              id="direccion" placeholder="Calle, Casa, Apto, Edificio, Barrio, Ciudad">{{ old('direccion') }}</textarea>
         </div>
 
         <div class="row">
-            <div class="form-group d-flex align-items-end">
-                <label for="deseo">Desea:</label>
+            <div class="form-group d-flex">
+              <label class="control-label col-sm-2" for="deseo">Desea:</label>
+              <div class="form-control col-sm-4">
                 <select name="deseo_id" id="deseo">
                   <option value="">Qué desea hacer?</option>
                 @foreach ($deseos as $deseo)
@@ -66,8 +73,9 @@
                 @endif
                 @endforeach
                 </select>
-                &nbsp;
-                <label for="propiedad">Propiedad:</label>
+              </div>
+              <label class="control-label col-sm-3" for="propiedad">Propiedad:</label>
+              <div class="form-control col-sm-3">
                 <select name="propiedad_id" id="propiedad_id">
                   <option value="">Qué propiedad?</option>
                 @foreach ($propiedades as $propiedad)
@@ -78,12 +86,14 @@
                 @endif
                 @endforeach
                 </select>
+              </div>
             </div>
         </div>
 
         <div class="row">
-            <div class="form-group d-flex align-items-end">
-            <label for="zona">Zona:</label>
+            <div class="form-group d-flex">
+              <label class="control-label col-sm-2" for="zona">Zona:</label>
+              <div class="form-control col-sm-4">
                 <select name="zona_id" id="zona">
                   <option value="">Qué zona?</option>
                 @foreach ($zonas as $zona)
@@ -94,8 +104,9 @@
                 @endif
                 @endforeach
                 </select>
-                &nbsp;
-                <label for="precio">Precio:</label>
+              </div>
+              <label class="control-label col-sm-2" for="precio">Precio:</label>
+              <div class="form-control col-sm-4">
                 <select name="precio_id" id="precio">
                   <option value="">Qué precio?</option>
                 @foreach ($precios as $precio)
@@ -106,13 +117,15 @@
                 @endif
                 @endforeach
                 </select>
+              </div>
             </div>
         </div>
 
         <div class="row">
-            <div class="form-group d-flex align-items-end">
-            <label for="origen">Origen:</label>
-                <select name="origen_id" id="origen">
+            <div class="form-group d-flex">
+              <label class="control-label col-sm-2" for="origen">Origen:</label>
+              <div class="form-control col-sm-4">
+                <select name="origen_id" id="origen_id">
                   <option value="">Cómo supo de nosotros?</option>
                 @foreach ($origenes as $origen)
                 @if (old('origen_id') == $origen->id)
@@ -122,8 +135,9 @@
                 @endif
                 @endforeach
                 </select>
-                &nbsp;
-                <label for="resultado">Resultado:</label>
+              </div>
+              <label class="control-label col-sm-2" for="resultado">Resultado:</label>
+              <div class="form-control col-sm-4">
                 <select name="resultado_id" id="resultado">
                   <option value="">Cuál fue el resultado?</option>
                 @foreach ($resultados as $resultado)
@@ -139,17 +153,20 @@
                         min="{{ now()->format('d/m/Y') }}" max="{{ now()->addWeeks(4)->format('d/m/Y') }}"
                         value="{{ old('fecha_evento') }}">
                 <input type="time" name="hora_evento" id="hora_evento" value="{{ old('hora_evento') }}">
+              </div>
             </div>
         </div>
 
-        <div class="form-group d-flex align-items-end">
-            <label for="observaciones">Observaciones:</label>
-            <textarea cols="5" rows="5" maxlength="190" class="form-control" name="observaciones" id="observaciones" placeholder="Coloque aqui las observaciones que tuvo de la conversación con el contacto inicial.">{{ old('observaciones') }}</textarea>
+        <div class="form-group d-flex">
+            <label class="control-label col-sm-2" for="observaciones">Observaciones:</label>
+            <textarea class="form-control col-sm-10" cols="5" rows="5" maxlength="190" 
+                      name="observaciones" id="observaciones" 
+                      placeholder="Coloque aqui las observaciones que tuvo de la conversación con el contacto inicial.">{{ old('observaciones') }}</textarea>
         </div>
 
         <div class="row">
-            <div class="form-group d-flex align-items-end">
-                <button type="submit" class="btn btn-success">Agregar contacto inicial</button>
+            <div class="form-group d-flex">
+                <button type="submit" class="btn btn-success col-sm-5">Agregar contacto inicial</button>
                 <a href="{{ url('/contactos') }}" class="btn btn-link">Regresar al listado de contactos iniciales</a>
             </div>
         </div>

@@ -20,7 +20,8 @@ class ContactoController extends Controller
     protected $diaSemana = [
         'Domingo', 'Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado'
     ];
-    protected $tipo = 'Contactos Iniciales';
+    protected $tipo = 'Contacto Inicial';
+    protected $tipoPlural = 'Contactos Iniciales';
     /**
      * Display a listing of the resource.
      *
@@ -32,7 +33,7 @@ class ContactoController extends Controller
             return redirect('login');
         }
 
-        $title = 'Listado de ' . $this->tipo;
+        $title = 'Listado de ' . $this->tipoPlural;
         $ruta = request()->path();
         $diaSemana = $this->diaSemana;
 
@@ -115,8 +116,8 @@ class ContactoController extends Controller
         $data = request()->validate([   // Si ocurre error, laravel nos envia al url anterior.
             'cedula' => ['sometimes', 'nullable', 'digits_between:7,8'],
             'name' => 'required',
-            'ddn' => ['sometimes', 'digits:3'],
-            'telefono' => ['sometimes', 'digits:7'],
+            'ddn' => ['sometimes', 'nullable', 'digits:3'],
+            'telefono' => ['sometimes', 'nullable', 'digits:7'],
             'email' => ['sometimes', 'nullable', 'email'],
             'direccion' => '',
             'deseo_id' => 'required',
@@ -125,7 +126,7 @@ class ContactoController extends Controller
             'precio_id' => 'required',
             'origen_id' => 'required',
             'resultado_id' => 'required',
-            'fecha_evento' => ['required_if:resultado_id,4,5,6,7', 'date'],
+            'fecha_evento' => ['sometimes', 'nullable', 'required_if:resultado_id,4,5,6,7', 'date'],
             'observaciones' => '',
         ], [
             'cedula.digits_between' => 'La cedula de ideintidad debe contener 7 u 8 digitos',
@@ -145,7 +146,8 @@ class ContactoController extends Controller
         //$data['user_id'] = intval($data['user_id']);
         //dd($data);
 
-        if ('' != $data['ddn'] and '' != $data['telefono']) {
+        if (null != $data['ddn'] and '' != $data['ddn'] and null != $data['telefono'] and
+                                                        '' != $data['telefono']) {
             $data['telefono'] = $data['ddn'] . $data['telefono'];
         } else {
             $data['telefono'] = '';
@@ -156,6 +158,7 @@ class ContactoController extends Controller
         $data['veces_email'] = Contacto::ofVeces($data['email'], 'email') + 1;
 
         Contacto::create([
+            'cedula' => $data['cedula'],
             'name' => $data['name'],
             'veces_name' => $data['veces_name'],
             'telefono' => $data['telefono'],
@@ -170,6 +173,7 @@ class ContactoController extends Controller
             'precio_id' => $data['precio_id'],
             'origen_id' => $data['origen_id'],
             'resultado_id' => $data['resultado_id'],
+            'fecha_evento' => $data['fecha_evento'],
             'observaciones' => $data['observaciones']
         ]);
 
@@ -219,6 +223,7 @@ class ContactoController extends Controller
         }
 
         $title = 'Editar ' . $this->tipo;
+
         $ddns = Venezueladdn::distinct()->get(['ddn'])->all();
 
         if ((1 == Auth::user()->is_admin) or ($contacto->user->id == Auth::user()->id)) {
@@ -237,6 +242,7 @@ class ContactoController extends Controller
     public function update(Request $request, Contacto $contacto)
     {
         $data = request()->validate([   // Si ocurre error, laravel nos envia al url anterior.
+            'cedula' => ['sometimes', 'nullable', 'digits_between:7,8'],
             'name' => 'required',
             'ddn' => '',
             'telefono' => '',
@@ -244,31 +250,33 @@ class ContactoController extends Controller
             'direccion' => '',
             'observaciones' => '',
         ], [
+            'cedula.digits_between' => 'La cedula de ideintidad debe contener 7 u 8 digitos',
             'name.required' => 'El campo nombre es obligatorio.',
             'email.email' => 'Debe suministrar un correo elctrónico válido.',
         ]);
 
         //dd($data);
 
-        if ('' != $data['ddn'] and '' != $data['telefono']) {
+        if (null != $data['ddn'] and '' != $data['ddn'] and null != $data['telefono'] and
+                                                        '' != $data['telefono']) {
             $data['telefono'] = $data['ddn'] . $data['telefono'];
         } else {
             $data['telefono'] = null;
         }
         unset($data['ddn']);
 
-        foreach (['telefono', 'email', 'direccion', 'observaciones'] as $col) {
+/*        foreach (['telefono', 'email', 'direccion', 'observaciones'] as $col) {
             if ('' == $data[$col] or $data[$col] == null) {
                 unset($data[$col]);
             }
-        }
-/*        if ('' == $data['telefono'] or $data['telefono'] == null) {
-            unset($data['telefono']);
+        }*/
+        if ('' == $data['telefono'] or $data['telefono'] == null) {
+            $data['veces_telefono'] = 0;
         }
         if ('' == $data['email'] or $data['email'] == null) {
-            unset($data['email']);
+            $data['veces_email'] = 0;
         }
-        if ('' == $data['direccion'] or $data['direccion'] == null) {
+/*        if ('' == $data['direccion'] or $data['direccion'] == null) {
             unset($data['direccion']);
         }
         if ('' == $data['observaciones'] or $data['observaciones'] == null) {

@@ -7,7 +7,7 @@
         {{ $diaSemana[$contacto->created_at->dayOfWeek] }}
         {{ $contacto->created_at->format('d/m/Y') }}.
         Ha contactado: <spam class="alert-info">{{ $contacto->veces_name }}
-        @if (1 >= $contacto->veces_name)
+        @if (1 == $contacto->veces_name)
                 vez.
             @else
                 veces.
@@ -15,11 +15,14 @@
         </spam>
     </h4>
     <div class="card-body">
+        <p>Cédula de Identidad: <spam class="alert-info">
+            {{ $contacto->cedula }}
+        </spam></p>
         <p>Telefono de contacto: <spam class="alert-info">
-            0{{ substr($contacto->telefono, 0, 3) }}-{{ substr($contacto->telefono, 3) }}
+            0{{ substr($contacto->telefono, 0, 3) }}-{{ substr($contacto->telefono, 3, 3) }}-{{ substr($contacto->telefono, 6) }}
         </spam>.
         Este telefono ha contactado: <spam class="alert-info">{{ $contacto->veces_telefono }}
-        @if (1 >= $contacto->veces_telefono)
+        @if (1 == $contacto->veces_telefono)
                 vez.
             @else
                 veces.
@@ -28,7 +31,7 @@
         <p>Correo de contacto: <spam class="alert-info">{{ $contacto->email }}
         </spam>.
         Este correo ha contactado: <spam class="alert-info">{{ $contacto->veces_email }}
-            @if (1 >= $contacto->veces_email)
+            @if (1 == $contacto->veces_email)
                 vez.
             @else
                 veces.
@@ -43,10 +46,10 @@
         Propiedad: <spam class="alert-info">{{ $contacto->propiedad->descripcion }}
         </spam></p>
         <p>Zona: <spam class="alert-info">{{ $contacto->zona->descripcion }}
-        </spam></p>
-        <p>Precio: <spam class="alert-info">{{ $contacto->precio->descripcion }}
         </spam>
-        Origen: <spam class="alert-info">{{ $contacto->origen->descripcion }}
+        Precio: <spam class="alert-info">{{ $contacto->precio->descripcion }}
+        </spam>
+        <p>Origen: <spam class="alert-info">{{ $contacto->origen->descripcion }}
         </spam></p>
         <p>Resultado:
             <spam class="alert-info">{{ $contacto->resultado->descripcion }}

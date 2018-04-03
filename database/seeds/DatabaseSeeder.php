@@ -30,10 +30,11 @@ class DatabaseSeeder extends Seeder
         $this->call(ResultadoSeeder::class);
         $this->call(ZonaSeeder::class);
         $this->call(ClienteSeeder::class);
-        $this->call(ContactoSeeder::class);
 
         DB::statement('INSERT INTO venezueladdns (estado_zona, ciudad_sector, ddn) SELECT estado_zona, ciudad_sector, ddn FROM pablo.venezueladdns;');
         DB::statement('CREATE INDEX ddn ON venezueladdns (ddn);');
+
+        $this->call(ContactoSeeder::class);
     }
 
     protected function truncateTables(array $tables)

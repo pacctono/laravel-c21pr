@@ -28,34 +28,25 @@
         <div class="collapse navbar-collapse" id="navbarCollapse">
         @auth
           <ul class="navbar-nav mr-auto col-md-10">
-          @if ('home' == substr($view_name, 0, 4))
+          @foreach (['home', 'contactos', 'users', 'turnos'] as $hMenu)
+            @if ($hMenu == substr($view_name, 0, ((strpos($view_name, '-'))?(strpos($view_name, '-')):4)))
             <li class="nav-item active">
-          @else
+            @else
             <li class="nav-item">
-          @endif
-                <a class="nav-link" href="/home">Home <!-- span class="sr-only">(current)</span --></a>
+            @endif
+            @if ('users' != $hMenu)
+              <a class="nav-link" href="/{{ $hMenu }}">
+            @else
+              <a class="nav-link" href="/usuarios">
+            @endif
+            @if ('users' != $hMenu)
+                {{ ucfirst($hMenu) }} <!-- span class="sr-only">(current)</span -->
+            @else
+              Asesores
+            @endif
+              </a>
             </li>
-          @if ('contactos' == substr($view_name, 0, 9))
-            <li class="nav-item active">
-          @else
-            <li class="nav-item">
-          @endif
-              <a class="nav-link" href="/contactos">Contactos</a>
-            </li>
-          @if ('users' == substr($view_name, 0, 5))
-            <li class="nav-item active">
-          @else
-            <li class="nav-item">
-          @endif
-              <a class="nav-link" href="/usuarios">Asesores</a>
-            </li>
-          @if ('turnos' == substr($view_name, 0, 6))
-            <li class="nav-item active">
-          @else
-            <li class="nav-item">
-          @endif
-              <a class="nav-link" href="/turnos">Turnos</a>
-            </li>
+          @endforeach
           </ul>
           @endauth
           <ul class="navbar-nav ml-auto col-md-2">
@@ -88,7 +79,7 @@
     <!-- Begin page content -->
     <main role="main" class="container">
         <div class="row mt-3">
-            <div class="col-md-12">
+            <div class="col-sm-12">
             @auth
               @yield('content')
             @else

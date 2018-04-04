@@ -14,6 +14,13 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/open-iconic/1.1.1/font/css/open-iconic-bootstrap.css" integrity="sha256-CNwnGWPO03a1kOlAsGaH5g8P3dFaqFqqGFV/1nkX5OU=" crossorigin="anonymous" />
     <!-- Custom styles for this template -->
     <link href="{{ asset('css/style.css') }}" rel="stylesheet">
+    <script>
+      window.onload=function() {
+        var $;
+
+        if (!$) { $ = document.getElementById; }
+      }
+    </script>
   </head>
 
   <body>
@@ -29,7 +36,8 @@
         @auth
           <ul class="navbar-nav mr-auto col-md-10">
           @foreach (['home', 'contactos', 'users', 'turnos'] as $hMenu)
-            @if ($hMenu == substr($view_name, 0, ((strpos($view_name, '-'))?(strpos($view_name, '-')):4)))
+            @if ($hMenu == substr($view_name, 0, 
+                ((strpos($view_name, '-'))?(strpos($view_name, '-')):4)))
             <li class="nav-item active">
             @else
             <li class="nav-item">

@@ -7,7 +7,18 @@
 
     @if (Auth::user()->is_admin)
     <p>
-        <a href="{{ route('turnos.crear', '0') }}" class="btn btn-primary">Preparar turno</a>
+        <!-- a href="{{ route('turnos.crear', '0') }}" class="btn btn-primary">Preparar turno</a -->
+        Preparar turno para:
+        <select name="semana" id="semana"
+          onchange="javascript:location.href = this.value;">
+          <option value="">Semana</option>
+          @foreach ($semanas as $semana)
+              <option value="{{ route('turnos.crear', $loop->index) }}">
+                  {{ $diaSemana[$semana->dayOfWeek] }}
+                  {{ $semana->format('d/m/Y') }}
+              </option>
+          @endforeach
+        </select>
     </p>
     @endif
 </div>

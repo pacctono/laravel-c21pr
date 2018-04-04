@@ -20,13 +20,11 @@ Auth::routes();
 Route::get('/home', 'HomeController@index')->name('home');
 
 Route::get('/usuarios', 'UserController@index')
-    ->name('users')
-    ->middleware('admin');
+    ->name('users');
 
 Route::get('/usuarios/{user}', 'UserController@show')
     ->where('user', '[0-9]+')
-    ->name('users.show')
-    ->middleware('admin');
+    ->name('users.show');
 
 Route::get('/usuarios/nuevo', 'UserController@create')
     ->name('users.create')
@@ -35,8 +33,7 @@ Route::get('/usuarios/nuevo', 'UserController@create')
 Route::post('/usuarios', 'UserController@store');
 
 Route::get('/usuarios/{user}/editar', 'UserController@edit')
-    ->name('users.edit')
-    ->middleware('admin');
+    ->name('users.edit');
 
 Route::put('/usuarios/{user}', 'UserController@update');
 

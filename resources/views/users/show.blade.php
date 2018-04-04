@@ -29,8 +29,12 @@
         </p>
 
         <p>
+            @if (auth()->user()->is_admin)
             <!-- a href="{{ action('UserController@index') }}">Regresar al listado de usuarios</a -->
             <a href="{{ url('/usuarios') }}" class="btn btn-link">Regresar al listado de asesores</a>
+            @else
+            <a href="{{ route('users.edit', auth()->user()->id) }}" class="btn btn-link">Editar asesor</a>
+            @endif
         </p>
     </div>
 </div>

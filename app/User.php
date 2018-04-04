@@ -26,13 +26,17 @@ class User extends Authenticatable
     protected $hidden = [
         'password', 'remember_token',
     ];
+    protected $dates = [
+        'created_at', 'updated_at', 'fecha_nacimiento', 'fecha_ingreso'
+    ];
+
     protected $casts = [
         'is_admin' => 'boolean'
     ];
 
-    public function clientes()    // user_id
+    public function contactos()    // user_id
     {
-        return $this->hasMany(Cliente::class); // Si llave foranea, diferente a esperada, usamos 2do parametro.
+        return $this->hasMany(Contacto::class); // Si llave foranea, diferente a esperada, usamos 2do parametro.
     }
 
     public function turnos()    // user_id

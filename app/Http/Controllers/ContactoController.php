@@ -116,7 +116,7 @@ class ContactoController extends Controller
         $data = request()->validate([   // Si ocurre error, laravel nos envia al url anterior.
             'cedula' => ['sometimes', 'nullable', 'digits_between:7,8'],
             'name' => 'required',
-            'ddn' => ['sometimes', 'nullable', 'digits:3'],
+            'ddn' => '',
             'telefono' => ['sometimes', 'nullable', 'digits:7'],
             'email' => ['sometimes', 'nullable', 'email'],
             'direccion' => '',
@@ -131,6 +131,7 @@ class ContactoController extends Controller
         ], [
             'cedula.digits_between' => 'La cedula de ideintidad debe contener 7 u 8 digitos',
             'name.required' => 'El campo nombre es obligatorio.',
+            'telefono.digits:7' => 'La parte del telefono, sin ddn, debe contener 7 dígitos',
             'email.email' => 'Debe suministrar un correo electrónico válido.',
             'deseo_id.required' => 'El deseo del contacto inicial es obligatorio suministrarlo.',
             'propiedad_id.required' => 'El tipo de propiedad es obligatorio suministrarlo.',
@@ -245,13 +246,14 @@ class ContactoController extends Controller
             'cedula' => ['sometimes', 'nullable', 'digits_between:7,8'],
             'name' => 'required',
             'ddn' => '',
-            'telefono' => '',
+            'telefono' => ['sometimes', 'nullable', 'digits:7'],
             'email' => ['sometimes', 'nullable', 'email'],
             'direccion' => '',
             'observaciones' => '',
         ], [
             'cedula.digits_between' => 'La cedula de ideintidad debe contener 7 u 8 digitos',
             'name.required' => 'El campo nombre es obligatorio.',
+            'telefono.digits:7' => 'La parte del telefono, sin ddn, debe contener 7 dígitos',
             'email.email' => 'Debe suministrar un correo elctrónico válido.',
         ]);
 

@@ -38,7 +38,7 @@
                         <select required name="u{{ $d }}" id="u{{ $d }}">
                             <option value="">mañana {{ $diaSemana[$d] }}</option>
                             @foreach ($users as $user)
-                            @if (old("u{{ $d }}") == $user->id)
+                            @if (old("u{$d}") == $user->id)
                             <option value="{{ $user->id }}" selected>{{ $user->name }}</option>
                             @else
                             <option value="{{ $user->id }}">{{ $user->name }}</option>
@@ -58,7 +58,7 @@
                         <select required name="u{{ 3+$d }}" id="u{{ 3+$d }}">
                             <option value="">tarde {{ $diaSemana[$d] }}</option>
                             @foreach ($users as $user)
-                            @if (old("u{{ 3+$d }}") == $user->id)
+                            @if (old("u{3+$d}") == $user->id)
                             <option value="{{ $user->id }}" selected>{{ $user->name }}</option>
                             @else
                             <option value="{{ $user->id }}">{{ $user->name }}</option>
@@ -89,7 +89,7 @@
                         <select required name="u{{ 3+$d }}" id="u{{ 3+$d }}">
                             <option value="">mañana {{ $diaSemana[$d] }}</option>
                             @foreach ($users as $user)
-                            @if (old("u{{ 3+$d }}") == $user->id)
+                            @if (old("u{3+$d}") == $user->id)
                             <option value="{{ $user->id }}" selected>{{ $user->name }}</option>
                             @else
                             <option value="{{ $user->id }}">{{ $user->name }}</option>
@@ -109,7 +109,7 @@
                         <select required name="u{{ 6+$d }}" id="u{{ 6+$d }}">
                             <option value="">tarde {{ $diaSemana[$d] }}</option>
                             @foreach ($users as $user)
-                            @if (old("u{{ 6+$d }}") == $user->id)
+                            @if (old("u{6+$d}") == $user->id)
                             <option value="{{ $user->id }}" selected>{{ $user->name }}</option>
                             @else
                             <option value="{{ $user->id }}">{{ $user->name }}</option>
@@ -130,7 +130,7 @@
                 </td>
                 <td colspan="2">Crear y preparar 
                     <select name="semana" id="semana"
-                        onchange="document.getElementById('crear-turnos').click();">
+                        onchange="$('crear-turnos').click();">
                         <option value="">Semana</option>
                         @foreach ($semanas as $semana)
                             <option value="{{ $loop->iteration }}">

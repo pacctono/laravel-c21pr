@@ -66,11 +66,16 @@
             <td>{{ $contacto->user->name }}</td>
             @endif
             <td class="d-flex align-items-end">
-                <a href="{{ route('contactos.show', $contacto) }}" class="btn btn-link"><span class="oi oi-eye"></span></a>
-                <a href="{{ route('contactos.edit', $contacto) }}" class="btn btn-link"><span class="oi oi-pencil"></span></a>
+                <a href="{{ route('contactos.show', $contacto) }}" class="btn btn-link">
+                    <span class="oi oi-eye"></span>
+                </a>
+                <a href="{{ route('contactos.edit', $contacto) }}" class="btn btn-link">
+                    <span class="oi oi-pencil"></span>
+                </a>
 
                 @if (1 == Auth::user()->is_admin)
-                <form action="{{ route('contactos.destroy', $contacto) }}" method="POST" class="form-inline mt-0 mt-md-0">
+                <form action="{{ route('contactos.destroy', $contacto) }}" method="POST" 
+                        class="form-inline mt-0 mt-md-0">
                     {{ csrf_field() }}
                     {{ method_field('DELETE' )}}
                     <button class="btn btn-link"><span class="oi-trash"></span></button>

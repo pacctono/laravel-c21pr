@@ -15,8 +15,9 @@
     <!-- Custom styles for this template -->
     <link href="{{ asset('css/style.css') }}" rel="stylesheet">
     <script>
+      var $;
+
       window.onload=function() {
-        var $;
 
         if (!$) { $ = document.getElementById; }
       }
@@ -35,7 +36,7 @@
         <div class="collapse navbar-collapse" id="navbarCollapse">
         @auth
           <ul class="navbar-nav mr-auto col-md-10">
-          @foreach (['home', 'contactos', 'users', 'turnos'] as $hMenu)
+          @foreach (['home', 'contactos', 'users', 'turnos', 'agenda', 'reportes'] as $hMenu)
             @if ($hMenu == substr($view_name, 0, 
                 ((strpos($view_name, '-'))?(strpos($view_name, '-')):4)))
             <li class="nav-item active">

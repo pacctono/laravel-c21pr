@@ -15,7 +15,7 @@
     </div>
     @endif
 
-    <form method="POST" action="{{ url('/turnos') }}" id="forma-crear-turnos">
+    <form method="POST" action="{{ url("/turnos/{$turno->id}") }}" id="forma-editar-turnos">
         {{ method_field('PUT') }}
         {!! csrf_field() !!}
 
@@ -45,7 +45,6 @@
                             <option value="{{ $user->id }}">{{ $user->name }}</option>
                             @endif
                             @endforeach
-                            <option value="999">Feriado</option>
                         </select>
                         <input type="hidden" name="f{{ $d }}" value="{{ $dia[$d] }} 08">
                     </td>
@@ -65,7 +64,6 @@
                             <option value="{{ $user->id }}">{{ $user->name }}</option>
                             @endif
                             @endforeach
-                            <option value="999">Feriado</option>
                         </select>
                         <input type="hidden" name="f{{ 3+$d }}" value="{{ $dia[$d] }} 12">
                     </td>
@@ -96,7 +94,6 @@
                             <option value="{{ $user->id }}">{{ $user->name }}</option>
                             @endif
                             @endforeach
-                            <option value="999">Feriado</option>
                         </select>
                         <input type="hidden" name="f{{ 3+$d }}" value="{{ $dia[$d] }} 08">
                     </td>
@@ -116,7 +113,6 @@
                             <option value="{{ $user->id }}">{{ $user->name }}</option>
                             @endif
                             @endforeach
-                            <option value="999">Feriado</option>
                         </select>
                         <input type="hidden" name="f{{ 6+$d }}" value="{{ $dia[$d] }} 12">
                     </td>
@@ -125,18 +121,18 @@
             </tr>
             <tr>
                 <td colspan="2">
-                    <button type="submit" class="btn btn-primary" id="crear-turnos">
-                        Crear Turno
+                    <button type="submit" class="btn btn-primary" id="actualizar-turnos">
+                        Actualizar Turno
                     </button>
                 </td>
-                <td colspan="2">Crear y preparar 
+                <td colspan="2">Preparar turno para:
                     <select name="semana" id="semana"
-                        onchange="$('crear-turnos').click();">
+                        onchange="document.getElementById('actualizar-turnos').click();">
                         <option value="">Semana</option>
-                        @foreach ($semanas as $semana)
+                        @foreach ($semanas as $lSemana)
                             <option value="{{ $loop->iteration }}">
-                                {{ $diaSemana[$semana->dayOfWeek - 1] }}
-                                {{ $semana->format('d/m/Y') }}
+                                {{ $diaSemana[$lSemana->dayOfWeek - 1] }}
+                                {{ $lSemana->format('d/m/Y') }}
                             </option>
                         @endforeach
                     </select>

@@ -15,7 +15,8 @@
         </div>
         @endif
 
-        <form class="form align-items-end-horizontal" method="POST" action="{{ url("/contactos/{$contacto->id}") }}">
+        <form class="form align-items-end-horizontal" method="POST" 
+                action="{{ url("/contactos/{$contacto->id}") }}">
             {{ method_field('PUT') }}
             {!! csrf_field() !!}
             <!-- input name="_method" type="hidden" value="PUT" -->

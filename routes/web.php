@@ -66,11 +66,17 @@ Route::delete('/turnos/{turno}', 'TurnoController@destroy')
 Route::get('/turnos/orden/{orden}', 'TurnoController@index')
     ->name('turnos.orden');
 
-    Route::get('/clientes/orden/{orden}', 'ClienteController@index')
+Route::get('/clientes/orden/{orden}', 'ClienteController@index')
     ->name('clientes.orden');
 
 Route::pattern('clientes', '[0-9]+');               // Para no crear conflictos con el resource cliente
 Route::resource('clientes', 'ClienteController');
+
+Route::get('/agenda', 'AgendaController@index')
+    ->name('agenda');
+
+Route::get('/reportes', 'ReporteController@index')
+    ->name('reportes');
 
 //Route::get('/clientes/filtrar/{filtro}', 'ClienteController@filtro')
 //    ->name('clientes.filtro');

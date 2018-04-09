@@ -10,6 +10,7 @@ use App\Propiedad;
 use App\Resultado;
 use App\Zona;
 use App\Venezueladdn;
+use App\Turno;
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;        // PC
@@ -20,7 +21,7 @@ class ReporteController extends Controller
     protected $diaSemana = [
         'Domingo', 'Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado'
     ];
-    protected $tipo = 'Agenda';
+    protected $tipo = 'Reportes';
 
     public function index($orden = null)
     {
@@ -46,6 +47,6 @@ class ReporteController extends Controller
             $title .= ' de ' . $user->name;
         }
     
-        return view('reportes.index', compact('title', 'turnos', 'ruta', 'diaSemana', 'semanas'));
+        return view('reportes.index', compact('title', 'turnos', 'ruta', 'diaSemana'));
     }
 }

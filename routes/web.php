@@ -75,6 +75,12 @@ Route::resource('clientes', 'ClienteController');
 Route::get('/agenda', 'AgendaController@index')
     ->name('agenda');
 
+Route::get('/agenda/orden/{orden}', 'AgendaController@index')
+    ->name('agenda.orden');
+
+Route::post('/agenda', 'AgendaController@index')
+    ->name('agenda.post');
+
 Route::get('/reportes', 'ReporteController@index')
     ->name('reportes');
 

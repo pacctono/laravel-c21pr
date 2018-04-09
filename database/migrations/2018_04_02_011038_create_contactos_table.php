@@ -37,11 +37,11 @@ class CreateContactosTable extends Migration
             $table->foreign('origen_id')->references('id')->on('origens');
             $table->unsignedInteger('resultado_id');
             $table->foreign('resultado_id')->references('id')->on('resultados');
-            $table->timestamp('fecha_evento')->nullable();
+            $table->datetime('fecha_evento')->nullable();
             $table->string('observaciones', 190)->nullable();
             $table->unsignedInteger('user_actualizo')->nullable();
             $table->unsignedInteger('user_borro')->nullable();
-            $table->timestamp('borrado_en')->nullable();
+            $table->datetime('borrado_en')->nullable();
             $table->timestamps();
         });
     }

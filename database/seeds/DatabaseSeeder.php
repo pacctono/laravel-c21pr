@@ -15,10 +15,13 @@ class DatabaseSeeder extends Seeder
             'users',
             'deseos',
             'origens',
+            'precios',
             'propiedads',
             'resultados',
+            'turnos',
             'zonas',
-            'clientes'
+            'clientes',
+            'contactos'
         ]);
 
         // $this->call(UsersTableSeeder::class);
@@ -35,6 +38,7 @@ class DatabaseSeeder extends Seeder
         DB::statement('CREATE INDEX ddn ON venezueladdns (ddn);');
 
         $this->call(ContactoSeeder::class);
+        $this->call(TurnoSeeder::class);
     }
 
     protected function truncateTables(array $tables)

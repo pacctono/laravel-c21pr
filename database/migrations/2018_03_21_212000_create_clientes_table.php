@@ -40,7 +40,7 @@ class CreateClientesTable extends Migration
             $table->string('observaciones', 190)->nullable();
             $table->unsignedInteger('user_actualizo')->nullable();
             $table->unsignedInteger('user_borro')->nullable();
-            $table->timestamp('borrado_en')->nullable();
+            $table->datetime('borrado_en')->nullable();
             $table->timestamps();
         });
     }

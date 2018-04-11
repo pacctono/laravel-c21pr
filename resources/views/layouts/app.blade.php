@@ -105,7 +105,7 @@
         <span class="text-muted">Piso 1, Centro Comercial Costanera Plaza I, Barcelona, 0281-416.0885.</span>
       </div>
     </footer>
-
+    @yield('js')
     <!-- Bootstrap core JavaScript
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->

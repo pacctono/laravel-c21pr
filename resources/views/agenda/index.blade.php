@@ -6,35 +6,48 @@
     <h1>{{ $title }}</h1>
   </div -->
 <div>
-    <form method="POST" class="form-horizontal" action="{{ url('/agenda') }}">
+    <form method="POST" class="form-horizontal" action="{{ url('/agenda') }}"
+          onSubmit="return alertaFechaRequerida()">
       {!! csrf_field() !!}
 
       <div class="form-group col-md-12">
-        <label>Hoy</label>
-        <input type="radio" name="periodo" id="periodo" value="hoy">
-        <label>Ayer</label>
-        <input type="radio" name="periodo" id="periodo" value="ayer">
-        <label>Mañana</label>
-        <input type="radio" name="periodo" id="periodo" value="manana">
-        <label>Esta semana</label>
-        <input type="radio" name="periodo" id="periodo" value="estsem">
-        <label>Semana pasada</label>
-        <input type="radio" name="periodo" id="periodo" value="sempas">
-        <label>Próxima semana</label>
-        <input type="radio" name="periodo" id="periodo" value="prosem">
-        <label>Este mes</label>
-        <input type="radio" name="periodo" id="periodo" value="estmes">
-        <label>Mes pasado</label>
-        <input type="radio" name="periodo" id="periodo" value="mespas">
-        <label>Próximo mes</label>
-        <input type="radio" name="periodo" id="periodo" value="promes">
+      @foreach (['hoy', 'ayer', 'manana', 'esta_semana', 'semana_pasada', 'proxima_semana',
+                'este_mes', 'mes_pasado', 'proximo_mes', 'todo', 'intervalo'] as $intervalo)
+        <input type="radio" required name="periodo" id="_{{ $intervalo }}" value="{{ $intervalo }}"
+        @if ($rPeriodo == $intervalo)
+          checked
+        @endif
+        >
+        <label>
+        @if ('manana' == $intervalo)
+        Mañana
+        @else
+        {{ str_replace('_', ' ', ucfirst($intervalo)) }}
+        @endif
+        </label>
+      @endforeach
         <br>
         <label>Desde:</label>
         <input type="date" name="fecha_desde" id="fecha_desde" min="{{ now() }}" max="{{ now() }}"
-                        value="{{ old('fecha_desde') }}">
+                        value="{{ old('fecha_desde', $fecha_desde) }}">
+        {{-- $fecha_desde --}}
         <label>Hasta:</label>
         <input type="date" name="fecha_hasta" id="fecha_hasta" min="{{ now() }}" max="{{ now() }}"
-                        value="{{ old('fecha_hasta') }}">
+                        value="{{ old('fecha_hasta', $fecha_hasta) }}">
+        @if (Auth::user()->is_admin)
+        <select name="asesor" id="asesor">
+          <option value="0">Asesor</option>
+          @foreach ($users as $user)
+            <option value="{{ $user->id }}"
+            @if (old("asesor", $asesor) == $user->id)
+              selected
+            @endif
+            >
+              {{ $user->name }}
+            </option>
+          @endforeach
+        </select>
+        @endif
         <button type="submit" class="btn btn-success">Mostrar</button>
       </div>
     </form>
@@ -52,7 +65,8 @@
       <th scope="col">Hora</th>
       <th scope="col">Cita</th>
       <th scope="col">
-        <a href="{{ route('agenda.orden', 'name') }}" class="btn btn-link">
+        <a title="Al ordenar por nombre de contacto, no mostrará los turnos" 
+            href="{{ route('agenda.orden', 'name') }}" class="btn btn-link">
           Nombre Contacto
         </a>
       </th>
@@ -108,5 +122,38 @@
 @else
 <p>No tiene agenda registrada.</p>
 @endif
+
+@endsection
+
+@section('js')
+
+<script>
+function alertaFechaRequerida() {
+  var periodo    = document.getElementsByName('periodo');
+  var fecha_desde = document.getElementById('fecha_desde').value;
+  var fecha_hasta = document.getElementById('fecha_hasta').value;
+  var valorPeriodo;
+
+  for (var i=0, len=periodo.length; i<len; i++) {
+    if (periodo[i].checked) {
+      valorPeriodo = periodo[i].value;
+      break;
+    }
+  }
+  if ('interv' != valorPeriodo) {
+    return true;
+  }
+  if ('' == fecha_desde) {
+    alert("Usted ha seleccionado 'Intervalo' y tiene que suministrar la fecha 'Desde'");
+    return false;
+  }
+  if ('' == fecha_desde) {
+    alert("Usted ha seleccionado 'Intervalo' y tiene que suministrar la fecha 'Hasta'");
+    return false;
+  }
+  return true;
+//  submit();
+}
+</script>
 
 @endsection

@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
+use App\MisClases\Fecha;
 
 class AgendaController extends Controller
 {
@@ -42,74 +43,20 @@ class AgendaController extends Controller
             $rPeriodo    = session('rPeriodo', '');
             $fecha_desde = session('fecha_desde', '');
             $fecha_hasta = session('fecha_hasta', '');
-            $asesor      = session('asesor', '');
+            $asesor      = session('asesor', '0');
         } else {
             $rPeriodo = $periodo['periodo'];
             if (isset($periodo['asesor'])) $asesor = $periodo['asesor'];
             else $asesor = 0;
 
-            if ('hoy' == $rPeriodo) {
-                $fecha_desde = Carbon::today()->startOfDay();
-                $fecha_hasta = Carbon::today()->endOfDay();
-            }
-            if ('ayer' == $rPeriodo) {
-                $fecha_desde = Carbon::yesterday()->startOfDay();
-                $fecha_hasta = Carbon::yesterday()->endOfDay();
-            }
-            if ('manana' == $rPeriodo) {
-                $fecha_desde = Carbon::tomorrow()->startOfDay();
-                $fecha_hasta = Carbon::tomorrow()->endOfDay();
-            }
-// Aqui debo revisar, si hoy es lunes va a dar la semana pasada.
-            if ('esta_semana' == $rPeriodo) {
-                if (1 != now()->dayOfWeek) {
-                    $fecha_desde = (new Carbon('previous monday'))->startOfDay();
-                    $fecha_hasta = (new Carbon('previous monday'))->addDays(6)->endOfDay(); // Domingo
-                } else {
-                    $fecha_desde = (new Carbon())->startOfDay();
-                    $fecha_hasta = (new Carbon())->addDays(6)->endOfDay(); // Domingo
-                }
-            }
-// Igual, aqui debo revisar, si hoy es lunes va a dar la semana antepasada.
-            if ('semana_pasada' == $rPeriodo) {
-                $fecha_desde = (new Carbon('previous monday'))->startOfDay();
-                $fecha_hasta = (new Carbon('previous monday'))->addDays(6)->endOfDay();
-                if (1 != now()->dayOfWeek) {
-                    $fecha_desde = $fecha_desde->addWeeks(-1);
-                    $fecha_hasta = $fecha_hasta->addWeeks(-1);
-                }
-            }
-            if ('proxima_semana' == $rPeriodo) {
-                $fecha_desde = (new Carbon('next monday'))->startOfDay();
-                $fecha_hasta = (new Carbon('next monday'))->addDays(6)->endOfDay();
-            }
-            if ('este_mes' == $rPeriodo) {
-                $fecha_desde = Carbon::now()->startOfMonth()->startOfDay();
-                $fecha_hasta = (new Carbon('last day of this month'))->endOfDay();
-            }
-            if ('mes_pasado' == $rPeriodo) {
-                $fecha_desde = (new Carbon('first day of last month'))->startOfDay();
-                $fecha_hasta = (new Carbon('last day of last month'))->endOfDay();
-            }
-            if ('proximo_mes' == $rPeriodo) {
-                $fecha_desde = (new Carbon('first day of next month'))->startOfDay();
-                $fecha_hasta = (new Carbon('last day of next month'))->endOfDay();
-            }
-            if ('todo' == $rPeriodo) {
-                $fecha_desde = '';
-                $fecha_hasta = '';
-            }
-            if ('intervalo' == $rPeriodo) {
-                $fecha_desde = (new Carbon($periodo['fecha_desde']))->startOfDay();
-                $fecha_hasta = (new Carbon($periodo['fecha_hasta']))->endOfDay();
-            }
-            if ('' != $fecha_desde and '' != $fecha_hasta) {
+            list ($fecha_desde, $fecha_hasta) = Fecha::periodo($periodo);
+
+/*            if ('' != $fecha_desde and '' != $fecha_hasta) {
                 $fecha_desde = $fecha_desde->format('Y-m-d H:m:s');
                 $fecha_hasta = $fecha_hasta->format('Y-m-d H:m:s');
-            }
+            }*/
         }
         //dd($periodo, $fecha_desde, $fecha_hasta);
-
         if ('' == $orden or $orden == null) {
             $orden = 'fecha_evento';
         }

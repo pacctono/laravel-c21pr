@@ -39,6 +39,20 @@ class DatabaseSeeder extends Seeder
 
         $this->call(ContactoSeeder::class);
         $this->call(TurnoSeeder::class);
+/*
+        (select c.user_id AS user_id, date_format(c.fecha_evento, '%Y-%m-%d') AS fecha_evento,
+                date_format(c.fecha_evento, '%H:%i:%s') AS hora_evento, r.descripcion AS descripcion,
+                c.name AS name, c.telefono AS telefono, c.email AS email, c.direccion AS direccion
+         from (c21pr.contactos c join c21pr.resultados r on (r.id = c.resultado_id))
+         where (c.resultado_id in (4,5,6,7)))
+        union
+        (select t.user_id AS user_id, date_format(t.turno_en, '%Y-%m-%d') AS fecha_evento,
+                if(('08' = date_format(t.turno_en, '%H')), 'Mañana', 'Tarde') AS hora_evento,
+                'Turno en oficina' AS descripcion, '' AS name, '' AS telefono, '' AS email,
+                '' AS direccion
+         from c21pr.turnos t)
+        order by 1,2
+ */
     }
 
     protected function truncateTables(array $tables)

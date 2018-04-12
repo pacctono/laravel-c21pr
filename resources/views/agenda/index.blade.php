@@ -65,7 +65,10 @@
       <th scope="col">Hora</th>
       <th scope="col">Cita</th>
       <th scope="col">
-        <a title="Al ordenar por nombre de contacto, no mostrará los turnos" 
+        <a
+          @if (Auth::user()->is_admin)
+            title="Al ordenar por nombre de contacto, no mostrará los turnos"
+          @endif
             href="{{ route('agenda.orden', 'name') }}" class="btn btn-link">
           Nombre Contacto
         </a>

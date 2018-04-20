@@ -30,8 +30,8 @@ class SampleChart extends Chart
     {
         parent::__construct();
 
-        $this->labels(['One', 'Two', 'Three', 'Four', 'Five']);
-        $this->displayLegend(false);                // chart configuration presets
+//        $this->labels(['One', 'Two', 'Three', 'Four', 'Five', 'six', 'seven', 'ocho', 'nueve', 'diez']);
+//        $this->displayLegend(false);                // chart configuration presets
 /*            ->options([
                 'legend' => [
                     'display' => false  // Esconda la leyenda.

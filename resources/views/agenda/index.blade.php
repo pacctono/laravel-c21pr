@@ -98,11 +98,11 @@
       <td>
         {{ $agenda->descripcion }}
       </td>
-      <td title="{{ $agenda->direccion }}">
+      <td title="DIRECCIÓN: {{ $agenda->direccion }}">
         {{ $agenda->name }}
       </td>
       @if (Auth::user()->is_admin)
-      <td title="{{ $agenda->email }}">
+      <td title="CORREO: {{ $agenda->email }}">
       @else
       <td>
       @endif

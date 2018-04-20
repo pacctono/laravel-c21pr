@@ -36,23 +36,23 @@
         <div class="collapse navbar-collapse" id="navbarCollapse">
         @auth
           <ul class="navbar-nav mr-auto col-md-10">
-          @foreach (['home', 'contactos', 'users', 'turnos', 'agenda', 'reportes'] as $hMenu)
+          @foreach (array('home' => 'Home', 'contactos' => 'Contactos', 'users' => 'Asesores',
+                    'turnos' => 'Turnos', 'agenda' => 'Agenda', 'reportes' => 'Reportes')
+                    as $hMenu => $muestra)
             @if ($hMenu == substr($view_name, 0, 
                 ((strpos($view_name, '-'))?(strpos($view_name, '-')):4)))
             <li class="nav-item active">
             @else
             <li class="nav-item">
             @endif
+              <a class="nav-link" 
             @if ('users' != $hMenu)
-              <a class="nav-link" href="/{{ $hMenu }}">
+              href="/{{ $hMenu }}"
             @else
-              <a class="nav-link" href="/usuarios">
+              href="/usuarios"
             @endif
-            @if ('users' != $hMenu)
-                {{ ucfirst($hMenu) }} <!-- span class="sr-only">(current)</span -->
-            @else
-              Asesores
-            @endif
+              >
+              {{ $muestra }} <!-- span class="sr-only">(current)</span -->
               </a>
             </li>
           @endforeach

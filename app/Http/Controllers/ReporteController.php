@@ -36,18 +36,12 @@ class ReporteController extends Controller
         }
 
         $title = $this->tipo . ' por Asesor';
-        $ruta = request()->path();
-        $diaSemana = $this->diaSemana;
 
-        if ('' == $orden or $orden == null) {
-            $orden = 'id';
-        }
-    
         $contactos = Contacto::select('user_id', DB::raw('count(*) as atendidos'))
                                     ->groupBy('user_id')
                                     ->get();
 
-        return view('reportes.index', compact('title', 'contactos', 'ruta', 'diaSemana'));
+        return view('reportes.index', compact('title', 'contactos'));
     }
 /**
  *  There are a few methods you can use in all datasets (regardless of the type, or charting library).
@@ -57,20 +51,51 @@ class ReporteController extends Controller
  *  values($values) - Set the dataset values.
  *  options($options, bool $overwrite = false) - Set the dataset options.
  */
-    public function chart($tipo = null)
+    public function chart($tipo = 'line')
     {
+        if (!(Auth::check())) {
+            return redirect('login');
+        }
+
+        if (!(Auth::user()->is_admin)) {
+            return redirect()->back();
+        }
+
+        $title = $this->tipo . ' por Asesor';
+        $legenda = $title;
+
         if ('' == $tipo or $tipo == null) {
             $tipo = 'line';
         }
 
         $chart = new SampleChart;
 
+        $contactos = Contacto::select('user_id', DB::raw('count(*) as atendidos'))
+                                    ->groupBy('user_id')
+                                    ->get();
+
 // Add the dataset (we will go with the chart template approach)
-        $chart->dataset('Sample', $tipo, [100, 65, 84, 45, 90])     // bar, pie, line, ...
-            ->color('#ff0000');                 // dataset configuration presets.
-/*            ->options([
-                'borderColor' => '#ff0000'
-            ]);*/
-        return view('reportes.chart', ['chart' => $chart]);
+        $arrEtiq  = array();
+        $arrData  = array();
+        $arrColor = array();
+
+        $intervalo = 0xffffff/count($contactos);
+        $hexColor  = 0x0;
+        foreach ($contactos as $contacto) {
+            $arrEtiq[]  = substr($contacto->user->name, 0, 20);
+            $arrData[]  = $contacto->atendidos;
+            $strColor   = str_pad(dechex($hexColor), 6, '0', STR_PAD_LEFT);
+            $arrColor[] = '#' . $strColor;
+            $hexColor  += $intervalo;
+        }
+//        dd($arrColor);
+        $chart->displayLegend(true);
+        $chart->labels($arrEtiq);
+        $chart->displayAxes(true);
+        $chart->dataset($legenda, $tipo, $arrData)     // bar, pie, line, ...
+            ->backgroundColor($arrColor)
+            ->color('#00ff00');
+//            ->color('#ff0000');                 // dataset configuration presets.
+        return view('reportes.chart', compact('title', 'contactos', 'chart'));
     }
 }

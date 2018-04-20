@@ -13,7 +13,10 @@ use Illuminate\Support\Facades\DB;
 use Faker\Generator as Faker;
 
 $factory->define(Contacto::class, function (Faker $faker) {
-    $fecha_contacto = $faker->dateTimeThisYear('now');
+    $fecha_contacto = $faker->dateTimeThisMonth('now');
+    while (($fecha_contacto->format('H') < 8) or ($fecha_contacto->format('H') > 18)) {
+        $fecha_contacto = $faker->dateTimeThisMonth('now');
+    }
     $ddns = DB::table('venezueladdns')->distinct()->pluck('ddn')->all();
     $ddn = $faker->randomElement($ddns);
     $telefono = $ddn . $faker->unique()->randomNumber(7, true);
@@ -24,7 +27,7 @@ $factory->define(Contacto::class, function (Faker $faker) {
         'veces_name' => 1,
         'telefono' => $telefono,
         'veces_telefono' => 1,
-        'user_id' => $faker->numberBetween(1, User::count()),
+        'user_id' => $faker->numberBetween(2, User::count()),
         'email' => $faker->unique()->safeEmail,
         'veces_email' => 1,
         'direccion' => $faker->address(),

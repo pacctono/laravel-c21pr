@@ -84,7 +84,7 @@ Route::post('/agenda', 'AgendaController@index')
 Route::get('/reportes', 'ReporteController@index')
     ->name('reportes');
 
-Route::get('/chart/{chart}', 'ReporteController@chart')
+Route::get('/reportes/chart/{chart}', 'ReporteController@chart')
     ->name('reportes.chart');
 
 //Route::get('/clientes/filtrar/{filtro}', 'ClienteController@filtro')

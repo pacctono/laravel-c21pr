@@ -79,7 +79,10 @@
 
             <div class="content">
                 <div class="title m-b-md">
-                    Imagenes de propiedades en carrousel
+                    <img src="{{ (asset('img/inauguracion1.jpg')) }}"
+                        alt="Conectado a la web de Century21 Puente Real"
+                        width="1040" height="600"
+                    >
                 </div>
 
                 <!-- div class="links">

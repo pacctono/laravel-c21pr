@@ -129,6 +129,7 @@
                         onchange="document.getElementById('crear-turnos').click();">
                         <option value="">Semana</option>
                         @foreach ($semanas as $lSemana)
+                            {{-- $loop->index, comienza desde 0, $loop-iteration, desde 1 --}}
                             @if (($semana+1) == $loop->iteration)
                                 continue
                             @else

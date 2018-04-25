@@ -5,17 +5,17 @@
     <div class="row justify-content-center">
         <div class="col-md-12">
             <div class="card">
+            @if ($errors->any())
                 <div class="card-header">
-                @if ($errors->any())
-                <div class="alert alert-danger">
-                    <ul>
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
+                    <div class="alert alert-danger">
+                        <ul>
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
                 </div>
-                @endif
-                </div>
+            @endif
 
                 <div class="card-body">
                     @if (session('status'))
@@ -24,7 +24,10 @@
                         </div>
                     @endif
 
-                    You are logged in!
+                    <img src="{{ (asset('img/inauguracion1.jpg')) }}"
+                        alt="Conectado a la web de Century21 Puente Real"
+                        width="1040" height="600"
+                    >
                 </div>
             </div>
         </div>

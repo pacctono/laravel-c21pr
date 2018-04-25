@@ -81,11 +81,17 @@ Route::get('/agenda/orden/{orden}', 'AgendaController@index')
 Route::post('/agenda', 'AgendaController@index')
     ->name('agenda.post');
 
-Route::get('/reportes', 'ReporteController@index')
+Route::get('/reportes/tipo/{tipo}', 'ReporteController@index')
     ->name('reportes');
+
+Route::post('/reportes', 'ReporteController@index')
+    ->name('reportes.post');
 
 Route::get('/reportes/chart/{chart}', 'ReporteController@chart')
     ->name('reportes.chart');
+
+Route::post('/reportes/chart/{chart}', 'ReporteController@chart')
+    ->name('reportes.chart.post');
 
 //Route::get('/clientes/filtrar/{filtro}', 'ClienteController@filtro')
 //    ->name('clientes.filtro');

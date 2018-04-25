@@ -30,15 +30,17 @@
       <!-- Fixed navbar -->
       <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
         <a class="navbar-brand" href="">C21 Puente Real</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+        <button class="navbar-toggler" type="button" data-toggle="collapse"
+                data-target="#navbarCollapse" aria-controls="navbarCollapse"
+                aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarCollapse">
         @auth
           <ul class="navbar-nav mr-auto col-md-10">
           @foreach (array('home' => 'Home', 'contactos' => 'Contactos', 'users' => 'Asesores',
-                    'turnos' => 'Turnos', 'agenda' => 'Agenda', 'reportes' => 'Reportes')
-                    as $hMenu => $muestra)
+                    'turnos' => 'Turnos', 'agenda' => 'Agenda')
+                    as $hMenu => $muestraMenu)
             @if ($hMenu == substr($view_name, 0, 
                 ((strpos($view_name, '-'))?(strpos($view_name, '-')):4)))
             <li class="nav-item active">
@@ -52,10 +54,19 @@
               href="/usuarios"
             @endif
               >
-              {{ $muestra }} <!-- span class="sr-only">(current)</span -->
+              {{ $muestraMenu }} <!-- span class="sr-only">(current)</span -->
               </a>
             </li>
           @endforeach
+            <li class="dropdown">
+              <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                Reportes
+              <span class="caret"></span></a>
+              <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="{{ route('reportes', 'Asesor') }}">Por asesor</a></li>
+                <li><a class="dropdown-item" href="{{ route('reportes', 'Fecha') }}">Por fecha</a></li>
+              </ul>
+            </li>
           </ul>
           @endauth
           <ul class="navbar-nav ml-auto col-md-2">
@@ -74,7 +85,8 @@
                     document.getElementById('logout-form').submit();">
                   {{ __('Logout') }}
                 </a>
-                <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                <form id="logout-form" action="{{ route('logout') }}" method="POST"
+                              style="display: none;">
                   @csrf
                 </form>
               </div>

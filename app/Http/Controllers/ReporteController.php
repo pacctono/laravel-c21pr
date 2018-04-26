@@ -83,10 +83,14 @@ class ReporteController extends Controller
             return redirect()->back();
         }
 
-        if ('' != session('fecha_desde', '') and '' != session('fecha_hasta', ''))  {
+        if ('POST' == request()->method()) {
+            $fechas = request()->all();
+            list ($fecha_desde, $fecha_hasta) = Fecha::periodo($fechas);
+            $muestra = session('muestra', 'Asesor');
+        } elseif ('' != session('fecha_desde', '') and '' != session('fecha_hasta', ''))  {
             $fecha_desde = session('fecha_desde');
             $fecha_hasta = session('fecha_hasta');
-            $muestra = session('muestra');
+            $muestra = session('muestra', 'Asesor');
         } else {
             $fecha_desde = (new Carbon(Contacto::min('created_at')))->startOfDay();
             $fecha_hasta = (new Carbon(Contacto::max('created_at')))->endOfDay();
@@ -153,6 +157,8 @@ class ReporteController extends Controller
             ->dashed([1, 5])                        // [0], por defecto.
             ->lineTension(0);                       // 0.5, por defecto.
 //            ->color('#ff0000');                 // dataset configuration presets.
+
+        session(['fecha_desde' => $fecha_desde, 'fecha_hasta' => $fecha_hasta, 'muestra' => $muestra]);
         return view('reportes.chart', compact('title', 'contactos', 'chart', 'tipo', 'muestra',
                                                 'fecha_desde', 'fecha_hasta'));
     }

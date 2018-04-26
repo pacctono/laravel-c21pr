@@ -143,9 +143,15 @@ class ReporteController extends Controller
         $chart->displayLegend('pie'==$tipo);
         $chart->labels($arrEtiq);
         $chart->displayAxes('pie'!=$tipo);
+        $chart->barWidth(1);
+        $chart->title($title);
+        $chart->height(400);
+        $chart->width(1000);
         $chart->dataset($legenda, $tipo, $arrData)     // bar, pie, line, ...
             ->backgroundColor($arrColor)
-            ->color($lineaColor);
+            ->color($lineaColor)
+            ->dashed([1, 5])                        // [0], por defecto.
+            ->lineTension(0);                       // 0.5, por defecto.
 //            ->color('#ff0000');                 // dataset configuration presets.
         return view('reportes.chart', compact('title', 'contactos', 'chart', 'tipo', 'muestra',
                                                 'fecha_desde', 'fecha_hasta'));

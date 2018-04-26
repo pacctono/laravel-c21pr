@@ -2,7 +2,7 @@
 
 @section('content')
 
-<!-- div>
+<div class="d-flex justify-content-between align-items-end mb-3">
   <form method="POST" class="form-horizontal" action="{{ url('/reportes/chart/'.$tipo) }}"
         onSubmit="return alertaFechaRequerida()">
     {!! csrf_field() !!}
@@ -16,16 +16,11 @@
       <input type="date" name="fecha_hasta" id="fecha_hasta" min="{{ now() }}" max="{{ now() }}"
                       value="{{ old('fecha_hasta', substr($fecha_hasta, 0, 10)) }}">
       <button type="submit" class="btn btn-success">Mostrar</button>
-    </div>
-  </form>
-</div -->
 
-<div class="d-flex justify-content-between align-items-end mb-3">
-  <h3 class="pb-1">{{ $title }}</h3>
+  <!-- h3 class="pb-1">{{ $title }}</h3 -->
 
-  <p>
       <!-- a href="{{ route('reportes.chart', 'bar') }}" class="btn btn-primary">Crear Gráfico</a -->
-      Crear gráfico de:
+      Mostrar gráfico de:
       <select name="grafico" id="grafico"
         onchange="javascript:location.href = this.value;">
         <option value="">tipo</option>
@@ -36,7 +31,7 @@
           </option>
         @endforeach
       </select>
-  </p>
+  </form>
 </div>
 
 <div>{!! $chart->container() !!}</div>
@@ -76,7 +71,8 @@
 @endsection
 
 @section('js')
-{{-- //www.chartjs.org/docs/latest/ --}}
+{{-- http://www.chartjs.org/docs/latest/ libreria usada por el proyecto --}}
+{{-- https://erik.cat/projects/charts este es el proyecto que estoy usando --}}
     <script src=//cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.1/Chart.min.js charset=utf-8></script>
     {!! $chart->script() !!}
 

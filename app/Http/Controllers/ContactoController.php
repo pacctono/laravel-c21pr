@@ -139,7 +139,7 @@ class ContactoController extends Controller
             'precio_id.required' => 'El precio de la propiedad es obligatorio suministrarlo.',
             'origen_id.required' => 'El origen de como conocio de nuestra oficina es obligatorio suministrarlo.',
             'resultado_id.required' => 'El resultado de la conversación con el contacto inicial es obligatorio suministrarlo.',
-            'fecha_evento.required_if:resultado_id,4,5,6,7' => 'La fecha del evento es requerida, cuando el resultado es llamada o cita',
+            'fecha_evento.required_if' => 'La fecha del evento es requerida, cuando el resultado es llamada o cita',
             'fecha_evento.date' => 'La fecha del evento debe ser una fecha valida.',
         ]);
 

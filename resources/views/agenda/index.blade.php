@@ -83,13 +83,14 @@
         Correo electrónico
       @endif
       </th>
+      <th scope="col">Acciones</th>
     </tr>
   </thead>
   <tbody>
   @foreach ($agendas as $agenda)
     <tr>
       <td>
-        {{ $diaSemana[$agenda->fecha_evento->dayOfWeek] }}
+        {{ substr($diaSemana[$agenda->fecha_evento->dayOfWeek], 0, 3) }}
         {{ $agenda->fecha_evento->format('d/m/Y') }}
       </td>
       <td>
@@ -115,6 +116,18 @@
         {{ $users->find($agenda->user_id)->name }}
       @else
         {{ $agenda->email }}
+      @endif
+      </td>
+      <td class="d-flex align-items-end">
+      @if (NULL == $agenda->contacto_id)
+        &nbsp;
+      @else
+        <a href="{{ route('agenda.show', $agenda->contacto) }}" class="btn btn-link">
+          <span class="oi oi-eye"></span>
+        </a>
+        <a href="{{ route('agenda.edit', $agenda->contacto) }}" class="btn btn-link">
+          <span class="oi oi-pencil"></span>
+        </a>
       @endif
       </td>
     </tr>

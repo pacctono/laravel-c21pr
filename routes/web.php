@@ -81,6 +81,13 @@ Route::get('/agenda/orden/{orden}', 'AgendaController@index')
 Route::post('/agenda', 'AgendaController@index')
     ->name('agenda.post');
 
+Route::get('/agenda/{contacto}', 'AgendaController@show')
+    ->where('contacto', '[0-9]+')
+    ->name('agenda.show');
+
+Route::get('/usuarios/{contacto}/editar', 'AgendaController@edit')
+    ->name('agenda.edit');
+
 Route::get('/reportes/tipo/{tipo}', 'ReporteController@index')
     ->name('reportes');
 

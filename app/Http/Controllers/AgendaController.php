@@ -53,7 +53,9 @@ class AgendaController extends Controller
 
 /*            if ('' != $fecha_desde and '' != $fecha_hasta) {
                 $fecha_desde = $fecha_desde->format('Y-m-d H:m:s');
-                $fecha_hasta = $fecha_hasta->format('Y-m-d H:m:s');
+                $fecha_hasta = $fecha_hasta->format('Y-m-d H:m:s');        {{ $diaSemana[$turno->turno_en->dayOfWeek] }}
+        {{ $turno->turno_en->format('d/m/Y') }}
+
             }*/
         }
         //dd($periodo, $fecha_desde, $fecha_hasta);
@@ -63,8 +65,9 @@ class AgendaController extends Controller
 
         if (Auth::user()->is_admin) {       // El usuario (asesor) es un administrador.
             $users   = User::all();         // Todos los usuarios.
-            $agendas = Agenda::select('fecha_evento', 'hora_evento', 'descripcion', 'name', 'telefono', 
-                                        'user_id', 'email', 'direccion');   // Solo estas columnas.
+            $agendas = Agenda::select('fecha_evento', 'hora_evento', 'descripcion', 'name',
+                                        'telefono', 'user_id', 'contacto_id', 'email',
+                                        'direccion');   // Solo estas columnas.
             if ('name' == $orden) {         // Si se ordena por nombre, no muestra turnos (name == '').
                 $agendas = $agendas->where('name', '!=', '');
             }
@@ -73,8 +76,8 @@ class AgendaController extends Controller
             $asesorConectado = User::find($user_id);    // Consigue la clase App\User del asesor conectado.
             $title  .= 'de ' . $asesorConectado->name;  // Titulo de la página de la Agenda.
             $agendas = Agenda::where('user_id', $user_id)   // Solo el asesor conectado.
-                    ->select('fecha_evento', 'hora_evento', 'descripcion', 'name', 'telefono', 'email', 
-                                'direccion');           // Solo estas columnas.
+                    ->select('fecha_evento', 'hora_evento', 'descripcion', 'name', 'telefono',
+                                'email', 'direccion');           // Solo estas columnas.
         }
 
         if (0 < $asesor) {                  // No se selecciono un asesor o el conectado no es administrador.
@@ -122,5 +125,35 @@ class AgendaController extends Controller
         }
     
         return view('agenda.index', compact('title', 'turnos', 'ruta', 'diaSemana'));
+    }
+
+    public function show(Contacto $contacto)
+    {
+        if (!(Auth::check())) {
+            return redirect('login');
+        }
+        $diaSemana = $this->diaSemana;
+
+        if (1 == Auth::user()->is_admin) {
+            return view('agenda.show', compact('contacto', 'diaSemana'));
+        }
+        if ($contacto->user->id == Auth::user()->id) {
+            return view('agenda.show', compact('contacto', 'diaSemana'));
+        } else {
+            return redirect('/agenda');
+        }
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     *
+     * @param  \App\Contacto  $contacto
+     * @return \Illuminate\Http\Response
+     */
+    public function edit(Contacto $contacto)
+    {
+        if (!(Auth::check())) {
+            return redirect('login');
+        }
     }
 }

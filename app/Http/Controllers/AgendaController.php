@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Agenda;
+use App\Cita;
 use App\Turno;
 use App\Contacto;
 use App\User;
@@ -18,13 +19,13 @@ class AgendaController extends Controller
     protected $diaSemana = [
         'Domingo', 'Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado'
     ];
-    protected $tipo = 'Agenda ';
+    protected $tipo = 'cita ';
 
     public function index($orden = null) {
         if (!(Auth::check())) {             // No esta conectado.
             return redirect('login');
         }
-// Variables propias del metodo del controlador.
+// Variables propias de la metodo de la controlador.
         $title = $this->tipo;
         $ruta = request()->path();
         $diaSemana = $this->diaSemana;
@@ -72,12 +73,12 @@ class AgendaController extends Controller
                 $agendas = $agendas->where('name', '!=', '');
             }
         } else {                            // El usuario (asesor) no es un administrador.
-            $user_id = Auth::user()->id;    // id del usuario (asesor) conectado.
-            $asesorConectado = User::find($user_id);    // Consigue la clase App\User del asesor conectado.
+            $user_id = Auth::user()->id;    // id de la usuario (asesor) conectado.
+            $asesorConectado = User::find($user_id);    // Consigue la clase App\User de la asesor conectado.
             $title  .= 'de ' . $asesorConectado->name;  // Titulo de la página de la Agenda.
             $agendas = Agenda::where('user_id', $user_id)   // Solo el asesor conectado.
                     ->select('fecha_evento', 'hora_evento', 'descripcion', 'name', 'telefono',
-                                'email', 'direccion');           // Solo estas columnas.
+                                'contacto_id', 'email', 'direccion');           // Solo estas columnas.
         }
 
         if (0 < $asesor) {                  // No se selecciono un asesor o el conectado no es administrador.
@@ -100,33 +101,6 @@ class AgendaController extends Controller
                     'rPeriodo', 'fecha_desde', 'fecha_hasta', 'asesor'));
     }
 
-    public function indice($orden = null)
-    {
-        if (!(Auth::check())) {
-            return redirect('login');
-        }
-
-        $title = $this->tipo;
-        $ruta = request()->path();
-        $diaSemana = $this->diaSemana;
-
-        if ('' == $orden or $orden == null) {
-            $orden = 'id';
-        }
-        if (1 == Auth::user()->is_admin) {
-            $turnos = Turno::where('turno_en','>=', 'now')
-                            ->orderBy($orden)->paginate(10);
-        } else {
-            $user   = User::find(Auth::user()->id);
-            $turnos = $user->turnos()
-                        ->where('turno_en','>=', 'now')
-                        ->orderBy($orden)->paginate(10);
-            $title .= ' de ' . $user->name;
-        }
-    
-        return view('agenda.index', compact('title', 'turnos', 'ruta', 'diaSemana'));
-    }
-
     public function show(Contacto $contacto)
     {
         if (!(Auth::check())) {
@@ -134,14 +108,70 @@ class AgendaController extends Controller
         }
         $diaSemana = $this->diaSemana;
 
-        if (1 == Auth::user()->is_admin) {
-            return view('agenda.show', compact('contacto', 'diaSemana'));
-        }
-        if ($contacto->user->id == Auth::user()->id) {
-            return view('agenda.show', compact('contacto', 'diaSemana'));
-        } else {
+        if ((!Auth::user()->is_admin) and ($contacto->user->id != Auth::user()->id)) {
             return redirect('/agenda');
         }
+
+        $cita = Cita::where('contacto_id', $contacto->id)->get();
+        if (0 >= $cita->count()) {
+            $cita->contacto = $contacto;
+            $cita->fecha_cita = NULL;
+            $cita->comentarios = NULL;
+        }
+//        dd($cita);
+        return view('agenda.show', compact('cita', 'diaSemana'));
+    }
+
+    /**
+     * Show the form for creating a new resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function create(Contacto $contacto)
+    {
+        if (!(Auth::check())) {
+            return redirect('login');
+        }
+
+        $cita = Cita::where('contacto_id', $contacto->id)->get();
+        if (0 < $cita->count()) {
+            return redirect()->route('agenda.edit', ['contacto' => $contacto]);
+        }
+
+        $title = 'Crear ' . $this->tipo;
+        $diaSemana = $this->diaSemana;
+
+        return view('agenda.crear', compact('title', 'contacto', 'diaSemana'));
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function store(Request $request)
+    {
+        //dd($request);
+        $data = request()->validate([   // Si ocurre error, laravel nos envia al url anterior.
+            'fecha_cita' => ['sometimes', 'nullable', 'required_if:resultado_id,4,5,6,7', 'date'],
+            'hora_cita'  => ['sometimes', 'nullable', 'required_if:resultado_id,4,5,6,7', 'time'],
+            'comentarios' => '',
+        ], [
+            'fecha_cita.required_if' => 'La fecha de la cita es requerida, cuando el resultado es llamada o cita',
+            'fecha_cita.date' => 'La fecha de la cita debe ser una fecha valida.',
+            'hora_cita.required_if' => 'La hora de la cita es requerida, cuando el resultado es llamada o cita',
+            'hora_cita.date' => 'La hora de la cita debe ser una hora valida.',
+        ]);
+
+        $contacto = $data['cpntacto'];
+        Cita::create([
+            'contacto_id' => $contacto->id,
+            'fecha_cita'  => $data['fecha_cita'],
+            'comentarios' => $data['comentarios']
+        ]);
+
+        return redirect()->route('agenda.show', compact('contacto'));
     }
 
     /**
@@ -155,5 +185,14 @@ class AgendaController extends Controller
         if (!(Auth::check())) {
             return redirect('login');
         }
+
+        $cita = Cita::where('contacto_id', $contacto->id)->get();
+        if (0 >= $cita->count()) {
+            return redirect()->route('agenda.crear', ['contacto' => $contacto]);
+        }
+
+        $title = 'Editar ' . $this->tipo;
+
+        return view('agenda.editar', compact('title', 'contacto'));
     }
 }

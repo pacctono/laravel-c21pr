@@ -125,7 +125,7 @@
         <a href="{{ route('agenda.show', $agenda->contacto) }}" class="btn btn-link">
           <span class="oi oi-eye"></span>
         </a>
-        <a href="{{ route('agenda.edit', $agenda->contacto) }}" class="btn btn-link">
+        <a href="{{ route('agenda.crear', $agenda->contacto) }}" class="btn btn-link">
           <span class="oi oi-pencil"></span>
         </a>
       @endif

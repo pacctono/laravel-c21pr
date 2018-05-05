@@ -18,7 +18,7 @@ class CreateCitasTable extends Migration
             $table->unsignedInteger('contacto_id');
             $table->foreign('contacto_id')->references('id')->on('contactos');
             $table->datetime('fecha_cita')->nullable();
-            $table->string('observacion', 190)->nullable();
+            $table->string('comentarios', 190)->nullable();
             $table->timestamps();
         });
     }

@@ -29,7 +29,9 @@
     <header>
       <!-- Fixed navbar -->
       <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
-        <a class="navbar-brand" href="">C21 Puente Real</a>
+        <a class="navbar-brand" href="">
+          <img src="{{ (asset('img/c21pr.jpeg')) }}" title="C21 Puente Real" alt="C21 Puente Real">
+        </a>
         <button class="navbar-toggler" type="button" data-toggle="collapse"
                 data-target="#navbarCollapse" aria-controls="navbarCollapse"
                 aria-expanded="false" aria-label="Toggle navigation">

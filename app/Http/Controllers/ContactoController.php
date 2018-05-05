@@ -127,6 +127,7 @@ class ContactoController extends Controller
             'origen_id' => 'required',
             'resultado_id' => 'required',
             'fecha_evento' => ['sometimes', 'nullable', 'required_if:resultado_id,4,5,6,7', 'date'],
+            'hora_evento' => ['sometimes', 'nullable', 'required_if:resultado_id,4,5,6,7', 'time'],
             'observaciones' => '',
         ], [
             'cedula.digits_between' => 'La cedula de ideintidad debe contener 7 u 8 digitos',
@@ -141,6 +142,8 @@ class ContactoController extends Controller
             'resultado_id.required' => 'El resultado de la conversación con el contacto inicial es obligatorio suministrarlo.',
             'fecha_evento.required_if' => 'La fecha del evento es requerida, cuando el resultado es llamada o cita',
             'fecha_evento.date' => 'La fecha del evento debe ser una fecha valida.',
+            'hora_evento.required_if' => 'La hora del evento es requerida, cuando el resultado es llamada o cita',
+            'hora_evento.date' => 'La hora del evento debe ser una hora valida.',
         ]);
 
         //$data['user_id'] = Auth::user()->id;

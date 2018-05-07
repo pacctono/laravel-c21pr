@@ -117,8 +117,10 @@ class AgendaController extends Controller
             $cita->contacto = $contacto;
             $cita->fecha_cita = NULL;
             $cita->comentarios = NULL;
+        } else {
+            $cita=$cita->all()[0];
         }
-//        dd($cita);
+        //dd($cita);
         return view('agenda.show', compact('cita', 'diaSemana'));
     }
 
@@ -154,23 +156,25 @@ class AgendaController extends Controller
     {
         //dd($request);
         $data = request()->validate([   // Si ocurre error, laravel nos envia al url anterior.
-            'fecha_cita' => ['sometimes', 'nullable', 'required_if:resultado_id,4,5,6,7', 'date'],
-            'hora_cita'  => ['sometimes', 'nullable', 'required_if:resultado_id,4,5,6,7', 'time'],
+            'fecha_cita' => ['date'],
+            'hora_cita'  => ['date_format:H:i'],
             'comentarios' => '',
+            'contacto_id' => '',
         ], [
-            'fecha_cita.required_if' => 'La fecha de la cita es requerida, cuando el resultado es llamada o cita',
             'fecha_cita.date' => 'La fecha de la cita debe ser una fecha valida.',
-            'hora_cita.required_if' => 'La hora de la cita es requerida, cuando el resultado es llamada o cita',
             'hora_cita.date' => 'La hora de la cita debe ser una hora valida.',
         ]);
-
-        $contacto = $data['cpntacto'];
+        //dd($data);
+        //$contacto = $data['contacto'];
+        $fecha_cita = Carbon::createFromFormat('Y-m-d H:i', $data['fecha_cita'] . ' ' .
+                                                            $data['hora_cita']);
         Cita::create([
-            'contacto_id' => $contacto->id,
-            'fecha_cita'  => $data['fecha_cita'],
+            'contacto_id' => $data['contacto_id'],
+            'fecha_cita'  => $fecha_cita,
             'comentarios' => $data['comentarios']
         ]);
 
+        $contacto = Contacto::find($data['contacto_id']);
         return redirect()->route('agenda.show', compact('contacto'));
     }
 
@@ -189,10 +193,43 @@ class AgendaController extends Controller
         $cita = Cita::where('contacto_id', $contacto->id)->get();
         if (0 >= $cita->count()) {
             return redirect()->route('agenda.crear', ['contacto' => $contacto]);
+        } else {
+            $id  = $cita->all()[0]->id;
+            $fecha_cita  = $cita->all()[0]->fecha_cita;
+            $comentarios = $cita->all()[0]->comentarios;
         }
 
         $title = 'Editar ' . $this->tipo;
+        $diaSemana = $this->diaSemana;
 
-        return view('agenda.editar', compact('title', 'contacto'));
+        return view('agenda.editar', compact('title', 'contacto',
+                'id', 'fecha_cita', 'comentarios', 'diaSemana'));
+    }
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \App\Contacto  $contacto
+     * @return \Illuminate\Http\Response
+     */
+    public function update(Request $request, Cita $cita)
+    {
+        $data = request()->validate([   // Si ocurre error, laravel nos envia al url anterior.
+            'fecha_cita' => ['date'],
+            'hora_cita'  => ['date_format:H:i'],
+            'comentarios' => '',
+        ], [
+            'fecha_cita.date' => 'La fecha de la cita debe ser una fecha valida.',
+            'hora_cita.date' => 'La hora de la cita debe ser una hora valida.',
+        ]);
+        //dd($data);
+
+        $data['fecha_cita'] = Carbon::createFromFormat('Y-m-d H:i', $data['fecha_cita']
+                                                    . ' ' . $data['hora_cita']);
+        $cita->update($data);
+
+        $contacto = $cita->contacto;
+        return redirect()->route('agenda.show', ['contacto' => $contacto]);
     }
 }

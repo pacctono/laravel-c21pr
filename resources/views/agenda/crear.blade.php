@@ -23,18 +23,18 @@
         <p>Dirección del contacto: <spam class="alert-info">{{ $contacto->direccion }}
         </spam></p>
 
-        <form method="POST" class="form align-items-end-horizontal" action="{{ url('agenda') }}">
+        <form method="POST" class="form align-items-end-horizontal"
+                action="{{ route('agenda.store') }}">
         {!! csrf_field() !!}
 
         <div class="row">
             <div class="form-group d-flex">
                 <label class="control-label" for="fecha_cita">La cita fue realizada:</label>
                 <input type="date" name="fecha_cita" id="fecha_cita"
-                        value="{{ old('fecha_cita', $contacto->fecha_evento->format('d/m/Y')) }}">
+                    value="{{ old('fecha_cita', $contacto->fecha_evento->format('Y-m-d')) }}">
                 <input type="time" name="hora_cita" id="hora_cita"
-                        value="{{ old('hora_cita', $contacto->fecha_evento->format('H:i')) }}">
-                <input type="hidden" name="contacto_id" id="contacto_id"
-                        value="{{ $contacto }}">
+                    value="{{ old('hora_cita', $contacto->fecha_evento->format('H:i')) }}">
+                <input type="hidden" name="contacto_id" value="{{ $contacto->id }}">
             </div>
         </div>
         <div class="row">
@@ -45,9 +45,12 @@
                         placeholder="Coloque aqui las comentarios que tuvo de la conversación con el contacto inicial citado.">{{ old('comentarios') }}</textarea>
             </div>
         </div>
-        <p>
-            <a href="{{ route('agenda') }}" class="btn btn-link">Regresar a la agenda</a>
-        </p>
+        <div class="row">
+            <div class="form-group d-flex">
+                <button type="submit" class="btn btn-success">Agregar cita realizada</button>
+                <a href="{{ route('agenda') }}" class="btn btn-link">Regresar a la agenda</a>
+            </div>
+        </div>
     </div>
 </div>
 @endsection

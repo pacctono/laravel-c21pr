@@ -88,12 +88,14 @@ Route::get('/agenda/{contacto}', 'AgendaController@show')
 Route::get('/agenda/{contacto}/crear', 'AgendaController@create')
     ->name('agenda.crear');
 
-Route::post('/agenda', 'AgendaController@store');
+Route::post('/agenda', 'AgendaController@store')
+    ->name('agenda.store');
 
 Route::get('/agenda/{contacto}/editar', 'AgendaController@edit')
     ->name('agenda.edit');
 
-Route::put('/agenda/{contacto}', 'AgendaController@update');
+Route::put('/agenda/{cita}', 'AgendaController@update')
+    ->name('agenda.update');
 
 Route::get('/reportes/tipo/{tipo}', 'ReporteController@index')
     ->name('reportes');

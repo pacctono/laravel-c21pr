@@ -6,7 +6,7 @@
         {{ $cita->contacto->resultado->descripcion }}
             el <spam class="alert-info">
                 {{ $diaSemana[$cita->contacto->fecha_evento->dayOfWeek] }}
-                {{ $cita->contacto->fecha_evento->format('d/m/Y H:i') }}
+                {{ $cita->contacto->fecha_evento->format('d/m/Y H:i (h:i a)') }}
             </spam>
         con {{ $cita->contacto->name }}
     </h4>
@@ -27,7 +27,7 @@
         @else
         <p>La cita fue realizada: <spam class="alert-info">
             {{ $diaSemana[$cita->fecha_cita->dayOfWeek] }}
-            {{ $cita->fecha_cita->format('d/m/Y H:i') }}
+            {{ $cita->fecha_cita->format('d/m/Y H:i (h:i a)') }}
         </spam></p>
         <p>Comentarios de la cita realizada: <spam class="alert-info">
             {{ $cita->comentarios }}

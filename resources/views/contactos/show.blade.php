@@ -57,7 +57,7 @@
             @if ((3 < $contacto->resultado->id) and (8 > $contacto->resultado->id))
             el <spam class="alert-info">
                 {{ $diaSemana[$contacto->fecha_evento->dayOfWeek] }}
-                {{ $contacto->fecha_evento->format('d/m/Y H:i:s') }}
+                {{ $contacto->fecha_evento->format('d/m/Y H:i (h:i a)') }}
             </spam>
             @endif
         </p>

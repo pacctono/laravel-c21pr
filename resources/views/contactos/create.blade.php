@@ -138,7 +138,8 @@
               </div>
               <label class="control-label col-sm-2" for="resultado">Resultado:</label>
               <div class="form-control col-sm-4">
-                <select name="resultado_id" id="resultado">
+                <select name="resultado_id" id="resultado"
+                                            onChange="alertaFechaRequerida()">
                   <option value="">Cuál fue el resultado?</option>
                 @foreach ($resultados as $resultado)
                 @if (old('resultado_id') == $resultado->id)
@@ -148,7 +149,7 @@
                 @endif
                 @endforeach
                 </select>
-                &nbsp; {{-- Javascript: La fecha es requerida, cuando el resultado es una cita o llamada --}}
+                &nbsp;
                 <input type="date" name="fecha_evento" id="fecha_evento"
                         min="{{ now()->format('d/m/Y') }}" max="{{ now()->addWeeks(4)->format('d/m/Y') }}"
                         value="{{ old('fecha_evento') }}">
@@ -173,4 +174,29 @@
     </form>
     </div>
 </div>
+@endsection
+
+@section('js')
+
+<script>
+function alertaFechaRequerida() {
+  var resValor = document.getElementById('resultado').value;
+  var fecha    = document.getElementById('fecha_evento');
+
+  if (('' == resValor) || (4 > parseInt(resValor)) || (7 < parseInt(resValor))) {
+    return;
+  }
+
+  if (4 == parseInt(resValor)) {
+    tipo = 'llamada';
+  } else {
+    tipo = 'cita';
+  }
+
+  alert("Como resultado de este contacto inicial, usted debe realizar una '" + tipo +
+    "', suministre la fecha y hora de la '" + tipo + "'");
+  fecha.focus();
+}
+</script>
+
 @endsection

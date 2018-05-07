@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Cita extends Model
 {
     protected $fillable = [
-        'contacto_id', 'fecha_cita', 'observacion'
+        'contacto_id', 'fecha_cita', 'comentarios'
     ];
     protected $dates = [
         'fecha_cita'

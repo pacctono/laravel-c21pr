@@ -160,6 +160,8 @@ class ContactoController extends Controller
         $data['veces_name'] = Contacto::ofVeces($data['name'], 'name') + 1;
         $data['veces_telefono'] = Contacto::ofVeces($data['telefono'], 'telefono') + 1;
         $data['veces_email'] = Contacto::ofVeces($data['email'], 'email') + 1;
+        $data['fecha_evento'] = Carbon::createFromFormat('Y-m-d H:i', $data['fecha_evento'] .
+                                                    ' ' . $data['hora_evento']);
 
         Contacto::create([
             'cedula' => $data['cedula'],

@@ -32,7 +32,7 @@ class DatabaseSeeder extends Seeder
         $this->call(PropiedadSeeder::class);
         $this->call(ResultadoSeeder::class);
         $this->call(ZonaSeeder::class);
-        $this->call(ClienteSeeder::class);
+//        $this->call(ClienteSeeder::class);
 
         DB::statement('INSERT INTO venezueladdns (estado_zona, ciudad_sector, ddn)
                         SELECT estado_zona, ciudad_sector, ddn FROM pablo.venezueladdns;');
@@ -41,7 +41,7 @@ class DatabaseSeeder extends Seeder
         $this->call(ContactoSeeder::class);
         $this->call(TurnoSeeder::class);
 
-        DB::statement('DROP VIEW vista_agenda;');
+        DB::statement('DROP VIEW IF EXISTS vista_agenda;');
 
         DB::statement("create view vista_agenda as 
         (select c.id AS contacto_id, c.user_id AS user_id, date_format(c.fecha_evento, '%Y-%m-%d') AS fecha_evento,

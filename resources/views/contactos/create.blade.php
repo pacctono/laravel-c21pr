@@ -4,6 +4,11 @@
 <div class="card col-10">
     <h4 class="card-header">{{ $title }}</h4>
     <div class="card-body">
+    @if ($exito)
+    <div class="alert alert-success">
+        <h5>{{ $exito }}</h5>
+    </div>
+    @endif
     @if ($errors->any())
     <div class="alert alert-danger">
         <h5>Por favor corrige los errores debajo:</h5>
@@ -21,7 +26,7 @@
         <div class="row">
             <div class="form-group d-flex">
                 <label class="control-label col-sm-2" for="cedula">Cedula:</label>
-                <input type="text" class="form-control col-sm-3" size="8" maxlength="8" minlength="7" 
+                <input type="text" class="form-control col-sm-3" size="8" maxlength="8" minlength="6" 
                         name="cedula" id="cedula" placeholder="12345678" value="{{ old('cedula') }}">
                 &nbsp;
                 <label class="control-label col-sm-2" for="name">Nombre:</label>

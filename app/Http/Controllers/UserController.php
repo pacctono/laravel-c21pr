@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\User;
 use App\Venezueladdn;
+use App\Bitacora;
 use Illuminate\Validation\Rule;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -39,7 +40,11 @@ class UserController extends Controller
 
     public function show(User $user)
     {
-        return view('users.show', compact('user'));
+        $fechaUltLogin = Bitacora::all()
+                                ->where('user_id', $user->id)
+                                ->where('tx_tipo', 'L')
+                                ->max('created_at');
+        return view('users.show', compact('user', 'fechaUltLogin'));
     }
 
     public function create()

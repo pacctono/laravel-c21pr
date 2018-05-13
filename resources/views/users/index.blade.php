@@ -33,7 +33,7 @@
                     {{ method_field('DELETE' )}}
                     <a href="{{ route('users.show', $user) }}" class="btn btn-link"><span class="oi oi-eye"></span></a>
                     <a href="{{ route('users.edit', $user) }}" class="btn btn-link"><span class="oi oi-pencil"></span></a>
-                    <button class="btn btn-link"><span class="oi-trash"></span></button>
+                    <button class="btn btn-link"><span class="oi oi-trash"></span></button>
                 </form>
             </td>
         </tr>

@@ -98,10 +98,12 @@ class ContactoController extends Controller
         $resultados = Resultado::all();
         $zonas = Zona::all();
         $ddns = Venezueladdn::distinct()->get(['ddn'])->all();
+        $exito = session('exito', '');
+        session(['exito' => '']);
 
         return view('contactos.create', compact(
             'title', 'deseos', 'origenes', 'precios',
-            'propiedades', 'resultados', 'zonas', 'ddns'));
+            'propiedades', 'resultados', 'zonas', 'ddns', 'exito'));
     }
 
     /**
@@ -114,7 +116,7 @@ class ContactoController extends Controller
     {
         //dd($request);
         $data = request()->validate([   // Si ocurre error, laravel nos envia al url anterior.
-            'cedula' => ['sometimes', 'nullable', 'digits_between:7,8'],
+            'cedula' => ['sometimes', 'nullable', 'digits_between:6,8'],
             'name' => 'required',
             'ddn' => '',
             'telefono' => ['sometimes', 'nullable', 'digits:7'],
@@ -127,7 +129,7 @@ class ContactoController extends Controller
             'origen_id' => 'required',
             'resultado_id' => 'required',
             'fecha_evento' => ['sometimes', 'nullable', 'required_if:resultado_id,4,5,6,7', 'date'],
-            'hora_evento' => ['sometimes', 'nullable', 'required_if:resultado_id,4,5,6,7', 'time'],
+            'hora_evento' => ['sometimes', 'nullable', 'required_if:resultado_id,4,5,6,7', 'date_format:H:i'],
             'observaciones' => '',
         ], [
             'cedula.digits_between' => 'La cedula de ideintidad debe contener 7 u 8 digitos',
@@ -183,7 +185,8 @@ class ContactoController extends Controller
             'observaciones' => $data['observaciones']
         ]);
 
-        //return redirect('usuarios');
+        session(['exito' => "El contacto inicial '" . $data['name'] .
+                            "' fue agregado con exito."]);
         return redirect()->route('contactos.create');
     }
 

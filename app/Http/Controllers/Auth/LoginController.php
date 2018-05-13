@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Bitacora;
+
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 
@@ -31,6 +33,11 @@ class LoginController extends Controller
     protected $redirectAsesor = '/contactos/crear';
 
     protected function authenticated(Request $request, $user) {
+        Bitacora::create([
+            'user_id' => $user->id,
+            'tx_tipo' => 'L',
+        ]);
+        
         if ($user->is_admin) {
             return redirect($this->redirectTo);
         }

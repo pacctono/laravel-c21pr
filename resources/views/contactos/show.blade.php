@@ -4,8 +4,8 @@
 <div class="card">
     <h4 class="card-header">Contacto inicial:
         {{ $contacto->name }} el
-        {{ $diaSemana[$contacto->created_at->dayOfWeek] }}
-        {{ $contacto->created_at->format('d/m/Y') }}.
+        {{ $diaSemana[$contacto->created_at->timezone('America/Caracas')->dayOfWeek] }}
+        {{ $contacto->created_at->timezone('America/Caracas')->format('d/m/Y') }}.
         Ha contactado: <spam class="alert-info">{{ $contacto->veces_name }}
         @if (1 == $contacto->veces_name)
                 vez.
@@ -65,12 +65,14 @@
         </spam></p>
         @if ($contacto->user_borro != null)
             <p>Este contacto inicial fue borrado por {{ $contacto->userBorro->name }}
-                el {{ $diaSemana[$contacto->created_at->format('w')] }}, {{ $contacto->borrado_en->format('d/m/Y') }}.
+                el {{ $diaSemana[$contacto->borrado_en->timezone('America/Caracas')->format('w')] }},
+                    {{ $contacto->borrado_en->format('d/m/Y H:i a') }}.
             </p>
         @endif
         @if ($contacto->user_actualizo != null)
             <p>Este contacto inicial fue actualizado por {{ $contacto->userActualizo->name }}
-                el {{ $diaSemana[$contacto->created_at->format('w')] }}, {{ $contacto->updated_at->format('d/m/Y') }}.
+                el {{ $diaSemana[$contacto->updated_at->timezone('America/Caracas')->format('w')] }},
+                    {{ $contacto->updated_at->format('d/m/Y H:i a') }}.
             </p>
         @endif
 

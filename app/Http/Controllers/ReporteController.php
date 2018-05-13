@@ -53,10 +53,12 @@ class ReporteController extends Controller
                                         ->whereBetween('created_at', [$fecha_desde, $fecha_hasta])
                                         ->groupBy('user_id');
         } else {
-            $contactos = Contacto::select(DB::raw('DATE_FORMAT(created_at, "%d/%m/%Y") as fecha'),
+            $contactos = Contacto::select('created_at',
+                                            DB::raw('DATE_FORMAT(created_at, "%d/%m/%Y") as fecha'),
                                             DB::raw('count(*) as atendidos'))
                                         ->whereBetween('created_at', [$fecha_desde, $fecha_hasta])
-                                        ->groupBy(DB::raw('DATE_FORMAT(created_at, "%d/%m/%Y")'))
+                                        ->groupBy('created_at',
+                                            DB::raw('DATE_FORMAT(created_at, "%d/%m/%Y")'))
                                         ->orderBy('created_at');
         }
         $contactos = $contactos->get();
@@ -112,10 +114,12 @@ class ReporteController extends Controller
                                         ->whereBetween('created_at', [$fecha_desde, $fecha_hasta])
                                         ->groupBy('user_id');
         } else {
-            $contactos = Contacto::select(DB::raw('DATE_FORMAT(created_at, "%d/%m/%Y") as fecha'),
+            $contactos = Contacto::select('created_at',
+                                            DB::raw('DATE_FORMAT(created_at, "%d/%m/%Y") as fecha'),
                                             DB::raw('count(*) as atendidos'))
                                         ->whereBetween('created_at', [$fecha_desde, $fecha_hasta])
-                                        ->groupBy(DB::raw('DATE_FORMAT(created_at, "%d/%m/%Y")'))
+                                        ->groupBy('created_at',
+                                            DB::raw('DATE_FORMAT(created_at, "%d/%m/%Y")'))
                                         ->orderBy('created_at');
         }
         $contactos = $contactos->get();

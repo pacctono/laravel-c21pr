@@ -56,8 +56,8 @@
             </td>
             <td>{{ $contacto->email }}</td>
             <td>
-                {{ substr($diaSemana[$contacto->created_at->dayOfWeek], 0, 3) }}
-                {{ $contacto->created_at->format('d/m/Y') }}
+                {{ substr($diaSemana[$contacto->created_at->timezone('America/Caracas')->dayOfWeek], 0, 3) }}
+                {{ $contacto->created_at->timezone('America/Caracas')->format('d/m/Y') }}
                 @if ('' != $contacto->user_borro and $contacto->user_borro != null)
                     [B]
                 @endif
@@ -78,7 +78,7 @@
                         class="form-inline mt-0 mt-md-0">
                     {{ csrf_field() }}
                     {{ method_field('DELETE' )}}
-                    <button class="btn btn-link"><span class="oi-trash"></span></button>
+                    <button class="btn btn-link"><span class="oi oi-trash"></span></button>
                 </form>
                 @endif
             </td>

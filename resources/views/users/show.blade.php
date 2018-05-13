@@ -27,13 +27,24 @@
             @endif
             </spam>
         </p>
+        @if (null != $fechaUltLogin)
+        <p>Fecha del último login:
+            <spam class="alert-info">
+                {{ $fechaUltLogin->timezone('America/Caracas')->format('d/m/Y H:i a') }}
+            </spam>
+        </p>
+        @endif
 
         <p>
             @if (auth()->user()->is_admin)
             <!-- a href="{{ action('UserController@index') }}">Regresar al listado de usuarios</a -->
-            <a href="{{ url('/usuarios') }}" class="btn btn-link">Regresar al listado de asesores</a>
+            <a href="{{ url('/usuarios') }}" class="btn btn-link">
+                Regresar al listado de asesores
+            </a>
             @else
-            <a href="{{ route('users.edit', auth()->user()->id) }}" class="btn btn-link">Editar asesor</a>
+            <a href="{{ route('users.edit', auth()->user()->id) }}" class="btn btn-link">
+                Editar asesor
+            </a>
             @endif
         </p>
     </div>

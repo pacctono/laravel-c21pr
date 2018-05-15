@@ -56,8 +56,8 @@
             </td>
             <td>{{ $contacto->email }}</td>
             <td>
-                {{ substr($diaSemana[$contacto->created_at->timezone('America/Caracas')->dayOfWeek], 0, 3) }}
-                {{ $contacto->created_at->timezone('America/Caracas')->format('d/m/Y') }}
+                {{ $contacto->creado_dia_semana }}
+                {{ $contacto->creado_en }}
                 @if ('' != $contacto->user_borro and $contacto->user_borro != null)
                     [B]
                 @endif

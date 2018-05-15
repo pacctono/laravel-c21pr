@@ -33,6 +33,9 @@ class User extends Authenticatable
     protected $casts = [
         'is_admin' => 'boolean'
     ];
+    protected $diaSemana = [
+        'Domingo', 'Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado'
+    ];
 
     public function contactos()    // user_id
     {
@@ -49,8 +52,39 @@ class User extends Authenticatable
         return $this->hasMany(Agenda::class); // Si llave foranea, diferente a esperada, usamos 2do parametro.
     }
 
+    public function bitacoras()    // user_id
+    {
+        return $this->hasMany(Bitacora::class); // Si llave foranea, diferente a esperada, usamos 2do parametro.
+    }
+
     public function scopeOfAdmin($query)
     {
         return $query->where('is_admin', 1);
+    }
+
+    public function getFechaNacimientoEnAttribute()
+    {
+        return $this->fecha_nacimiento->format('d/m/Y');
+    }
+
+    public function getFechaIngresoEnAttribute()
+    {
+        return $this->fecha_ingreso->format('d/m/Y');
+    }
+
+    public function getCreadoEnAttribute()
+    {
+        return $this->created_at->timezone('America/Caracas')->format('d/m/Y');
+    }
+
+    public function getCreadoDiaSemanaAttribute()
+    {
+        return substr($this->diaSemana[$this->created_at->timezone('America/Caracas')
+                        ->dayOfWeek], 0, 3);
+    }
+
+    public function getCreadoConHoraAttribute()
+    {
+        return $this->created_at->timezone('America/Caracas')->format('d/m/Y H:i a');
     }
 }

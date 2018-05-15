@@ -35,7 +35,6 @@ class ContactoController extends Controller
 
         $title = 'Listado de ' . $this->tipoPlural;
         $ruta = request()->path();
-        $diaSemana = $this->diaSemana;
 
         if ('' == $orden or $orden == null) {
             $orden = 'id';
@@ -49,7 +48,7 @@ class ContactoController extends Controller
     
         //dd(Auth::user()->id);
 
-        return view('contactos.index', compact('title', 'contactos', 'ruta', 'diaSemana'));
+        return view('contactos.index', compact('title', 'contactos', 'ruta'));
     }
 
     public function filtro($filtro)
@@ -60,9 +59,6 @@ class ContactoController extends Controller
 
         $title = 'Listado de ' . $this->tipo;
         $ruta = request()->path();
-        $diaSemana = [
-            'Domingo', 'Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado'
-        ];
 
         if ('' == $filtro or $filtro == null) {
             $filtro = 'created_at';
@@ -76,7 +72,7 @@ class ContactoController extends Controller
     
         //dd(Auth::user()->id);
 
-        return view('contactos.index', compact('title', 'contactos', 'ruta', 'diaSemana'));
+        return view('contactos.index', compact('title', 'contactos', 'ruta'));
     }
 
     /**

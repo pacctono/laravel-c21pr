@@ -40,10 +40,13 @@ class UserController extends Controller
 
     public function show(User $user)
     {
-        $fechaUltLogin = Bitacora::all()
+/*        $fechaUltLogin = Bitacora::all()
                                 ->where('user_id', $user->id)
                                 ->where('tx_tipo', 'L')
-                                ->max('created_at');
+                                ->max('created_at');*/
+/*        $fechaUltLogin = Bitacora::OfUltLogin($user->id);
+        if (!($fechaUltLogin instanceof Carbon)) $fechaUltLogin = null;*/
+        $fechaUltLogin = Bitacora::fechaUltLogin($user->id);
         return view('users.show', compact('user', 'fechaUltLogin'));
     }
 

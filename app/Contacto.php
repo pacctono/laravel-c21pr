@@ -13,8 +13,14 @@ class Contacto extends Model
         'fecha_evento', 'observaciones', 'user_actualizo', 'user_borro',
         'borrado_en'
     ];
-    protected $dates = [
-        'created_at', 'updated_at', 'borrado_en', 'fecha_evento'
+    protected $dates = [        // Mutan a una instancia de Carbon.
+        'created_at',
+        'updated_at',
+        'borrado_en',
+        'fecha_evento'
+    ];
+    protected $diaSemana = [
+        'Domingo', 'Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado'
     ];
 
     public function user()    // user_id
@@ -83,5 +89,69 @@ class Contacto extends Model
             ->whereDate('created_at', '<', date('Y-m-d'))
             ->groupBy('veces_'.$col)
             ->count();
+    }
+
+    public function getCreadoEnAttribute()
+    {
+        return $this->created_at->timezone('America/Caracas')->format('d/m/Y');
+    }
+
+    public function getCreadoDiaSemanaAttribute()
+    {
+        return substr($this->diaSemana[$this->created_at->timezone('America/Caracas')
+                        ->dayOfWeek], 0, 3);
+    }
+
+    public function getCreadoConHoraAttribute()
+    {
+        return $this->created_at->timezone('America/Caracas')->format('d/m/Y h:i a');
+    }
+
+    public function getActualizadoEnAttribute()
+    {
+        return $this->updated_at->timezone('America/Caracas')->format('d/m/Y');
+    }
+
+    public function getActualizadoDiaSemanaAttribute()
+    {
+        return substr($this->diaSemana[$this->updated_at->timezone('America/Caracas')
+                        ->dayOfWeek], 0, 3);
+    }
+
+    public function getActualizadoConHoraAttribute()
+    {
+        return $this->updated_at->timezone('America/Caracas')->format('d/m/Y h:i a');
+    }
+
+    public function getBorradoEnAttribute()
+    {
+        return $this->borrado_en->timezone('America/Caracas')->format('d/m/Y');
+    }
+
+    public function getBorradoDiaSemanaAttribute()
+    {
+        return substr($this->diaSemana[$this->borrado_en->timezone('America/Caracas')
+                        ->dayOfWeek], 0, 3);
+    }
+
+    public function getBorradoConHoraAttribute()
+    {
+        return $this->borrado_en->timezone('America/Caracas')->format('d/m/Y h:i a');
+    }
+
+    public function getEventoEnAttribute()
+    {
+        return $this->fecha_evento->format('d/m/Y');
+    }
+
+    public function getEventoDiaSemanaAttribute()
+    {
+        return substr($this->diaSemana[$this->fecha_evento
+                        ->dayOfWeek], 0, 3);
+    }
+
+    public function getEventoConHoraAttribute()
+    {
+        return $this->fecha_evento->format('d/m/Y H:i (h:i a)');
     }
 }

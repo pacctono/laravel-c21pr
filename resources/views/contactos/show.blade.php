@@ -4,8 +4,8 @@
 <div class="card">
     <h4 class="card-header">Contacto inicial:
         {{ $contacto->name }} el
-        {{ $diaSemana[$contacto->created_at->timezone('America/Caracas')->dayOfWeek] }}
-        {{ $contacto->created_at->timezone('America/Caracas')->format('d/m/Y') }}.
+        {{ $contacto->creado_dia_semana }}
+        {{ $contacto->creado_con_hora }}.
         Ha contactado: <spam class="alert-info">{{ $contacto->veces_name }}
         @if (1 == $contacto->veces_name)
                 vez.
@@ -54,25 +54,33 @@
         <p>Resultado:
             <spam class="alert-info">{{ $contacto->resultado->descripcion }}
             </spam>
-            @if ((3 < $contacto->resultado->id) and (8 > $contacto->resultado->id))
-            el <spam class="alert-info">
-                {{ $diaSemana[$contacto->fecha_evento->dayOfWeek] }}
-                {{ $contacto->fecha_evento->format('d/m/Y H:i (h:i a)') }}
-            </spam>
+            @if ((3 < $contacto->resultado->id) and
+                (8 > $contacto->resultado->id))
+                @if (null == $contacto->fecha_evento)
+                <spam class="alert-info">
+                    OJO: NO FUE ASIGNADA LA FECHA. MUY EXTRAÑO.
+                </spam>
+                @else
+                el <spam class="alert-info">
+                    {{ $contacto->evento_dia_semana }}
+                    {{ $contacto->evento_con_hora }}.
+                </spam>
+                @endif
             @endif
         </p>
         <p>Observaciones: <spam class="alert-info">{{ $contacto->observaciones }}
         </spam></p>
         @if ($contacto->user_borro != null)
-            <p>Este contacto inicial fue borrado por {{ $contacto->userBorro->name }}
-                el {{ $diaSemana[$contacto->borrado_en->timezone('America/Caracas')->format('w')] }},
-                    {{ $contacto->borrado_en->format('d/m/Y H:i a') }}.
+            <p>Este contacto inicial fue borrado por {{ $contacto->userBorro->name }} el
+                {{ $contacto->borrado_dia_semana }}
+                {{ $contacto->borrado_con_hora }}.
             </p>
         @endif
         @if ($contacto->user_actualizo != null)
             <p>Este contacto inicial fue actualizado por {{ $contacto->userActualizo->name }}
-                el {{ $diaSemana[$contacto->updated_at->timezone('America/Caracas')->format('w')] }},
-                    {{ $contacto->updated_at->format('d/m/Y H:i a') }}.
+                el
+                {{ $contacto->actualizado_dia_semana }}
+                {{ $contacto->actualizado_con_hora }}.
             </p>
         @endif
 

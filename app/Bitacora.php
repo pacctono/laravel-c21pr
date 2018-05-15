@@ -3,6 +3,7 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Carbon\Carbon;
 
 class Bitacora extends Model
 {
@@ -20,6 +21,18 @@ class Bitacora extends Model
 
     public function scopeOfUltLogin($query, $user)
     {
-        return $query->where('user_id', $user)->where('tx_tipo', 'L')->max('created_at');
+        $fecha = $query->where('user_id', $user)->where('tx_tipo', 'L')->max('created_at');
+        if (is_string($fecha)) {
+            return new Carbon($fecha);
+        } else {
+            return $fecha;
+        }
+    }
+
+    public static function fechaUltLogin($user)
+    {
+        return self::all()->where('user_id', $user)
+                        ->where('tx_tipo', 'L')
+                        ->max('created_at');
     }
 }

@@ -52,12 +52,15 @@ class ReporteController extends Controller
             $contactos = Contacto::select('user_id', DB::raw('count(*) as atendidos'))
                                         ->whereBetween('created_at', [$fecha_desde, $fecha_hasta])
                                         ->groupBy('user_id');
+/*            $users = User::withCount('contactos');
+            Campos: $user->name, $user->contactos_count */
         } else {
-            $contactos = Contacto::select(DB::raw('DATE_FORMAT(created_at, "%d/%m/%Y") as fecha'),
+            $contactos = Contacto::select(DB::raw('DATE_FORMAT(created_at, "%Y-%m-%d")'),
+                                            DB::raw('DATE_FORMAT(created_at, "%d/%m/%Y") as fecha'),
                                             DB::raw('count(*) as atendidos'))
                                         ->whereBetween('created_at', [$fecha_desde, $fecha_hasta])
-                                        ->groupBy(DB::raw('DATE_FORMAT(created_at, "%d/%m/%Y")'))
-                                        ->orderBy('created_at');
+                                        ->groupBy(DB::raw('DATE_FORMAT(created_at, "%Y-%m-%d")'),
+                                                    DB::raw('DATE_FORMAT(created_at, "%d/%m/%Y")'));
         }
         $contactos = $contactos->get();
 
@@ -85,8 +88,8 @@ class ReporteController extends Controller
 
         if ('POST' == request()->method()) {
             $fechas = request()->all();
-            list ($fecha_desde, $fecha_hasta) = Fecha::periodo($fechas);
             $muestra = session('muestra', 'Asesor');
+            list ($fecha_desde, $fecha_hasta) = Fecha::periodo($fechas);
         } elseif ('' != session('fecha_desde', '') and '' != session('fecha_hasta', ''))  {
             $fecha_desde = session('fecha_desde');
             $fecha_hasta = session('fecha_hasta');
@@ -112,11 +115,12 @@ class ReporteController extends Controller
                                         ->whereBetween('created_at', [$fecha_desde, $fecha_hasta])
                                         ->groupBy('user_id');
         } else {
-            $contactos = Contacto::select(DB::raw('DATE_FORMAT(created_at, "%d/%m/%Y") as fecha'),
+            $contactos = Contacto::select(DB::raw('DATE_FORMAT(created_at, "%Y-%m-%d")'),
+                                            DB::raw('DATE_FORMAT(created_at, "%d/%m/%Y") as fecha'),
                                             DB::raw('count(*) as atendidos'))
                                         ->whereBetween('created_at', [$fecha_desde, $fecha_hasta])
-                                        ->groupBy(DB::raw('DATE_FORMAT(created_at, "%d/%m/%Y")'))
-                                        ->orderBy('created_at');
+                                        ->groupBy(DB::raw('DATE_FORMAT(created_at, "%Y-%m-%d")'),
+                                                    DB::raw('DATE_FORMAT(created_at, "%d/%m/%Y")'));
         }
         $contactos = $contactos->get();
 

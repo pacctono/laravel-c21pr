@@ -40,30 +40,37 @@
   </p>
 </div>
 
-@if ($contactos->isNotEmpty())
+@if ($elemsRep->isNotEmpty())
 
 <table class="table table-striped table-hover table-bordered">
   <thead class="thead-dark">
     <tr>
       <th scope="col">{{ $muestra }}</th>
+      @if ('Conexion' == $muestra)
+      <th scope="col">Conexiones</th>
+      @else
       <th scope="col">Atendidos</th>
+      @endif
     </tr>
   </thead>
   <tbody>
-  @foreach ($contactos as $contacto)
+  @foreach ($elemsRep as $elemento)
+    {{-- @continue (0 >= $elemento->atendidos) --}}
     <tr>
     @if ('Asesor' == $muestra)
-      <td>{{ $contacto->user->name }}</td>
+      <td>{{ $elemento->user->name }}</td>
+    @elseif ('Conexion' == $muestra)
+      <td>{{ $elemento->name }}</td>
     @else
-      <td>{{ $contacto->fecha }}</td>
+      <td>{{ $elemento->fecha }}</td>
     @endif
-      <td>{{ $contacto->atendidos }}</td>
+      <td>{{ $elemento->atendidos }}</td>
     </tr>
   @endForeach
   </tbody>
 </table>
 @else
-<p>No hay contactos registrados.</p>
+<p>No hay registros.</p>
 @endif
 
 <script>

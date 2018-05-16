@@ -17,9 +17,6 @@ use Carbon\Carbon;                          // PC
 
 class ContactoController extends Controller
 {
-    protected $diaSemana = [
-        'Domingo', 'Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado'
-    ];
     protected $tipo = 'Contacto Inicial';
     protected $tipoPlural = 'Contactos Iniciales';
     /**
@@ -187,8 +184,6 @@ class ContactoController extends Controller
     }
 
     /**
-     * Display the specified resource.
-     *
      * @param  \App\Contacto  $contacto
      * @return \Illuminate\Http\Response
      */
@@ -197,16 +192,15 @@ class ContactoController extends Controller
         if (!(Auth::check())) {
             return redirect('login');
         }
-        $diaSemana = $this->diaSemana;
 
         if (1 == Auth::user()->is_admin) {
-            return view('contactos.show', compact('contacto', 'diaSemana'));
+            return view('contactos.show', compact('contacto'));
         }
         if ($contacto->user_borro != null) {
             return redirect('/contactos');
         }
         if ($contacto->user->id == Auth::user()->id) {
-            return view('contactos.show', compact('contacto', 'diaSemana'));
+            return view('contactos.show', compact('contacto'));
         } else {
             return redirect('/contactos');
         }

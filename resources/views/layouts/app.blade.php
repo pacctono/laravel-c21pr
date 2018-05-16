@@ -67,6 +67,7 @@
               <ul class="dropdown-menu">
                 <li><a class="dropdown-item" href="{{ route('reportes', 'Asesor') }}">Por asesor</a></li>
                 <li><a class="dropdown-item" href="{{ route('reportes', 'Fecha') }}">Por fecha</a></li>
+                <li><a class="dropdown-item" href="{{ route('reportes', 'Conexion') }}">Por conexión</a></li>
               </ul>
             </li>
           </ul>

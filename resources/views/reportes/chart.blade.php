@@ -36,7 +36,7 @@
 
 <div>{!! $chart->container() !!}</div>
 
-@if ($contactos->isNotEmpty())
+@if ($elemsRep->isNotEmpty())
 <table class="table table-striped table-hover table-bordered">
   <thead class="thead-dark">
     <tr>
@@ -47,17 +47,17 @@
     </tr>
   </thead>
   <tbody>
-  @foreach ($contactos as $contacto)
+  @foreach ($elemsRep as $elemento)
     {{-- $loop->index, comienza desde 0, $loop-iteration, desde 1 --}}
     @if (0 == ($loop->index % 2))
     <tr>
     @endif
     @if ('Asesor' == $muestra)
-      <td>{{ $contacto->user->name }}</td>
+      <td>{{ $elemento->user->name }}</td>
     @else
-      <td>{{ $contacto->fecha }}</td>
+      <td>{{ $elemento->fecha }}</td>
     @endif
-      <td>{{ $contacto->atendidos }}</td>
+      <td>{{ $elemento->atendidos }}</td>
     @if (0 != ($loop->index % 2))
     </tr>
     @endif
@@ -65,7 +65,7 @@
   </tbody>
 </table>
 @else
-<p>No hay contactos registrados.</p>
+<p>No hay registros.</p>
 @endif
 
 @endsection

@@ -2,6 +2,7 @@
 
 namespace App;
 
+use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Model;
 
 class Contacto extends Model
@@ -89,6 +90,16 @@ class Contacto extends Model
             ->whereDate('created_at', '<', date('Y-m-d'))
             ->groupBy('veces_'.$col)
             ->count();
+    }
+
+    public static function contactosXFecha($fecha_desde, $fecha_hasta)
+    {
+        return self::select(DB::raw('DATE_FORMAT(created_at, "%Y-%m-%d")'),
+                        DB::raw('DATE_FORMAT(created_at, "%d/%m/%Y") as fecha'),
+                        DB::raw('count(*) as atendidos'))
+                    ->whereBetween('created_at', [$fecha_desde, $fecha_hasta])
+                       ->groupBy(DB::raw('DATE_FORMAT(created_at, "%Y-%m-%d")'),
+                        DB::raw('DATE_FORMAT(created_at, "%d/%m/%Y")'));
     }
 
     public function getCreadoEnAttribute()

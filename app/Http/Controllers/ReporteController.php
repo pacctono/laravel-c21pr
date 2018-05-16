@@ -11,12 +11,13 @@ use App\Resultado;
 use App\Zona;
 use App\Venezueladdn;
 use App\Turno;
+use App\Bitacora;
 use App\User;
 use App\Charts\SampleChart;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Auth;        // PC
-use Carbon\Carbon;                          // PC
+use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
 use App\MisClases\Fecha;
 
 class ReporteController extends Controller
@@ -37,6 +38,9 @@ class ReporteController extends Controller
             $fechas = request()->all();
             $muestra = session('muestra', 'Asesor');
             list ($fecha_desde, $fecha_hasta) = Fecha::periodo($fechas);
+        } elseif ('Conexion' == $muestra) {
+            $fecha_desde = (new Carbon(Bitacora::min('created_at')))->startOfDay();
+            $fecha_hasta = (new Carbon(Bitacora::max('created_at')))->endOfDay();
         } else {
             $fecha_desde = (new Carbon(Contacto::min('created_at')))->startOfDay();
             $fecha_hasta = (new Carbon(Contacto::max('created_at')))->endOfDay();
@@ -45,22 +49,30 @@ class ReporteController extends Controller
         $title = $this->tipo . ' por ' . $muestra . ' desde ' . $fecha_desde->format('d/m/Y') .
                                                     ' hasta ' . $fecha_hasta->format('d/m/Y');
 
-        if ('Asesor' == $muestra) {
-            $elemsRep = Contacto::select('user_id', DB::raw('count(*) as atendidos'))
+        switch ($muestra) {
+            case 'Asesor':
+/*            $elemsRep = Contacto::select('user_id', DB::raw('count(*) as atendidos'))
                                         ->whereBetween('created_at', [$fecha_desde, $fecha_hasta])
-                                        ->groupBy('user_id')->get();
-/*            $users = User::withCount('contactos');
-            Campos: $user->name, $user->contactos_count */
-        } elseif ('Conexion' == $muestra) {
-            $elemsRep = User::withCount([
-                            'bitacoras as atendidos' => function ($query) {
-                                $query->where('id', '>', 1);
+                                        ->groupBy('user_id')->get();*/
+                $elemsRep = User::where('id', '>', 1)
+                            ->withCount(['contactos as atendidos' => function ($query)
+                                        use ($fecha_desde, $fecha_hasta) {  // 'use' permite heredar variables del scope del padre, donde el closure es definido.
+                                $query->whereBetween('created_at', [$fecha_desde, $fecha_hasta]);
+                            }]);
+                break;
+            case 'Conexion':
+                $elemsRep = User::where('id', '>', 1)->withCount([
+                            'bitacoras as atendidos' => function ($query)
+                                        use ($fecha_desde, $fecha_hasta) {
+                                $query->where('tx_tipo', 'L')
+                                    ->whereBetween('created_at', [$fecha_desde, $fecha_hasta]);
                             }
-                        ])->get();
-        } else {
-            $elemsRep = Contacto::contactosXFecha($fecha_desde, $fecha_hasta)->get();                                                    
+                        ]);
+                break;
+            default:        // 'Fecha'
+                $elemsRep = Contacto::contactosXFecha($fecha_desde, $fecha_hasta);
         } 
-//        $elemsRep = $elemsRep->get();
+        $elemsRep = $elemsRep->get();
 
         session(['fecha_desde' => $fecha_desde, 'fecha_hasta' => $fecha_hasta, 'muestra' => $muestra]);
         return view('reportes.index', compact('title', 'elemsRep', 'chart', 'muestra',
@@ -92,6 +104,9 @@ class ReporteController extends Controller
             $fecha_desde = session('fecha_desde');
             $fecha_hasta = session('fecha_hasta');
             $muestra = session('muestra', 'Asesor');
+        } elseif ('Conexion' == $muestra) {
+            $fecha_desde = (new Carbon(Bitacora::min('created_at')))->startOfDay();
+            $fecha_hasta = (new Carbon(Bitacora::max('created_at')))->endOfDay();
         } else {
             $fecha_desde = (new Carbon(Contacto::min('created_at')))->startOfDay();
             $fecha_hasta = (new Carbon(Contacto::max('created_at')))->endOfDay();
@@ -108,15 +123,26 @@ class ReporteController extends Controller
 
         $chart = new SampleChart;
 
-        if ('Asesor' == $muestra) {
-            $elemsRep = Contacto::select('user_id', DB::raw('count(*) as atendidos'))
-                                        ->whereBetween('created_at', [$fecha_desde, $fecha_hasta])
-                                        ->groupBy('user_id');
-/*            $users = User::withCount('contactos');
-            Campos: $user->name, $user->contactos_count */
-        } else {
-            $elemsRep = Contacto::contactosXFecha($fecha_desde, $fecha_hasta);                                                    
-        }
+        switch ($muestra) {
+            case 'Asesor':
+                $elemsRep = User::where('id', '>', 1)
+                            ->withCount(['contactos as atendidos' => function ($query)
+                                        use ($fecha_desde, $fecha_hasta) {
+                                $query->whereBetween('created_at', [$fecha_desde, $fecha_hasta]);
+                            }]);
+                break;
+            case 'Conexion':
+                $elemsRep = User::where('id', '>', 1)->withCount([
+                            'bitacoras as atendidos' => function ($query)
+                                        use ($fecha_desde, $fecha_hasta) {
+                                $query->where('tx_tipo', 'L')
+                                    ->whereBetween('created_at', [$fecha_desde, $fecha_hasta]);
+                            }
+                        ]);
+                break;
+            default:        // 'Fecha'
+                $elemsRep = Contacto::contactosXFecha($fecha_desde, $fecha_hasta);
+        } 
         $elemsRep = $elemsRep->get();
 
 // Add the dataset (we will go with the chart template approach)
@@ -127,11 +153,10 @@ class ReporteController extends Controller
         $intervalo = 0xffffff/count($elemsRep);
         $hexColor  = 0x0;
         foreach ($elemsRep as $elemento) {
-            if (0 >= $elemento->atendidos) continue;
-            if ('Asesor' == $muestra) {
-                $arrEtiq[]  = substr($elemento->user->name, 0, 20);
-            } else {
+            if ('Fecha' == $muestra) {
                 $arrEtiq[]  = $elemento->fecha;
+            } else {
+                $arrEtiq[]  = substr($elemento->name, 0, 20);
             }
             $arrData[]  = $elemento->atendidos;
             $strColor   = str_pad(dechex($hexColor), 6, '0', STR_PAD_LEFT);

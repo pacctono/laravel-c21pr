@@ -45,7 +45,11 @@
 <table class="table table-striped table-hover table-bordered">
   <thead class="thead-dark">
     <tr>
+      @if ('Conexion' == $muestra)
+      <th scope="col">Asesor</th>
+      @else
       <th scope="col">{{ $muestra }}</th>
+      @endif
       @if ('Conexion' == $muestra)
       <th scope="col">Conexiones</th>
       @else
@@ -57,12 +61,10 @@
   @foreach ($elemsRep as $elemento)
     {{-- @continue (0 >= $elemento->atendidos) --}}
     <tr>
-    @if ('Asesor' == $muestra)
-      <td>{{ $elemento->user->name }}</td>
-    @elseif ('Conexion' == $muestra)
-      <td>{{ $elemento->name }}</td>
-    @else
+    @if ('Fecha' == $muestra)
       <td>{{ $elemento->fecha }}</td>
+    @else
+      <td>{{ $elemento->name }}</td>
     @endif
       <td>{{ $elemento->atendidos }}</td>
     </tr>

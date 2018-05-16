@@ -40,10 +40,26 @@
 <table class="table table-striped table-hover table-bordered">
   <thead class="thead-dark">
     <tr>
+      @if ('Conexion' == $muestra)
+      <th scope="col">Asesor</th>
+      @else
       <th scope="col">{{ $muestra }}</th>
+      @endif
+      @if ('Conexion' == $muestra)
+      <th scope="col">Conexiones</th>
+      @else
       <th scope="col">Atendidos</th>
+      @endif
+      @if ('Conexion' == $muestra)
+      <th scope="col">Asesor</th>
+      @else
       <th scope="col">{{ $muestra }}</th>
+      @endif
+      @if ('Conexion' == $muestra)
+      <th scope="col">Conexiones</th>
+      @else
       <th scope="col">Atendidos</th>
+      @endif
     </tr>
   </thead>
   <tbody>
@@ -52,10 +68,10 @@
     @if (0 == ($loop->index % 2))
     <tr>
     @endif
-    @if ('Asesor' == $muestra)
-      <td>{{ $elemento->user->name }}</td>
-    @else
+    @if ('Fecha' == $muestra)
       <td>{{ $elemento->fecha }}</td>
+    @else
+      <td>{{ $elemento->name }}</td>
     @endif
       <td>{{ $elemento->atendidos }}</td>
     @if (0 != ($loop->index % 2))

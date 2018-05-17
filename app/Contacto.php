@@ -102,6 +102,22 @@ class Contacto extends Model
                         DB::raw('DATE_FORMAT(created_at, "%d/%m/%Y")'));
     }
 
+    public function fechaEn($fecha)
+    {
+        return $this[$fecha]->timezone('America/Caracas')->format('d/m/Y');
+    }
+
+    public function fechaDiaSemana($fecha)
+    {
+        return substr($this->diaSemana[$this[$fecha]->timezone('America/Caracas')
+                        ->dayOfWeek], 0, 3);
+    }
+
+    public function fechaConHora($fecha)
+    {
+        return $this[$fecha]->timezone('America/Caracas')->format('d/m/Y h:i a');
+    }
+
     public function getCreadoEnAttribute()
     {
         return $this->created_at->timezone('America/Caracas')->format('d/m/Y');

@@ -65,9 +65,15 @@
                 Reportes
               <span class="caret"></span></a>
               <ul class="dropdown-menu">
-                <li><a class="dropdown-item" href="{{ route('reportes', 'Asesor') }}">Por asesor</a></li>
-                <li><a class="dropdown-item" href="{{ route('reportes', 'Fecha') }}">Por fecha</a></li>
-                <li><a class="dropdown-item" href="{{ route('reportes', 'Conexion') }}">Por conexión</a></li>
+                <li><a class="dropdown-item" href="{{ route('reportes', 'Asesor') }}">
+                  Contactos X asesor
+                </a></li>
+                <li><a class="dropdown-item" href="{{ route('reportes', 'Fecha') }}">
+                  Contactos X fecha
+                </a></li>
+                <li><a class="dropdown-item" href="{{ route('reportes', 'Conexion') }}">
+                  Conexión X asesor
+                </a></li>
               </ul>
             </li>
           </ul>

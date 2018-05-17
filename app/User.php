@@ -62,6 +62,25 @@ class User extends Authenticatable
         return $query->where('is_admin', 1);
     }
 
+    public static function contactosXAsesor($fecha_desde, $fecha_hasta)
+    {
+        return self::where('id', '>', 1)
+                    ->withCount(['contactos as atendidos' => function ($query)
+                                        use ($fecha_desde, $fecha_hasta) {  // 'use' permite heredar variables del scope del padre, donde el closure es definido.
+                            $query->whereBetween('created_at', [$fecha_desde, $fecha_hasta]);
+                    }]);
+    }
+
+    public static function conexionXAsesor($fecha_desde, $fecha_hasta)
+    {
+        return self::where('id', '>', 1)
+                    ->withCount(['bitacoras as atendidos' => function ($query)
+                                        use ($fecha_desde, $fecha_hasta) {
+                            $query->where('tx_tipo', 'L')
+                            ->whereBetween('created_at', [$fecha_desde, $fecha_hasta]);
+                    }]);
+    }
+
     public function getFechaNacimientoEnAttribute()
     {
         return $this->fecha_nacimiento->format('d/m/Y');

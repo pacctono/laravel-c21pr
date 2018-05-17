@@ -54,20 +54,10 @@ class ReporteController extends Controller
 /*            $elemsRep = Contacto::select('user_id', DB::raw('count(*) as atendidos'))
                                         ->whereBetween('created_at', [$fecha_desde, $fecha_hasta])
                                         ->groupBy('user_id')->get();*/
-                $elemsRep = User::where('id', '>', 1)
-                            ->withCount(['contactos as atendidos' => function ($query)
-                                        use ($fecha_desde, $fecha_hasta) {  // 'use' permite heredar variables del scope del padre, donde el closure es definido.
-                                $query->whereBetween('created_at', [$fecha_desde, $fecha_hasta]);
-                            }]);
+                $elemsRep = User::contactosXAsesor($fecha_desde, $fecha_hasta);
                 break;
             case 'Conexion':
-                $elemsRep = User::where('id', '>', 1)->withCount([
-                            'bitacoras as atendidos' => function ($query)
-                                        use ($fecha_desde, $fecha_hasta) {
-                                $query->where('tx_tipo', 'L')
-                                    ->whereBetween('created_at', [$fecha_desde, $fecha_hasta]);
-                            }
-                        ]);
+                $elemsRep = User::conexionXAsesor($fecha_desde, $fecha_hasta);
                 break;
             default:        // 'Fecha'
                 $elemsRep = Contacto::contactosXFecha($fecha_desde, $fecha_hasta);
@@ -125,20 +115,10 @@ class ReporteController extends Controller
 
         switch ($muestra) {
             case 'Asesor':
-                $elemsRep = User::where('id', '>', 1)
-                            ->withCount(['contactos as atendidos' => function ($query)
-                                        use ($fecha_desde, $fecha_hasta) {
-                                $query->whereBetween('created_at', [$fecha_desde, $fecha_hasta]);
-                            }]);
+                $elemsRep = User::contactosXAsesor($fecha_desde, $fecha_hasta);
                 break;
             case 'Conexion':
-                $elemsRep = User::where('id', '>', 1)->withCount([
-                            'bitacoras as atendidos' => function ($query)
-                                        use ($fecha_desde, $fecha_hasta) {
-                                $query->where('tx_tipo', 'L')
-                                    ->whereBetween('created_at', [$fecha_desde, $fecha_hasta]);
-                            }
-                        ]);
+                $elemsRep = User::conexionXAsesor($fecha_desde, $fecha_hasta);
                 break;
             default:        // 'Fecha'
                 $elemsRep = Contacto::contactosXFecha($fecha_desde, $fecha_hasta);

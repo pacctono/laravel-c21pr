@@ -78,7 +78,8 @@ Route::get('/agenda', 'AgendaController@index')
 Route::get('/agenda/orden/{orden}', 'AgendaController@index')
     ->name('agenda.orden');
 
-Route::post('/agenda', 'AgendaController@index')
+Route::get('/agenda/filtro', 'AgendaController@index');
+Route::post('/agenda/filtro', 'AgendaController@index')
     ->name('agenda.post');
 
 Route::get('/agenda/{contacto}', 'AgendaController@show')

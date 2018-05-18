@@ -39,11 +39,15 @@ class ReporteController extends Controller
             $muestra = session('muestra', 'Asesor');
             list ($fecha_desde, $fecha_hasta) = Fecha::periodo($fechas);
         } elseif ('Conexion' == $muestra) {
-            $fecha_desde = (new Carbon(Bitacora::min('created_at')))->startOfDay();
-            $fecha_hasta = (new Carbon(Bitacora::max('created_at')))->endOfDay();
+            $fecha_desde = (new Carbon(Bitacora::min('created_at')))
+                                ->timezone('America/Caracas')->startOfDay();
+            $fecha_hasta = (new Carbon(Bitacora::max('created_at')))
+                                ->timezone('America/Caracas')->endOfDay();
         } else {
-            $fecha_desde = (new Carbon(Contacto::min('created_at')))->startOfDay();
-            $fecha_hasta = (new Carbon(Contacto::max('created_at')))->endOfDay();
+            $fecha_desde = (new Carbon(Contacto::min('created_at')))
+                                ->timezone('America/Caracas')->startOfDay();
+            $fecha_hasta = (new Carbon(Contacto::max('created_at')))
+                                ->timezone('America/Caracas')->endOfDay();
         }
 
         $title = $this->tipo . ' por ' . $muestra . ' desde ' . $fecha_desde->format('d/m/Y') .

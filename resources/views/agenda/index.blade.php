@@ -6,7 +6,7 @@
     <h1>{{ $title }}</h1>
   </div -->
 <div>
-    <form method="POST" class="form-horizontal" action="{{ url('/agenda') }}"
+    <form method="POST" class="form-horizontal" action="{{ route('agenda.post') }}"
           onSubmit="return alertaFechaRequerida()">
       {!! csrf_field() !!}
 

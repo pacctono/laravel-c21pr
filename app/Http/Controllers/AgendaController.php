@@ -30,6 +30,7 @@ class AgendaController extends Controller
         $ruta = request()->path();
         $diaSemana = $this->diaSemana;
         $periodo = request()->all();
+//        dd($periodo);
 // Todo se inicia, cuando se selecciona 'Agenda' desde el menú horizontal.
         if (('GET' == request()->method()) and ('' == $orden) and (0 == count($periodo))) {
             session(['rPeriodo' => '', 'fecha_desde' => '', 'fecha_hasta' => '', 'asesor' => '0']);
@@ -50,7 +51,9 @@ class AgendaController extends Controller
             if (isset($periodo['asesor'])) $asesor = $periodo['asesor'];
             else $asesor = 0;
 
-            list ($fecha_desde, $fecha_hasta) = Fecha::periodo($periodo);
+            $fecha_min = (new Carbon(Agenda::min('fecha_evento')));
+            $fecha_max = (new Carbon(Agenda::max('fecha_evento')));
+            list ($fecha_desde, $fecha_hasta) = Fecha::periodo($periodo, $fecha_min, $fecha_max);
 
 /*            if ('' != $fecha_desde and '' != $fecha_hasta) {
                 $fecha_desde = $fecha_desde->format('Y-m-d H:m:s');
@@ -59,7 +62,7 @@ class AgendaController extends Controller
 
             }*/
         }
-        //dd($periodo, $fecha_desde, $fecha_hasta);
+//        dd($periodo, $fecha_desde, $fecha_hasta);
         if ('' == $orden or $orden == null) {
             $orden = 'fecha_evento';
         }
@@ -166,6 +169,9 @@ class AgendaController extends Controller
         ]);
         //dd($data);
         //$contacto = $data['contacto'];
+/*        if (!isset($data['fecha_cita'])) {    // Esto fue un invento, al parecer, muy malo.
+            return redirect()->route('agenda.post');
+        }*/
         $fecha_cita = Carbon::createFromFormat('Y-m-d H:i', $data['fecha_cita'] . ' ' .
                                                             $data['hora_cita']);
         Cita::create([

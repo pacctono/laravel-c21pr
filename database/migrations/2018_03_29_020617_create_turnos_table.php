@@ -15,7 +15,7 @@ class CreateTurnosTable extends Migration
     {
         Schema::create('turnos', function (Blueprint $table) {
             $table->increments('id');
-            $table->datetime('turno_en')->unique();          // Incluye hora 8:mañana (8:30) y 12:tarde (12:30)
+            $table->datetime('turno')->unique();          // Incluye hora 8:mañana (8:30) y 12:tarde (12:30)
             $table->unsignedInteger('user_id');
             $table->foreign('user_id')->references('id')->on('users');
             $table->unsignedInteger('user_creo');

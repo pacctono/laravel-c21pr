@@ -16,9 +16,6 @@ use App\MisClases\Fecha;
 
 class AgendaController extends Controller
 {
-    protected $diaSemana = [
-        'Domingo', 'Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado'
-    ];
     protected $tipo = 'cita ';
 
     public function index($orden = null) {
@@ -28,10 +25,9 @@ class AgendaController extends Controller
 // Variables propias de la metodo de la controlador.
         $title = $this->tipo;
         $ruta = request()->path();
-        $diaSemana = $this->diaSemana;
         $periodo = request()->all();
 //        dd($periodo);
-// Todo se inicia, cuando se selecciona 'Agenda' desde el menú horizontal.
+// Todo se inicializa, cuando se selecciona 'Agenda' desde el menú horizontal.
         if (('GET' == request()->method()) and ('' == $orden) and (0 == count($periodo))) {
             session(['rPeriodo' => '', 'fecha_desde' => '', 'fecha_hasta' => '', 'asesor' => '0']);
         }
@@ -47,20 +43,13 @@ class AgendaController extends Controller
             $fecha_hasta = session('fecha_hasta', '');
             $asesor      = session('asesor', '0');
         } else {
-            $rPeriodo = $periodo['periodo'];
+            $rPeriodo = $periodo['periodo'];            // Radio periodo.
             if (isset($periodo['asesor'])) $asesor = $periodo['asesor'];
             else $asesor = 0;
 
             $fecha_min = (new Carbon(Agenda::min('fecha_evento')));
             $fecha_max = (new Carbon(Agenda::max('fecha_evento')));
             list ($fecha_desde, $fecha_hasta) = Fecha::periodo($periodo, $fecha_min, $fecha_max);
-
-/*            if ('' != $fecha_desde and '' != $fecha_hasta) {
-                $fecha_desde = $fecha_desde->format('Y-m-d H:m:s');
-                $fecha_hasta = $fecha_hasta->format('Y-m-d H:m:s');        {{ $diaSemana[$turno->turno_en->dayOfWeek] }}
-        {{ $turno->turno_en->format('d/m/Y') }}
-
-            }*/
         }
 //        dd($periodo, $fecha_desde, $fecha_hasta);
         if ('' == $orden or $orden == null) {
@@ -84,15 +73,15 @@ class AgendaController extends Controller
                                 'contacto_id', 'email', 'direccion');           // Solo estas columnas.
         }
 
-        if (0 < $asesor) {                  // No se selecciono un asesor o el conectado no es administrador.
+        if (0 < $asesor) {      // Se selecciono un asesor o el conectado no es administrador.
             $agendas = $agendas->where('user_id', $asesor);
         }
         if ('' != $fecha_desde and '' != $fecha_hasta) {    // No se seleccionaron fechas.
             $agendas = $agendas->whereBetween('fecha_evento', [$fecha_desde, $fecha_hasta]);
         }
         $agendas = $agendas->orderBy($orden);   // Ordenar los items de la agenda.
-        if ('user_id' == $orden) {              // Si se pidió ordenar por id de usuario, ordenar por fecha_evento dentro de cada usuario.
-            $agendas = $agendas->orderBy('fecha_evento');
+        if ('user_id' == $orden) {              // Si se pidió ordenar por id de usuario,
+            $agendas = $agendas->orderBy('fecha_evento');   // ordenar por fecha_evento en cada usuario.
         }
         $agendas = $agendas->paginate(10);      // Pagina la impresión de 10 en 10
 // Devolver las fechas sin la hora. Los diez primeros caracteres son: yyyy-mm-dd.
@@ -100,7 +89,7 @@ class AgendaController extends Controller
         $fecha_hasta = substr($fecha_hasta, 0, 10);
         session(['rPeriodo' => $rPeriodo, 'fecha_desde' => $fecha_desde,    // Asignar valores en sesión.
                     'fecha_hasta' => $fecha_hasta, 'asesor' => $asesor]);
-        return view('agenda.index', compact('title', 'users', 'ruta', 'diaSemana', 'agendas',
+        return view('agenda.index', compact('title', 'users', 'ruta', 'agendas',
                     'rPeriodo', 'fecha_desde', 'fecha_hasta', 'asesor'));
     }
 
@@ -109,7 +98,6 @@ class AgendaController extends Controller
         if (!(Auth::check())) {
             return redirect('login');
         }
-        $diaSemana = $this->diaSemana;
 
         if ((!Auth::user()->is_admin) and ($contacto->user->id != Auth::user()->id)) {
             return redirect('/agenda');
@@ -124,7 +112,7 @@ class AgendaController extends Controller
             $cita=$cita->all()[0];
         }
         //dd($cita);
-        return view('agenda.show', compact('cita', 'diaSemana'));
+        return view('agenda.show', compact('cita'));
     }
 
     /**
@@ -144,9 +132,8 @@ class AgendaController extends Controller
         }
 
         $title = 'Crear ' . $this->tipo;
-        $diaSemana = $this->diaSemana;
 
-        return view('agenda.crear', compact('title', 'contacto', 'diaSemana'));
+        return view('agenda.crear', compact('title', 'contacto'));
     }
 
     /**
@@ -206,10 +193,9 @@ class AgendaController extends Controller
         }
 
         $title = 'Editar ' . $this->tipo;
-        $diaSemana = $this->diaSemana;
 
         return view('agenda.editar', compact('title', 'contacto',
-                'id', 'fecha_cita', 'comentarios', 'diaSemana'));
+                'id', 'fecha_cita', 'comentarios'));
     }
 
     /**

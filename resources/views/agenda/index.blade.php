@@ -90,8 +90,8 @@
   @foreach ($agendas as $agenda)
     <tr>
       <td>
-        {{ substr($diaSemana[$agenda->fecha_evento->dayOfWeek], 0, 3) }}
-        {{ $agenda->fecha_evento->format('d/m/Y') }}
+        {{ $agenda->evento_dia_semana }}
+        {{ $agenda->evento_en }}
       </td>
       <td>
         {{ $agenda->hora_evento }}
@@ -108,7 +108,7 @@
       <td>
       @endif
         @if ('' != $agenda->telefono)
-        0{{ substr($agenda->telefono, 0, 3) }}-{{ substr($agenda->telefono, 3, 3) }}-{{ substr($agenda->telefono, 6) }}
+        0{{ $agenda->telefono }}
         @endif
       </td>
       <td>

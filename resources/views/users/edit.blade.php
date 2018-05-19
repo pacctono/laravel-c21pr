@@ -55,7 +55,7 @@
             <div class="form-group d-flex align-items-end">
                 <label for="fecha_nacimiento">Fecha de nacimiento:</label>
                 <input type="date" name="fecha_nacimiento" id="fecha_nacimiento"
-                        value="{{ old('fecha_nacimiento', ($user->fecha_nacimiento)?$user->fecha_nacimiento->format('Y-m-d'):'') }}">
+                        value="{{ old('fecha_nacimiento', ($user->fecha_nacimiento)?$user->fecha_nacimiento_bd:'') }}">
             </div>
             <div class="form-group d-flex align-items-end">
                 <label for="email_c21">Correo electrónico C21:</label>
@@ -70,7 +70,7 @@
             <div class="form-group d-flex align-items-end">
                 <label for="fecha_ingreso">Fecha de ingreso:</label>
                 <input type="date" name="fecha_ingreso" id="fecha_ingreso"
-                        value="{{ old('fecha_ingreso', ($user->fecha_ingreso)?$user->fecha_ingreso->format('Y-m-d'):'') }}">
+                        value="{{ old('fecha_ingreso', ($user->fecha_ingreso)?$user->fecha_ingreso_bd:'') }}">
             </div>
             <div class="form-group d-flex align-items-end">
                 <label for="password">Contraseña:</label>

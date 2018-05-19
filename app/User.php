@@ -86,9 +86,19 @@ class User extends Authenticatable
         return $this->fecha_nacimiento->format('d/m/Y');
     }
 
+    public function getFechaNacimientoBdAttribute()
+    {
+        return $this->fecha_nacimiento->format('Y-m-d');
+    }
+
     public function getFechaIngresoEnAttribute()
     {
         return $this->fecha_ingreso->format('d/m/Y');
+    }
+
+    public function getFechaIngresoBdAttribute()
+    {
+        return $this->fecha_ingreso->format('Y-m-d');
     }
 
     public function getCreadoEnAttribute()

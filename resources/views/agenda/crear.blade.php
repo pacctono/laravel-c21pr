@@ -5,14 +5,14 @@
     <h4 class="card-header">Resultado de
         {{ $contacto->resultado->descripcion }}
             el <spam class="alert-info">
-                {{ $diaSemana[$contacto->fecha_evento->dayOfWeek] }}
-                {{ $contacto->fecha_evento->format('d/m/Y H:i') }}
+                {{ $contacto->evento_dia_semana }}
+                {{ $contacto->evento_con_hora }}
             </spam>
         con {{ $contacto->name }}
     </h4>
     <div class="card-body">
         <p>Telefono de contacto: <spam class="alert-info">
-            0{{ substr($contacto->telefono, 0, 3) }}-{{ substr($contacto->telefono, 3, 3) }}-{{ substr($contacto->telefono, 6) }}
+            0{{ $contacto->telefono }}
         </spam>.
         </p>
         <p>Correo de contacto: <spam class="alert-info">{{ $contacto->email }}
@@ -31,9 +31,9 @@
             <div class="form-group d-flex">
                 <label class="control-label" for="fecha_cita">La cita fue realizada:</label>
                 <input type="date" name="fecha_cita" id="fecha_cita"
-                    value="{{ old('fecha_cita', $contacto->fecha_evento->format('Y-m-d')) }}">
+                    value="{{ old('fecha_cita', $contacto->evento_bd) }}">
                 <input type="time" name="hora_cita" id="hora_cita"
-                    value="{{ old('hora_cita', $contacto->fecha_evento->format('H:i')) }}">
+                    value="{{ old('hora_cita', $contacto->evento_hora) }}">
                 <input type="hidden" name="contacto_id" value="{{ $contacto->id }}">
             </div>
         </div>

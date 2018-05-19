@@ -14,6 +14,9 @@ class Agenda extends Model
         'fecha_evento'
     ];
     protected $table = 'vista_agenda';
+    protected $diaSemana = [
+        'Domingo', 'Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado'
+    ];
 
     public function user()    // user_id
     {
@@ -33,5 +36,30 @@ class Agenda extends Model
     public function scopeOfContacto($query, $contacto)
     {
         return $query->where('contacto_id', $contacto);
+    }
+
+    public function getEventoEnAttribute()
+    {
+        return $this->fecha_evento->format('d/m/Y');
+    }
+
+    public function getEventoDiaSemanaAttribute()
+    {
+        return substr($this->diaSemana[$this->fecha_evento->dayOfWeek], 0, 3);
+    }
+
+    public function getEventoConHoraAttribute()
+    {
+        return $this->fecha_evento->format('d/m/Y H:i (h:i a)');
+    }
+
+    public function getEventoHoraAttribute()
+    {
+        return $this->fecha_evento->format('H:i');
+    }
+
+    public function getTelefonoAttribute($value)
+    {
+        return substr($value, 0, 3) . '-' . substr($value, 3, 3) . '-' . substr($value, 6);
     }
 }

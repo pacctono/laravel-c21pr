@@ -30,7 +30,7 @@
         @if (null != $fechaUltLogin)
         <p>Fecha del último login:
             <spam class="alert-info">
-                {{ $fechaUltLogin->timezone('America/Caracas')->format('d/m/Y H:i (h:i a)') }}
+                {{ $fechaUltLogin }}
             </spam>
         </p>
         @endif

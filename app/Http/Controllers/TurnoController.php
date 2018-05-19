@@ -34,13 +34,13 @@ class TurnoController extends Controller
         if ('' == $orden or $orden == null) {
             $orden = 'id';
         }
-        if (1 == Auth::user()->is_admin) {
-            $turnos = Turno::where('turno_en','>=', 'now')
+        if (Auth::user()->is_admin) {
+            $turnos = Turno::where('turno','>=', 'now')
                             ->orderBy($orden)->paginate(10);
         } else {
             $user   = User::find(Auth::user()->id);
             $turnos = $user->turnos()
-                        ->where('turno_en','>=', 'now')
+                        ->where('turno','>=', 'now')
                         ->orderBy($orden)->paginate(10);
             $title .= ' de ' . $user->name;
         }
@@ -62,7 +62,7 @@ class TurnoController extends Controller
         }
 
         $fecha = (new Carbon('next monday'))->addWeeks($semana);    // Fecha del lunes de la semana a editar.
-        $turnoExiste = Turno::where('turno_en', $fecha->format('Y-m-d') . ' 08:00:00')->get()->all();
+        $turnoExiste = Turno::where('turno', $fecha->format('Y-m-d') . ' 08:00:00')->get()->all();
         if ($turnoExiste) {
             return redirect()->route('turnos.editar', $semana);
         }
@@ -127,12 +127,12 @@ class TurnoController extends Controller
         //dd($fechas);
 
         for ($i = 0; $i < 11; $i++) {
-            $data['turno_en']  = new Carbon($fechas['f'.$i] . ':00:00');
+            $data['turno']  = new Carbon($fechas['f'.$i] . ':00:00');
             $data['user_id']   = $fechas['u'.$i];
             $data['user_creo'] = Auth::user()->id;            
 
             Turno::create([
-                'turno_en'  => $data['turno_en'],
+                'turno'  => $data['turno'],
                 'user_id'   => $data['user_id'],
                 'user_creo' => $data['user_creo'],
             ]);
@@ -160,7 +160,7 @@ class TurnoController extends Controller
         }
 
         $fecha = (new Carbon('next monday'))->addWeeks($semana);    // Fecha del lunes de la semana a editar.
-        $turnoExiste = Turno::where('turno_en', $fecha->format('Y-m-d') . ' 08:00:00')->get()->all();
+        $turnoExiste = Turno::where('turno', $fecha->format('Y-m-d') . ' 08:00:00')->get()->all();
         if (!$turnoExiste) {
             return redirect()->route('turnos.crear', $semana);
         }
@@ -182,7 +182,7 @@ class TurnoController extends Controller
 
         $fecha1 = (new Carbon('next monday'))->addWeeks($semana);   // Lunes
         $fecha2 = (new Carbon('next monday'))->addWeeks($semana)->addDays(6);                              // Domingo
-        $turnos = Turno::whereBetween('turno_en', [$fecha1->format('Y-m-d'), $fecha2->format('Y-m-d')])
+        $turnos = Turno::whereBetween('turno', [$fecha1->format('Y-m-d'), $fecha2->format('Y-m-d')])
                     ->orderBy('id')         // Puede estar demas, pero, me aseguro el orden correcto.
                     ->get()->all();
         //dd($turnos);
@@ -235,7 +235,7 @@ class TurnoController extends Controller
         $id = $turno->id;
         for ($i = 0; $i < 11; $i++) {
             $turno = Turno::find($id+$i);
-//            $data['turno_en'] = new Carbon($fechas['f'.$i] . ':00:00');
+//            $data['turno'] = new Carbon($fechas['f'.$i] . ':00:00');
             $data['user_id'] = $fechas['u'.$i];
             if ($data['user_id'] != $turno->user_id) {
                 $data['user_actualizo'] = Auth::user()->id;

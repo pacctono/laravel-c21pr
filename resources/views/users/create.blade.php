@@ -56,8 +56,8 @@
             <div class="form-group d-flex">
                 <label class="control-label col-sm-4" for="fecha_nacimiento">Fecha de nacimiento:</label>
                 <input type="date" class="form-control col-sm-2" name="fecha_nacimiento" 
-                        id="fecha_nacimiento" min="{{ now()->addYears(-120)->format('d/m/Y') }}" 
-                        max="{{ now()->addYears(-18)->format('d/m/Y') }}"
+                        id="fecha_nacimiento" min="{{ now()->addYears(-120)->format('Y-m-d') }}" 
+                        max="{{ now()->addYears(-18)->format('Y-m-d') }}"
                         value="{{ old('fecha_nacimiento') }}">
             </div>
 
@@ -78,8 +78,8 @@
             <div class="form-group d-flex">
                 <label class="control-label col-sm-4" for="fecha_ingreso">Fecha de ingreso:</label>
                 <input type="date" class="form-control col-sm-3" required name="fecha_ingreso" 
-                        id="fecha_ingreso" min="{{ now()->addYears(-3)->format('d/m/Y') }}" 
-                        max="{{ now()->format('d/m/Y') }}" value="{{ old('fecha_ingreso') }}">
+                        id="fecha_ingreso" min="{{ now()->addYears(-3)->format('Y-m-d') }}" 
+                        max="{{ now()->format('Y-m-d') }}" value="{{ old('fecha_ingreso') }}">
             </div>
 
             <div class="form-group d-flex">

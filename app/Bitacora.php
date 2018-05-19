@@ -13,6 +13,9 @@ class Bitacora extends Model
     protected $dates = [
         'created_at', 'updated_at'
     ];
+    protected static $diaSemana = [
+        'Domingo', 'Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado'
+    ];
 
     public function user()    // user_id
     {
@@ -31,8 +34,11 @@ class Bitacora extends Model
 
     public static function fechaUltLogin($user)
     {
-        return self::all()->where('user_id', $user)
-                        ->where('tx_tipo', 'L')
-                        ->max('created_at');
+        $fechaUltLogin = self::all()->where('user_id', $user)
+                            ->where('tx_tipo', 'L')
+                            ->max('created_at')
+                            ->timezone('America/Caracas');
+        return self::$diaSemana[$fechaUltLogin->dayOfWeek] . ' ' .
+                $fechaUltLogin->format('d/m/Y H:i (h:i a)');
     }
 }

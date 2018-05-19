@@ -50,8 +50,8 @@ class DatabaseSeeder extends Seeder
          from (c21pr.contactos c join c21pr.resultados r on (r.id = c.resultado_id))
          where (c.resultado_id in (4,5,6,7)))
         union
-        (select null AS contacto_id, t.user_id AS user_id, date_format(t.turno_en, '%Y-%m-%d') AS fecha_evento,
-                if(('08' = date_format(t.turno_en, '%H')), 'Mañana', 'Tarde') AS hora_evento,
+        (select null AS contacto_id, t.user_id AS user_id, date_format(t.turno, '%Y-%m-%d') AS fecha_evento,
+                if(('08' = date_format(t.turno, '%H')), 'Mañana', 'Tarde') AS hora_evento,
                 'Turno en oficina' AS descripcion, '' AS name, '' AS telefono, '' AS email,
                 '' AS direccion
          from c21pr.turnos t)

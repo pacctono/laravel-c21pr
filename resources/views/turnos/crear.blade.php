@@ -52,7 +52,6 @@
             <tr>
                 <th scope="col">Tarde</th>
                 @for ($d = 0; $d < 3; $d++)
-                @if ('Sabado' != $diaSemana[$d])
                     <td>
                         <select required name="u{{ 3+$d }}" id="u{{ 3+$d }}">
                             <option value="">tarde {{ $diaSemana[$d] }}</option>
@@ -66,7 +65,6 @@
                         </select>
                         <input type="hidden" name="f{{ 3+$d }}" value="{{ $dia[$d] }} 12">
                     </td>
-                @endif
                 @endfor
             </tr>
             </tbody>

@@ -5,14 +5,14 @@
     <h4 class="card-header">Resultado de
         {{ $contacto->resultado->descripcion }}
             el <spam class="alert-info">
-                {{ $diaSemana[$contacto->fecha_evento->dayOfWeek] }}
-                {{ $contacto->fecha_evento->format('d/m/Y H:i') }}
+                {{ $contacto->evento_dia_semana }}
+                {{ $contacto->evento_con_hora }}
             </spam>
         con {{ $contacto->name }}
     </h4>
     <div class="card-body">
         <p>Telefono de contacto: <spam class="alert-info">
-            0{{ substr($contacto->telefono, 0, 3) }}-{{ substr($contacto->telefono, 3, 3) }}-{{ substr($contacto->telefono, 6) }}
+            0{{ $contacto->telefono }}
         </spam>.
         </p>
         <p>Correo de contacto: <spam class="alert-info">{{ $contacto->email }}

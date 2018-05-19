@@ -118,6 +118,11 @@ class Contacto extends Model
         return $this[$fecha]->timezone('America/Caracas')->format('d/m/Y h:i a');
     }
 
+    public function getTelefonoAttribute($value)
+    {
+        return substr($value, 0, 3) . '-' . substr($value, 3, 3) . '-' . substr($value, 6);
+    }
+
     public function getCreadoEnAttribute()
     {
         return $this->created_at->timezone('America/Caracas')->format('d/m/Y');
@@ -171,6 +176,11 @@ class Contacto extends Model
         return $this->fecha_evento->format('d/m/Y');
     }
 
+    public function getEventoBdAttribute()
+    {
+        return $this->fecha_evento->format('Y-m-d');
+    }
+
     public function getEventoDiaSemanaAttribute()
     {
         return substr($this->diaSemana[$this->fecha_evento
@@ -180,5 +190,10 @@ class Contacto extends Model
     public function getEventoConHoraAttribute()
     {
         return $this->fecha_evento->format('d/m/Y H:i (h:i a)');
+    }
+
+    public function getEventoHoraAttribute()
+    {
+        return $this->fecha_evento->format('H:i');
     }
 }

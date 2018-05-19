@@ -28,7 +28,7 @@
   <thead class="thead-dark">
     <tr>
       <th scope="col">
-        <a href="{{ route('turnos.orden', 'turno_en') }}" class="btn btn-link">
+        <a href="{{ route('turnos.orden', 'turno') }}" class="btn btn-link">
           Fecha
         </a>
       </th>
@@ -47,15 +47,11 @@
   @foreach ($turnos as $turno)
     <tr>
       <td>
-        {{ $diaSemana[$turno->turno_en->dayOfWeek] }}
-        {{ $turno->turno_en->format('d/m/Y') }}
+        {{ $diaSemana[$turno->turno->dayOfWeek] }}
+        {{ $turno->turno_fecha }}
       </td>
       <td>
-        @if ('08' == $turno->turno_en->format('H'))
-          Mañana
-        @else
-          Tarde
-        @endif
+        {{ $turno->turno_en }}
       </td>
       @if (Auth::user()->is_admin)
       <td>{{ $turno->user->name }}</td>

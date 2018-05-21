@@ -7,10 +7,10 @@ use Illuminate\Database\Eloquent\Model;
 class Turno extends Model
 {
     protected $fillable = [
-        'turno', 'user_id', 'user_creo', 'user_actualizo', 'user_borro', 'borrado_en'
+        'turno', 'user_id', 'user_creo', 'user_actualizo', 'user_borro', 'borrado_at'
     ];
     protected $dates = [
-        'turno', 'borrado_en', 'turno', 'updated_at'
+        'turno', 'borrado_at', 'turno', 'updated_at'
     ];
 
     public function user()    // user_id
@@ -35,22 +35,26 @@ class Turno extends Model
 
     public function getTurnoFechaAttribute()
     {
+        if (null == $this->turno) return '';    // No tiene sentido, pero.........
         return $this->turno->timezone('America/Caracas')->format('d/m/Y');
     }
 
     public function getTurnoEnAttribute()
     {
+        if (null == $this->turno) return '';    // No tiene sentido, pero.........
         return ('08' == $this->turno->format('H'))?'Mañana':'Tarde';
     }
 
     public function getTurnoDiaSemanaAttribute()
     {
+        if (null == $this->turno) return '';    // No tiene sentido, pero.........
         return substr($this->diaSemana[$this->turno->timezone('America/Caracas')
                         ->dayOfWeek], 0, 3);
     }
 
     public function getTurnoConHoraAttribute()
     {
+        if (null == $this->turno) return '';    // No tiene sentido, pero.........
         return $this->turno->timezone('America/Caracas')->format('d/m/Y H:i a');
     }
 }

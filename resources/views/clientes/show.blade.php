@@ -50,7 +50,7 @@
         </spam></p>
         @if ($cliente->user_borro != null)
             <p>Este cliente fue borrado por {{ $cliente->userBorro->name }}
-                el {{ $diaSemana[$cliente->created_at->format('w')] }}, {{ $cliente->borrado_en->format('d/m/Y') }}.
+                el {{ $diaSemana[$cliente->created_at->format('w')] }}, {{ $cliente->borrado_at->format('d/m/Y') }}.
             </p>
         @endif
         @if ($cliente->user_actualizo != null)

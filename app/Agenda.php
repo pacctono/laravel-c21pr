@@ -40,21 +40,25 @@ class Agenda extends Model
 
     public function getEventoEnAttribute()
     {
+        if (null == $this->fecha_evento) return '';
         return $this->fecha_evento->format('d/m/Y');
     }
 
     public function getEventoDiaSemanaAttribute()
     {
+        if (null == $this->fecha_evento) return '';
         return substr($this->diaSemana[$this->fecha_evento->dayOfWeek], 0, 3);
     }
 
     public function getEventoConHoraAttribute()
     {
+        if (null == $this->fecha_evento) return '';
         return $this->fecha_evento->format('d/m/Y H:i (h:i a)');
     }
 
     public function getEventoHoraAttribute()
     {
+        if (null == $this->fecha_evento) return '';
         return $this->fecha_evento->format('H:i');
     }
 

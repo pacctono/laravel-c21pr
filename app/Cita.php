@@ -20,21 +20,25 @@ class Cita extends Model
 
     public function getCitaEnAttribute()
     {
+        if (null == $this->fecha_cita) return '';
         return $this->fecha_cita->format('d/m/Y');
     }
 
     public function getCitaDiaSemanaAttribute()
     {
+        if (null == $this->fecha_cita) return '';
         return substr($this->diaSemana[$this->fecha_cita->dayOfWeek], 0, 3);
     }
 
     public function getCitaHoraAttribute()
     {
+        if (null == $this->fecha_cita) return '';
         return $this->fecha_cita->format('H:i');
     }
 
     public function getCitaConHoraAttribute()
     {
+        if (null == $this->fecha_cita) return '';
         return $this->fecha_cita->format('d/m/Y H:i (h:i a)');
     }
 }

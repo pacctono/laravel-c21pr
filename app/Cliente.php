@@ -11,10 +11,10 @@ class Cliente extends Model
         'user_id', 'email', 'veces_email', 'direccion', 'deseo_id',
         'propiedad_id', 'zona_id', 'precio_id', 'origen_id',
         'resultado_id', 'observaciones', 'user_actualizo', 'user_borro',
-        'borrado_en'
+        'borrado_at'
     ];
     protected $dates = [
-        'created_at', 'updated_at', 'borrado_en'
+        'created_at', 'updated_at', 'borrado_at'
     ];
 
     public function user()    // user_id

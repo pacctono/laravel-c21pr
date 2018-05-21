@@ -4,8 +4,8 @@
 <div class="card">
     <h4 class="card-header">Asesor: {{ $user->name }}</h4>
     <div class="card-body">
-        <p>Cédula de identidad: <spam class="alert-info">{{ $user->cedula }}</spam></p>
-        <p>Telefono del asesor: <spam class="alert-info">0{{ substr($user->telefono, 0, 3) }}-{{ substr($user->telefono, 3) }}</spam></p>
+        <p>Cédula de identidad: <spam class="alert-info">{{ $user->cedula_f }}</spam></p>
+        <p>Telefono del asesor: <spam class="alert-info">{{ $user->telefono_f }}</spam></p>
         <p>Correo personal del asesor: <spam class="alert-info">{{ $user->email }}</spam></p>
         <p>Fecha de nacimiento:
             @if ('' == $user->fecha_nacimiento or $user->fecha_nacimiento == null)
@@ -13,6 +13,7 @@
             @else
             <spam class="alert-info">
                 {{ $user->fecha_nacimiento_en }}
+                ({{ $user->edad }} años)
             </spam>
             @endif
         </p>
@@ -24,6 +25,7 @@
             @else
             <spam class="alert-info">
                 {{ $user->fecha_ingreso_en }}
+                ({{ $user->Tiempo_servicio }})
             </spam>
             @endif
         </p>

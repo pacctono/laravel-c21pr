@@ -36,8 +36,10 @@ class Bitacora extends Model
     {
         $fechaUltLogin = self::all()->where('user_id', $user)
                             ->where('tx_tipo', 'L')
-                            ->max('created_at')
-                            ->timezone('America/Caracas');
+                            ->max('created_at');
+        if (null == $fechaUltLogin) return null;
+
+        $fechaUltLogin = $fechaUltLogin->timezone('America/Caracas');
         return self::$diaSemana[$fechaUltLogin->dayOfWeek] . ' ' .
                 $fechaUltLogin->format('d/m/Y H:i (h:i a)');
     }

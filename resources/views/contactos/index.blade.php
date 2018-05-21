@@ -50,9 +50,7 @@
             <!-- th scope="row">{{ $contacto->id }}</th -->
             <td>{{ $contacto->name }}</td>
             <td>
-                0{{ substr($contacto->telefono, 0, 3) }}
-                -{{ substr($contacto->telefono, 3, 3) }}
-                .{{ substr($contacto->telefono, 6) }}
+                {{ $contacto->telefono_f }}
             </td>
             <td>{{ $contacto->email }}</td>
             <td>
@@ -75,7 +73,8 @@
 
                 @if (1 == Auth::user()->is_admin)
                 <form action="{{ route('contactos.destroy', $contacto) }}" method="POST" 
-                        class="form-inline mt-0 mt-md-0">
+                        class="form-inline mt-0 mt-md-0"
+                        onSubmit="return confirm('Realmente, desea borrar (borrado lógico) los datos de este contacto inicial de la base de datos?')">
                     {{ csrf_field() }}
                     {{ method_field('DELETE' )}}
                     <button class="btn btn-link"><span class="oi oi-trash"></span></button>
@@ -83,7 +82,7 @@
                 @endif
             </td>
         </tr>
-        @endForeach
+        @endforeach
         </tbody>
     </table>
     {{ $contactos->links() }}

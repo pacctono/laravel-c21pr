@@ -16,10 +16,10 @@
     </h4>
     <div class="card-body">
         <p>Cédula de Identidad: <spam class="alert-info">
-            {{ $contacto->cedula }}
+            {{ $contacto->cedula_f }}
         </spam></p>
         <p>Telefono de contacto: <spam class="alert-info">
-            0{{ substr($contacto->telefono, 0, 3) }}-{{ substr($contacto->telefono, 3, 3) }}-{{ substr($contacto->telefono, 6) }}
+            {{ $contacto->telefono_f }}
         </spam>.
         Este telefono ha contactado: <spam class="alert-info">{{ $contacto->veces_telefono }}
         @if (1 == $contacto->veces_telefono)
@@ -70,6 +70,11 @@
         </p>
         <p>Observaciones: <spam class="alert-info">{{ $contacto->observaciones }}
         </spam></p>
+        <p>Esta persona fue contactada hace:
+            <spam class="alert-info">
+                {{ $contacto->tiempo_creado }}
+            </spam>
+        </p>
         @if ($contacto->user_borro != null)
             <p>Este contacto inicial fue borrado por {{ $contacto->userBorro->name }} el
                 {{ $contacto->borrado_dia_semana }}

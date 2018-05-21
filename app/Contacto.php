@@ -2,6 +2,7 @@
 
 namespace App;
 
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Model;
 
@@ -12,12 +13,12 @@ class Contacto extends Model
         'user_id', 'email', 'veces_email', 'direccion', 'deseo_id',
         'propiedad_id', 'zona_id', 'precio_id', 'origen_id', 'resultado_id',
         'fecha_evento', 'observaciones', 'user_actualizo', 'user_borro',
-        'borrado_en'
+        'borrado_at'
     ];
     protected $dates = [        // Mutan a una instancia de Carbon.
         'created_at',
         'updated_at',
-        'borrado_en',
+        'borrado_at',
         'fecha_evento'
     ];
     protected $diaSemana = [
@@ -118,9 +119,18 @@ class Contacto extends Model
         return $this[$fecha]->timezone('America/Caracas')->format('d/m/Y h:i a');
     }
 
-    public function getTelefonoAttribute($value)
+    public function getCedulaFAttribute()     // Cedula formateado.
     {
-        return substr($value, 0, 3) . '-' . substr($value, 3, 3) . '-' . substr($value, 6);
+        $value = $this->cedula;
+        if (null == $value) return '';
+        return number_format($value, 0, ',', '.');
+    }
+
+    public function getTelefonoFAttribute()
+    {
+        $value = $this->telefono;
+        if (null == $value) return '';
+        return '0' . substr($value, 0, 3) . '-' . substr($value, 3, 3) . '-' . substr($value, 6);
     }
 
     public function getCreadoEnAttribute()
@@ -137,6 +147,14 @@ class Contacto extends Model
     public function getCreadoConHoraAttribute()
     {
         return $this->created_at->timezone('America/Caracas')->format('d/m/Y h:i a');
+    }
+
+    public function getTiempoCreadoAttribute()
+    {
+        return Carbon::parse($this->created_at)
+                        ->timezone('America/Caracas')
+                        ->diff(Carbon::now('America/Caracas'))
+                        ->format('%y años, %m meses y %d dias');
     }
 
     public function getActualizadoEnAttribute()
@@ -157,43 +175,51 @@ class Contacto extends Model
 
     public function getBorradoEnAttribute()
     {
-        return $this->borrado_en->timezone('America/Caracas')->format('d/m/Y');
+        if (null == $this->borrado_at) return '';
+        return $this->borrado_at->timezone('America/Caracas')->format('d/m/Y');
     }
 
     public function getBorradoDiaSemanaAttribute()
     {
-        return substr($this->diaSemana[$this->borrado_en->timezone('America/Caracas')
+        if (null == $this->borrado_at) return '';
+        return substr($this->diaSemana[$this->borrado_at->timezone('America/Caracas')
                         ->dayOfWeek], 0, 3);
     }
 
     public function getBorradoConHoraAttribute()
     {
-        return $this->borrado_en->timezone('America/Caracas')->format('d/m/Y h:i a');
+        if (null == $this->borrado_at) return '';
+        return $this->borrado_at->timezone('America/Caracas')->format('d/m/Y h:i a');
     }
 
     public function getEventoEnAttribute()
     {
+        if (null == $this->fecha_evento) return '';
         return $this->fecha_evento->format('d/m/Y');
     }
 
     public function getEventoBdAttribute()
     {
+        if (null == $this->fecha_evento) return '';
         return $this->fecha_evento->format('Y-m-d');
     }
 
     public function getEventoDiaSemanaAttribute()
     {
+        if (null == $this->fecha_evento) return '';
         return substr($this->diaSemana[$this->fecha_evento
                         ->dayOfWeek], 0, 3);
     }
 
     public function getEventoConHoraAttribute()
     {
+        if (null == $this->fecha_evento) return '';
         return $this->fecha_evento->format('d/m/Y H:i (h:i a)');
     }
 
     public function getEventoHoraAttribute()
     {
+        if (null == $this->fecha_evento) return '';
         return $this->fecha_evento->format('H:i');
     }
 }

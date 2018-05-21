@@ -25,14 +25,26 @@
         <tr>
             <th scope="row">{{ $user->id }}</th>
             <td>{{ $user->name }}</td>
-            <td>{{ $user->telefono }}</td>
+            <td>0{{ $user->telefono_f }}</td>
             <td>{{ $user->email }}</td>
             <td>
-                <form action="{{ route('users.destroy', $user) }}" method="POST">
+                <form action="{{ route('users.destroy', $user) }}" method="POST"
+                        id="forma.{{ $user->id }}" name="forma.{{ $user->id }}"
+                        onSubmit="return estaSeguro({{ $user->id }})">
                     {{ csrf_field() }}
                     {{ method_field('DELETE' )}}
-                    <a href="{{ route('users.show', $user) }}" class="btn btn-link"><span class="oi oi-eye"></span></a>
-                    <a href="{{ route('users.edit', $user) }}" class="btn btn-link"><span class="oi oi-pencil"></span></a>
+
+                    <input type="hidden" name="contactos" id="contactos.{{ $user->id }}"
+                            value="{{ $user->contactos->count()-$user->contactosBorrados->count() }}">
+                    <input type="hidden" name="contactosBorrados"
+                            id="contactosBorrados.{{ $user->id }}"
+                            value="{{ $user->contactosBorrados->count() }}">
+                    <a href="{{ route('users.show', $user) }}" class="btn btn-link">
+                        <span class="oi oi-eye"></span>
+                    </a>
+                    <a href="{{ route('users.edit', $user) }}" class="btn btn-link">
+                        <span class="oi oi-pencil"></span>
+                    </a>
                     <button class="btn btn-link"><span class="oi oi-trash"></span></button>
                 </form>
             </td>
@@ -44,5 +56,28 @@
     @else
         <p>No hay asesores registrados.</p>
     @endif
+
+@endsection
+
+@section('js')
+<script>
+function estaSeguro(id) {
+    var nroContactos         = document.getElementById('contactos.'+id).value;
+    var nroContactosBorrados = document.getElementById('contactosBorrados.'+id).value;
+
+    if (0 < nroContactos) {
+        alert('Este asesor ha creado ' + nroContactos +
+                            ' contactos iniciales, por lo tanto, no puede borrar sus datos.');
+        return false;
+    }
+    if (0 < nroContactosBorrados) {
+        return confirm('Este asesor tiene ' + nroContactosBorrados +
+                            " 'Contactos Iniciales borrados', " +
+                            'esta seguro de querer borrar sus datos de la base de datos?');
+    }
+    return confirm('Realmente, desea borrar los datos de este asesor de la base de datos?')
+//  submit();
+}
+</script>
 
 @endsection

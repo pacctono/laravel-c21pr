@@ -298,8 +298,8 @@ class ClienteController extends Controller
         }
 
         $data['user_borro'] = Auth::user()->id;
-        //$data['borrado_en'] = Carbon::now();
-        $data['borrado_en'] = new Carbon();
+        //$data['borrado_at'] = Carbon::now();
+        $data['borrado_at'] = new Carbon();
 
         //dd($data);
 

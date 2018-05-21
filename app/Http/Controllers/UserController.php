@@ -63,7 +63,7 @@ class UserController extends Controller
     {
 //        $data = request()->all();   // all() ---> only(campos requeridos separados por ,)
         $data = request()->validate([   // Si ocurre error, laravel nos envia al url anterior.
-            'cedula' => ['sometimes', 'nullable', 'digits_between:7,8'],
+            'cedula' => ['sometimes', 'nullable', 'digits_between:6,8'],
             'name' => 'required',
             'ddn' => '',
             'telefono' => 'required',
@@ -74,7 +74,7 @@ class UserController extends Controller
             'fecha_nacimiento' => ['sometimes', 'nullable', 'date'],
             'password' => ['required']
         ], [
-            'cedula.digits_between' => 'La cedula de ideintidad debe contener 7 u 8 digitos',
+            'cedula.digits_between' => 'La cedula de ideintidad debe ser entre 6 y 8 digitos',
             'name.required' => 'El campo nombre es obligatorio',
             'telefono.required' => 'El teléfono debe ser suministrado',
             'email.required' => 'El correo electrónico es obligatorio suministrarlo',
@@ -165,8 +165,16 @@ class UserController extends Controller
     public function destroy(User $user)
     {
 
+        if (0 < ($user->contactos->count()-$user->contactosBorrados->count())) {
+            return redirect()->route('users');  // Existen contactos asignados a este usuario.
+        }
+        if (0 < $user->contactosBorrados->count()) {    // Existen contactos borrados (logico).
+            $contactos = $user->contactos;
+            foreach ($contactos as $contacto) {     // Ciclo para borrar fisicamente los contactos.
+                $contacto->delete();
+            }
+        }
         $user->delete();
-
         return redirect()->route('users');
     }
 }

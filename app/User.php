@@ -2,6 +2,7 @@
 
 namespace App;
 
+use Carbon\Carbon;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
@@ -42,6 +43,16 @@ class User extends Authenticatable
         return $this->hasMany(Contacto::class); // Si llave foranea, diferente a esperada, usamos 2do parametro.
     }
 
+    public function contactosBorrados()
+    {
+        return $this->hasMany(Contacto::class, 'user_borro'); // Si llave foranea, diferente a esperada, usamos 2do parametro.
+    }
+
+    public function contactosActualizados()
+    {
+        return $this->hasMany(Contacto::class, 'user_actualizo'); // Si llave foranea, diferente a esperada, usamos 2do parametro.
+    }
+
     public function turnos()    // user_id
     {
         return $this->hasMany(Turno::class); // Si llave foranea, diferente a esperada, usamos 2do parametro.
@@ -60,6 +71,20 @@ class User extends Authenticatable
     public function scopeOfAdmin($query)
     {
         return $query->where('is_admin', 1);
+    }
+
+    public function getCedulaFAttribute()     // Cedula formateado.
+    {
+        $value = $this->cedula;
+        if (null == $value) return '';
+        return number_format($value, 0, ',', '.');
+    }
+
+    public function getTelefonoFAttribute()     // Telefono formateado.
+    {
+        $value = $this->telefono;
+        if (null == $value) return '';
+        return '0' . substr($value, 0, 3) . '-' . substr($value, 3, 3) . '-' . substr($value, 6);
     }
 
     public static function contactosXAsesor($fecha_desde, $fecha_hasta)
@@ -83,21 +108,25 @@ class User extends Authenticatable
 
     public function getFechaNacimientoEnAttribute()
     {
+        if (null == $this->fecha_nacimiento) return '';
         return $this->fecha_nacimiento->format('d/m/Y');
     }
 
     public function getFechaNacimientoBdAttribute()
     {
+        if (null == $this->fecha_nacimiento) return '';
         return $this->fecha_nacimiento->format('Y-m-d');
     }
 
     public function getFechaIngresoEnAttribute()
     {
+        if (null == $this->fecha_ingreso) return '';
         return $this->fecha_ingreso->format('d/m/Y');
     }
 
     public function getFechaIngresoBdAttribute()
     {
+        if (null == $this->fecha_ingreso) return '';
         return $this->fecha_ingreso->format('Y-m-d');
     }
 
@@ -115,5 +144,20 @@ class User extends Authenticatable
     public function getCreadoConHoraAttribute()
     {
         return $this->created_at->timezone('America/Caracas')->format('d/m/Y H:i a');
+    }
+
+    public function getEdadAttribute()
+    {
+        if (null == $this->fecha_nacimiento) return '';
+        return Carbon::parse($this->fecha_nacimiento)->timezone('America/Caracas')->age;
+    }
+
+    public function getTiempoServicioAttribute()
+    {
+        if (null == $this->fecha_ingreso) return '';
+        return Carbon::parse($this->fecha_ingreso)
+                        ->timezone('America/Caracas')
+                        ->diff(Carbon::now('America/Caracas'))
+                        ->format('%y años, %m meses y %d dias');
     }
 }

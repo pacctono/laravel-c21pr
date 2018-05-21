@@ -12,7 +12,7 @@
     </h4>
     <div class="card-body">
         <p>Telefono de contacto: <spam class="alert-info">
-            0{{ $cita->contacto->telefono }}
+            {{ $cita->contacto->telefono_f }}
         </spam>.
         </p>
         <p>Correo de contacto: <spam class="alert-info">{{ $cita->contacto->email }}

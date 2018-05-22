@@ -28,7 +28,17 @@ class TurnoController extends Controller
         $diaSemana = $this->diaSemana;
 
         for ($d = 0; $d < 11; $d++) {
-            $semanas[$d] = (new Carbon('next monday'))->addWeeks($d);   // Proximos once lunes.
+            if (0 == $d) {
+                if (1 == Carbon::today('America/Caracas')->dayOfWeek) {
+                    $semanas[$d] = Carbon::today('America/Caracas');
+                    continue;
+                } elseif (1 < (1 == Carbon::today('America/Caracas')->dayOfWeek)) {
+                    $semanas[$d] = Carbon::parse('last monday')->timezone('America/Caracas');
+                    continue;
+                }
+            }
+            $semanas[$d] = (new Carbon('next monday', 'America/Caracas'))
+                                ->addWeeks($d);   // Proximos diez o once lunes.
         }
 
         if ('' == $orden or $orden == null) {
@@ -78,8 +88,19 @@ class TurnoController extends Controller
         }
 
         $users = User::get(['id', 'name']);     // Todos los usuarios (asesores).
+
         for ($d = 0; $d < 11; $d++) {
-            $semanas[$d] = (new Carbon('next monday'))->addWeeks($d);   // Proximos diez lunes.
+            if (0 == $d) {
+                if (1 == Carbon::today('America/Caracas')->dayOfWeek) {
+                    $semanas[$d] = Carbon::today('America/Caracas');
+                    continue;
+                } elseif (1 < (1 == Carbon::today('America/Caracas')->dayOfWeek)) {
+                    $semanas[$d] = Carbon::parse('last monday')->timezone('America/Caracas');
+                    continue;
+                }
+            }
+            $semanas[$d] = (new Carbon('next monday', 'America/Caracas'))
+                                ->addWeeks($d);   // Proximos diez o once lunes.
         }
         //dd($semanas);
         return view('turnos.crear', compact('title', 'diaSemana', 'dia', 'users', 'semanas', 'semana'));
@@ -176,8 +197,19 @@ class TurnoController extends Controller
         }
 
         $users = User::get(['id', 'name']);     // Todos los usuarios (asesores).
+
         for ($d = 0; $d < 11; $d++) {
-            $semanas[$d] = (new Carbon('next monday'))->addWeeks($d);   // Proximos diez lunes.
+            if (0 == $d) {
+                if (1 == Carbon::today('America/Caracas')->dayOfWeek) {
+                    $semanas[$d] = Carbon::today('America/Caracas');
+                    continue;
+                } elseif (1 < (1 == Carbon::today('America/Caracas')->dayOfWeek)) {
+                    $semanas[$d] = Carbon::parse('last monday')->timezone('America/Caracas');
+                    continue;
+                }
+            }
+            $semanas[$d] = (new Carbon('next monday', 'America/Caracas'))
+                                ->addWeeks($d);   // Proximos diez o once lunes.
         }
 
         $fecha1 = (new Carbon('next monday'))->addWeeks($semana);   // Lunes

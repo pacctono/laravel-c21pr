@@ -64,8 +64,9 @@
             </div>
             <div class="form-group d-flex align-items-end">
                 <label for="licencia_mls">Licencia MLS:</label>
-                <input type="text" size="30" maxlength="30" name="licencia_mls" id="licencia_mls" 
-                        placeholder="111111" value="{{ old('licencia_mls', $user->licencia_mls) }}">
+                <input type="text" size="7" minlength="5" maxlength="7" name="licencia_mls"
+                        id="licencia_mls" placeholder="111111"
+                        value="{{ old('licencia_mls', $user->licencia_mls) }}">
             </div>
             <div class="form-group d-flex align-items-end">
                 <label for="fecha_ingreso">Fecha de ingreso:</label>

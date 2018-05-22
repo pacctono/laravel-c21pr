@@ -70,8 +70,8 @@
 
             <div class="form-group d-flex">
                 <label class="control-label col-sm-4" for="licencia_mls">Licencia MLS:</label>
-                <input type="text" class="form-control col-sm-2" size="6" maxlength="6"
-                    minlength="7" name="licencia_mls" id="licencia_mls" placeholder="111111"
+                <input type="text" class="form-control col-sm-2" size="7" maxlength="7"
+                    minlength="5" name="licencia_mls" id="licencia_mls" placeholder="111111"
                     value="{{ old('licencia_mls') }}">
             </div>
 

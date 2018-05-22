@@ -16,7 +16,7 @@
                     alt="Primera slide" style="width:100%;height:600px;">
             <div class="container">
               <div class="carousel-caption text-left">
-                <h1>Ejemplo 1</h1>
+                <h1>Hola, {{ Auth::user()->name }}!</h1>
                 <p>Cras justo odio, dapibus ac facilisis in, egestas eget quam. Donec id elit non mi porta gravida at eget metus. Nullam id dolor id nibh ultricies vehicula ut id elit.</p>
                 <p><a class="btn btn-lg btn-primary" href="#" role="button">Registrese hoy</a></p>
               </div>

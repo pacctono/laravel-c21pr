@@ -69,7 +69,7 @@ class UserController extends Controller
             'telefono' => 'required',
             'email' => ['required', 'email', 'unique:users,email'],   // 'required|email|...'
             'email_c21' => ['sometimes', 'nullable', 'email'],
-            'licencia_mls' => ['sometimes', 'nullable', 'digits_between:6,7'],
+            'licencia_mls' => ['sometimes', 'nullable', 'digits_between:5,7', 'unique:users,licencia_mls'],
             'fecha_ingreso' => ['sometimes', 'nullable', 'date'],
             'fecha_nacimiento' => ['sometimes', 'nullable', 'date'],
             'password' => ['required']
@@ -81,7 +81,7 @@ class UserController extends Controller
             'email.email' => 'Debe suministrar un correo elctrónico válido',
             'email.unique' => 'Ese correo electrónico está siendo usado por otro usuario',
             'email_c21.email' => 'El correo electrónico de trabajo no es válido',
-            'licencia_mls.digits_between:6,7' => 'La licencia MLS debe contener 6 o 7 dígitos',
+            'licencia_mls.digits_between:5,7' => 'La licencia MLS debe contener entre 5 y 7 dígitos',
             'fecha_ingreso.date' => 'La fecha de ingreso debe corresponder con una fecha',
             'fecha_nacimiento.date' => 'La fecha de nacimiento debe corresponder con una fecha',
             'password.required' => 'La contraseña es obligatorio suministrarla'
@@ -125,7 +125,7 @@ class UserController extends Controller
 //            'email' => ['required', 'email', 'unique:users,email,'.$user->id],   // 'required|email|...'
             'email' => ['required', 'email', Rule::unique('users')->ignore($user->id)],    // 'email' 2do par no es necesario.
             'email_c21' => ['sometimes', 'nullable', 'email'],
-            'licencia_mls' => ['sometimes', 'nullable', 'digits_between:6,7'],
+            'licencia_mls' => ['sometimes', 'nullable', 'digits_between:5,7', Rule::unique('users')->ignore($users->licencia_mls)],
             'fecha_ingreso' => ['sometimes', 'nullable', 'date'],
             'fecha_nacimiento' => ['sometimes', 'nullable', 'date'],
             'password' => 'nullable|min:7'
@@ -137,7 +137,7 @@ class UserController extends Controller
             'email.email' => 'Debe suministrar un correo elctrónico válido',
             'email.unique' => 'Ese correo electrónico está siendo usado por otro usuario',
             'email_c21.email' => 'El correo electrónico de trabajo no es válido',
-            'licencia_mls.digits_between:6,7' => 'La licencia MLS debe contener 6 o 7 dígitos',
+            'licencia_mls.digits_between:5,7' => 'La licencia MLS debe contener entre 5 y 7 dígitos',
             'fecha_ingreso.date' => 'La fecha de ingreso debe corresponder con una fecha',
             'fecha_nacimiento.date' => 'La fecha de nacimiento debe corresponder con una fecha',
             'password.min' => 'La contraseña debe contener más de 6 caracteres'

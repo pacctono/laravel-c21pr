@@ -107,9 +107,11 @@
       @else
       <td>
       @endif
-        @if ('' != $agenda->telefono)
-        0{{ $agenda->telefono }}
-        @endif
+      @if ('' != $agenda->telefono)
+        {{ $agenda->telefono_f }}
+      @elseif (Auth::user()->is_admin)
+        {{ $agenda->user->telefono_f }}
+      @endif
       </td>
       <td>
       @if (Auth::user()->is_admin)

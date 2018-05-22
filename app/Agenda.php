@@ -62,8 +62,10 @@ class Agenda extends Model
         return $this->fecha_evento->format('H:i');
     }
 
-    public function getTelefonoAttribute($value)
+    public function getTelefonoFAttribute()
     {
-        return substr($value, 0, 3) . '-' . substr($value, 3, 3) . '-' . substr($value, 6);
+        $value = $this->telefono;
+        if (null == $value) return '';
+        return '0' . substr($value, 0, 3) . '-' . substr($value, 3, 3) . '-' . substr($value, 6);
     }
 }

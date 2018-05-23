@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
+use App\MisClases\Fecha;
 
 class TurnoController extends Controller
 {
@@ -28,19 +29,10 @@ class TurnoController extends Controller
         $diaSemana = $this->diaSemana;
 
         for ($d = 0; $d < 11; $d++) {
-            if (0 == $d) {
-                if (1 == Carbon::today('America/Caracas')->dayOfWeek) {
-                    $semanas[$d] = Carbon::today('America/Caracas');
-                    continue;
-                } elseif (1 < (1 == Carbon::today('America/Caracas')->dayOfWeek)) {
-                    $semanas[$d] = Carbon::parse('last monday')->timezone('America/Caracas');
-                    continue;
-                }
-            }
-            $semanas[$d] = (new Carbon('next monday', 'America/Caracas'))
-                                ->addWeeks($d);   // Proximos diez o once lunes.
+            $semanas[$d] = Fecha::primerLunesDePrimeraSemana()
+                                    ->addWeeks($d);            // Proximos once lunes.
         }
-
+//        dd($semanas);
         if ('' == $orden or $orden == null) {
             $orden = 'id';
         }
@@ -71,7 +63,7 @@ class TurnoController extends Controller
             $semana = 0;
         }
 
-        $fecha = (new Carbon('next monday'))->addWeeks($semana);    // Fecha del lunes de la semana a editar.
+        $fecha = Fecha::primerLunesDePrimeraSemana()->addWeeks($semana);
         $turnoExiste = Turno::where('turno', $fecha->format('Y-m-d') . ' 08:00:00')->get()->all();
         if ($turnoExiste) {
             return redirect()->route('turnos.editar', $semana);
@@ -83,27 +75,19 @@ class TurnoController extends Controller
                     $fecha->format('d/m/Y');
 
         for ($d = 0; $d < 6; $d++) {
-            $fecha = (new Carbon('next monday'))->addWeeks($semana);
+            $fecha = Fecha::primerLunesDePrimeraSemana()->addWeeks($semana);
             $dia[$d] = $fecha->addDays($d)->format('Y-m-d');    // Fecha de cada dia.
         }
 
         $users = User::get(['id', 'name']);     // Todos los usuarios (asesores).
 
         for ($d = 0; $d < 11; $d++) {
-            if (0 == $d) {
-                if (1 == Carbon::today('America/Caracas')->dayOfWeek) {
-                    $semanas[$d] = Carbon::today('America/Caracas');
-                    continue;
-                } elseif (1 < (1 == Carbon::today('America/Caracas')->dayOfWeek)) {
-                    $semanas[$d] = Carbon::parse('last monday')->timezone('America/Caracas');
-                    continue;
-                }
-            }
-            $semanas[$d] = (new Carbon('next monday', 'America/Caracas'))
-                                ->addWeeks($d);   // Proximos diez o once lunes.
+            $semanaInicial = Fecha::primerLunesDePrimeraSemana();
+            $semanas[$d] = $semanaInicial->addWeeks($d);            // Proximos once lunes.
         }
         //dd($semanas);
-        return view('turnos.crear', compact('title', 'diaSemana', 'dia', 'users', 'semanas', 'semana'));
+        return view('turnos.crear', compact('title', 'diaSemana', 'dia', 'users',
+                    'semanas', 'semana'));
     }
 
     public function store(Request $request)
@@ -180,7 +164,7 @@ class TurnoController extends Controller
             $semana = 0;
         }
 
-        $fecha = (new Carbon('next monday'))->addWeeks($semana);    // Fecha del lunes de la semana a editar.
+        $fecha = Fecha::primerLunesDePrimeraSemana()->addWeeks($semana);
         $turnoExiste = Turno::where('turno', $fecha->format('Y-m-d') . ' 08:00:00')->get()->all();
         if (!$turnoExiste) {
             return redirect()->route('turnos.crear', $semana);
@@ -192,32 +176,23 @@ class TurnoController extends Controller
                     $fecha->format('d/m/Y');
 
         for ($d = 0; $d < 6; $d++) {
-            $fecha = (new Carbon('next monday'))->addWeeks($semana);
+            $fecha = Fecha::primerLunesDePrimeraSemana()->addWeeks($semana);
             $dia[$d] = $fecha->addDays($d)->format('Y-m-d');    // Fecha de cada dia.
         }
 
         $users = User::get(['id', 'name']);     // Todos los usuarios (asesores).
 
         for ($d = 0; $d < 11; $d++) {
-            if (0 == $d) {
-                if (1 == Carbon::today('America/Caracas')->dayOfWeek) {
-                    $semanas[$d] = Carbon::today('America/Caracas');
-                    continue;
-                } elseif (1 < (1 == Carbon::today('America/Caracas')->dayOfWeek)) {
-                    $semanas[$d] = Carbon::parse('last monday')->timezone('America/Caracas');
-                    continue;
-                }
-            }
-            $semanas[$d] = (new Carbon('next monday', 'America/Caracas'))
-                                ->addWeeks($d);   // Proximos diez o once lunes.
+            $semanaInicial = Fecha::primerLunesDePrimeraSemana();
+            $semanas[$d] = $semanaInicial->addWeeks($d);            // Proximos once lunes.
         }
 
-        $fecha1 = (new Carbon('next monday'))->addWeeks($semana);   // Lunes
-        $fecha2 = (new Carbon('next monday'))->addWeeks($semana)->addDays(6);                              // Domingo
+        $fecha1 = Fecha::primerLunesDePrimeraSemana()->addWeeks($semana);   // Lunes
+        $fecha2 = Fecha::primerLunesDePrimeraSemana()->addWeeks($semana)->addDays(6);                              // Domingo
         $turnos = Turno::whereBetween('turno', [$fecha1->format('Y-m-d'), $fecha2->format('Y-m-d')])
                     ->orderBy('id')         // Puede estar demas, pero, me aseguro el orden correcto.
                     ->get()->all();
-        //dd($turnos);
+//        dd($turnos);
         $turno = $turnos[0];
         return view('turnos.editar', compact('title', 'diaSemana', 'dia', 'users', 'semanas', 'semana',
                     'turnos', 'turno'));

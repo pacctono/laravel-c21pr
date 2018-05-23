@@ -5,6 +5,8 @@ namespace App;
 use Carbon\Carbon;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Support\Facades\DB;
+use App\MisClases\Fecha;
 
 class User extends Authenticatable
 {
@@ -116,6 +118,29 @@ class User extends Authenticatable
     {
         if (null == $this->fecha_nacimiento) return '';
         return $this->fecha_nacimiento->format('Y-m-d');
+    }
+
+    public function getFechaCumpleanosAttribute()
+    {
+        if (null == $this->fecha_nacimiento) return '';
+        $anos = now(Fecha::$ZONA)->format('Y') -
+                            (new Carbon($this->fecha_nacimiento, Fecha::$ZONA))->format('Y');
+        $fecha = (new Carbon($this->fecha_nacimiento, Fecha::$ZONA))->addYears($anos);
+        if (now(Fecha::$ZONA) < $fecha) return $fecha;
+        else return $fecha->addYears(1);
+    }
+
+    public static function cumpleanos($fecha=null, $fecha_hasta=null) {
+        if(null == $fecha) $fecha = now(Fecha::$ZONA);
+//        dd($fecha);
+        $fecha_desde = new Carbon($fecha, Fecha::$ZONA);
+        if(null == $fecha_hasta) $fecha_hasta = (new Carbon($fecha, Fecha::$ZONA))->addDays(30);
+//        dd($fecha, $fecha_desde, $fecha_hasta);
+        return self::whereBetween(DB::raw("DATE_ADD(fecha_nacimiento,
+                                        INTERVAL YEAR(now())-YEAR(fecha_nacimiento) +
+                                        IF(DAYOFYEAR(now()) > DAYOFYEAR(fecha_nacimiento),1,0)
+                                        YEAR)"), [$fecha_desde, $fecha_hasta]);
+//                            ->get();
     }
 
     public function getFechaIngresoEnAttribute()

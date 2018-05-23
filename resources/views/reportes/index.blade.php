@@ -24,6 +24,7 @@
 <div class="d-flex justify-content-between align-items-end mb-3">
   <h3 class="pb-1">{{ $title }}</h3>
 
+  @if ('Cumpleanos' != $muestra)
   <p class="text-right">
       <!-- a href="{{ route('reportes.chart', 'bar') }}" class="btn btn-primary">Crear Gráfico</a -->
       Crear gráfico de:
@@ -38,6 +39,7 @@
         @endforeach
       </select>
   </p>
+  @endif
 </div>
 
 @if ($elemsRep->isNotEmpty())
@@ -45,13 +47,15 @@
 <table class="table table-striped table-hover table-bordered">
   <thead class="thead-dark">
     <tr>
-      @if ('Conexion' == $muestra)
+      @if (('Conexion' == $muestra) || ('Cumpleanos' == $muestra))
       <th scope="col">Asesor</th>
       @else
       <th scope="col">{{ $muestra }}</th>
       @endif
       @if ('Conexion' == $muestra)
       <th scope="col">Conexiones</th>
+      @elseif ('Cumpleanos' == $muestra)
+      <th scope="col">Cumpleaños</th>
       @else
       <th scope="col">Atendidos</th>
       @endif
@@ -66,7 +70,11 @@
     @else
       <td>{{ $elemento->name }}</td>
     @endif
+    @if ('Cumpleanos' == $muestra)
+      <td>{{ $elemento->fecha_cumpleanos->format('d-m') }}
+    @else
       <td>{{ $elemento->atendidos }}</td>
+    @endif
     </tr>
   @endForeach
   </tbody>

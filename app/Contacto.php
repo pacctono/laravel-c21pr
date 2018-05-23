@@ -93,14 +93,20 @@ class Contacto extends Model
             ->count();
     }
 
-    public static function contactosXFecha($fecha_desde, $fecha_hasta)
+    public static function contactosXFecha($fecha_desde, $fecha_hasta, $user=null)
     {
-        return self::select(DB::raw('DATE_FORMAT(created_at, "%Y-%m-%d")'),
+        If (null == $user) {
+            $user  = 0;
+            $signo = '>';
+        } else $signo = '=';
+        $sql = self::select(DB::raw('DATE_FORMAT(created_at, "%Y-%m-%d")'),
                         DB::raw('DATE_FORMAT(created_at, "%d/%m/%Y") as fecha'),
                         DB::raw('count(*) as atendidos'))
                     ->whereBetween('created_at', [$fecha_desde, $fecha_hasta])
-                       ->groupBy(DB::raw('DATE_FORMAT(created_at, "%Y-%m-%d")'),
+                    ->where('user_id', $signo, $user)
+                    ->groupBy(DB::raw('DATE_FORMAT(created_at, "%Y-%m-%d")'),
                         DB::raw('DATE_FORMAT(created_at, "%d/%m/%Y")'));
+        return $sql;
     }
 
     public function fechaEn($fecha)

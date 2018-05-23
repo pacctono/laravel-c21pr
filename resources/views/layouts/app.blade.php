@@ -65,14 +65,21 @@
                 Reportes
               <span class="caret"></span></a>
               <ul class="dropdown-menu">
+                @if (Auth::user()->is_admin)
                 <li><a class="dropdown-item" href="{{ route('reportes', 'Asesor') }}">
                   Contactos X asesor
                 </a></li>
+                @endif
                 <li><a class="dropdown-item" href="{{ route('reportes', 'Fecha') }}">
                   Contactos X fecha
                 </a></li>
+                @if (Auth::user()->is_admin)
                 <li><a class="dropdown-item" href="{{ route('reportes', 'Conexion') }}">
                   Conexión X asesor
+                </a></li>
+                @endif
+                <li><a class="dropdown-item" href="{{ route('reportes', 'Cumpleanos') }}">
+                  Cumpleaños
                 </a></li>
               </ul>
             </li>

@@ -130,10 +130,12 @@
                         onchange="document.getElementById('actualizar-turnos').click();">
                         <option value="">Semana</option>
                         @foreach ($semanas as $lSemana)
-                            <option value="{{ $loop->iteration }}">
+                            @if (($semana) != $loop->index)
+                            <option value="{{ $loop->index }}">
                                 {{ $diaSemana[$lSemana->dayOfWeek - 1] }}
                                 {{ $lSemana->format('d/m/Y') }}
                             </option>
+                            @endif
                         @endforeach
                     </select>
                 </td>

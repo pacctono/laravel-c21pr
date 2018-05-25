@@ -14,12 +14,10 @@ use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;        // PC
 use Carbon\Carbon;                          // PC
+use App\MisClases\Fecha;
 
 class ClienteController extends Controller
 {
-    protected $diaSemana = [
-        'Domingo', 'Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado'
-    ];
     protected $tipo = 'Contactos Iniciales';
     /**
      * Display a listing of the resource.
@@ -34,7 +32,7 @@ class ClienteController extends Controller
 
         $title = 'Listado de ' . $this->tipo;
         $ruta = request()->path();
-        $diaSemana = $this->diaSemana;
+        $diaSemana = Fecha::$diaSemana;
 
         if ('' == $orden or $orden == null) {
             $orden = 'id';
@@ -59,9 +57,6 @@ class ClienteController extends Controller
 
         $title = 'Listado de ' . $this->tipo;
         $ruta = request()->path();
-        $diaSemana = [
-            'Domingo', 'Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado'
-        ];
 
         if ('' == $filtro or $filtro == null) {
             $filtro = 'created_at';
@@ -183,7 +178,7 @@ class ClienteController extends Controller
         if (!(Auth::check())) {
             return redirect('login');
         }
-        $diaSemana = $this->diaSemana;
+        $diaSemana = Fecha::$diaSemana;
 
         if (1 == Auth::user()->is_admin) {
             return view('clientes.show', compact('cliente', 'diaSemana'));

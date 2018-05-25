@@ -3,6 +3,7 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use App\MisClases\Fecha;
 
 class Cliente extends Model
 {
@@ -66,12 +67,7 @@ class Cliente extends Model
     {
         return $query->whereBetween('created_at', [$fechaDesde, $fechaHasta]);
     }
-/*
-    public function scopeOfDiaSemana($query, $indDia)
-    {
-        return $this->diaSemana[$indDia];
-    }
- */
+
     public function scopeOfUsuario($query, $user)
     {
         return $query->where('user_id', $user);

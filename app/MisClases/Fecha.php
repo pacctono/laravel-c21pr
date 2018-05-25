@@ -16,6 +16,9 @@ class Fecha
     protected static $priDiaProxMes = 'first day of next month';
     protected static $ultDiaProxMes = 'last day of next month';
     public static $ZONA = 'America/Caracas';
+    public static $diaSemana = [
+        'Domingo', 'Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado'
+    ];
 
     public static function hoy(){
         return Carbon::today(self::$ZONA);

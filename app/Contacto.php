@@ -5,6 +5,7 @@ namespace App;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Model;
+use App\MisClases\Fecha;
 
 class Contacto extends Model
 {
@@ -20,9 +21,6 @@ class Contacto extends Model
         'updated_at',
         'borrado_at',
         'fecha_evento'
-    ];
-    protected $diaSemana = [
-        'Domingo', 'Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado'
     ];
 
     public function user()    // user_id
@@ -74,12 +72,15 @@ class Contacto extends Model
     {
         return $query->whereBetween('created_at', [$fechaDesde, $fechaHasta]);
     }
-/*
-    public function scopeOfDiaSemana($query, $indDia)
-    {
-        return $this->diaSemana[$indDia];
+
+    public function setNameAttribute($value) {
+        $this->attributes['name'] = ucwords(strtolower($value));
     }
- */
+
+    public function getNameAttribute($value) {
+        return ucwords(strtolower($value));
+    }
+
     public function scopeOfUsuario($query, $user)
     {
         return $query->where('user_id', $user);
@@ -109,22 +110,6 @@ class Contacto extends Model
         return $sql;
     }
 
-    public function fechaEn($fecha)
-    {
-        return $this[$fecha]->timezone('America/Caracas')->format('d/m/Y');
-    }
-
-    public function fechaDiaSemana($fecha)
-    {
-        return substr($this->diaSemana[$this[$fecha]->timezone('America/Caracas')
-                        ->dayOfWeek], 0, 3);
-    }
-
-    public function fechaConHora($fecha)
-    {
-        return $this[$fecha]->timezone('America/Caracas')->format('d/m/Y h:i a');
-    }
-
     public function getCedulaFAttribute()     // Cedula formateado.
     {
         $value = $this->cedula;
@@ -139,63 +124,79 @@ class Contacto extends Model
         return '0' . substr($value, 0, 3) . '-' . substr($value, 3, 3) . '-' . substr($value, 6);
     }
 
+    public function fechaEn($fecha)         // La funcion se llama como fechaEn no fecha_en.
+    {
+        return $this[$fecha]->timezone(Fecha::$ZONA)->format('d/m/Y');
+    }
+
+    public function fechaDiaSemana($fecha)
+    {
+        return substr(Fecha::$diaSemana[$this[$fecha]->timezone(Fecha::$ZONA)
+                        ->dayOfWeek], 0, 3);
+    }
+
+    public function fechaConHora($fecha)
+    {
+        return $this[$fecha]->timezone(Fecha::$ZONA)->format('d/m/Y h:i a');
+    }
+
     public function getCreadoEnAttribute()
     {
-        return $this->created_at->timezone('America/Caracas')->format('d/m/Y');
+        return $this->created_at->timezone(Fecha::$ZONA)->format('d/m/Y');
     }
 
     public function getCreadoDiaSemanaAttribute()
     {
-        return substr($this->diaSemana[$this->created_at->timezone('America/Caracas')
+        return substr(Fecha::$diaSemana[$this->created_at->timezone(Fecha::$ZONA)
                         ->dayOfWeek], 0, 3);
     }
 
     public function getCreadoConHoraAttribute()
     {
-        return $this->created_at->timezone('America/Caracas')->format('d/m/Y h:i a');
+        return $this->created_at->timezone(Fecha::$ZONA)->format('d/m/Y h:i a');
     }
 
     public function getTiempoCreadoAttribute()
     {
         return Carbon::parse($this->created_at)
-                        ->timezone('America/Caracas')
-                        ->diff(Carbon::now('America/Caracas'))
+                        ->timezone(Fecha::$ZONA)
+                        ->diff(Carbon::now(Fecha::$ZONA))
                         ->format('%y años, %m meses y %d dias');
     }
 
     public function getActualizadoEnAttribute()
     {
-        return $this->updated_at->timezone('America/Caracas')->format('d/m/Y');
+        return $this->updated_at->timezone(Fecha::$ZONA)->format('d/m/Y');
     }
 
     public function getActualizadoDiaSemanaAttribute()
     {
-        return substr($this->diaSemana[$this->updated_at->timezone('America/Caracas')
+        return substr(Fecha::$diaSemana[$this->updated_at->timezone(Fecha::$ZONA)
                         ->dayOfWeek], 0, 3);
     }
 
     public function getActualizadoConHoraAttribute()
     {
-        return $this->updated_at->timezone('America/Caracas')->format('d/m/Y h:i a');
+        return $this->updated_at->timezone(Fecha::$ZONA)->format('d/m/Y h:i a');
     }
 
     public function getBorradoEnAttribute()
     {
         if (null == $this->borrado_at) return '';
-        return $this->borrado_at->timezone('America/Caracas')->format('d/m/Y');
+        return $this->borrado_at->timezone(Fecha::$ZONA)->format('d/m/Y');
     }
 
     public function getBorradoDiaSemanaAttribute()
     {
         if (null == $this->borrado_at) return '';
-        return substr($this->diaSemana[$this->borrado_at->timezone('America/Caracas')
+        return substr(Fecha::$diaSemana[$this->borrado_at->timezone(Fecha::$ZONA)
                         ->dayOfWeek], 0, 3);
     }
 
     public function getBorradoConHoraAttribute()
     {
         if (null == $this->borrado_at) return '';
-        return $this->borrado_at->timezone('America/Caracas')->format('d/m/Y h:i a');
+        return $this->borrado_at->timezone(Fecha::$ZONA)->format('d/m/Y h:i a');
     }
 
     public function getEventoEnAttribute()
@@ -213,7 +214,7 @@ class Contacto extends Model
     public function getEventoDiaSemanaAttribute()
     {
         if (null == $this->fecha_evento) return '';
-        return substr($this->diaSemana[$this->fecha_evento
+        return substr(Fecha::$diaSemana[$this->fecha_evento
                         ->dayOfWeek], 0, 3);
     }
 

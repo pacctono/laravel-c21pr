@@ -3,6 +3,7 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use App\MisClases\Fecha;
 
 class Agenda extends Model
 {
@@ -14,9 +15,6 @@ class Agenda extends Model
         'fecha_evento'
     ];
     protected $table = 'vista_agenda';
-    protected $diaSemana = [
-        'Domingo', 'Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado'
-    ];
 
     public function user()    // user_id
     {
@@ -47,7 +45,7 @@ class Agenda extends Model
     public function getEventoDiaSemanaAttribute()
     {
         if (null == $this->fecha_evento) return '';
-        return substr($this->diaSemana[$this->fecha_evento->dayOfWeek], 0, 3);
+        return substr(Fecha::$diaSemana[$this->fecha_evento->dayOfWeek], 0, 3);
     }
 
     public function getEventoConHoraAttribute()

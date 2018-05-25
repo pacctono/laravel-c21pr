@@ -13,9 +13,6 @@ use App\MisClases\Fecha;
 
 class TurnoController extends Controller
 {
-    protected $diaSemana = [
-        'Domingo', 'Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado'
-    ];
     protected $tipo = 'Turnos';
 
     public function index($orden = null)
@@ -26,7 +23,7 @@ class TurnoController extends Controller
 
         $title = 'Listado de ' . $this->tipo;
         $ruta = request()->path();
-        $diaSemana = $this->diaSemana;
+        $diaSemana = Fecha::$diaSemana;
 
         for ($d = 0; $d < 11; $d++) {
             $semanas[$d] = Fecha::primerLunesDePrimeraSemana()
@@ -69,7 +66,7 @@ class TurnoController extends Controller
             return redirect()->route('turnos.editar', $semana);
         }
 
-        $diaSemana = $this->diaSemana;
+        $diaSemana = Fecha::$diaSemana;
         array_shift($diaSemana);                // Desaparece el domingo y comienza el lunes.
         $title = 'Crear ' . $this->tipo . ' para la semana que comienza el lunes, ' . 
                     $fecha->format('d/m/Y');
@@ -170,7 +167,7 @@ class TurnoController extends Controller
             return redirect()->route('turnos.crear', $semana);
         }
 
-        $diaSemana = $this->diaSemana;
+        $diaSemana = Fecha::$diaSemana;
         array_shift($diaSemana);                // Desaparece el domingo y comienza el lunes.
         $title = 'Editar ' . $this->tipo . ' para la semana que comienza el lunes, ' . 
                     $fecha->format('d/m/Y');

@@ -36,9 +36,6 @@ class User extends Authenticatable
     protected $casts = [
         'is_admin' => 'boolean'
     ];
-    protected $diaSemana = [
-        'Domingo', 'Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado'
-    ];
 
     public function contactos()    // user_id
     {
@@ -82,6 +79,14 @@ class User extends Authenticatable
         return number_format($value, 0, ',', '.');
     }
 
+    public function setNameAttribute($value) {
+        $this->attributes['name'] = ucwords(strtolower($value));
+    }
+
+    public function getNameAttribute($value) {
+        return ucwords(strtolower($value));
+    }
+    
     public function getTelefonoFAttribute()     // Telefono formateado.
     {
         $value = $this->telefono;
@@ -155,34 +160,49 @@ class User extends Authenticatable
         return $this->fecha_ingreso->format('Y-m-d');
     }
 
+    public function fechaEn($fecha)         // La funcion se llama como fechaEn no fecha_en.
+    {
+        return $this[$fecha]->timezone(Fecha::$ZONA)->format('d/m/Y');
+    }
+
+    public function fechaDiaSemana($fecha)
+    {
+        return substr(Fecha::$diaSemana[$this[$fecha]->timezone(Fecha::$ZONA)
+                        ->dayOfWeek], 0, 3);
+    }
+
+    public function fechaConHora($fecha)
+    {
+        return $this[$fecha]->timezone(Fecha::$ZONA)->format('d/m/Y h:i a');
+    }
+
     public function getCreadoEnAttribute()
     {
-        return $this->created_at->timezone('America/Caracas')->format('d/m/Y');
+        return $this->created_at->timezone(Fecha::$ZONA)->format('d/m/Y');
     }
 
     public function getCreadoDiaSemanaAttribute()
     {
-        return substr($this->diaSemana[$this->created_at->timezone('America/Caracas')
+        return substr(Fecha::$diaSemana[$this->created_at->timezone(Fecha::$ZONA)
                         ->dayOfWeek], 0, 3);
     }
 
     public function getCreadoConHoraAttribute()
     {
-        return $this->created_at->timezone('America/Caracas')->format('d/m/Y H:i a');
+        return $this->created_at->timezone(Fecha::$ZONA)->format('d/m/Y H:i a');
     }
 
     public function getEdadAttribute()
     {
-        if (null == $this->fecha_nacimiento) return '';
-        return Carbon::parse($this->fecha_nacimiento)->timezone('America/Caracas')->age;
+        if (null == $this->fecha_nacimiento) return '';     // Aunque es UTC, tiene hora 0.
+        return Carbon::parse($this->fecha_nacimiento)->age; // No debe usarse timezone.
     }
 
     public function getTiempoServicioAttribute()
     {
         if (null == $this->fecha_ingreso) return '';
-        return Carbon::parse($this->fecha_ingreso)
-                        ->timezone('America/Caracas')
-                        ->diff(Carbon::now('America/Caracas'))
+        return Carbon::parse($this->fecha_ingreso)          // Aunque es UTC, tiene hora 0.
+                        ->diff(Carbon::now(Fecha::$ZONA))  // Aqui si debe usarse timezone.
                         ->format('%y años, %m meses y %d dias');
     }
 }

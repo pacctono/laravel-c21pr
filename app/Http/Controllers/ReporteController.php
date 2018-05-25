@@ -141,6 +141,9 @@ class ReporteController extends Controller
             case 'Conexion':
                 $elemsRep = User::conexionXAsesor($fecha_desde, $fecha_hasta);
                 break;
+            case 'Fecha':
+                $elemsRep = Contacto::contactosXFecha($fecha_desde, $fecha_hasta, $asesor);
+                break;
             default:        // 'Fecha'
                 $elemsRep = Contacto::contactosXFecha($fecha_desde, $fecha_hasta, $asesor);
         } 

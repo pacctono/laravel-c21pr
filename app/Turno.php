@@ -3,6 +3,7 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use App\MisClases\Fecha;
 
 class Turno extends Model
 {
@@ -48,7 +49,7 @@ class Turno extends Model
     public function getTurnoDiaSemanaAttribute()
     {
         if (null == $this->turno) return '';    // No tiene sentido, pero.........
-        return substr($this->diaSemana[$this->turno->timezone('America/Caracas')
+        return substr(Fecha::$diaSemana[$this->turno->timezone('America/Caracas')
                         ->dayOfWeek], 0, 3);
     }
 

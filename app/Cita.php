@@ -3,6 +3,7 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use App\MisClases\Fecha;
 
 class Cita extends Model
 {
@@ -27,7 +28,7 @@ class Cita extends Model
     public function getCitaDiaSemanaAttribute()
     {
         if (null == $this->fecha_cita) return '';
-        return substr($this->diaSemana[$this->fecha_cita->dayOfWeek], 0, 3);
+        return substr(Fecha::$diaSemana[$this->fecha_cita->dayOfWeek], 0, 3);
     }
 
     public function getCitaHoraAttribute()

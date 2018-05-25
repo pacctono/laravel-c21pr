@@ -4,6 +4,7 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 use Carbon\Carbon;
+use App\MisClases\Fecha;
 
 class Bitacora extends Model
 {
@@ -12,9 +13,6 @@ class Bitacora extends Model
     ];
     protected $dates = [
         'created_at', 'updated_at'
-    ];
-    protected static $diaSemana = [
-        'Domingo', 'Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado'
     ];
 
     public function user()    // user_id
@@ -40,7 +38,7 @@ class Bitacora extends Model
         if (null == $fechaUltLogin) return null;
 
         $fechaUltLogin = $fechaUltLogin->timezone('America/Caracas');
-        return self::$diaSemana[$fechaUltLogin->dayOfWeek] . ' ' .
+        return Fecha::$diaSemana[$fechaUltLogin->dayOfWeek] . ' ' .
                 $fechaUltLogin->format('d/m/Y H:i (h:i a)');
     }
 }

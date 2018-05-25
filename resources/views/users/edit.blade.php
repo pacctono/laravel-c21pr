@@ -55,6 +55,7 @@
             <div class="form-group d-flex align-items-end">
                 <label for="fecha_nacimiento">Fecha de nacimiento:</label>
                 <input type="date" name="fecha_nacimiento" id="fecha_nacimiento"
+                        max="{{ now()->format('Y-m-d') }}"
                         value="{{ old('fecha_nacimiento', ($user->fecha_nacimiento)?$user->fecha_nacimiento_bd:'') }}">
             </div>
             <div class="form-group d-flex align-items-end">
@@ -71,6 +72,7 @@
             <div class="form-group d-flex align-items-end">
                 <label for="fecha_ingreso">Fecha de ingreso:</label>
                 <input type="date" name="fecha_ingreso" id="fecha_ingreso"
+                        min="2015-06-01" max="{{ now()->format('Y-m-d') }}"
                         value="{{ old('fecha_ingreso', ($user->fecha_ingreso)?$user->fecha_ingreso_bd:'') }}">
             </div>
             <div class="form-group d-flex align-items-end">

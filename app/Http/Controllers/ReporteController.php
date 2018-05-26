@@ -34,9 +34,16 @@ class ReporteController extends Controller
         }
         $ZONA = Fecha::$ZONA;
         
+        if (Auth::user()->is_admin) {
+            $asesor = session('asesor', 0);
+            $users  = User::all();         // Todos los usuarios.
+        } else {
+            $asesor = Auth::user()->id;
+        }
         if ('POST' == request()->method()) {
             $fechas = request()->all();
             $muestra = session('muestra', 'Asesor');
+            $asesor = $fechas['asesor'];
             list ($fecha_desde, $fecha_hasta) = Fecha::periodo($fechas);
         } elseif ('Conexion' == $muestra) {
             $fecha_desde = (new Carbon(Bitacora::min('created_at', $ZONA)))->startOfDay();
@@ -50,14 +57,12 @@ class ReporteController extends Controller
             $fecha_hasta = (new Carbon(Contacto::max('created_at', $ZONA)))->endOfDay();
         }
 
-        $title = $this->tipo . ' por ' . $muestra . ' desde ' . $fecha_desde->format('d/m/Y') .
-                                                    ' hasta ' . $fecha_hasta->format('d/m/Y');
+        $title = $this->tipo . ' por ' . $muestra .
+                                    ((('Fecha'==$muestra) and (0<$asesor))?
+                                            (' de '.User::find($asesor)->name.' '):'') .
+                                    ' desde ' . $fecha_desde->format('d/m/Y') .
+                                    ' hasta ' . $fecha_hasta->format('d/m/Y');
 
-        if (Auth::user()->is_admin) {
-            $asesor = null;
-        } else {
-            $asesor = Auth::user()->id;
-        }
         switch ($muestra) {
             case 'Asesor':
 /*            $elemsRep = Contacto::select('user_id', DB::raw('count(*) as atendidos'))
@@ -75,14 +80,14 @@ class ReporteController extends Controller
                 $elemsRep = Contacto::contactosXFecha($fecha_desde, $fecha_hasta, $asesor);
                 break;
             default:        // 'Fecha'
-                $elemsRep = Contacto::contactosXFecha($fecha_desde, $fecha_hasta);
+                $elemsRep = Contacto::contactosXFecha($fecha_desde, $fecha_hasta, $asesor);
         } 
         $elemsRep = $elemsRep->get();
 
         session(['fecha_desde' => $fecha_desde, 'fecha_hasta' => $fecha_hasta,
-                    'muestra' => $muestra]);
-        return view('reportes.index', compact('title', 'elemsRep', 'chart', 'muestra',
-                                                'fecha_desde', 'fecha_hasta'));
+                    'muestra' => $muestra, 'asesor' => $asesor]);
+        return view('reportes.index', compact('title', 'users', 'elemsRep', 'chart', 'muestra',
+                                                'fecha_desde', 'fecha_hasta', 'asesor'));
     }
 /**
  *  There are a few methods you can use in all datasets (regardless of the type, or charting library).
@@ -98,9 +103,16 @@ class ReporteController extends Controller
             return redirect('login');
         }
 
+        if (Auth::user()->is_admin) {
+            $asesor = session('asesor', 0);
+            $users  = User::all();         // Todos los usuarios.
+        } else {
+            $asesor = Auth::user()->id;
+        }
         if ('POST' == request()->method()) {
             $fechas = request()->all();
             $muestra = session('muestra', 'Asesor');
+            $asesor = $fechas['asesor'];
             list ($fecha_desde, $fecha_hasta) = Fecha::periodo($fechas);
         } elseif ('' != session('fecha_desde', '') and '' != session('fecha_hasta', ''))  {
             $fecha_desde = session('fecha_desde');
@@ -119,8 +131,11 @@ class ReporteController extends Controller
             return redirect()->back();
         }
 
-        $title = $this->tipo . ' por ' . $muestra . ' desde ' . $fecha_desde->format('d/m/Y') .
-                                                    ' hasta ' . $fecha_hasta->format('d/m/Y');
+        $title = $this->tipo . ' por ' . $muestra .
+                                    ((('Fecha'==$muestra) and (0<$asesor))?
+                                            (' de '.User::find($asesor)->name.' '):'') .
+                                    ' desde ' . $fecha_desde->format('d/m/Y') .
+                                    ' hasta ' . $fecha_hasta->format('d/m/Y');
         $legenda = $title;
 
         if ('' == $tipo or $tipo == null) {
@@ -129,11 +144,6 @@ class ReporteController extends Controller
 
         $chart = new SampleChart;
 
-        if (Auth::user()->is_admin) {
-            $asesor = null;
-        } else {
-            $asesor = Auth::user()->id;
-        }
         switch ($muestra) {
             case 'Asesor':
                 $elemsRep = User::contactosXAsesor($fecha_desde, $fecha_hasta);
@@ -188,8 +198,9 @@ class ReporteController extends Controller
             ->lineTension(0);                       // 0.5, por defecto.
 //            ->color('#ff0000');                 // dataset configuration presets.
 
-        session(['fecha_desde' => $fecha_desde, 'fecha_hasta' => $fecha_hasta, 'muestra' => $muestra]);
-        return view('reportes.chart', compact('title', 'elemsRep', 'chart', 'tipo', 'muestra',
-                                                'fecha_desde', 'fecha_hasta'));
+        session(['fecha_desde' => $fecha_desde, 'fecha_hasta' => $fecha_hasta,
+                    'muestra' => $muestra, 'asesor' => $asesor]);
+        return view('reportes.chart', compact('title', 'users', 'elemsRep', 'chart', 'tipo',
+                                            'muestra', 'fecha_desde', 'fecha_hasta', 'asesor'));
     }
 }

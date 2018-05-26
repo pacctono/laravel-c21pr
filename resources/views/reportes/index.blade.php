@@ -16,13 +16,27 @@
       <label>Hasta:</label>
       <input type="date" name="fecha_hasta" id="fecha_hasta" min="{{ now() }}" max="{{ now() }}"
                       value="{{ old('fecha_hasta', substr($fecha_hasta, 0, 10)) }}">
+      @if ((Auth::user()->is_admin) and ('Fecha' == $muestra))
+      <select name="asesor" id="asesor">
+        <option value="0">Asesor</option>
+        @foreach ($users as $user)
+          <option value="{{ $user->id }}"
+          @if (old("asesor", $asesor) == $user->id)
+            selected
+          @endif
+          >
+            {{ $user->name }}
+          </option>
+        @endforeach
+      </select>
+      @endif
       <button type="submit" class="btn btn-success">Mostrar</button>
     </div>
   </form>
 </div>
 
 <div class="d-flex justify-content-between align-items-end mb-3">
-  <h3 class="pb-1">{{ $title }}</h3>
+  <h4 class="pb-1">{{ $title }}</h4>
 
   @if ('Cumpleanos' != $muestra)
   <p class="text-right">

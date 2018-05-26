@@ -96,10 +96,8 @@ class Contacto extends Model
 
     public static function contactosXFecha($fecha_desde, $fecha_hasta, $user=null)
     {
-        If (null == $user) {
-            $user  = 0;
-            $signo = '>';
-        } else $signo = '=';
+        If (0 >= $user) $signo = '>';
+        else $signo = '=';
         $sql = self::select(DB::raw('DATE_FORMAT(created_at, "%Y-%m-%d")'),
                         DB::raw('DATE_FORMAT(created_at, "%d/%m/%Y") as fecha'),
                         DB::raw('count(*) as atendidos'))

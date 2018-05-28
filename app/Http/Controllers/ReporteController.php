@@ -36,7 +36,7 @@ class ReporteController extends Controller
         
         if (Auth::user()->is_admin) {
             $asesor = session('asesor', 0);
-            $users  = User::all();         // Todos los usuarios.
+            $users  = User::all()->where('id', '>', 1); // Todos los usuarios, excepto id=1.
         } else {
             $asesor = Auth::user()->id;
         }
@@ -80,6 +80,7 @@ class ReporteController extends Controller
                 $elemsRep = Contacto::contactosXFecha($fecha_desde, $fecha_hasta, $asesor);
                 break;
             default:        // 'Fecha'
+                dd(request()->method(), session('muestra', 'muestra sin asignar'), session('asesor', 'asesor sin asignar'));
                 $elemsRep = Contacto::contactosXFecha($fecha_desde, $fecha_hasta, $asesor);
         } 
         $elemsRep = $elemsRep->get();
@@ -105,7 +106,7 @@ class ReporteController extends Controller
 
         if (Auth::user()->is_admin) {
             $asesor = session('asesor', 0);
-            $users  = User::all();         // Todos los usuarios.
+            $users  = User::all()->where('id', '>', 1);         // Todos los usuarios.
         } else {
             $asesor = Auth::user()->id;
         }
@@ -155,6 +156,7 @@ class ReporteController extends Controller
                 $elemsRep = Contacto::contactosXFecha($fecha_desde, $fecha_hasta, $asesor);
                 break;
             default:        // 'Fecha'
+                dd(request()->method(), session('muestra', 'muestra sin asignar'), session('asesor', 'asesor sin asignar'));
                 $elemsRep = Contacto::contactosXFecha($fecha_desde, $fecha_hasta, $asesor);
         } 
         $elemsRep = $elemsRep->get();

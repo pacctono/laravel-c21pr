@@ -57,7 +57,7 @@ class AgendaController extends Controller
         }
 
         if (Auth::user()->is_admin) {       // El usuario (asesor) es un administrador.
-            $users   = User::all();         // Todos los usuarios.
+            $users   = User::all()->where('id', '>', 1);         // Todos los usuarios.
             $agendas = Agenda::select('fecha_evento', 'hora_evento', 'descripcion', 'name',
                                         'telefono', 'user_id', 'contacto_id', 'email',
                                         'direccion');   // Solo estas columnas.
@@ -109,7 +109,7 @@ class AgendaController extends Controller
             $cita->fecha_cita = NULL;
             $cita->comentarios = NULL;
         } else {
-            $cita=$cita->all()[0];
+            $cita=$cita->all()[0];      // Primera fila devuelta de 'Cita' del $contacto->id.
         }
         //dd($cita);
         return view('agenda.show', compact('cita'));

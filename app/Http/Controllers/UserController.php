@@ -98,9 +98,14 @@ class UserController extends Controller
         unset($data['ddn']);
 
         User::create([
+            'cedula' => $data['cedula'],
             'name' => $data['name'],
             'telefono' => $data['telefono'],
             'email' => $data['email'],
+            'email_c21' => $data['email_c21'],
+            'licencia_mls' => $data['licencia_mls'],
+            'fecha_ingreso' => $data['fecha_ingreso'],
+            'fecha_nacimiento' => $data['fecha_nacimiento'],
             'password' => bcrypt($data['password'])
         ]);
 
@@ -176,7 +181,17 @@ class UserController extends Controller
                 $contacto->delete();
             }
         }
+        $usuario = Auth::user()->id;
+        $datos = 'id:'.$user->id.', cedula:'.$user->cedula.', nombre:'.$user->name;
         $user->delete();
+
+        Bitacora::create([
+            'user_id' => $usuario,
+            'tx_modelo' => 'User',
+            'tx_data' => $datos,
+            'tx_tipo' => 'B',
+        ]);
+
         return redirect()->route('users');
     }
 }

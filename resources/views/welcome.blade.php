@@ -87,7 +87,7 @@
 
             <div class="content">
                 <div class="title m-b-md">
-                    <img src="{{ (asset('img/fachadaConAsesores_201804.jpg')) }}"
+                    <img src="{{ (asset('img/c21pr3.jpg')) }}"
                         alt="Conectado a la web de Century21 Puente Real"
                         width="1040" height="600"
                     >

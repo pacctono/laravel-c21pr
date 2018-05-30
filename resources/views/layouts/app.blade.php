@@ -29,8 +29,9 @@
     <header>
       <!-- Fixed navbar -->
       <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
-        <a class="navbar-brand" href="">
-          <img src="{{ (asset('img/c21pr.jpeg')) }}" title="C21 Puente Real" alt="C21 Puente Real">
+        <a class="navbar-brand" href="http://www.century21.com.ve/" target="_blank">
+          <img src="{{ (asset('img/c21pr.jpg')) }}" title="C21 Puente Real"
+                alt="C21 Puente Real" style="width:32px;height:31px;">
         </a>
         <button class="navbar-toggler" type="button" data-toggle="collapse"
                 data-target="#navbarCollapse" aria-controls="navbarCollapse"
@@ -83,6 +84,33 @@
                 </a></li>
               </ul>
             </li>
+            @if (Auth::user()->is_admin)
+            <li class="dropdown">
+              <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                Tablas
+              <span class="caret"></span></a>
+              <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="">{{-- <{{ route('desea') }}"> --}}
+                  Desea
+                </a></li>
+                <li><a class="dropdown-item" href="">{{-- <{{ route('propiedad') }}"> --}}
+                  Propiedad
+                </a></li>
+                <li><a class="dropdown-item" href="">{{-- <{{ route('zona') }}"> --}}
+                  Zona
+                </a></li>
+                <li><a class="dropdown-item" href="">{{-- <{{ route('precio') }}"> --}}
+                  Precio
+                </a></li>
+                <li><a class="dropdown-item" href="">{{-- <{{ route('origen') }}"> --}}
+                  Origen
+                </a></li>
+                <li><a class="dropdown-item" href="">{{-- <{{ route('resultado') }}"> --}}
+                  Resultado
+                </a></li>
+              </ul>
+            </li>
+            @endif
           </ul>
           @endauth
           <ul class="navbar-nav ml-auto col-md-2">

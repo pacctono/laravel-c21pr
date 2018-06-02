@@ -81,6 +81,8 @@
     <tr>
     @if ('Fecha' == $muestra)
       <td>{{ $elemento->fecha }}</td>
+    @elseif ('Origen' == $muestra)
+      <td>{{ $elemento->descripcion }}</td>
     @else
       <td>{{ $elemento->name }}</td>
     @endif

@@ -23,6 +23,13 @@ class TurnoController extends Controller
 
         $title = 'Listado de ' . $this->tipo;
         $ruta = request()->path();
+        $periodo = request()->all();
+//        dd($periodo);
+// Todo se inicializa, cuando se selecciona 'turnos' desde el menú horizontal.
+        if (('GET' == request()->method()) and ('' == $orden) and (0 == count($periodo))) {
+            session(['rPeriodo' => '', 'fecha_desde' => '', 'fecha_hasta' => '',
+                        'asesor' => '0']);
+        }
         $diaSemana = Fecha::$diaSemana;
 
         for ($d = 0; $d < 11; $d++) {
@@ -30,21 +37,59 @@ class TurnoController extends Controller
                                     ->addWeeks($d);            // Proximos once lunes.
         }
 //        dd($semanas);
+/*
+ * Manejo de las variables de la forma superior. $periodo (radios, fecha_desde, fecha_hasta y asesor).
+ * Cuando el arreglo $periodo contiene un solo item, este es el número de página (page=n).
+ * Si el arreglo $periodo está vacio (count($arreglo) == 0), es una ruta 'GET' con o sin $orden.
+ * Si $periodo tiene más de 1 item. Fue seleccionado un radio y/o las fechas y el asesor.
+ */
+        if (1 >= count($periodo)) {
+            $rPeriodo    = session('rPeriodo', '');
+            $fecha_desde = session('fecha_desde', '');
+            $fecha_hasta = session('fecha_hasta', '');
+            $asesor      = session('asesor', '0');
+        } else {
+            $rPeriodo = $periodo['periodo'];            // Radio periodo.
+            if (isset($periodo['asesor'])) $asesor = $periodo['asesor'];
+            else $asesor = 0;
+
+            $fecha_min = (new Carbon(Turno::min('turno')));
+            $fecha_max = (new Carbon(Turno::max('turno')));
+            list ($fecha_desde, $fecha_hasta) = Fecha::periodo($periodo, $fecha_min, $fecha_max);
+        }
+//        dd($periodo, $fecha_desde, $fecha_hasta);
         if ('' == $orden or $orden == null) {
-            $orden = 'id';
+            $orden = 'turno';
         }
         if (Auth::user()->is_admin) {
-            $turnos = Turno::where('turno','>=', 'now')
-                            ->orderBy($orden)->paginate(10);
+            $users   = User::all();         // Todos los usuarios. Incluye '1' porque en turnos hay feriado.
+            $turnos = Turno::where('id', '>', 0);   // condición dummy, solo para continuar armando la consulta.
         } else {
             $user   = User::find(Auth::user()->id);
-            $turnos = $user->turnos()
-                        ->where('turno','>=', 'now')
-                        ->orderBy($orden)->paginate(10);
             $title .= ' de ' . $user->name;
+            $turnos = $user->turnos();
         }
     
-        return view('turnos.index', compact('title', 'turnos', 'ruta', 'diaSemana', 'semanas'));
+        if (0 < $asesor) {      // Se selecciono un asesor o el conectado no es administrador.
+            $turnos = $turnos->where('user_id', $asesor);
+        }
+        if ('' != $fecha_desde and '' != $fecha_hasta) {    // No se seleccionaron fechas.
+            $fecha_desde = substr($fecha_desde, 0, 10);
+            $fecha_hasta = substr($fecha_hasta, 0, 10);
+            $turnos = $turnos->whereBetween('turno', [$fecha_desde, $fecha_hasta]);
+        } else {
+            $turnos = $turnos->where('turno', '>=', now(Fecha::$ZONA));
+        }
+        $turnos = $turnos->orderBy($orden);   // Ordenar los items de los turnos.
+        if ('user_id' == $orden) {              // Si se pidió ordenar por id de usuario,
+            $turnos = $turnos->orderBy('turno');   // ordenar por turno en cada usuario.
+        }
+        $turnos = $turnos->paginate(10);      // Pagina la impresión de 10 en 10
+// Devolver las fechas sin la hora. Los diez primeros caracteres son: yyyy-mm-dd.
+        session(['rPeriodo' => $rPeriodo, 'fecha_desde' => $fecha_desde,    // Asignar valores en sesión.
+                    'fecha_hasta' => $fecha_hasta, 'asesor' => $asesor]);
+        return view('turnos.index', compact('title', 'users', 'turnos', 'ruta', 'diaSemana',
+                    'semanas', 'rPeriodo', 'fecha_desde', 'fecha_hasta', 'asesor'));
     }
 
     public function crear($semana = null)

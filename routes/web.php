@@ -66,6 +66,10 @@ Route::delete('/turnos/{turno}', 'TurnoController@destroy')
 Route::get('/turnos/orden/{orden}', 'TurnoController@index')
     ->name('turnos.orden');
 
+Route::get('/turnos/filtro', 'TurnoController@index');     // Para paginación con filtro.
+Route::post('/turnos/filtro', 'TurnoController@index')
+    ->name('turnos.post');
+
 Route::get('/clientes/orden/{orden}', 'ClienteController@index')
     ->name('clientes.orden');
 
@@ -78,7 +82,7 @@ Route::get('/agenda', 'AgendaController@index')
 Route::get('/agenda/orden/{orden}', 'AgendaController@index')
     ->name('agenda.orden');
 
-Route::get('/agenda/filtro', 'AgendaController@index');
+Route::get('/agenda/filtro', 'AgendaController@index');     // Para paginación con filtro.
 Route::post('/agenda/filtro', 'AgendaController@index')
     ->name('agenda.post');
 
@@ -109,6 +113,138 @@ Route::get('/reportes/chart/{chart}', 'ReporteController@chart')
 
 Route::post('/reportes/chart/{chart}', 'ReporteController@chart')
     ->name('reportes.chart.post');
+
+Route::get('/origenes', 'OrigenController@index')
+    ->name('origen');
+
+Route::get('/origenes/{origen}', 'OrigenController@show')
+    ->where('origen', '[0-9]+')
+    ->name('origen.show');
+
+Route::get('/origenes/nuevo', 'OrigenController@create')
+    ->name('origen.create')
+    ->middleware('admin');
+
+Route::post('/origenes', 'OrigenController@store');
+
+Route::get('/origenes/{origen}/editar', 'OrigenController@edit')
+    ->name('origen.edit');
+
+Route::put('/origenes/{origen}', 'OrigenController@update');
+
+Route::delete('/origenes/{origen}', 'OrigenController@destroy')
+    ->name('origen.destroy')
+    ->middleware('admin');
+
+Route::get('/deseos', 'DeseoController@index')
+    ->name('deseo');
+
+Route::get('/deseos/{deseo}', 'DeseoController@show')
+    ->where('deseo', '[0-9]+')
+    ->name('deseo.show');
+
+Route::get('/deseos/nuevo', 'DeseoController@create')
+    ->name('deseo.create')
+    ->middleware('admin');
+
+Route::post('/deseos', 'DeseoController@store');
+
+Route::get('/deseos/{deseo}/editar', 'DeseoController@edit')
+    ->name('deseo.edit');
+
+Route::put('/deseos/{deseo}', 'DeseoController@update');
+
+Route::delete('/deseos/{deseo}', 'DeseoController@destroy')
+    ->name('deseo.destroy')
+    ->middleware('admin');
+
+Route::get('/propiedades', 'PropiedadController@index')
+    ->name('propiedad');
+
+Route::get('/propiedades/{deseo}', 'PropiedadController@show')
+    ->where('propiedad', '[0-9]+')
+    ->name('propiedad.show');
+
+Route::get('/propiedades/nuevo', 'PropiedadController@create')
+    ->name('propiedad.create')
+    ->middleware('admin');
+
+Route::post('/propiedades', 'PropiedadController@store');
+
+Route::get('/propiedades/{propiedad}/editar', 'PropiedadController@edit')
+    ->name('propiedad.edit');
+
+Route::put('/propiedades/{propiedad}', 'PropiedadController@update');
+
+Route::delete('/propiedades/{propiedad}', 'PropiedadController@destroy')
+    ->name('propiedad.destroy')
+    ->middleware('admin');
+
+Route::get('/zonas', 'ZonaController@index')
+    ->name('zona');
+
+Route::get('/zonas/{zona}', 'ZonaController@show')
+    ->where('zona', '[0-9]+')
+    ->name('zona.show');
+
+Route::get('/zonas/nuevo', 'ZonaController@create')
+    ->name('zona.create')
+    ->middleware('admin');
+
+Route::post('/zonas', 'ZonaController@store');
+
+Route::get('/zonas/{zona}/editar', 'ZonaController@edit')
+    ->name('zona.edit');
+
+Route::put('/zonas/{zona}', 'ZonaController@update');
+
+Route::delete('/zonas/{zona}', 'ZonaController@destroy')
+    ->name('zona.destroy')
+    ->middleware('admin');
+
+Route::get('/precios', 'PrecioController@index')
+    ->name('precio');
+
+Route::get('/precios/{precio}', 'PrecioController@show')
+    ->where('precio', '[0-9]+')
+    ->name('precio.show');
+
+Route::get('/precios/nuevo', 'PrecioController@create')
+    ->name('precio.create')
+    ->middleware('admin');
+
+Route::post('/precios', 'PrecioController@store');
+
+Route::get('/precios/{precio}/editar', 'PrecioController@edit')
+    ->name('precio.edit');
+
+Route::put('/precios/{precio}', 'PrecioController@update');
+
+Route::delete('/precios/{precio}', 'PrecioController@destroy')
+    ->name('precio.destroy')
+    ->middleware('admin');
+
+Route::get('/resultados', 'ResultadoController@index')
+    ->name('resultado');
+
+Route::get('/resultados/{resultado}', 'ResultadoController@show')
+    ->where('resultado', '[0-9]+')
+    ->name('resultado.show');
+
+Route::get('/resultados/nuevo', 'ResultadoController@create')
+    ->name('resultado.create')
+    ->middleware('admin');
+
+Route::post('/resultados', 'ResultadoController@store');
+
+Route::get('/resultados/{resultado}/editar', 'ResultadoController@edit')
+    ->name('resultado.edit');
+
+Route::put('/resultados/{resultado}', 'ResultadoController@update');
+
+Route::delete('/resultados/{resultado}', 'ResultadoController@destroy')
+    ->name('resultado.destroy')
+    ->middleware('admin');
 
 //Route::get('/clientes/filtrar/{filtro}', 'ClienteController@filtro')
 //    ->name('clientes.filtro');

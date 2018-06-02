@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Resultado;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class ResultadoController extends Controller
 {
@@ -12,9 +13,26 @@ class ResultadoController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    protected $tipo = 'Resultados';
+
+    public function index($orden = null)
     {
-        //
+        if (!(Auth::check())) {
+            return redirect('login');
+        }
+        if (!auth()->user()->is_admin) {
+            $user = auth()->user();
+            return redirect()->route('users.show', ['user' => $user]);
+        }
+
+        $title = 'Listado de ' . $this->tipo;
+
+        if ('' == $orden or $orden == null) {
+            $orden = 'id';
+        }
+        $resultados = Resultado::orderBy($orden)->paginate(10);
+
+        return view('resultado.index', compact('title', 'resultados'));
     }
 
     /**

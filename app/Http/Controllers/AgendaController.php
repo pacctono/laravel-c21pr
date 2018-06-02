@@ -27,7 +27,7 @@ class AgendaController extends Controller
         $ruta = request()->path();
         $periodo = request()->all();
 //        dd($periodo);
-// Todo se inicializa, cuando se selecciona 'Agenda' desde el menú horizontal.
+// Todo se inicializa, cuando se selecciona 'Agenda' desde el menú horizontal principal.
         if (('GET' == request()->method()) and ('' == $orden) and (0 == count($periodo))) {
             session(['rPeriodo' => '', 'fecha_desde' => '', 'fecha_hasta' => '', 'asesor' => '0']);
         }
@@ -57,7 +57,7 @@ class AgendaController extends Controller
         }
 
         if (Auth::user()->is_admin) {       // El usuario (asesor) es un administrador.
-            $users   = User::all()->where('id', '>', 1);         // Todos los usuarios.
+            $users   = User::all();         // Todos los usuarios. Incluye '1' porque en turnos hay feriado.
             $agendas = Agenda::select('fecha_evento', 'hora_evento', 'descripcion', 'name',
                                         'telefono', 'user_id', 'contacto_id', 'email',
                                         'direccion');   // Solo estas columnas.
@@ -76,7 +76,10 @@ class AgendaController extends Controller
         if (0 < $asesor) {      // Se selecciono un asesor o el conectado no es administrador.
             $agendas = $agendas->where('user_id', $asesor);
         }
+// Devolver las fechas sin la hora. Los diez primeros caracteres son: yyyy-mm-dd.
         if ('' != $fecha_desde and '' != $fecha_hasta) {    // No se seleccionaron fechas.
+            $fecha_desde = substr($fecha_desde, 0, 10);
+            $fecha_hasta = substr($fecha_hasta, 0, 10);
             $agendas = $agendas->whereBetween('fecha_evento', [$fecha_desde, $fecha_hasta]);
         }
         $agendas = $agendas->orderBy($orden);   // Ordenar los items de la agenda.
@@ -84,11 +87,9 @@ class AgendaController extends Controller
             $agendas = $agendas->orderBy('fecha_evento');   // ordenar por fecha_evento en cada usuario.
         }
         $agendas = $agendas->paginate(10);      // Pagina la impresión de 10 en 10
-// Devolver las fechas sin la hora. Los diez primeros caracteres son: yyyy-mm-dd.
-        $fecha_desde = substr($fecha_desde, 0, 10);
-        $fecha_hasta = substr($fecha_hasta, 0, 10);
         session(['rPeriodo' => $rPeriodo, 'fecha_desde' => $fecha_desde,    // Asignar valores en sesión.
                     'fecha_hasta' => $fecha_hasta, 'asesor' => $asesor]);
+        //if ('este_mes' == $rPeriodo) dd($agendas, $users, $fecha_desde, $fecha_hasta, $asesor);
         return view('agenda.index', compact('title', 'users', 'ruta', 'agendas',
                     'rPeriodo', 'fecha_desde', 'fecha_hasta', 'asesor'));
     }

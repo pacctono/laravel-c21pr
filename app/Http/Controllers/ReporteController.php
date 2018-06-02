@@ -76,6 +76,9 @@ class ReporteController extends Controller
             case 'Cumpleanos':
                 $elemsRep = User::cumpleanos($fecha_desde, $fecha_hasta);
                 break;
+            case 'Origen':
+                $elemsRep = Origen::contactosXOrigen($fecha_desde, $fecha_hasta);
+                break;
             case 'Fecha':
                 $elemsRep = Contacto::contactosXFecha($fecha_desde, $fecha_hasta, $asesor);
                 break;
@@ -152,6 +155,9 @@ class ReporteController extends Controller
             case 'Conexion':
                 $elemsRep = User::conexionXAsesor($fecha_desde, $fecha_hasta);
                 break;
+            case 'Origen':
+                $elemsRep = Origen::contactosXOrigen($fecha_desde, $fecha_hasta);
+                break;
             case 'Fecha':
                 $elemsRep = Contacto::contactosXFecha($fecha_desde, $fecha_hasta, $asesor);
                 break;
@@ -171,6 +177,8 @@ class ReporteController extends Controller
         foreach ($elemsRep as $elemento) {
             if ('Fecha' == $muestra) {
                 $arrEtiq[]  = $elemento->fecha;
+            } elseif ('Origen' == $muestra) {
+                $arrEtiq[]  = $elemento->descripcion;
             } else {
                 $arrEtiq[]  = substr($elemento->name, 0, 20);
             }

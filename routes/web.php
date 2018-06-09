@@ -44,6 +44,10 @@ Route::delete('/usuarios/{user}', 'UserController@destroy')
 Route::get('/contactos/orden/{orden}', 'ContactoController@index')
     ->name('contactos.orden');
 
+Route::get('/contactos/{contacto}/{ruta}', 'ContactoController@show')
+    ->where('contacto', '[0-9]+')
+    ->name('contactos.muestra');
+
 Route::pattern('contactos', '[0-9]+');               // Para no crear conflictos con el resource contacto
 Route::resource('contactos', 'ContactoController');
 
@@ -114,6 +118,27 @@ Route::get('/reportes/chart/{chart}', 'ReporteController@chart')
 Route::post('/reportes/chart/{chart}', 'ReporteController@chart')
     ->name('reportes.chart.post');
 
+Route::get('/reportes/contactosUsers/{id}/{orden}', 'ReporteController@contactosXUser')
+    ->name('reporte.contactosUsers');
+
+Route::get('/reportes/contactosDeseo/{id}/{orden}', 'ReporteController@contactosXDeseo')
+    ->name('reporte.contactosDeseo');
+
+Route::get('/reportes/contactosPropiedad/{id}/{orden}', 'ReporteController@contactosXPropiedad')
+    ->name('reporte.contactosPropiedad');
+
+Route::get('/reportes/contactosOrigen/{id}/{orden}', 'ReporteController@contactosXOrigen')
+    ->name('reporte.contactosOrigen');
+
+Route::get('/reportes/contactosPrecio/{id}/{orden}', 'ReporteController@contactosXPrecio')
+    ->name('reporte.contactosPrecio');
+
+Route::get('/reportes/contactosZona/{id}/{orden}', 'ReporteController@contactosXZona')
+    ->name('reporte.contactosZona');
+
+Route::get('/reportes/contactosResultado/{id}/{orden}', 'ReporteController@contactosXResultado')
+    ->name('reporte.contactosResultado');
+
 Route::get('/origenes', 'OrigenController@index')
     ->name('origen');
 
@@ -122,7 +147,7 @@ Route::get('/origenes/{origen}', 'OrigenController@show')
     ->name('origen.show');
 
 Route::get('/origenes/nuevo', 'OrigenController@create')
-    ->name('origen.create')
+    ->name('origen.crear')
     ->middleware('admin');
 
 Route::post('/origenes', 'OrigenController@store');
@@ -144,7 +169,7 @@ Route::get('/deseos/{deseo}', 'DeseoController@show')
     ->name('deseo.show');
 
 Route::get('/deseos/nuevo', 'DeseoController@create')
-    ->name('deseo.create')
+    ->name('deseo.crear')
     ->middleware('admin');
 
 Route::post('/deseos', 'DeseoController@store');
@@ -161,12 +186,12 @@ Route::delete('/deseos/{deseo}', 'DeseoController@destroy')
 Route::get('/propiedades', 'PropiedadController@index')
     ->name('propiedad');
 
-Route::get('/propiedades/{deseo}', 'PropiedadController@show')
+Route::get('/propiedades/{propiedad}', 'PropiedadController@show')
     ->where('propiedad', '[0-9]+')
     ->name('propiedad.show');
 
 Route::get('/propiedades/nuevo', 'PropiedadController@create')
-    ->name('propiedad.create')
+    ->name('propiedad.crear')
     ->middleware('admin');
 
 Route::post('/propiedades', 'PropiedadController@store');
@@ -188,7 +213,7 @@ Route::get('/zonas/{zona}', 'ZonaController@show')
     ->name('zona.show');
 
 Route::get('/zonas/nuevo', 'ZonaController@create')
-    ->name('zona.create')
+    ->name('zona.crear')
     ->middleware('admin');
 
 Route::post('/zonas', 'ZonaController@store');
@@ -210,7 +235,7 @@ Route::get('/precios/{precio}', 'PrecioController@show')
     ->name('precio.show');
 
 Route::get('/precios/nuevo', 'PrecioController@create')
-    ->name('precio.create')
+    ->name('precio.crear')
     ->middleware('admin');
 
 Route::post('/precios', 'PrecioController@store');
@@ -232,7 +257,7 @@ Route::get('/resultados/{resultado}', 'ResultadoController@show')
     ->name('resultado.show');
 
 Route::get('/resultados/nuevo', 'ResultadoController@create')
-    ->name('resultado.create')
+    ->name('resultado.crear')
     ->middleware('admin');
 
 Route::post('/resultados', 'ResultadoController@store');

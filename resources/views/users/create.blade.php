@@ -82,6 +82,24 @@
             </div>
 
             <div class="form-group d-flex">
+                <label class="control-label col-sm-1" for="sexo">Sexo:</label>
+                <input type="text" class="form-control col-sm-1" size="1" maxlength="1" 
+                        name="sexo" id="sexo" placeholder="M" value="{{ old('sexo') }}">
+                <div class="control-label col-sm-2" for="sexo">&nbsp;</div>
+                <label class="control-label col-sm-2" for="estado_civil">Estado civil:</label>
+                <input type="text" class="form-control col-sm-1" size="1" maxlength="1" 
+			name="estado_civil" id="estado_civil" placeholder="C"
+                        value="{{ old('estado_civil') }}">
+            </div>
+
+            <div class="form-group d-flex">
+                <label class="control-label col-sm-3" for="direccion">Direccion:</label>
+                <input type="text" class="form-control col-sm-6" size="30" maxlength="100" 
+			name="direccion" id="direccion" placeholder="Aqui la dirección del asesor"
+                        value="{{ old('direccion') }}">
+            </div>
+
+            <div class="form-group d-flex">
                 <label class="control-label col-sm-4" for="password">Contraseña:</label>
                 <input type="password" class="form-control col-sm-2" required name="password" 
                         id=password placeholder="Mayor a 6 cars">

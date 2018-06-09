@@ -13,9 +13,14 @@ class Deseo extends Model
         return $this->hasMany(Cliente::class); // Si llave foranea, diferente a esperada, usamos 2do parametro.
     }
 
-    public function contactos()    // contacto_id
+    public function contactos()    // deseo_id
     {
         return $this->hasMany(Contacto::class); // Si llave foranea, diferente a esperada, usamos 2do parametro.
+    }
+
+    public static function contactosBorrados($id)
+    {
+        return self::find($id)->contactos->where('user_borro', '!=', null);
     }
 
     public static function contactosXDeseo($fecha_desde, $fecha_hasta)

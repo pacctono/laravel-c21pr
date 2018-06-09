@@ -91,7 +91,13 @@
 
         <p>
             <!-- a href="{{ action('ContactoController@index') }}">Regresar al listado de contactos iniciales</a -->
-            <a href="{{ route('contactos.index') }}" class="btn btn-link">Regresar al listado de contactos iniciales</a>
+            @if ('' == $col_id)
+	    <a href="{{ route($rutRetorno) }}" class="btn btn-link">
+	    @else
+	    <a href="{{ route($rutRetorno, [$contacto[$col_id], 'id']) }}" class="btn btn-link">
+	    @endif
+		Regresar
+            </a>
         </p>
     </div>
 </div>

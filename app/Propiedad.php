@@ -8,14 +8,14 @@ class Propiedad extends Model
 {
     protected $fillable = ['descripcion'];
 
-    public function clientes()    // cliente_id
-    {
-        return $this->hasMany(Cliente::class); // Si llave foranea, diferente a esperada, usamos 2do parametro.
-    }
-
     public function contactos()    // contacto_id
     {
         return $this->hasMany(Contacto::class); // Si llave foranea, diferente a esperada, usamos 2do parametro.
+    }
+
+    public static function contactosBorrados($id)
+    {
+        return self::find($id)->contactos->where('user_borro', '!=', null);
     }
 
     public static function contactosXPropiedad($fecha_desde, $fecha_hasta)

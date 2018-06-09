@@ -29,6 +29,13 @@
             </spam>
             @endif
         </p>
+	<p>
+            Sexo: <spam class="alert-info">{{ $user->sexo }}</spam>
+            Estado civil: <spam class="alert-info">{{ $user->estado_civil }}</spam>
+        </p>
+	<p>
+            Dirección: <spam class="alert-info">{{ $user->direccion }}</spam>
+        </p>
         @if (null != $fechaUltLogin)
         <p>Fecha del último login:
             <spam class="alert-info">
@@ -41,7 +48,7 @@
             @if (auth()->user()->is_admin)
             <!-- a href="{{ action('UserController@index') }}">Regresar al listado de usuarios</a -->
             <a href="{{ url('/usuarios') }}" class="btn btn-link">
-                Regresar al listado de asesores
+                Regresar
             </a>
             @else
             <a href="{{ route('users.edit', auth()->user()->id) }}" class="btn btn-link">

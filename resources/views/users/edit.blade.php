@@ -76,6 +76,19 @@
                         value="{{ old('fecha_ingreso', ($user->fecha_ingreso)?$user->fecha_ingreso_bd:'') }}">
             </div>
             <div class="form-group d-flex align-items-end">
+                <label for="sexo">Sexo:</label>
+                <input type="text" size="1" maxlength="1" 
+                        name="sexo" id="sexo" value="{{ old('sexo', $user->sexo) }}">
+                <label for="estado_civil">Estado civil:</label>
+                <input type="text" size="1" maxlength="1" name="estado_civil" id="estado_civil"
+                        value="{{ old('estado_civil', $user->estado_civil) }}">
+            </div>
+            <div class="form-group d-flex align-items-end">
+                <label for="direccion">Dirección:</label>
+                <input type="text" size="30" maxlength="100" name="direccion" id="direccion"
+                        value="{{ old('direccion', $user->direccion) }}">
+            </div>
+            <div class="form-group d-flex align-items-end">
                 <label for="password">Contraseña:</label>
                 <input type="password" name="password" id=password 
                         placeholder="Mayor a 6 caracteres">

@@ -23,6 +23,9 @@ class CreateUsersTable extends Migration
             $table->string('licencia_mls', 6)->nullable();
             $table->date('fecha_ingreso')->nullable();
             $table->date('fecha_nacimiento')->nullable();
+            $table->string('sexo', 1)->nullable();
+            $table->string('estado_civil', 1)->nullable();
+            $table->string('direccion', 100)->nullable();
             $table->string('password', 160);
             $table->boolean('is_admin')->default(false);
             $table->rememberToken();

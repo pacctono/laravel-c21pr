@@ -19,7 +19,8 @@ class User extends Authenticatable
      */
     protected $fillable = [
         'cedula', 'name', 'telefono', 'email', 'email_c21', 'licencia_mls',
-        'fecha_ingreso', 'fecha_nacimiento', 'password',
+	'fecha_ingreso', 'fecha_nacimiento', 'sexo', 'estado_civil',
+        'direccion', 'password',
     ];
     /**
      * The attributes that should be hidden for arrays.

@@ -24,7 +24,14 @@
         @foreach ($users as $user)
         <tr>
             <th scope="row">{{ $user->id }}</th>
-            <td>{{ $user->name }}</td>
+            <td>
+                @if (1 < $user->id)
+                <a href="{{ route('reporte.contactosUsers', [$user->id, 'id']) }}" class="btn btn-link">
+                @endif
+                    {{ $user->name }}
+                @if (1 < $user->id)
+                </a>
+                @endif
             <td>0{{ $user->telefono_f }}</td>
             <td>{{ $user->email }}</td>
             <td>

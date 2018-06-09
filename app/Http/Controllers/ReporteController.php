@@ -213,4 +213,186 @@ class ReporteController extends Controller
         return view('reportes.chart', compact('title', 'users', 'elemsRep', 'chart', 'tipo',
                                             'muestra', 'fecha_desde', 'fecha_hasta', 'asesor'));
     }
+
+    public function contactosXUser($id = 0, $orden = 'id')
+    {
+        if (!(Auth::check())) {
+            return redirect('login');
+        }
+        if (!(Auth::user()->is_admin)) {
+            return redirect()->back();
+        }
+        if ((0 == $id) or (null == $id)) {
+            return redirect()->back();
+        }
+
+        $ruta = request()->path();
+        $tipo = strtolower(substr($ruta, 18, strpos($ruta, '/', 18)-18));
+        $title = 'Listado de contactos iniciales por el ' . $tipo . ': ' . User::find($id)->name;
+
+        if ('' == $orden or $orden == null) {
+            $orden = 'id';
+        }
+        $tipoId   = substr($tipo, 0, -1) . '_id';
+        $contactos = Contacto::where($tipoId, $id)->orderBy($orden)->paginate(10);
+
+	$rutRetorno = 'reporte.contactos' . ucfirst($tipo);
+        return view('reportes.contactos', compact('title', 'contactos', 'tipo', 'rutRetorno', 'id'));
+    }
+
+    public function contactosXDeseo($id = 0, $orden = 'id')
+    {
+        if (!(Auth::check())) {
+            return redirect('login');
+        }
+        if (!(Auth::user()->is_admin)) {
+            return redirect()->back();
+        }
+        if ((0 == $id) or (null == $id)) {
+            return redirect()->back();
+        }
+
+        $ruta = request()->path();
+        $tipo = strtolower(substr($ruta, 18, strpos($ruta, '/', 18)-18));
+        $title = 'Listado de contactos iniciales por el ' . $tipo . ': ' . Deseo::find($id)->descripcion;
+
+        if ('' == $orden or $orden == null) {
+            $orden = 'id';
+        }
+        $tipoId   = $tipo . '_id';
+        $contactos = Contacto::where($tipoId, $id)->orderBy($orden)->paginate(10);
+
+	$rutRetorno = 'reporte.contactos' . ucfirst($tipo);
+        return view('reportes.contactos', compact('title', 'contactos', 'tipo', 'rutRetorno', 'id'));
+    }
+
+    public function contactosXPropiedad($id = 0, $orden = 'id')
+    {
+        if (!(Auth::check())) {
+            return redirect('login');
+        }
+        if (!(Auth::user()->is_admin)) {
+            return redirect()->back();
+        }
+        if ((0 == $id) or (null == $id)) {
+            return redirect()->back();
+        }
+
+        $ruta = request()->path();
+        $tipo = strtolower(substr($ruta, 18, strpos($ruta, '/', 18)-18));
+        $title = 'Listado de contactos iniciales por el ' . $tipo . ': ' . Propiedad::find($id)->descripcion;
+
+        if ('' == $orden or $orden == null) {
+            $orden = 'id';
+        }
+	$tipoId = $tipo . '_id';
+        $contactos = Contacto::where($tipoId, $id)->orderBy($orden)->paginate(10);
+
+	$rutRetorno = 'reporte.contactos' . ucfirst($tipo);
+        return view('reportes.contactos', compact('title', 'contactos', 'tipo', 'rutRetorno', 'id'));
+    }
+
+    public function contactosXZona($id = 0, $orden = 'id')
+    {
+        if (!(Auth::check())) {
+            return redirect('login');
+        }
+        if (!(Auth::user()->is_admin)) {
+            return redirect()->back();
+        }
+        if ((0 == $id) or (null == $id)) {
+            return redirect()->back();
+        }
+
+        $ruta = request()->path();
+        $tipo = strtolower(substr($ruta, 18, strpos($ruta, '/', 18)-18));
+        $title = 'Listado de contactos iniciales por el ' . $tipo . ': ' . Zona::find($id)->descripcion;
+
+        if ('' == $orden or $orden == null) {
+            $orden = 'id';
+        }
+	$tipoId = $tipo . '_id';
+        $contactos = Contacto::where($tipoId, $id)->orderBy($orden)->paginate(10);
+
+	$rutRetorno = 'reporte.contactos' . ucfirst($tipo);
+        return view('reportes.contactos', compact('title', 'contactos', 'tipo', 'rutRetorno', 'id'));
+    }
+
+    public function contactosXPrecio($id = 0, $orden = 'id')
+    {
+        if (!(Auth::check())) {
+            return redirect('login');
+        }
+        if (!(Auth::user()->is_admin)) {
+            return redirect()->back();
+        }
+        if ((0 == $id) or (null == $id)) {
+            return redirect()->back();
+        }
+
+        $ruta = request()->path();
+        $tipo = strtolower(substr($ruta, 18, strpos($ruta, '/', 18)-18));
+        $title = 'Listado de contactos iniciales por el ' . $tipo . ': ' . Precio::find($id)->descripcion;
+
+        if ('' == $orden or $orden == null) {
+            $orden = 'id';
+        }
+	$tipoId = $tipo . '_id';
+        $contactos = Contacto::where($tipoId, $id)->orderBy($orden)->paginate(10);
+
+	$rutRetorno = 'reporte.contactos' . ucfirst($tipo);
+        return view('reportes.contactos', compact('title', 'contactos', 'tipo', 'rutRetorno', 'id'));
+    }
+
+    public function contactosXOrigen($id = 0, $orden = 'id')
+    {
+        if (!(Auth::check())) {
+            return redirect('login');
+        }
+        if (!(Auth::user()->is_admin)) {
+            return redirect()->back();
+        }
+        if ((0 == $id) or (null == $id)) {
+            return redirect()->back();
+        }
+
+        $ruta = request()->path();
+        $tipo = strtolower(substr($ruta, 18, strpos($ruta, '/', 18)-18));
+        $title = 'Listado de contactos iniciales por el ' . $tipo . ': ' . Origen::find($id)->descripcion;
+
+        if ('' == $orden or $orden == null) {
+            $orden = 'id';
+        }
+	$tipoId = $tipo . '_id';
+        $contactos = Contacto::where($tipoId, $id)->orderBy($orden)->paginate(10);
+
+	$rutRetorno = 'reporte.contactos' . ucfirst($tipo);
+        return view('reportes.contactos', compact('title', 'contactos', 'tipo', 'rutRetorno', 'id'));
+    }
+
+    public function contactosXResultado($id = 0, $orden = 'id')
+    {
+        if (!(Auth::check())) {
+            return redirect('login');
+        }
+        if (!(Auth::user()->is_admin)) {
+            return redirect()->back();
+        }
+        if ((0 == $id) or (null == $id)) {
+            return redirect()->back();
+        }
+
+        $ruta = request()->path();
+        $tipo = strtolower(substr($ruta, 18, strpos($ruta, '/', 18)-18));
+        $title = 'Listado de contactos iniciales por el ' . $tipo . ': ' . Resultado::find($id)->descripcion;
+
+        if ('' == $orden or $orden == null) {
+            $orden = 'id';
+        }
+	$tipoId = $tipo . '_id';
+        $contactos = Contacto::where($tipoId, $id)->orderBy($orden)->paginate(10);
+
+	$rutRetorno = 'reporte.contactos' . ucfirst($tipo);
+        return view('reportes.contactos', compact('title', 'contactos', 'tipo', 'rutRetorno', 'id'));
+    }
 }

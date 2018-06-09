@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Resultado;
+use App\Bitacora;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -14,6 +15,10 @@ class ResultadoController extends Controller
      * @return \Illuminate\Http\Response
      */
     protected $tipo = 'Resultados';
+    protected $ruta = 'resultado';
+    protected $vistaCrear  = 'tabla.crear';
+    protected $vistaIndice = 'tabla.index';
+    protected $vistaEditar = 'tabla.edit';
 
     public function index($orden = null)
     {
@@ -21,18 +26,24 @@ class ResultadoController extends Controller
             return redirect('login');
         }
         if (!auth()->user()->is_admin) {
-            $user = auth()->user();
-            return redirect()->route('users.show', ['user' => $user]);
+            return redirect()->back();
         }
 
-        $title = 'Listado de ' . $this->tipo;
+        $tipo = $this->tipo;
+        $elemento = $this->ruta;
+        $title = 'Listado de ' . $tipo;
+        $rutCrear = $elemento . '.crear';
+        $rutMostrar = $elemento . '.show';
+        $rutEditar = $elemento . '.edit';
+        $rutBorrar = $elemento . '.destroy';
 
         if ('' == $orden or $orden == null) {
             $orden = 'id';
         }
-        $resultados = Resultado::orderBy($orden)->paginate(10);
+        $arreglo = Resultado::orderBy($orden)->paginate(10);
 
-        return view('resultado.index', compact('title', 'resultados'));
+        return view($this->vistaIndice, compact('title', 'arreglo', 'tipo', 'elemento',
+                                        'rutCrear', 'rutMostrar', 'rutEditar', 'rutBorrar'));
     }
 
     /**
@@ -42,7 +53,12 @@ class ResultadoController extends Controller
      */
     public function create()
     {
-        //
+        $tipo = $this->tipo;
+        $elemento = $this->ruta;
+        $title = 'Crear ' . substr($tipo, 0, -1);
+        $url  = '/' . strtolower($tipo);
+
+        return view($this->vistaCrear, compact('title', 'tipo', 'elemento', 'url'));
     }
 
     /**
@@ -53,7 +69,17 @@ class ResultadoController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $data = request()->validate([   // Si ocurre error, laravel nos envia al url anterior.
+            'descripcion' => 'required',
+        ], [
+            'descripcion.required' => 'El campo descripcion es obligatorio',
+        ]);
+
+        Resultado::create([
+            'descripcion' => $data['descripcion'],
+        ]);
+
+        return redirect()->route($this->ruta);
     }
 
     /**
@@ -75,7 +101,16 @@ class ResultadoController extends Controller
      */
     public function edit(Resultado $resultado)
     {
-        //
+        $tipo = $this->tipo;
+        $plural = strtolower($tipo);
+        $singular = substr($tipo, 0, -1);
+        $title = 'Editar ' . $singular;
+        $ruta = $this->ruta;
+        $objModelo = $resultado;
+        $rutActualizar = '/' . strtolower($tipo) . '/' . $resultado->id;
+
+        return view($this->vistaEditar, compact('objModelo', 'title', 'ruta', 'rutActualizar',
+                                        'singular', 'plural'));
     }
 
     /**
@@ -87,7 +122,15 @@ class ResultadoController extends Controller
      */
     public function update(Request $request, Resultado $resultado)
     {
-        //
+        $data = request()->validate([   // Si ocurre error, laravel nos envia al url anterior.
+            'descripcion' => 'required',
+        ], [
+            'descripcion.required' => 'El campo descripcion es obligatorio',
+        ]);
+        //dd($data);
+        $resultado->update($data);
+
+        return redirect()->route($this->ruta);
     }
 
     /**
@@ -98,6 +141,26 @@ class ResultadoController extends Controller
      */
     public function destroy(Resultado $resultado)
     {
-        //
+        if (0 < ($resultado->contactos->count()-$resultado->contactosBorrados($resultado->id)->count())) {
+            return redirect()->route($this->ruta);  // Existen contactos asignados a este usuario.
+        }
+        if (0 < $resultado->contactosBorrados($resultado->id)->count()) {    // Existen contactos borrados (logico).
+            $contactos = $resultado->contactos;         // Todos los contactos con este resultado, estan borrados.
+            foreach ($contactos as $contacto) {     // Ciclo para borrar fisicamente los contactos.
+                $contacto->delete();
+            }
+        }
+        $usuario = Auth::user()->id;
+        $datos = 'id:'.$resultado->id.', descripcion:'.$resultado->descripcion;
+        $resultado->delete();
+
+        Bitacora::create([
+            'user_id' => $usuario,
+            'tx_modelo' => 'Resultado',
+            'tx_data' => $datos,
+            'tx_tipo' => 'B',
+        ]);
+
+        return redirect()->route($this->ruta);
     }
 }

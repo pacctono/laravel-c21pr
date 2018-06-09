@@ -187,22 +187,27 @@ class ContactoController extends Controller
      * @param  \App\Contacto  $contacto
      * @return \Illuminate\Http\Response
      */
-    public function show(Contacto $contacto)
+    public function show(Contacto $contacto, $rutRetorno='contactos.index')
     {
         if (!(Auth::check())) {
             return redirect('login');
         }
 
+        $col_id = '';
+        if (15 < strlen($rutRetorno)) {
+            $col_id = strtolower(substr($rutRetorno, 17, -1)) . '_id';
+        }
+        
         if (1 == Auth::user()->is_admin) {
-            return view('contactos.show', compact('contacto'));
+            return view('contactos.show', compact('contacto', 'rutRetorno', 'col_id'));
         }
         if ($contacto->user_borro != null) {
-            return redirect('/contactos');
+            return redirect()->back();
         }
         if ($contacto->user->id == Auth::user()->id) {
-            return view('contactos.show', compact('contacto'));
+            return view('contactos.show', compact('contacto', 'rutRetorno', 'col_id'));
         } else {
-            return redirect('/contactos');
+            return redirect()->back();
         }
     }
 

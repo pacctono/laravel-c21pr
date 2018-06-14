@@ -113,7 +113,7 @@
               <label class="control-label col-sm-2" for="precio">Precio:</label>
               <div class="form-control col-sm-4">
                 <select name="precio_id" id="precio">
-                  <option value="">Qué precio?</option>
+                  <!-- option value="">Qué precio?</option -->
                 @foreach ($precios as $precio)
                 @if (old('precio_id') == $precio->id)
                   <option value="{{ $precio->id }}" selected>{{ $precio->descripcion }}</option>

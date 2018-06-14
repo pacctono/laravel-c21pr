@@ -29,11 +29,14 @@
             </spam>
             @endif
         </p>
-	<p>
-            Sexo: <spam class="alert-info">{{ $user->sexo }}</spam>
-            Estado civil: <spam class="alert-info">{{ $user->estado_civil }}</spam>
+	    <p>
+            Sexo: <spam class="alert-info">{{ $user->genero }}</spam>
+            Estado civil: <spam class="alert-info">{{ $user->edocivil }}</spam>
         </p>
-	<p>
+    	<p>
+            Profesión: <spam class="alert-info">{{ $user->profesion }}</spam>
+        </p>
+    	<p>
             Dirección: <spam class="alert-info">{{ $user->direccion }}</spam>
         </p>
         @if (null != $fechaUltLogin)

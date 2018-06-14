@@ -122,6 +122,7 @@ class ContactoController extends Controller
             'origen_id' => 'required',
             'resultado_id' => 'required',
             'fecha_evento' => ['sometimes', 'nullable', 'required_if:resultado_id,4,5,6,7', 'date'],
+// El tipo 'time' decuelve la hora militar (formato de 24 horas) por eso 'H:i' no incluye am o pm.
             'hora_evento' => ['sometimes', 'nullable', 'required_if:resultado_id,4,5,6,7', 'date_format:H:i'],
             'observaciones' => '',
         ], [
@@ -138,7 +139,7 @@ class ContactoController extends Controller
             'fecha_evento.required_if' => 'La fecha del evento es requerida, cuando el resultado es llamada o cita',
             'fecha_evento.date' => 'La fecha del evento debe ser una fecha valida.',
             'hora_evento.required_if' => 'La hora del evento es requerida, cuando el resultado es llamada o cita',
-            'hora_evento.date' => 'La hora del evento debe ser una hora valida.',
+            'hora_evento.date_format' => 'La hora del evento debe ser una hora valida.',
         ]);
 
         //$data['user_id'] = Auth::user()->id;
@@ -155,8 +156,10 @@ class ContactoController extends Controller
         $data['veces_name'] = Contacto::ofVeces($data['name'], 'name') + 1;
         $data['veces_telefono'] = Contacto::ofVeces($data['telefono'], 'telefono') + 1;
         $data['veces_email'] = Contacto::ofVeces($data['email'], 'email') + 1;
-        $data['fecha_evento'] = Carbon::createFromFormat('Y-m-d H:i', $data['fecha_evento'] .
-                                                    ' ' . $data['hora_evento']);
+        if (null != $data['fecha_evento']) {
+// El tipo 'time' decuelve la hora militar (formato de 24 horas) por eso 'H:i' no incluye am/pm.
+            $data['fecha_evento'] = Carbon::createFromFormat('Y-m-d H:i', $data['fecha_evento'] . ' ' . $data['hora_evento']);
+        }
 
         Contacto::create([
             'cedula' => $data['cedula'],
@@ -195,7 +198,7 @@ class ContactoController extends Controller
 
         $col_id = '';
         if (15 < strlen($rutRetorno)) {
-            $col_id = strtolower(substr($rutRetorno, 17, -1)) . '_id';
+            $col_id = strtolower(substr($rutRetorno, 17)) . '_id';
         }
         
         if (1 == Auth::user()->is_admin) {

@@ -26,7 +26,7 @@
             <th scope="row">{{ $user->id }}</th>
             <td>
                 @if (1 < $user->id)
-                <a href="{{ route('reporte.contactosUsers', [$user->id, 'id']) }}" class="btn btn-link">
+                <a href="{{ route('reporte.contactosUser', [$user->id, 'id']) }}" class="btn btn-link">
                 @endif
                     {{ $user->name }}
                 @if (1 < $user->id)
@@ -46,13 +46,24 @@
                     <input type="hidden" name="contactosBorrados"
                             id="contactosBorrados.{{ $user->id }}"
                             value="{{ $user->contactosBorrados->count() }}">
-                    <a href="{{ route('users.show', $user) }}" class="btn btn-link">
+                    <a href="{{ route('users.show', $user) }}" class="btn btn-link"
+                            title="Motrar los datos personales de {{ $user->name }}">
                         <span class="oi oi-eye"></span>
                     </a>
-                    <a href="{{ route('users.edit', $user) }}" class="btn btn-link">
+                    @if (1 < $user->id)
+                    <a href="{{ route('users.edit', $user) }}" class="btn btn-link"
+                            title="Editar los datos personales de {{ $user->name }}">
                         <span class="oi oi-pencil"></span>
                     </a>
-                    <button class="btn btn-link"><span class="oi oi-trash"></span></button>
+                    <a href="{{ route('users.edit', $user) }}" class="btn btn-link"
+                            title="Enviar correo a '{{ $user->name }}' con sus citas.">
+                        <span class="oi oi-envelope-closed"></span>
+                    </a>
+                    <button class="btn btn-link" title="Borrar este asesor. Mucho cuidado!!!">
+                        <span class="oi oi-trash">
+                        </span>
+                    </button>
+                    @endif
                 </form>
             </td>
         </tr>

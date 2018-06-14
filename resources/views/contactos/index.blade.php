@@ -64,10 +64,12 @@
             <td>{{ $contacto->user->name }}</td>
             @endif
             <td class="d-flex align-items-end">
-                <a href="{{ route('contactos.show', $contacto) }}" class="btn btn-link">
+                <a href="{{ route('contactos.show', $contacto) }}" class="btn btn-link" 
+                        title="Mostrar los datos de este contacto incial.">
                     <span class="oi oi-eye"></span>
                 </a>
-                <a href="{{ route('contactos.edit', $contacto) }}" class="btn btn-link">
+                <a href="{{ route('contactos.edit', $contacto) }}" class="btn btn-link"
+                        title="Editar los datos de este contacto incial.">
                     <span class="oi oi-pencil"></span>
                 </a>
 
@@ -77,8 +79,17 @@
                         onSubmit="return confirm('Realmente, desea borrar (borrado lógico) los datos de este contacto inicial de la base de datos?')">
                     {{ csrf_field() }}
                     {{ method_field('DELETE' )}}
-                    <button class="btn btn-link"><span class="oi oi-trash"></span></button>
+                    <button class="btn btn-link" title="Borrar (lógico) contacto inicial.">
+                        <span class="oi oi-trash" title="Borrar">
+                        </span>
+                    </button>
                 </form>
+                    @if ((4 <= $contacto->resultado_id) and (7 >= $contacto->resultado_id))
+                    <a href="{{ route('agenda.crear', $contacto) }}" class="btn btn-link"
+                            title="Enviar correo a '{{ $contacto->user->name }}', sobre cita con este contacto inicial">
+                        <span class="oi oi-envelope-closed"></span>
+                    </a>
+                    @endif
                 @endif
             </td>
         </tr>

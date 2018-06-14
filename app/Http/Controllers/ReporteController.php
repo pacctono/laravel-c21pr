@@ -22,7 +22,8 @@ use App\MisClases\Fecha;
 
 class ReporteController extends Controller
 {
-    protected $tipo = 'Reporte';
+    protected $tipo   = 'Reporte';
+    protected $titulo = 'Listado de contactos iniciales ';
 
     public function index($muestra = 'Asesor')
     {
@@ -228,15 +229,16 @@ class ReporteController extends Controller
 
         $ruta = request()->path();
         $tipo = strtolower(substr($ruta, 18, strpos($ruta, '/', 18)-18));
-        $title = 'Listado de contactos iniciales por el ' . $tipo . ': ' . User::find($id)->name;
+        $title = $this->titulo . 'del ' . 'asesor' . ': ' . User::find($id)->name;
 
         if ('' == $orden or $orden == null) {
             $orden = 'id';
         }
-        $tipoId   = substr($tipo, 0, -1) . '_id';
+        $tipoId   = $tipo . '_id';
         $contactos = Contacto::where($tipoId, $id)->orderBy($orden)->paginate(10);
 
 	$rutRetorno = 'reporte.contactos' . ucfirst($tipo);
+	$tipo .= 's';						// route 'users'
         return view('reportes.contactos', compact('title', 'contactos', 'tipo', 'rutRetorno', 'id'));
     }
 
@@ -254,7 +256,7 @@ class ReporteController extends Controller
 
         $ruta = request()->path();
         $tipo = strtolower(substr($ruta, 18, strpos($ruta, '/', 18)-18));
-        $title = 'Listado de contactos iniciales por el ' . $tipo . ': ' . Deseo::find($id)->descripcion;
+        $title = $this->titulo . 'con el ' . $tipo . ': ' . Deseo::find($id)->descripcion;
 
         if ('' == $orden or $orden == null) {
             $orden = 'id';
@@ -280,7 +282,7 @@ class ReporteController extends Controller
 
         $ruta = request()->path();
         $tipo = strtolower(substr($ruta, 18, strpos($ruta, '/', 18)-18));
-        $title = 'Listado de contactos iniciales por el ' . $tipo . ': ' . Propiedad::find($id)->descripcion;
+        $title = $this->titulo . 'con la ' . $tipo . ': ' . Propiedad::find($id)->descripcion;
 
         if ('' == $orden or $orden == null) {
             $orden = 'id';
@@ -306,7 +308,7 @@ class ReporteController extends Controller
 
         $ruta = request()->path();
         $tipo = strtolower(substr($ruta, 18, strpos($ruta, '/', 18)-18));
-        $title = 'Listado de contactos iniciales por el ' . $tipo . ': ' . Zona::find($id)->descripcion;
+        $title = $this->titulo . 'en la ' . $tipo . ': ' . Zona::find($id)->descripcion;
 
         if ('' == $orden or $orden == null) {
             $orden = 'id';
@@ -332,7 +334,7 @@ class ReporteController extends Controller
 
         $ruta = request()->path();
         $tipo = strtolower(substr($ruta, 18, strpos($ruta, '/', 18)-18));
-        $title = 'Listado de contactos iniciales por el ' . $tipo . ': ' . Precio::find($id)->descripcion;
+        $title = $this->titulo . 'con el ' . $tipo . ': ' . Precio::find($id)->descripcion;
 
         if ('' == $orden or $orden == null) {
             $orden = 'id';
@@ -358,7 +360,7 @@ class ReporteController extends Controller
 
         $ruta = request()->path();
         $tipo = strtolower(substr($ruta, 18, strpos($ruta, '/', 18)-18));
-        $title = 'Listado de contactos iniciales por el ' . $tipo . ': ' . Origen::find($id)->descripcion;
+        $title = $this->titulo . 'con ' . $tipo . ': ' . Origen::find($id)->descripcion;
 
         if ('' == $orden or $orden == null) {
             $orden = 'id';
@@ -384,7 +386,7 @@ class ReporteController extends Controller
 
         $ruta = request()->path();
         $tipo = strtolower(substr($ruta, 18, strpos($ruta, '/', 18)-18));
-        $title = 'Listado de contactos iniciales por el ' . $tipo . ': ' . Resultado::find($id)->descripcion;
+        $title = $this->titulo . 'con el ' . $tipo . ': ' . Resultado::find($id)->descripcion;
 
         if ('' == $orden or $orden == null) {
             $orden = 'id';

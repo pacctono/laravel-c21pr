@@ -13,6 +13,10 @@ class PrecioSeeder extends Seeder
     public function run()
     {
         Precio::create([
+            'descripcion' => 'No suministrado',
+        ]);
+    
+        Precio::create([
             'descripcion' => 'Menor a 10.000',
         ]);
     

@@ -77,11 +77,20 @@
             </div>
             <div class="form-group d-flex align-items-end">
                 <label for="sexo">Sexo:</label>
-                <input type="text" size="1" maxlength="1" 
-                        name="sexo" id="sexo" value="{{ old('sexo', $user->sexo) }}">
+                <input type="radio" name="sexo" value="F"
+                        {{ (('F' == old('sexo', $user->sexo))?'checked':'') }}>Femenino
+                <input type="radio" name="sexo" value="M"
+                        {{ (('M' == old('sexo', $user->sexo))?'checked':'') }}>Masculino
                 <label for="estado_civil">Estado civil:</label>
-                <input type="text" size="1" maxlength="1" name="estado_civil" id="estado_civil"
-                        value="{{ old('estado_civil', $user->estado_civil) }}">
+                <input type="radio" name="estado_civil" value="C"
+                        {{ (('C' == old('sexo', $user->estado_civil))?'checked':'') }}>Casado
+                <input type="radio" name="estado_civil" value="S"
+                        {{ (('S' == old('sexo', $user->estado_civil))?'checked':'') }}>Soltero
+            </div>
+            <div class="form-group d-flex align-items-end">
+                <label for="profesion">Profesión:</label>
+                <input type="text" size="30" maxlength="100" name="profesion" id="profesion"
+                        value="{{ old('profesion', $user->profesion) }}">
             </div>
             <div class="form-group d-flex align-items-end">
                 <label for="direccion">Dirección:</label>

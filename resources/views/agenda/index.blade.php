@@ -124,17 +124,36 @@
       @if (NULL == $agenda->contacto_id)
         &nbsp;
       @else
-        <a href="{{ route('agenda.show', $agenda->contacto) }}" class="btn btn-link">
+        <a href="{{ route('agenda.show', $agenda->contacto) }}" class="btn btn-link"
+            title="Motrar datos de esta cita.">
           <span class="oi oi-eye"></span>
         </a>
-        <a href="{{ route('agenda.crear', $agenda->contacto) }}" class="btn btn-link">
+        <a href="{{ route('agenda.crear', $agenda->contacto) }}" class="btn btn-link"
+            title="Editar datos de esta cita.">
           <span class="oi oi-pencil"></span>
         </a>
+        @if (Auth::user()->is_admin)
+        <a href="{{ route('agenda.crear', $agenda->contacto) }}" class="btn btn-link"
+            title="Enviar correo a '{{ $users->find($agenda->user_id)->name }}' sobre esta cita">
+          <span class="oi oi-envelope-closed"></span>
+        </a>
+        @endif
       @endif
       </td>
     </tr>
   @endForeach
   </tbody>
+  @if (Auth::user()->is_admin)
+  <tfoot>
+    <tr>
+      <td colspan="7">
+        <a href="{{ route('agenda.crear', $agenda->contacto) }}" class="btn btn-link">
+          Enviar correo de las citas a los asesores
+        </a>
+      </td>
+    </tr>
+  </tfoot>
+  @endif
 </table>
 {{ $agendas->links() }}
 @else

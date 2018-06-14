@@ -85,6 +85,20 @@ class UserSeeder extends Seeder
         ]);
 
         User::create([
+            'cedula' => '18117091',
+            'name' => 'Lisbeth Andrade',
+            'telefono' => '4147960864',
+            'email' => 'lisbethandrade@gmail.com',
+            'email_c21' => 'landrade@century21.com.ve',
+            'fecha_ingreso' => '2015-06-02',
+            'fecha_nacimiento' => '1985-09-22',
+            'sexo' => 'F',
+            'direccion' => 'Lechería',
+            'estado_civil' => 'C',
+            'password' => bcrypt('1234567'),
+        ]);
+
+        User::create([
             'cedula' => '15367426',
             'name' => 'Eduardo Arias',
             'telefono' => '4165027461',

@@ -19,7 +19,7 @@ class User extends Authenticatable
      */
     protected $fillable = [
         'cedula', 'name', 'telefono', 'email', 'email_c21', 'licencia_mls',
-	'fecha_ingreso', 'fecha_nacimiento', 'sexo', 'estado_civil',
+	    'fecha_ingreso', 'fecha_nacimiento', 'sexo', 'estado_civil', 'profesion',
         'direccion', 'password',
     ];
     /**
@@ -205,5 +205,19 @@ class User extends Authenticatable
         return Carbon::parse($this->fecha_ingreso)          // Aunque es UTC, tiene hora 0.
                         ->diff(Carbon::now(Fecha::$ZONA))  // Aqui si debe usarse timezone.
                         ->format('%y años, %m meses y %d dias');
+    }
+
+    public function getGeneroAttribute()
+    {
+        if ('F' == $this->sexo) return 'Femenino';
+        if ('M' == $this->sexo) return 'Masculino';
+        return 'Ninguno';
+    }
+
+    public function getEdocivilAttribute()
+    {
+        if ('C' == $this->estado_civil) return 'Casado';
+        if ('S' == $this->estado_civil) return 'Soltero';
+        return 'Ninguno';
     }
 }

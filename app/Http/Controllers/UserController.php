@@ -74,6 +74,7 @@ class UserController extends Controller
             'fecha_nacimiento' => ['sometimes', 'nullable', 'date'],
             'sexo' => ['sometimes', 'nullable'],
             'estado_civil' => ['sometimes', 'nullable'],
+            'profesion' => ['sometimes', 'nullable'],
             'direccion' => ['sometimes', 'nullable'],
             'password' => ['required']
         ], [
@@ -143,6 +144,7 @@ class UserController extends Controller
             'fecha_nacimiento' => ['sometimes', 'nullable', 'date'],
             'sexo' => ['sometimes', 'nullable'],
             'estado_civil' => ['sometimes', 'nullable'],
+            'profesion' => ['sometimes', 'nullable'],
             'direccion' => ['sometimes', 'nullable'],
             'password' => 'nullable|min:7'
         ], [
@@ -160,6 +162,9 @@ class UserController extends Controller
             'password.min' => 'La contraseña debe contener más de 6 caracteres'
         ]);
         //dd($data);
+	if (0 < User::where('id', '!=', $user->id)->where('licencia_mls', $data['licencia_mls'])->count()) {
+            redirect()->back();
+        }
         if (null != $data['ddn'] and '' != $data['ddn'] and null != $data['telefono'] and
                                                         '' != $data['telefono']) {
             $data['telefono'] = $data['ddn'] . $data['telefono'];

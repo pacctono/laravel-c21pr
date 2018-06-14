@@ -83,19 +83,30 @@
 
             <div class="form-group d-flex">
                 <label class="control-label col-sm-1" for="sexo">Sexo:</label>
-                <input type="text" class="form-control col-sm-1" size="1" maxlength="1" 
-                        name="sexo" id="sexo" placeholder="M" value="{{ old('sexo') }}">
-                <div class="control-label col-sm-2" for="sexo">&nbsp;</div>
+                <input type="radio" name="sexo"
+                        value="F" {{ (('F' == old('sexo', 'X'))?'checked':'') }}>Femenino
+                <input type="radio" name="sexo"
+                        value="M" {{ (('M' == old('sexo', 'X'))?'checked':'') }}>Masculino
                 <label class="control-label col-sm-2" for="estado_civil">Estado civil:</label>
-                <input type="text" class="form-control col-sm-1" size="1" maxlength="1" 
-			name="estado_civil" id="estado_civil" placeholder="C"
-                        value="{{ old('estado_civil') }}">
+                <input type="radio" name="estado_civil"
+                        value="C" {{ (('C' == old('estado_civil', 'X'))?'checked':'') }}>Casado
+                <input type="radio" name="estado_civil"
+                        value="S" {{ (('S' == old('estado_civil', 'X'))?'checked':'') }}>Soltero
+            </div>
+
+            <div class="form-group d-flex">
+                <label class="control-label col-sm-3" for="profesion">Profesión:</label>
+                <input type="text" class="form-control col-sm-6" size="30" maxlength="100" 
+			            name="profesion" id="profesion"
+                        placeholder="Aqui la profesión del asesor"
+                        value="{{ old('profesion') }}">
             </div>
 
             <div class="form-group d-flex">
                 <label class="control-label col-sm-3" for="direccion">Direccion:</label>
                 <input type="text" class="form-control col-sm-6" size="30" maxlength="100" 
-			name="direccion" id="direccion" placeholder="Aqui la dirección del asesor"
+			            name="direccion" id="direccion"
+                        placeholder="Aqui la dirección del asesor"
                         value="{{ old('direccion') }}">
             </div>
 

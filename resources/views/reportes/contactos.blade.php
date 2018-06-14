@@ -38,7 +38,7 @@
                     Contactado por
                 </a>
             </th>
-            <th scope="col">Ac.</th>
+            <th scope="col">Acción</th>
         </tr>
         </thead>
         <tbody>
@@ -61,15 +61,25 @@
                 <a href="{{ route('contactos.muestra', [$contacto, $rutRetorno]) }}" class="btn btn-link">
                     <span class="oi oi-eye"></span>
                 </a>
+                @if ((4 <= $contacto->resultado_id) and (7 >= $contacto->resultado_id))
+                    <a href="{{ route('contactos.muestra', [$contacto, $rutRetorno]) }}" class="btn btn-link" title="Enviar correo al asesor">
+                        <span class="oi oi-envelope-closed"></span>
+                    </a>
+                @endif
             </td>
         </tr>
         @endforeach
         </tbody>
         <tfoot>
             <tr>
-                <td colspan="6">
+                <td colspan="2">
                     <a href="{{ route($tipo) }}" class="btn btn-link">
                         Volver
+                    </a>
+                </td>
+                <td colspan="4">
+                    <a href="{{ route($tipo) }}" class="btn btn-link">
+                        Enviar correo de las citas con Contactos inciales a los asesores
                     </a>
                 </td>
             </tr>

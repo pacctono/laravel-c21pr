@@ -118,8 +118,8 @@ Route::get('/reportes/chart/{chart}', 'ReporteController@chart')
 Route::post('/reportes/chart/{chart}', 'ReporteController@chart')
     ->name('reportes.chart.post');
 
-Route::get('/reportes/contactosUsers/{id}/{orden}', 'ReporteController@contactosXUser')
-    ->name('reporte.contactosUsers');
+Route::get('/reportes/contactosUser/{id}/{orden}', 'ReporteController@contactosXUser')
+    ->name('reporte.contactosUser');
 
 Route::get('/reportes/contactosDeseo/{id}/{orden}', 'ReporteController@contactosXDeseo')
     ->name('reporte.contactosDeseo');

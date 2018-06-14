@@ -108,6 +108,17 @@
     </tr>
   @endForeach
   </tbody>
+  @if (Auth::user()->is_admin)
+  <tfoot>
+    <tr>
+      <td colspan="4">
+        <a href="{{ route('turnos') }}" class="btn btn-link">
+          Enviar correo de los turnos a los asesores
+        </a>
+      </td>
+    </tr>
+  </tfoot>
+  @endif
 </table>
 {{ $turnos->links() }}
 @else

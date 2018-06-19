@@ -23,10 +23,10 @@ $factory->define(Contacto::class, function (Faker $faker) {
         $fecha_carbon = new Carbon($fecha_contacto->format('Y-m-d H:m'));
     }
 
-    $fecha_evento = $faker->datetimeInInterval($fecha_contacto, '+ 10 days');
+    $fecha_evento = $faker->datetimeInInterval('now', '+ 10 days');
     $fecha_carbon = new Carbon($fecha_evento->format('Y-m-d H:m'));
     while (($fecha_carbon->format('H') < 8) or ($fecha_carbon->format('H') > 18)) {
-        $fecha_evento = $faker->datetimeInInterval($fecha_contacto, '+ 10 days');
+        $fecha_evento = $faker->datetimeInInterval('now', '+ 10 days');
         $fecha_carbon = new Carbon($fecha_evento->format('Y-m-d H:m'));
     }
 

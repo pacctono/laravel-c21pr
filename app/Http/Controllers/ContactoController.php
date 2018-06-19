@@ -33,6 +33,12 @@ class ContactoController extends Controller
         $title = 'Listado de ' . $this->tipoPlural;
         $ruta = request()->path();
 
+// En caso de volver luego de haber enviado un correo, ver el metodo 'emailcita', en AgendaController.
+        $alertar = 0;
+        if ('alert' == $orden) {
+            $orden = '';
+            $alertar = 1;
+        }
         if ('' == $orden or $orden == null) {
             $orden = 'id';
         }
@@ -45,7 +51,7 @@ class ContactoController extends Controller
     
         //dd(Auth::user()->id);
 
-        return view('contactos.index', compact('title', 'contactos', 'ruta'));
+        return view('contactos.index', compact('title', 'contactos', 'ruta', 'alertar'));
     }
 
     public function filtro($filtro)

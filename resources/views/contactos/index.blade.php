@@ -4,11 +4,14 @@
     <div class="d-flex justify-content-between align-items-end mb-3">
         <h1 class="pb-1">{{ $title }}</h1>
 
+        <p>{{ $alertar }}</p>
         <p>
             <a href="{{ route('contactos.create') }}" class="btn btn-primary">Crear Contacto Inicial</a>
         </p>
     </div>
-
+    @if ($alertar)
+        <script>alert('El correo fue enviado al asesor');</script>
+    @endif
     @if ($contactos->isNotEmpty())
     <table class="table table-striped table-hover table-bordered">
         <thead class="thead-dark">
@@ -78,14 +81,14 @@
                         class="form-inline mt-0 mt-md-0"
                         onSubmit="return confirm('Realmente, desea borrar (borrado lógico) los datos de este contacto inicial de la base de datos?')">
                     {{ csrf_field() }}
-                    {{ method_field('DELETE' )}}
+                    {{ method_field('DELETE') }}
                     <button class="btn btn-link" title="Borrar (lógico) contacto inicial.">
                         <span class="oi oi-trash" title="Borrar">
                         </span>
                     </button>
                 </form>
                     @if ((4 <= $contacto->resultado_id) and (7 >= $contacto->resultado_id))
-                    <a href="{{ route('agenda.crear', $contacto) }}" class="btn btn-link"
+                    <a href="{{ route('agenda.emailcita', $contacto) }}" class="btn btn-link"
                             title="Enviar correo a '{{ $contacto->user->name }}', sobre cita con este contacto inicial">
                         <span class="oi oi-envelope-closed"></span>
                     </a>

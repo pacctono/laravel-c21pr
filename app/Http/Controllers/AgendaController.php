@@ -7,10 +7,12 @@ use App\Cita;
 use App\Turno;
 use App\Contacto;
 use App\User;
+use \App\Mail\CitaAsesor;
 use Illuminate\Validation\Rule;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 use Carbon\Carbon;
 use App\MisClases\Fecha;
 
@@ -224,5 +226,20 @@ class AgendaController extends Controller
 
         $contacto = $cita->contacto;
         return redirect()->route('agenda.show', ['contacto' => $contacto]);
+    }
+
+    public function emailcita(Contacto $contacto)
+    {
+        if (!(Auth::check())) {
+            return redirect('login');
+        }
+        if (!Auth::user()->is_admin) {
+            return redirect()->back();
+        }
+
+//        return new CitaAsesor($contacto);
+        Mail::to($contacto->user->email, $contacto->user->name)
+                ->send(new CitaAsesor($contacto));
+        return redirect()->route('contactos.orden', 'alert');
     }
 }

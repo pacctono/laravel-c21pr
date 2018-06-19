@@ -271,6 +271,9 @@ Route::delete('/resultados/{resultado}', 'ResultadoController@destroy')
     ->name('resultado.destroy')
     ->middleware('admin');
 
+Route::get('/emailcita/{contacto}', 'AgendaController@emailcita')
+    ->name('agenda.emailcita');
+
 //Route::get('/clientes/filtrar/{filtro}', 'ClienteController@filtro')
 //    ->name('clientes.filtro');
 

@@ -44,7 +44,7 @@ class ReporteController extends Controller
         if ('POST' == request()->method()) {
             $fechas = request()->all();
             $muestra = session('muestra', 'Asesor');
-            $asesor = $fechas['asesor'];
+            if (array_key_exists('asesor', $fechas)) $asesor = $fechas['asesor'];
             list ($fecha_desde, $fecha_hasta) = Fecha::periodo($fechas);
         } elseif ('Conexion' == $muestra) {
             $fecha_desde = (new Carbon(Bitacora::min('created_at', $ZONA)))->startOfDay();
@@ -117,7 +117,7 @@ class ReporteController extends Controller
         if ('POST' == request()->method()) {
             $fechas = request()->all();
             $muestra = session('muestra', 'Asesor');
-            $asesor = $fechas['asesor'];
+            if (array_key_exists('asesor', $fechas)) $asesor = $fechas['asesor'];
             list ($fecha_desde, $fecha_hasta) = Fecha::periodo($fechas);
         } elseif ('' != session('fecha_desde', '') and '' != session('fecha_hasta', ''))  {
             $fecha_desde = session('fecha_desde');
@@ -237,8 +237,8 @@ class ReporteController extends Controller
         $tipoId   = $tipo . '_id';
         $contactos = Contacto::where($tipoId, $id)->orderBy($orden)->paginate(10);
 
-	$rutRetorno = 'reporte.contactos' . ucfirst($tipo);
-	$tipo .= 's';						// route 'users'
+	    $rutRetorno = 'reporte.contactos' . ucfirst($tipo);
+	    $tipo .= 's';						// route 'users'
         return view('reportes.contactos', compact('title', 'contactos', 'tipo', 'rutRetorno', 'id'));
     }
 
@@ -264,7 +264,7 @@ class ReporteController extends Controller
         $tipoId   = $tipo . '_id';
         $contactos = Contacto::where($tipoId, $id)->orderBy($orden)->paginate(10);
 
-	$rutRetorno = 'reporte.contactos' . ucfirst($tipo);
+	    $rutRetorno = 'reporte.contactos' . ucfirst($tipo);
         return view('reportes.contactos', compact('title', 'contactos', 'tipo', 'rutRetorno', 'id'));
     }
 
@@ -287,10 +287,10 @@ class ReporteController extends Controller
         if ('' == $orden or $orden == null) {
             $orden = 'id';
         }
-	$tipoId = $tipo . '_id';
+	    $tipoId = $tipo . '_id';
         $contactos = Contacto::where($tipoId, $id)->orderBy($orden)->paginate(10);
 
-	$rutRetorno = 'reporte.contactos' . ucfirst($tipo);
+	    $rutRetorno = 'reporte.contactos' . ucfirst($tipo);
         return view('reportes.contactos', compact('title', 'contactos', 'tipo', 'rutRetorno', 'id'));
     }
 
@@ -313,10 +313,10 @@ class ReporteController extends Controller
         if ('' == $orden or $orden == null) {
             $orden = 'id';
         }
-	$tipoId = $tipo . '_id';
+	    $tipoId = $tipo . '_id';
         $contactos = Contacto::where($tipoId, $id)->orderBy($orden)->paginate(10);
 
-	$rutRetorno = 'reporte.contactos' . ucfirst($tipo);
+	    $rutRetorno = 'reporte.contactos' . ucfirst($tipo);
         return view('reportes.contactos', compact('title', 'contactos', 'tipo', 'rutRetorno', 'id'));
     }
 
@@ -339,10 +339,10 @@ class ReporteController extends Controller
         if ('' == $orden or $orden == null) {
             $orden = 'id';
         }
-	$tipoId = $tipo . '_id';
+	    $tipoId = $tipo . '_id';
         $contactos = Contacto::where($tipoId, $id)->orderBy($orden)->paginate(10);
 
-	$rutRetorno = 'reporte.contactos' . ucfirst($tipo);
+	    $rutRetorno = 'reporte.contactos' . ucfirst($tipo);
         return view('reportes.contactos', compact('title', 'contactos', 'tipo', 'rutRetorno', 'id'));
     }
 
@@ -365,10 +365,10 @@ class ReporteController extends Controller
         if ('' == $orden or $orden == null) {
             $orden = 'id';
         }
-	$tipoId = $tipo . '_id';
+	    $tipoId = $tipo . '_id';
         $contactos = Contacto::where($tipoId, $id)->orderBy($orden)->paginate(10);
 
-	$rutRetorno = 'reporte.contactos' . ucfirst($tipo);
+	    $rutRetorno = 'reporte.contactos' . ucfirst($tipo);
         return view('reportes.contactos', compact('title', 'contactos', 'tipo', 'rutRetorno', 'id'));
     }
 
@@ -391,10 +391,10 @@ class ReporteController extends Controller
         if ('' == $orden or $orden == null) {
             $orden = 'id';
         }
-	$tipoId = $tipo . '_id';
+	    $tipoId = $tipo . '_id';
         $contactos = Contacto::where($tipoId, $id)->orderBy($orden)->paginate(10);
 
-	$rutRetorno = 'reporte.contactos' . ucfirst($tipo);
+	    $rutRetorno = 'reporte.contactos' . ucfirst($tipo);
         return view('reportes.contactos', compact('title', 'contactos', 'tipo', 'rutRetorno', 'id'));
     }
 }

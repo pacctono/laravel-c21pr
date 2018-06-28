@@ -242,4 +242,46 @@ class AgendaController extends Controller
                 ->send(new CitaAsesor($contacto));
         return redirect()->route('contactos.orden', 'alert');
     }
+
+    public function emailcitas(User $user)
+    {
+        if (!(Auth::check())) {
+            return redirect('login');
+        }
+        if (!Auth::user()->is_admin) {
+            return redirect()->back();
+        }
+
+        Mail::to($contacto->user->email, $contacto->user->name)
+                ->send(new CitaAsesor($contacto));
+        return redirect()->route('contactos.orden', 'alert');
+    }
+
+    public function emailturnos($semana)
+    {
+        if (!(Auth::check())) {
+            return redirect('login');
+        }
+        if (!Auth::user()->is_admin) {
+            return redirect()->back();
+        }
+
+        Mail::to($contacto->user->email, $contacto->user->name)
+                ->send(new CitaAsesor($contacto));
+        return redirect()->route('contactos.orden', 'alert');
+    }
+
+    public function emailtodascitas()
+    {
+        if (!(Auth::check())) {
+            return redirect('login');
+        }
+        if (!Auth::user()->is_admin) {
+            return redirect()->back();
+        }
+
+        Mail::to($contacto->user->email, $contacto->user->name)
+                ->send(new CitaAsesor($contacto));
+        return redirect()->route('contactos.orden', 'alert');
+    }
 }

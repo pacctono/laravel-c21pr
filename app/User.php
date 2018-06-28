@@ -145,7 +145,8 @@ class User extends Authenticatable
         return self::whereBetween(DB::raw("DATE_ADD(fecha_nacimiento,
                                         INTERVAL YEAR(now())-YEAR(fecha_nacimiento) +
                                         IF(DAYOFYEAR(now()) > DAYOFYEAR(fecha_nacimiento),1,0)
-                                        YEAR)"), [$fecha_desde, $fecha_hasta]);
+                                        YEAR)"), [$fecha_desde, $fecha_hasta])
+                                        ->orderBy(DB::raw("DAYOFYEAR(fecha_nacimiento)"));
 //                            ->get();
     }
 

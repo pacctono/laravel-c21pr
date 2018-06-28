@@ -55,7 +55,7 @@
                             title="Editar los datos personales de {{ $user->name }}">
                         <span class="oi oi-pencil"></span>
                     </a>
-                    <a href="{{ route('users.edit', $user) }}" class="btn btn-link"
+                    <a href="{{-- route('agenda.emailcitas', $user) --}}" class="btn btn-link"
                             title="Enviar correo a '{{ $user->name }}' con sus citas.">
                         <span class="oi oi-envelope-closed"></span>
                     </a>

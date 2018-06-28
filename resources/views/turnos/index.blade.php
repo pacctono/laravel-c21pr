@@ -112,7 +112,7 @@
   <tfoot>
     <tr>
       <td colspan="4">
-        <a href="{{ route('turnos') }}" class="btn btn-link">
+        <a href="{{-- route('agenda.emailturnos', $semana) --}}" class="btn btn-link"
           Enviar correo de los turnos a los asesores
         </a>
       </td>

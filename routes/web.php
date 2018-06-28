@@ -274,6 +274,15 @@ Route::delete('/resultados/{resultado}', 'ResultadoController@destroy')
 Route::get('/emailcita/{contacto}', 'AgendaController@emailcita')
     ->name('agenda.emailcita');
 
+Route::get('/emailcitas/{asesor}', 'AgendaController@emailcitas')
+    ->name('agenda.emailcitas');
+
+Route::get('/emailturnos/{semana}', 'AgendaController@emailturnos')
+    ->name('agenda.emailturnos');
+
+Route::get('/emailtodascitas/{tipo}', 'AgendaController@emailtodascitas')
+    ->name('agenda.emailtodascitas');
+
 //Route::get('/clientes/filtrar/{filtro}', 'ClienteController@filtro')
 //    ->name('clientes.filtro');
 

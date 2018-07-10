@@ -53,6 +53,9 @@
     </form>
 </div>
 
+@if ($alertar)
+    <script>alert('Fue enviado un correo a cada asesor con todas sus citas.');</script>
+@endif
 @if ($agendas->isNotEmpty())
 <table class="table table-striped table-hover table-bordered">
   <thead class="thead-dark">
@@ -133,7 +136,7 @@
           <span class="oi oi-pencil"></span>
         </a>
         @if (Auth::user()->is_admin)
-        <a href="{{-- route('agenda.emailcita', $agenda->contacto) --}}" class="btn btn-link"
+        <a href="{{ route('agenda.emailcita', $agenda->contacto) }}" class="btn btn-link"
             title="Enviar correo a '{{ $users->find($agenda->user_id)->name }}' sobre esta cita">
           <span class="oi oi-envelope-closed"></span>
         </a>
@@ -147,7 +150,7 @@
   <tfoot>
     <tr>
       <td colspan="7">
-        <a href="{{-- route('agenda.emailtodascitas', 'todas') --}}" class="btn btn-link">
+        <a href="{{ route('agenda.emailtodascitas', 'todas') }}" class="btn btn-link">
           Enviar correo de las citas a los asesores
         </a>
       </td>

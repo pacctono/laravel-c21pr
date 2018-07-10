@@ -64,7 +64,7 @@
                     <span class="oi oi-eye"></span>
                 </a>
                 @if ((4 <= $contacto->resultado_id) and (7 >= $contacto->resultado_id))
-                    <a href="{{-- route('agenda.emailcita', $contacto) --}}" class="btn btn-link"
+                    <a href="{{ route('agenda.emailcita', $contacto) }}" class="btn btn-link"
                             title="Enviar correo a '{{ $contacto->user->name }}' con esta cita.">
                         <span class="oi oi-envelope-closed"></span>
                     </a>

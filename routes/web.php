@@ -22,6 +22,9 @@ Route::get('/home', 'HomeController@index')->name('home');
 Route::get('/usuarios', 'UserController@index')
     ->name('users');
 
+Route::get('/usuarios/orden/{orden}', 'UserController@index')
+    ->name('users.orden');
+
 Route::get('/usuarios/{user}', 'UserController@show')
     ->where('user', '[0-9]+')
     ->name('users.show');
@@ -274,10 +277,10 @@ Route::delete('/resultados/{resultado}', 'ResultadoController@destroy')
 Route::get('/emailcita/{contacto}', 'AgendaController@emailcita')
     ->name('agenda.emailcita');
 
-Route::get('/emailcitas/{asesor}', 'AgendaController@emailcitas')
+Route::get('/emailcitas/{user}', 'AgendaController@emailcitas')
     ->name('agenda.emailcitas');
 
-Route::get('/emailturnos/{semana}', 'AgendaController@emailturnos')
+Route::get('/emailturnos/', 'AgendaController@emailturnos')
     ->name('agenda.emailturnos');
 
 Route::get('/emailtodascitas/{tipo}', 'AgendaController@emailtodascitas')

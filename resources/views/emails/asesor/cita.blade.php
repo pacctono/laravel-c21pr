@@ -9,8 +9,8 @@ Por medio del presente te recuerdo tu cita.
 
 @component('mail::panel')
     {{ $contacto->name }} el
-    {{ $contacto->creado_dia_semana }}
-    {{ $contacto->creado_con_hora }}.
+    {{ $contacto->evento_dia_semana }}
+    {{ $contacto->evento_con_hora }}.
 @endcomponent
 
 Gracias,<br>

@@ -87,7 +87,7 @@
                     </button>
                 </form>
                     @if ((4 <= $contacto->resultado_id) and (7 >= $contacto->resultado_id))
-                    <a href="{{-- route('agenda.emailcita', $contacto) --}}" class="btn btn-link"
+                    <a href="{{ route('agenda.emailcita', $contacto) }}" class="btn btn-link"
                             title="Enviar correo a '{{ $contacto->user->name }}', sobre cita con este contacto inicial">
                         <span class="oi oi-envelope-closed"></span>
                     </a>

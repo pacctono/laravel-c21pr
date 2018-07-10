@@ -9,6 +9,9 @@
         </p>
     </div>
 
+    @if ($alertar)
+        <script>alert('El correo fue enviado al asesor');</script>
+    @endif
     @if ($users->isNotEmpty())
     <table class="table table-striped table-hover table-bordered">
         <thead class="thead-dark">
@@ -55,14 +58,16 @@
                             title="Editar los datos personales de {{ $user->name }}">
                         <span class="oi oi-pencil"></span>
                     </a>
-                    <a href="{{-- route('agenda.emailcitas', $user) --}}" class="btn btn-link"
-                            title="Enviar correo a '{{ $user->name }}' con sus citas.">
-                        <span class="oi oi-envelope-closed"></span>
-                    </a>
                     <button class="btn btn-link" title="Borrar este asesor. Mucho cuidado!!!">
                         <span class="oi oi-trash">
                         </span>
                     </button>
+                    @if (0 < $user->contactos->count())
+                    <a href="{{ route('agenda.emailcitas', $user) }}" class="btn btn-link"
+                            title="Enviar correo a '{{ $user->name }}' con sus citas.">
+                        <span class="oi oi-envelope-closed"></span>
+                    </a>
+                    @endif
                     @endif
                 </form>
             </td>

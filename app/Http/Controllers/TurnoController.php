@@ -58,6 +58,12 @@ class TurnoController extends Controller
             list ($fecha_desde, $fecha_hasta) = Fecha::periodo($periodo, $fecha_min, $fecha_max);
         }
 //        dd($periodo, $fecha_desde, $fecha_hasta);
+// En caso de volver luego de haber enviado un correo, ver el metodo 'emailcita', en AgendaController.
+        $alertar = 0;
+        if ('alert' == $orden) {
+            $orden = '';
+            $alertar = 1;
+        }
         if ('' == $orden or $orden == null) {
             $orden = 'turno';
         }
@@ -89,7 +95,7 @@ class TurnoController extends Controller
         session(['rPeriodo' => $rPeriodo, 'fecha_desde' => $fecha_desde,    // Asignar valores en sesión.
                     'fecha_hasta' => $fecha_hasta, 'asesor' => $asesor]);
         return view('turnos.index', compact('title', 'users', 'turnos', 'ruta', 'diaSemana',
-                    'semanas', 'rPeriodo', 'fecha_desde', 'fecha_hasta', 'asesor'));
+                'semanas', 'rPeriodo', 'fecha_desde', 'fecha_hasta', 'asesor', 'alertar'));
     }
 
     public function crear($semana = null)

@@ -76,7 +76,7 @@
 
             <div class="form-group d-flex">
                 <label class="control-label col-sm-4" for="fecha_ingreso">Fecha de ingreso:</label>
-                <input type="date" class="form-control col-sm-3" required name="fecha_ingreso" 
+                <input type="date" class="form-control col-sm-3" name="fecha_ingreso" 
                         id="fecha_ingreso" min="2015-06-01" max="{{ now()->format('Y-m-d') }}"
                         value="{{ old('fecha_ingreso') }}">
             </div>
@@ -117,8 +117,7 @@
             </div>
             <div class="form-group d-flex">
                 <button type="submit" class="btn btn-primary col-sm-4">Crear Usuario</button>
-                <!-- a href="{{ action('UserController@index') }}">Regresar al listado de usuarios</a -->
-                <a href="{{ url('/usuarios') }}" class="btn btn-link col-sm-4">Regresar al listado de usuarios</a>
+                <a href="{{ route('users') }}" class="btn btn-link col-sm-4">Regresar al listado de usuarios</a>
             </div>
         </form>
         </div>

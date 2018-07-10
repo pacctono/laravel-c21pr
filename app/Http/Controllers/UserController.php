@@ -29,13 +29,19 @@ class UserController extends Controller
         //$users = DB::table('users')->get();
         $title = 'Listado de ' . $this->tipo . 'es';
 
+// En caso de volver luego de haber enviado un correo, ver el metodo 'emailcita', en AgendaController.
+        $alertar = 0;
+        if ('alert' == $orden) {
+            $orden = '';
+            $alertar = 1;
+        }
         if ('' == $orden or $orden == null) {
             $orden = 'id';
         }
         $users = User::orderBy($orden)->paginate(10);
         //dd($users);
 
-        return view('users.index', compact('title', 'users'));
+        return view('users.index', compact('title', 'users', 'alertar'));
     }
 
     public function show(User $user)
@@ -92,7 +98,6 @@ class UserController extends Controller
             'password.required' => 'La contraseña es obligatorio suministrarla'
         ]);
 
-        //dd($data);
         if (null != $data['ddn'] and '' != $data['ddn'] and null != $data['telefono'] and
                                                         '' != $data['telefono']) {
             $data['telefono'] = $data['ddn'] . $data['telefono'];
@@ -100,7 +105,9 @@ class UserController extends Controller
             $data['telefono'] = '';
         }
         unset($data['ddn']);
-
+        if (!array_key_exists('sexo', $data)) $data['sexo'] = null;
+        if (!array_key_exists('estado_civil', $data)) $data['estado_civil'] = null;
+        //dd($data);
         User::create([
             'cedula' => $data['cedula'],
             'name' => $data['name'],

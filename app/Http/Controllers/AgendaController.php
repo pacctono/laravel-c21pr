@@ -8,6 +8,8 @@ use App\Turno;
 use App\Contacto;
 use App\User;
 use \App\Mail\CitaAsesor;
+use \App\Mail\CitasAsesor;
+use \App\Mail\TurnosAsesor;
 use Illuminate\Validation\Rule;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -53,7 +55,13 @@ class AgendaController extends Controller
             $fecha_max = (new Carbon(Agenda::max('fecha_evento')));
             list ($fecha_desde, $fecha_hasta) = Fecha::periodo($periodo, $fecha_min, $fecha_max);
         }
-//        dd($periodo, $fecha_desde, $fecha_hasta);
+        //dd($periodo, $fecha_desde, $fecha_hasta);
+// En caso de volver luego de haber enviado un correo, ver el metodo 'emailcita', en AgendaController.
+        $alertar = 0;
+        if ('alert' == $orden) {
+            $orden = '';
+            $alertar = 1;
+        }
         if ('' == $orden or $orden == null) {
             $orden = 'fecha_evento';
         }
@@ -93,7 +101,7 @@ class AgendaController extends Controller
                     'fecha_hasta' => $fecha_hasta, 'asesor' => $asesor]);
         //if ('este_mes' == $rPeriodo) dd($agendas, $users, $fecha_desde, $fecha_hasta, $asesor);
         return view('agenda.index', compact('title', 'users', 'ruta', 'agendas',
-                    'rPeriodo', 'fecha_desde', 'fecha_hasta', 'asesor'));
+                    'rPeriodo', 'fecha_desde', 'fecha_hasta', 'asesor', 'alertar'));
     }
 
     public function show(Contacto $contacto)
@@ -237,7 +245,7 @@ class AgendaController extends Controller
             return redirect()->back();
         }
 
-//        return new CitaAsesor($contacto);
+        //return new CitaAsesor($contacto);   // Vista preliminar del correo, en el navegador.
         Mail::to($contacto->user->email, $contacto->user->name)
                 ->send(new CitaAsesor($contacto));
         return redirect()->route('contactos.orden', 'alert');
@@ -252,12 +260,13 @@ class AgendaController extends Controller
             return redirect()->back();
         }
 
-        Mail::to($contacto->user->email, $contacto->user->name)
-                ->send(new CitaAsesor($contacto));
-        return redirect()->route('contactos.orden', 'alert');
+        //return new CitasAsesor($user);  // Vista preliminar del correo, en el navegador.
+        Mail::to($user->email, $user->name)
+                ->send(new CitasAsesor($user));
+        return redirect()->route('users.orden', 'alert');
     }
 
-    public function emailturnos($semana)
+    public function emailturnos()
     {
         if (!(Auth::check())) {
             return redirect('login');
@@ -266,12 +275,21 @@ class AgendaController extends Controller
             return redirect()->back();
         }
 
-        Mail::to($contacto->user->email, $contacto->user->name)
-                ->send(new CitaAsesor($contacto));
-        return redirect()->route('contactos.orden', 'alert');
+        //return new TurnosAsesor(User::find(2));  // Vista preliminar del correo, en el navegador.
+        $turnos = Turno::select(DB::raw("user_id")) // Devuelve arreglo de Turno.
+                            ->where('turno','>','now')
+                            ->where('user_id','>',1)
+                            ->groupBy('user_id')
+                            ->get();
+        foreach ($turnos as $turno) {
+            $user = $turno->user;
+            Mail::to($user->email, $user->name)
+                    ->send(new TurnosAsesor($user));
+        }
+        return redirect()->route('turnos.orden', 'alert');
     }
 
-    public function emailtodascitas()
+    public function emailtodascitas($tipo='todas')
     {
         if (!(Auth::check())) {
             return redirect('login');
@@ -280,8 +298,16 @@ class AgendaController extends Controller
             return redirect()->back();
         }
 
-        Mail::to($contacto->user->email, $contacto->user->name)
-                ->send(new CitaAsesor($contacto));
-        return redirect()->route('contactos.orden', 'alert');
+        //return new CitasAsesor(User::find(2));  // Vista preliminar del correo, en el navegador.
+        $contactos = Contacto::select(DB::raw("user_id"))   // Devuelve arreglo de Contacto.
+                            ->where('fecha_evento','>','now')
+                            ->groupBy('user_id')
+                            ->get();
+        foreach ($contactos as $contacto) {
+            $user = $contacto->user;
+            Mail::to($user->email, $user->name)
+                    ->send(new CitasAsesor($user));
+        }
+        return redirect()->route('agenda.orden', 'alert');
     }
 }

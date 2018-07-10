@@ -35,7 +35,7 @@
                 @if (1 < $user->id)
                 </a>
                 @endif
-            <td>0{{ $user->telefono_f }}</td>
+            <td>{{ $user->telefono_f }}</td>
             <td>{{ $user->email }}</td>
             <td>
                 <form action="{{ route('users.destroy', $user) }}" method="POST"

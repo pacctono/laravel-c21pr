@@ -64,6 +64,7 @@ class ReporteController extends Controller
                                     ' desde ' . $fecha_desde->format('d/m/Y') .
                                     ' hasta ' . $fecha_hasta->format('d/m/Y');
 
+        $hoy = Fecha::hoy()->format('d-m');
         switch ($muestra) {
             case 'Asesor':
 /*            $elemsRep = Contacto::select('user_id', DB::raw('count(*) as atendidos'))
@@ -92,7 +93,7 @@ class ReporteController extends Controller
         session(['fecha_desde' => $fecha_desde, 'fecha_hasta' => $fecha_hasta,
                     'muestra' => $muestra, 'asesor' => $asesor]);
         return view('reportes.index', compact('title', 'users', 'elemsRep', 'chart', 'muestra',
-                                                'fecha_desde', 'fecha_hasta', 'asesor'));
+                                            'fecha_desde', 'fecha_hasta', 'asesor', 'hoy'));
     }
 /**
  *  There are a few methods you can use in all datasets (regardless of the type, or charting library).

@@ -82,13 +82,15 @@
     @if (0 == ($loop->index % 2))
     <tr>
     @endif
+      <td>
     @if ('Fecha' == $muestra)
-      <td>{{ $elemento->fecha }}</td>
+      {{ $elemento->fecha }}
     @elseif ('Origen' == $muestra)
-      <td>{{ $elemento->descripcion }}</td>
+      {{ $elemento->descripcion }}
     @else
-      <td>{{ $elemento->name }}</td>
+      {{ $elemento->name }}
     @endif
+      </td>
       <td>{{ $elemento->atendidos }}</td>
     @if (0 != ($loop->index % 2))
     </tr>

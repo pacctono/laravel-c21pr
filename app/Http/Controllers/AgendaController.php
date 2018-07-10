@@ -10,6 +10,7 @@ use App\User;
 use \App\Mail\CitaAsesor;
 use \App\Mail\CitasAsesor;
 use \App\Mail\TurnosAsesor;
+use \App\Mail\Cumpleano;
 use Illuminate\Validation\Rule;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -309,5 +310,20 @@ class AgendaController extends Controller
                     ->send(new CitasAsesor($user));
         }
         return redirect()->route('agenda.orden', 'alert');
+    }
+
+    public function cumpleano(User $user)
+    {
+        if (!(Auth::check())) {
+            return redirect('login');
+        }
+        if (!Auth::user()->is_admin) {
+            return redirect()->back();
+        }
+
+        //return new Cumpleano($user);  // Vista preliminar del correo, en el navegador.
+        Mail::to($user->email, $user->name)
+                ->send(new Cumpleano($user));
+        return redirect()->route('reportes', 'Cumpleanos');
     }
 }

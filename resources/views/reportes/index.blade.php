@@ -61,36 +61,50 @@
 <table class="table table-striped table-hover table-bordered">
   <thead class="thead-dark">
     <tr>
+      <th scope="col">
       @if (('Conexion' == $muestra) || ('Cumpleanos' == $muestra))
-      <th scope="col">Asesor</th>
+      Asesor
       @else
-      <th scope="col">{{ $muestra }}</th>
+      {{ $muestra }}
       @endif
+      </th>
+      <th scope="col">
       @if ('Conexion' == $muestra)
-      <th scope="col">Conexiones</th>
+      Conexiones
       @elseif ('Cumpleanos' == $muestra)
-      <th scope="col">Cumpleaños</th>
+      Cumpleaños
       @else
-      <th scope="col">Atendidos</th>
+      Atendidos
       @endif
+      </th>
     </tr>
   </thead>
   <tbody>
   @foreach ($elemsRep as $elemento)
     {{-- @continue (0 >= $elemento->atendidos) --}}
     <tr>
+      <td>
     @if ('Fecha' == $muestra)
-      <td>{{ $elemento->fecha }}</td>
+      {{ $elemento->fecha }}
     @elseif ('Origen' == $muestra)
-      <td>{{ $elemento->descripcion }}</td>
+      {{ $elemento->descripcion }}
     @else
-      <td>{{ $elemento->name }}</td>
+      {{ $elemento->name }}
     @endif
+      </td>
+      <td>
     @if ('Cumpleanos' == $muestra)
-      <td>{{ $elemento->fecha_cumpleanos->format('d-m') }}
+      {{ $elemento->fecha_cumpleanos->format('d-m') }}
+      @if ($hoy == $elemento->fecha_cumpleanos->format('d-m'))
+      <a href="{{ route('agenda.cumpleano', $elemento) }}" class="btn btn-link"
+              title="Enviar correo a '{{ $elemento->name }}', porque esta de cumpleaños!">
+          <span class="oi oi-envelope-closed"></span>
+      </a>
+      @endif
     @else
-      <td>{{ $elemento->atendidos }}</td>
+      {{ $elemento->atendidos }}
     @endif
+      </td>
     </tr>
   @endForeach
   </tbody>

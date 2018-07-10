@@ -105,8 +105,8 @@
             <div class="form-group d-flex align-items-end">
                 <button class="btn btn-primary">Actualizar Asesor</button>
                 @if (auth()->user()->is_admin)
-                <!-- a href="{{ action('UserController@index') }}">Regresar al listado de usuarios</a -->
-                <a href="{{ url('/usuarios') }}" class="btn btn-link">Regresar al listado de asesores</a>
+                {{-- <a href="{{ action('UserController@index') }}">Regresar al listado de usuarios</a> --}}
+                <a href="{{ route('users') }}" class="btn btn-link">Regresar al listado de asesores</a>
                 @else
                 <a href="{{ route('users.show', auth()->user()->id) }}" class="btn btn-link">Mostrar asesor</a>
                 @endif

@@ -49,7 +49,7 @@
 
         <p>
             @if (auth()->user()->is_admin)
-            <!-- a href="{{ action('UserController@index') }}">Regresar al listado de usuarios</a -->
+            {{-- <a href="{{ action('UserController@index') }}">Regresar al listado de usuarios</a> --}}
             <a href="{{ url('/usuarios') }}" class="btn btn-link">
                 Regresar
             </a>

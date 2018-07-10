@@ -286,6 +286,9 @@ Route::get('/emailturnos/', 'AgendaController@emailturnos')
 Route::get('/emailtodascitas/{tipo}', 'AgendaController@emailtodascitas')
     ->name('agenda.emailtodascitas');
 
+Route::get('/cumpleano/{user}', 'AgendaController@cumpleano')
+    ->name('agenda.cumpleano');
+
 //Route::get('/clientes/filtrar/{filtro}', 'ClienteController@filtro')
 //    ->name('clientes.filtro');
 

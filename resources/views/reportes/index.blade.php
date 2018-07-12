@@ -3,7 +3,7 @@
 
 @section('content')
 
-<div class="d-flex justify-content-between align-items-end mb-3">
+<div class="d-flex justify-content-between align-items-end mb-1">
   <form method="POST" class="form-horizontal" action="{{ url('/reportes') }}"
         onSubmit="return alertaFechaRequerida()">
     {!! csrf_field() !!}
@@ -35,9 +35,10 @@
   </form>
 </div>
 
-<div class="d-flex justify-content-between align-items-end mb-3">
-  <h4 class="pb-1">{{ $title }}</h4>
+<div class="d-flex justify-content-between align-items-end mb-1 col-sm-12">
+  <div class="col-sm-9"><h4 class="pb-1">{{ $title }}</h4></div>
 
+  <div class="col-sm-3">
   @if ('Cumpleanos' != $muestra)
   <p class="text-right">
       <!-- a href="{{ route('reportes.chart', 'bar') }}" class="btn btn-primary">Crear Gráfico</a -->
@@ -53,7 +54,10 @@
         @endforeach
       </select>
   </p>
+  @else
+  &nbsp;
   @endif
+  </div>
 </div>
 
 @if ($elemsRep->isNotEmpty())
@@ -110,7 +114,9 @@
   </tbody>
 </table>
 @else
-<p>No hay registros.</p>
+<div class="d-flex justify-content-between align-items-end mb-1 col-sm-12">
+  <p>No hay registros.</p>
+</div>
 @endif
 
 <script>

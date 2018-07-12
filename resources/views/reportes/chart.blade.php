@@ -2,38 +2,42 @@
 
 @section('content')
 
-<div class="d-flex justify-content-between align-items-end mb-3">
+<div class="d-flex justify-content-between align-items-end mb-1 col-sm-12">
+  <div class="col-sm-9">
   <form method="POST" class="form-horizontal" action="{{ url('/reportes/chart/'.$tipo) }}"
         onSubmit="return alertaFechaRequerida()">
     {!! csrf_field() !!}
 
-      <input type="hidden" name="periodo" value="intervalo">
-      <label>Desde:</label>
-      <input type="date" name="fecha_desde" id="fecha_desde" min="{{ now() }}" max="{{ now() }}"
-                      value="{{ old('fecha_desde', substr($fecha_desde, 0, 10)) }}">
-      {{-- $fecha_desde --}}
-      <label>Hasta:</label>
-      <input type="date" name="fecha_hasta" id="fecha_hasta" min="{{ now() }}" max="{{ now() }}"
-                      value="{{ old('fecha_hasta', substr($fecha_hasta, 0, 10)) }}">
-      @if ((Auth::user()->is_admin) and ('Fecha' == $muestra))
-      <select name="asesor" id="asesor">
-        <option value="0">Asesor</option>
-        @foreach ($users as $user)
-          <option value="{{ $user->id }}"
-          @if (old("asesor", $asesor) == $user->id)
-            selected
-          @endif
-          >
-            {{ $user->name }}
-          </option>
-        @endforeach
-      </select>
-      @endif
-      <button type="submit" class="btn btn-success">Mostrar</button>
+    <input type="hidden" name="periodo" value="intervalo">
+    <label>Desde:</label>
+    <input type="date" name="fecha_desde" id="fecha_desde" min="{{ now() }}" max="{{ now() }}"
+                    value="{{ old('fecha_desde', substr($fecha_desde, 0, 10)) }}">
+    {{-- $fecha_desde --}}
+    <label>Hasta:</label>
+    <input type="date" name="fecha_hasta" id="fecha_hasta" min="{{ now() }}" max="{{ now() }}"
+                    value="{{ old('fecha_hasta', substr($fecha_hasta, 0, 10)) }}">
+    @if ((Auth::user()->is_admin) and ('Fecha' == $muestra))
+    <select name="asesor" id="asesor">
+      <option value="0">Asesor</option>
+      @foreach ($users as $user)
+        <option value="{{ $user->id }}"
+        @if (old("asesor", $asesor) == $user->id)
+          selected
+        @endif
+        >
+          {{ $user->name }}
+        </option>
+      @endforeach
+    </select>
+    @endif
+    <button type="submit" class="btn btn-success">Mostrar</button>
+  </form>
+  </div>
 
   <!-- h3 class="pb-1">{{ $title }}</h3 -->
 
       <!-- a href="{{ route('reportes.chart', 'bar') }}" class="btn btn-primary">Crear Gráfico</a -->
+  <div class="col-sm-3">
       Mostrar gráfico de:
       <select name="grafico" id="grafico"
         onchange="javascript:location.href = this.value;">
@@ -45,7 +49,7 @@
           </option>
         @endforeach
       </select>
-  </form>
+  </div>
 </div>
 
 <div>{!! $chart->container() !!}</div>

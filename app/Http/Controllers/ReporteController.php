@@ -52,7 +52,6 @@ class ReporteController extends Controller
         } elseif ('Cumpleanos' == $muestra) {
             $fecha_desde = Fecha::hoy();
             $fecha_hasta = Fecha::hoy()->addDays(30)->endOfDay();
-//            dd($fecha_desde, $fecha_hasta);
         } else {
             $fecha_desde = (new Carbon(Contacto::min('created_at', $ZONA)))->startOfDay();
             $fecha_hasta = (new Carbon(Contacto::max('created_at', $ZONA)))->endOfDay();

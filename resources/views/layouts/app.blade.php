@@ -146,7 +146,7 @@
 
     <!-- Begin page content -->
     <main role="main" class="container">
-        <div class="row mt-3">
+        <div class="row mt-1">  <!-- margen de arriba (top margin) es 1 -->
             <div class="col-sm-12">
             @auth
               @yield('content')

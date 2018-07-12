@@ -50,7 +50,7 @@
     </form>
 </div>
 
-<div class="d-flex justify-content-between align-items-end mb-3">
+<div class="d-flex justify-content-between align-items-end mb-1">
     <h1 class="pb-1">{{ $title }}</h1>
 
     @if (Auth::user()->is_admin)

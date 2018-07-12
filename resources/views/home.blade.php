@@ -1,6 +1,30 @@
 @extends('layouts.app')
 
 @section('content')
+@if ($cumpleaneros->isNotEmpty())
+
+<div class="d-flex justify-content-between align-items-end mb-1 col-sm-6">
+<table class="table table-striped table-hover table-bordered">
+  <tr><td colspan="2" class="justify-content-center">Próximos cumpleaños</td></tr>
+  @foreach ($cumpleaneros as $cumpleano)
+    <tr>
+      <td class="col-sm-4">
+      {{ $cumpleano->name }}
+      </td>
+      <td class="col-sm-2">
+      {{ $cumpleano->fecha_cumpleanos->format('d-m') }}
+      @if ($hoy == $cumpleano->fecha_cumpleanos->format('d-m'))
+      <a href="{{ route('agenda.cumpleano', $cumpleano) }}" class="btn btn-link"
+              title="Enviar correo a '{{ $cumpleano->name }}', porque esta de cumpleaños!">
+          <span class="oi oi-envelope-closed"></span>
+      </a>
+      @endif
+      </td>
+    </tr>
+  @endForeach
+</table>
+</div>
+@else
 <div class="container">
     <div id="myCarousel" class="carousel slide" data-ride="carousel">
         <ol class="carousel-indicators">
@@ -73,4 +97,5 @@
         </a>
     </div>
 </div>
+@endif
 @endsection

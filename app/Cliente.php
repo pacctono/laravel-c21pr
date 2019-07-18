@@ -10,7 +10,7 @@ class Cliente extends Model
     protected $fillable = [
         'cedula', 'name', 'veces_name', 'telefono', 'veces_telefono',
         'user_id', 'email', 'veces_email', 'direccion', 'deseo_id',
-        'propiedad_id', 'zona_id', 'precio_id', 'origen_id',
+        'tipo_id', 'zona_id', 'precio_id', 'origen_id',
         'resultado_id', 'observaciones', 'user_actualizo', 'user_borro',
         'borrado_at'
     ];
@@ -28,9 +28,9 @@ class Cliente extends Model
         return $this->belongsTo(Deseo::class); // Si llave foranea, diferente a esperada, usamos 2do parametro.
     }
 
-    public function propiedad()    // propiedad_id
+    public function tipo()    // tipo_id
     {
-        return $this->belongsTo(Propiedad::class); // Si llave foranea, diferente a esperada, usamos 2do parametro.
+        return $this->belongsTo(Tipo::class); // Si llave foranea, diferente a esperada, usamos 2do parametro.
     }
 
     public function zona()    // zona_id
@@ -43,7 +43,7 @@ class Cliente extends Model
         return $this->belongsTo(Precio::class); // Si llave foranea, diferente a esperada, usamos 2do parametro.
     }
 
-    public function origen()    // propiedad_id
+    public function origen()    // tipo_id
     {
         return $this->belongsTo(Origen::class); // Si llave foranea, diferente a esperada, usamos 2do parametro.
     }

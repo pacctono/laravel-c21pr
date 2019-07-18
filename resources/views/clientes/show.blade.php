@@ -36,7 +36,7 @@
         </spam></p>
         <p>Desea: <spam class="alert-info">{{ $cliente->deseo->descripcion }}
         </spam></p>
-        <p>Propiedad: <spam class="alert-info">{{ $cliente->propiedad->descripcion }}
+        <p>Tipo: <spam class="alert-info">{{ $cliente->tipo->descripcion }}
         </spam></p>
         <p>Zona: <spam class="alert-info">{{ $cliente->zona->descripcion }}
         </spam></p>

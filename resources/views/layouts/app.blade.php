@@ -15,11 +15,14 @@
     <!-- Custom styles for this template -->
     <link href="{{ asset('css/style.css') }}" rel="stylesheet">
     <script>
-      var $;
+//      var $;
 
-      window.onload=function() {
-
-        if (!$) { $ = document.getElementById; }
+      window.onload = function() {
+//        if (!$) { $ = document.getElementById; }
+        if (fnWinOnLoad) fnWinOnLoad();
+      }
+      window.onunload = function() {
+        if (fnWinOnUnload) fnWinOnUnload();
       }
     </script>
   </head>
@@ -42,7 +45,7 @@
         @auth
           <ul class="navbar-nav mr-auto col-md-10">
           @foreach (array('home' => 'Home', 'contactos' => 'Contactos', 'users' => 'Asesores',
-                    'turnos' => 'Turnos', 'agenda' => 'Agenda')
+                    'turnos' => 'Turnos', 'agenda' => 'Agenda', 'propiedades' => 'Propiedades')
                     as $hMenu => $muestraMenu)
             @if ($hMenu == substr($view_name, 0, 
                 ((strpos($view_name, '-'))?(strpos($view_name, '-')):4)))
@@ -96,8 +99,8 @@
                 <li><a class="dropdown-item" href="{{ route('deseo') }}">
                   Deseo
                 </a></li>
-                <li><a class="dropdown-item" href="{{ route('propiedad') }}">
-                  Propiedad
+                <li><a class="dropdown-item" href="{{ route('tipo') }}">
+                  Tipo de propiedad
                 </a></li>
                 <li><a class="dropdown-item" href="{{ route('zona') }}">
                   Zona
@@ -123,13 +126,13 @@
             </li>
           @else
             <li class="nav-item dropdown">
-              <button type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown">
+              <button type="button" class="btn btn-info dropdown-toggle"
+                              data-toggle="dropdown">
                 {{ Auth::user()->name }}
               </button>
               <div class="dropdown-menu">
                 <a class="dropdown-item active" href="{{ route('logout') }}"
-                    onclick="event.preventDefault();
-                    document.getElementById('logout-form').submit();">
+                    onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                   {{ __('Logout') }}
                 </a>
                 <form id="logout-form" action="{{ route('logout') }}" method="POST"

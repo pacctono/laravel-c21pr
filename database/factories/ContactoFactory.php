@@ -3,7 +3,7 @@
 use App\Contacto;
 use App\User;
 use App\Deseo;
-use App\Propiedad;
+use App\Tipo;
 use App\Zona;
 use App\Precio;
 use App\Origen;
@@ -45,7 +45,7 @@ $factory->define(Contacto::class, function (Faker $faker) {
         'veces_email' => 1,
         'direccion' => $faker->address(),
         'deseo_id' => $faker->numberBetween(1, Deseo::count()),
-        'propiedad_id' => $faker->numberBetween(1, Propiedad::count()),
+        'tipo_id' => $faker->numberBetween(1, Tipo::count()),
         'zona_id' => $faker->numberBetween(1, Zona::count()),
         'precio_id' => $faker->numberBetween(1, Precio::count()),
         'origen_id' => $faker->numberBetween(1, Origen::count()),

@@ -6,7 +6,7 @@ use App\Contacto;
 use App\Deseo;
 use App\Origen;
 use App\Precio;
-use App\Propiedad;
+use App\Tipo;
 use App\Resultado;
 use App\Zona;
 use App\Venezueladdn;
@@ -93,7 +93,7 @@ class ContactoController extends Controller
         $deseos = Deseo::all();
         $origenes = Origen::all();
         $precios = Precio::all();
-        $propiedades = Propiedad::all();
+        $tipos = Tipo::all();
         $resultados = Resultado::all();
         $zonas = Zona::all();
         $ddns = Venezueladdn::distinct()->get(['ddn'])->all();
@@ -102,7 +102,7 @@ class ContactoController extends Controller
 
         return view('contactos.create', compact(
             'title', 'deseos', 'origenes', 'precios',
-            'propiedades', 'resultados', 'zonas', 'ddns', 'exito'));
+            'tipos', 'resultados', 'zonas', 'ddns', 'exito'));
     }
 
     /**
@@ -122,7 +122,7 @@ class ContactoController extends Controller
             'email' => ['sometimes', 'nullable', 'email'],
             'direccion' => '',
             'deseo_id' => 'required',
-            'propiedad_id' => 'required',
+            'tipo_id' => 'required',
             'zona_id' => 'required',
             'precio_id' => 'required',
             'origen_id' => 'required',
@@ -137,9 +137,9 @@ class ContactoController extends Controller
             'telefono.digits:7' => 'La parte del telefono, sin ddn, debe contener 7 dígitos',
             'email.email' => 'Debe suministrar un correo electrónico válido.',
             'deseo_id.required' => 'El deseo del contacto inicial es obligatorio suministrarlo.',
-            'propiedad_id.required' => 'El tipo de propiedad es obligatorio suministrarlo.',
-            'zona_id.required' => 'La zona de la propiedad es obligatorio suministrarla.',
-            'precio_id.required' => 'El precio de la propiedad es obligatorio suministrarlo.',
+            'tipo_id.required' => 'El tipo de tipo es obligatorio suministrarlo.',
+            'zona_id.required' => 'La zona de la tipo es obligatorio suministrarla.',
+            'precio_id.required' => 'El precio de la tipo es obligatorio suministrarlo.',
             'origen_id.required' => 'El origen de como conocio de nuestra oficina es obligatorio suministrarlo.',
             'resultado_id.required' => 'El resultado de la conversación con el contacto inicial es obligatorio suministrarlo.',
             'fecha_evento.required_if' => 'La fecha del evento es requerida, cuando el resultado es llamada o cita',
@@ -178,7 +178,7 @@ class ContactoController extends Controller
             'veces_email' => $data['veces_email'],
             'direccion' => $data['direccion'],
             'deseo_id' => $data['deseo_id'],
-            'propiedad_id' => $data['propiedad_id'],
+            'tipo_id' => $data['tipo_id'],
             'zona_id' => $data['zona_id'],
             'precio_id' => $data['precio_id'],
             'origen_id' => $data['origen_id'],
@@ -240,7 +240,8 @@ class ContactoController extends Controller
         $ddns = Venezueladdn::distinct()->get(['ddn'])->all();
 
         if ((1 == Auth::user()->is_admin) or ($contacto->user->id == Auth::user()->id)) {
-            return view('contactos.edit', ['contacto' => $contacto, 'title' => $title, 'ddns' => $ddns]);
+            return view('contactos.edit', ['contacto' => $contacto, 'title' => $title,
+                        'ddns' => $ddns]);
         }
         return redirect('/contactos');
     }

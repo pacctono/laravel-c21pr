@@ -67,14 +67,14 @@
                 @endforeach
                 </select>
                 &nbsp;
-                <label for="propiedad">Propiedad:</label>
-                <select name="propiedad_id" id="propiedad_id">
-                  <option value="">Qué propiedad?</option>
-                @foreach ($propiedades as $propiedad)
-                @if (old('propiedad_id') == $propiedad->id)
-                  <option value="{{ $propiedad->id }}" selected>{{ $propiedad->descripcion }}</option>
+                <label for="tipo">Tipo:</label>
+                <select name="tipo_id" id="tipo_id">
+                  <option value="">Qué tipo?</option>
+                @foreach ($tipos as $tipo)
+                @if (old('tipo_id') == $tipo->id)
+                  <option value="{{ $tipo->id }}" selected>{{ $tipo->descripcion }}</option>
                 @else
-                  <option value="{{ $propiedad->id }}">{{ $propiedad->descripcion }}</option>
+                  <option value="{{ $tipo->id }}">{{ $tipo->descripcion }}</option>
                 @endif
                 @endforeach
                 </select>

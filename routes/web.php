@@ -47,12 +47,14 @@ Route::delete('/usuarios/{user}', 'UserController@destroy')
 Route::get('/contactos/orden/{orden}', 'ContactoController@index')
     ->name('contactos.orden');
 
-Route::get('/contactos/{contacto}/{ruta}', 'ContactoController@show')
+Route::pattern('contactos', '[0-9]+');  // Para no crear conflictos con el resource contacto
+/* Las rutas de resource estan traducidos (crear y editar) en el metodo 'boot'
+ * de "app/Providers/AppServiceProvider.php".*/
+Route::resource('contactos', 'ContactoController');
+
+Route::get('/contactos/{contacto}/{rutRetorno}', 'ContactoController@show')
     ->where('contacto', '[0-9]+')
     ->name('contactos.muestra');
-
-Route::pattern('contactos', '[0-9]+');               // Para no crear conflictos con el resource contacto
-Route::resource('contactos', 'ContactoController');
 
 Route::get('/turnos', 'TurnoController@index')
     ->name('turnos');
@@ -81,6 +83,8 @@ Route::get('/clientes/orden/{orden}', 'ClienteController@index')
     ->name('clientes.orden');
 
 Route::pattern('clientes', '[0-9]+');               // Para no crear conflictos con el resource cliente
+/* Las rutas de resource estan traducidos (crear y editar) en el metodo 'boot'
+ * de "app/Providers/AppServiceProvider.php".*/
 Route::resource('clientes', 'ClienteController');
 
 Route::get('/agenda', 'AgendaController@index')
@@ -109,6 +113,24 @@ Route::get('/agenda/{contacto}/editar', 'AgendaController@edit')
 Route::put('/agenda/{cita}', 'AgendaController@update')
     ->name('agenda.update');
 
+Route::get('/propiedades/orden/{orden}', 'PropiedadController@index')
+    ->name('propiedades.orden');
+
+Route::get('/propiedades/filtro', 'PropiedadController@index');     // Para paginación con filtro.
+Route::post('/propiedades/filtro', 'PropiedadController@index')
+    ->name('propiedades.post');
+
+Route::get('/propiedades/grabar', 'PropiedadController@grabarArchivo')
+    ->name('propiedades.grabar');
+
+Route::pattern('propiedades', '[0-9]+');               // Para no crear conflictos con el resource propiedad
+Route::resource('propiedades', 'PropiedadController')
+    ->parameters(['propiedades' => 'propiedad']);
+
+Route::get('/propiedades/{propiedad}/{rutRetorno}', 'PropiedadController@show')
+    ->where('propiedad', '[0-9]+')
+    ->name('propiedades.muestra');
+
 Route::get('/reportes/tipo/{tipo}', 'ReporteController@index')
     ->name('reportes');
 
@@ -127,8 +149,8 @@ Route::get('/reportes/contactosUser/{id}/{orden}', 'ReporteController@contactosX
 Route::get('/reportes/contactosDeseo/{id}/{orden}', 'ReporteController@contactosXDeseo')
     ->name('reporte.contactosDeseo');
 
-Route::get('/reportes/contactosPropiedad/{id}/{orden}', 'ReporteController@contactosXPropiedad')
-    ->name('reporte.contactosPropiedad');
+Route::get('/reportes/contactosTipo/{id}/{orden}', 'ReporteController@contactosXTipo')
+    ->name('reporte.contactosTipo');
 
 Route::get('/reportes/contactosOrigen/{id}/{orden}', 'ReporteController@contactosXOrigen')
     ->name('reporte.contactosOrigen');
@@ -186,26 +208,26 @@ Route::delete('/deseos/{deseo}', 'DeseoController@destroy')
     ->name('deseo.destroy')
     ->middleware('admin');
 
-Route::get('/propiedades', 'PropiedadController@index')
-    ->name('propiedad');
+Route::get('/tipos', 'TipoController@index')
+    ->name('tipo');
 
-Route::get('/propiedades/{propiedad}', 'PropiedadController@show')
-    ->where('propiedad', '[0-9]+')
-    ->name('propiedad.show');
+Route::get('/tipos/{tipo}', 'TipoController@show')
+    ->where('tipo', '[0-9]+')
+    ->name('tipo.show');
 
-Route::get('/propiedades/nuevo', 'PropiedadController@create')
-    ->name('propiedad.crear')
+Route::get('/tipos/nuevo', 'TipoController@create')
+    ->name('tipo.crear')
     ->middleware('admin');
 
-Route::post('/propiedades', 'PropiedadController@store');
+Route::post('/tipos', 'TipoController@store');
 
-Route::get('/propiedades/{propiedad}/editar', 'PropiedadController@edit')
-    ->name('propiedad.edit');
+Route::get('/tipos/{tipo}/editar', 'TipoController@edit')
+    ->name('tipo.edit');
 
-Route::put('/propiedades/{propiedad}', 'PropiedadController@update');
+Route::put('/tipos/{tipo}', 'TipoController@update');
 
-Route::delete('/propiedades/{propiedad}', 'PropiedadController@destroy')
-    ->name('propiedad.destroy')
+Route::delete('/tipos/{tipo}', 'TipoController@destroy')
+    ->name('tipo.destroy')
     ->middleware('admin');
 
 Route::get('/zonas', 'ZonaController@index')

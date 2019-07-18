@@ -63,6 +63,31 @@ class User extends Authenticatable
         return $this->hasMany(Agenda::class); // Si llave foranea, diferente a esperada, usamos 2do parametro.
     }
 
+    public function propiedades()    // user_id
+    {
+        return $this->hasMany(Propiedad::class); // Si llave foranea, diferente a esperada, usamos 2do parametro.
+    }
+
+    public function captadorPropiedades()    // asesor_captador_id
+    {
+        return $this->hasMany(Propiedad::class, 'asesor_captador_id'); // Si llave foranea, diferente a esperada, usamos 2do parametro.
+    }
+
+    public function cerradorPropiedades()    // asesor_cerrador_id
+    {
+        return $this->hasMany(Propiedad::class, 'asesor_cerrador_id'); // Si llave foranea, diferente a esperada, usamos 2do parametro.
+    }
+
+    public function propiedadesBorradas()
+    {
+        return $this->hasMany(Propiedad::class, 'user_borro'); // Si llave foranea, diferente a esperada, usamos 2do parametro.
+    }
+
+    public function propiedadesActualizadas()
+    {
+        return $this->hasMany(Propiedad::class, 'user_actualizo'); // Si llave foranea, diferente a esperada, usamos 2do parametro.
+    }
+
     public function bitacoras()    // user_id
     {
         return $this->hasMany(Bitacora::class); // Si llave foranea, diferente a esperada, usamos 2do parametro.

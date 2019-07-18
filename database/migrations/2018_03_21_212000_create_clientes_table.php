@@ -27,8 +27,8 @@ class CreateClientesTable extends Migration
             $table->string('direccion', 160)->nullable();
             $table->unsignedInteger('deseo_id');
             $table->foreign('deseo_id')->references('id')->on('deseos');
-            $table->unsignedInteger('propiedad_id');
-            $table->foreign('propiedad_id')->references('id')->on('propiedads');
+            $table->unsignedInteger('tipo_id');
+            $table->foreign('tipo_id')->references('id')->on('tipos');
             $table->unsignedInteger('zona_id');
             $table->foreign('zona_id')->references('id')->on('zonas');
             $table->unsignedInteger('precio_id');

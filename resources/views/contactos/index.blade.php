@@ -67,11 +67,11 @@
             @endif
             <td class="d-flex align-items-end">
                 <a href="{{ route('contactos.show', $contacto) }}" class="btn btn-link" 
-                        title="Mostrar los datos de este contacto incial.">
+                        title="Mostrar los datos de este contacto inicial.">
                     <span class="oi oi-eye"></span>
                 </a>
                 <a href="{{ route('contactos.edit', $contacto) }}" class="btn btn-link"
-                        title="Editar los datos de este contacto incial.">
+                        title="Editar los datos de este contacto inicial.">
                     <span class="oi oi-pencil"></span>
                 </a>
 

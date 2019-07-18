@@ -64,7 +64,7 @@ class TurnoController extends Controller
             $orden = '';
             $alertar = 1;
         }
-        if ('' == $orden or $orden == null) {
+        if ('' == $orden or null == $orden) {
             $orden = 'turno';
         }
         if (Auth::user()->is_admin) {

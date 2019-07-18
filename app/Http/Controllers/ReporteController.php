@@ -6,7 +6,7 @@ use App\Contacto;
 use App\Deseo;
 use App\Origen;
 use App\Precio;
-use App\Propiedad;
+use App\Tipo;
 use App\Resultado;
 use App\Zona;
 use App\Venezueladdn;
@@ -268,7 +268,7 @@ class ReporteController extends Controller
         return view('reportes.contactos', compact('title', 'contactos', 'tipo', 'rutRetorno', 'id'));
     }
 
-    public function contactosXPropiedad($id = 0, $orden = 'id')
+    public function contactosXTipo($id = 0, $orden = 'id')
     {
         if (!(Auth::check())) {
             return redirect('login');
@@ -282,7 +282,7 @@ class ReporteController extends Controller
 
         $ruta = request()->path();
         $tipo = strtolower(substr($ruta, 18, strpos($ruta, '/', 18)-18));
-        $title = $this->titulo . 'con la ' . $tipo . ': ' . Propiedad::find($id)->descripcion;
+        $title = $this->titulo . 'con la ' . $tipo . ': ' . Tipo::find($id)->descripcion;
 
         if ('' == $orden or $orden == null) {
             $orden = 'id';

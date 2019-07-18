@@ -152,7 +152,7 @@ function alertaFechaRequerida() {
     alert("Usted ha seleccionado 'Intervalo' y tiene que suministrar la fecha 'Desde'");
     return false;
   }
-  if ('' == fecha_desde) {
+  if ('' == fecha_hasta) {
     alert("Usted ha seleccionado 'Intervalo' y tiene que suministrar la fecha 'Hasta'");
     return false;
   }

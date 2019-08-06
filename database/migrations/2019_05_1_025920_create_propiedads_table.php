@@ -15,7 +15,7 @@ class CreatePropiedadsTable extends Migration
     {
         Schema::create('propiedads', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('codigo', 6)->unique();
+            $table->string('codigo', 6);
             $table->date('fecha_reserva')->nullable();
             $table->date('fecha_firma')->nullable();
             $table->enum('negociacion', ['V', 'A'])->comment('[V]enta, [A]luiler');
@@ -25,7 +25,7 @@ class CreatePropiedadsTable extends Migration
                 ->default('I');
             $table->unsignedInteger('user_id');
             $table->foreign('user_id')->references('id')->on('users');
-            $table->enum('moneda', ['$', 'Bs'])->default('$')->comment('$, Bs');
+            $table->enum('moneda', ['$', 'Bs'])->default('$')->comment('$, Eu, Bs');
             $table->float('precio', 20, 2)->comment('Precio del inmueble');
             $table->float('comision', 4, 2)->default(5.00)->comment('Porcentaje de comision');
 //            $table->float('reserva_sin_iva', 18, 2)->nullable();
@@ -39,7 +39,19 @@ class CreatePropiedadsTable extends Migration
                 ->comment('Compartido con otra oficina sin IVA');*/
             $table->float('porc_franquicia', 4, 2)
                 ->default(10.00)->comment('Porcentaje para franquicia');
-            $table->boolean('aplicar_porc_franquicia')->default(true);
+            $table->boolean('aplicar_porc_franquicia')->default(False)
+                ->comment('Si se selecciona, se calcula <Franquicia de reserva sin IVA(O)> ' . 
+                            'como el %Franquicia[10%] de <Compartido sin IVA(M)>; sino se ' . 
+                            'usa <Compartido con IVA(L)>.');
+            $table->boolean('aplicar_porc_franquicia_pagar_reportada')->default(False)
+                ->comment('Si se selecciona, <Franquicia a pagar reportada(Q)> ' .
+                            'será el %Franquicia[10%] X %<Reportado a casa nacional(R)>[5%] ' .
+                            'X <precio(G)> dividido entre 1 o 2, dependiendo de <lados(N)>; ' .
+                            'sino se usa %<Franquicia>[10%] X <Compartido sin IVA(M)>.');
+            $table->boolean('aplicar_franquicia_pagar_reportada_bruto')->default(False)
+                ->comment('Si se selecciona, <Oficina Bruto Real(U)> es ' .
+                            '<Compartido con IVA(L)> - <Franquicia a pagar reportada(Q)>; ' .
+                            'si no, es <Compartido con IVA(L)> - <Franquicia de reserva sin IVA(O)>.');
 /*            $table->float('franquicia_reservado_sin_iva', 18, 2)->nullable()
                 ->comment('Monto sin iva');
             $table->float('franquicia_pagar_reportada', 18, 2)->nullable()
@@ -49,24 +61,37 @@ class CreatePropiedadsTable extends Migration
             $table->float('porc_regalia', 4, 2)
                 ->default(80.00)->comment('Porcentaje para regalia');
 //            $table->float('regalia', 18, 2)->nullable();
-            $table->float('sanaf_5_porciento', 18, 2)->nullable();
+//            $table->float('sanaf_5_porciento', 18, 2)->nullable();
 //            $table->float('oficina_bruto_real', 18, 2)->nullable();
 //            $table->float('base_para_honorarios', 18, 2)->nullable();
             $table->float('porc_captador_prbr', 4, 2)
                 ->default(20.00)->comment('Porcentaje para captador');
-            $table->boolean('aplicar_porc_captador')->default(true);
+            $table->boolean('aplicar_porc_captador')->default(true)
+                ->comment('Si se selecciona, se calcula <Captador PRBR(X)> ' .
+                            'como el %Captador [20%] de <Oficina Bruto Real(U)>; ' .
+                            'sino se usa una expresión más larga basada en ' .
+                            '<Base para honorarios(W)[W*%-(0,2*W)+W*%*16%]>.');
 //            $table->float('captador_prbr', 18, 2)->nullable();
             $table->float('porc_gerente', 4, 2)
                 ->default(10.00)->comment('Porcentaje para gerente');
-            $table->boolean('aplicar_porc_gerente')->default(true);
+            $table->boolean('aplicar_porc_gerente')->default(true)
+                ->comment('Si se selecciona, se calcula <Gerente(Y)> ' .
+                            'como el %Gerente [10%] de <Oficina Bruto Real(U)>; ' .
+                            'sino se calcula el % de <Base para honorarios(W)>[W*%-(0,2*W)+W*%*16%].');
 //            $table->float('gerente', 18, 2)->nullable();
             $table->float('porc_cerrador_prbr', 4, 2)
                 ->default(20.00)->comment('Porcentaje para cerrador');
-            $table->boolean('aplicar_porc_cerrador')->default(true);
+            $table->boolean('aplicar_porc_cerrador')->default(true)
+                ->comment('Si se selecciona, se calcula <Cerrador PRBR(Z)> ' .
+                            'como el %Cerrador [20%] de <Oficina Bruto Real(U)>; ' .
+                            'sino se usa una expresión más larga basada en ' .
+                            '<Base para honorarios(W)>[W*%-(0,2*W)+W*%*16%].');
 //            $table->float('cerrador_prbr', 18, 2)->nullable();
             $table->float('porc_bonificacion', 4, 2)
-                ->default(5.00)->comment('Porcentaje para bonificacion');
-            $table->boolean('aplicar_porc_bonificacion')->default(true);
+                ->default(0.00)->comment('Porcentaje para bonificacion');
+            $table->boolean('aplicar_porc_bonificacion')->default(False)
+                ->comment('Si se selecciona, se calcula <Binificaciones> como el ' .
+                            '%bonificacion[5%] de <Base para honorarios(W)>; si no es 0.00.');
 //            $table->float('bonificacion', 18, 2)->nullable();
             $table->float('comision_bancaria', 14, 2)->nullable()
                 ->comment('Comision bancaria descontada');
@@ -91,8 +116,8 @@ class CreatePropiedadsTable extends Migration
             $table->string('pago_otra_oficina', 100)->nullable()
                 ->comment('Forma de pago a la(s) otra(s) oficina(s)');
             $table->boolean('pagado_casa_nacional')->default(false);
-            $table->enum('estatus_sistema_c21', ['V', 'P'])->default('P')
-                ->comment('[V]endido, [P]endiente');
+            $table->enum('estatus_sistema_c21', ['V', 'A', 'P'])->default('P')
+                ->comment('[V]endido, (A)ctivo, [P]endiente');
             $table->string('reporte_casa_nacional', 10)->nullable()
                 ->comment('Número de reporte a casa nacional');
             $table->string('comentarios', 600)->nullable();

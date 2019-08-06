@@ -57,7 +57,7 @@
                 <label class="control-label col-sm-2" for="estatus">*Estatus:</label>
               <div class="form-control col-sm-5">
                 <select name="estatus" id="estatus">
-                @foreach ($cols['estatus']['tipo'] as $opcion => $muestra)
+                @foreach ($cols['estatus']['opcion'] as $opcion => $muestra)
                   <option value="{{$opcion}}"
                   @if (old('estatus', $propiedad->estatus) == $opcion)
                     selected
@@ -98,7 +98,8 @@
             <div class="form-group d-flex">
                 <label class="control-label col-sm-2" for="lados">Lados:</label>
                 <input type="number" class="form-control col-sm-2" size="1" maxlength="1"
-                    name="lados" id="lados" value="{{ old('lados', $propiedad->lados) }}">
+                    required name="lados" id="lados"
+                    value="{{ old('lados', $propiedad->lados) }}">
                 <label class="control-label col-sm-2" for="porc_franquicia">
                     *Franquicia:
                 </label>
@@ -115,7 +116,7 @@
             </div>
 
             <div class="form-group d-flex">
-                <label class="control-label col-sm-12"
+                <label class="control-label col-sm-11"
                     for="aplicar_porc_franquicia_pagar_reportada">
                     Aplicar formula con precio para franquicia a pagar reportada:</label>
                 <input type="checkbox" class="form-control col-sm-1"
@@ -127,7 +128,7 @@
             </div>
 
             <div class="form-group d-flex">
-                <label class="control-label col-sm-12"
+                <label class="control-label col-sm-11"
                     for="aplicar_franquicia_pagar_reportada_bruto">
                     Aplicar franquicia a pagar reportada para bruto real:</label>
                 <input type="checkbox" class="form-control col-sm-1"

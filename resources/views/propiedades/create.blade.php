@@ -33,7 +33,7 @@
                 &nbsp;
               <div class="form-control col-sm-6">
                 <select name="estatus" id="estatus">
-                @foreach ($cols['estatus']['tipo'] as $opcion => $muestra)
+                @foreach ($cols['estatus']['opcion'] as $opcion => $muestra)
                   <option value="{{$opcion}}"
                   @if (old('estatus', $cols['estatus']['xdef']) == $opcion)
                     selected
@@ -54,7 +54,7 @@
                 <select name="negociacion" id="negociacion">
                   {{--<option value="">Tipo de negociacion?</option>--}}
                 {{-- @foreach (array('V' => 'Venta', 'A' => 'Alquiler') as $opcion => $muestra)--}}
-                @foreach ($cols['negociacion']['tipo'] as $opcion => $muestra)
+                @foreach ($cols['negociacion']['opcion'] as $opcion => $muestra)
                   <option value="{{$opcion}}"
                   @if (old('negociacion', $cols['negociacion']['xdef']) == $opcion)
                     selected
@@ -95,7 +95,7 @@
                     name="moneda" id="moneda" list="monedas"
                     value="{{ old('comision', $cols['moneda']['xdef']) }}">
                 <datalist id="monedas">
-                @foreach ($cols['moneda']['tipo'] as $opcion => $muestra)
+                @foreach ($cols['moneda']['opcion'] as $opcion => $muestra)
                     <option value="{{ $opcion }}">
                 @endforeach
                 </datalist>
@@ -117,7 +117,7 @@
             <div class="form-group d-flex">
                 <label class="control-label col-sm-2" for="lados">Lados:</label>
                 <input type="number" class="form-control col-sm-2" size="1" maxlength="1"
-                    name="lados" id="lados" value="{{ old('lados') }}">
+                    required name="lados" id="lados" value="{{ old('lados') }}">
                 <label class="control-label col-sm-3" for="porc_franquicia">*Franquicia:</label>
                 <input type="float" class="form-control col-sm-1" size="5" maxlength="5"
                     name="porc_franquicia" id="porc_franquicia" placeholder="10" required
@@ -371,7 +371,7 @@
                     *Estatus sistema C21:</label>
               <div class="form-control col-sm-3">
                 <select name="estatus_sistema_c21" id="estatus_sistema_c21">
-                @foreach ($cols['estatus_sistema_c21']['tipo'] as $opcion => $muestra)
+                @foreach ($cols['estatus_sistema_c21']['opcion'] as $opcion => $muestra)
                   <option value="{{$opcion}}"
                   @if (old('estatus_sistema_c21',
                         $cols['estatus_sistema_c21']['xdef']) == $opcion)

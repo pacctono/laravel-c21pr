@@ -63,36 +63,55 @@
         @endif
         <button type="submit" class="btn btn-success">Mostrar</button>
         <br>
-        {{ $filas }} props:
-        <spam class="alert-success" title="Precio">{{ $tPrecio }}</spam>
-        <spam class="alert-info" title="Franquicia reservada sin IVA">
-            {{ $tFranquiciaSinIva }}</spam>
-        <spam class="alert-success" title="Franquicia reservada con IVA">
-            {{ $tFranquiciaConIva }}</spam>
-        <spam class="alert-info" title="Franquicia a pagar reportada">
-            {{ $tFranquiciaPagarR }}</spam>
+        TOTS: {{ $filas }} props
+        <spam class="alert-success" title="Precio">
+            {{ Prop::numeroVen($tPrecio, 0) }}</spam>{{-- 'Prop' es un alias definido en config/app.php --}}
+        <spam class="alert-info">Compartido con IVA:</spam>
+        <spam class="alert-success" title="Compartido con otra oficina con IVA">
+            {{ Prop::numeroVen($tCompartidoConIva, 2) }}</spam>
+        <spam class="alert-info">Lados:</spam>
+        <spam class="alert-success" title="Sumatoria de los lados">
+            {{ $tLados }}</spam>
+        <spam class="alert-info">Franq a pagar rep:</spam>
+        <spam class="alert-success" title="Franquicia a pagar reportada">
+            {{ Prop::numeroVen($tFranquiciaPagarR, 2) }}</spam>
+        <spam class="alert-info">Regalia:</spam>
         <spam class="alert-success" title="Regalia">
-            {{ $tRegalia }}</spam>
-        <spam class="alert-info" title="Sanaf - 5%">
-            {{ $tSanaf5PorCiento }}</spam>
-        <spam class="alert-success" title="Oficina Bruto Real">
-            {{ $tOficinaBrutoReal }}</spam>
-        <spam class="alert-success" title="Base para los honorarios de los socios">
-            {{ $tBaseHonorariosSo }}</spam>
-        <spam class="alert-info" title="Base para los honorarios">
-            {{ $tBaseParaHonorari }}</spam>
-        <spam class="alert-success" title="Ingreso neto de la oficina">
-            {{ $tIngresoNetoOfici }}</spam>
-        <spam class="alert-info" title="Captador PRBR">
-            {{ $tCaptadorPrbr }}</spam>
+            {{ Prop::numeroVen($tRegalia, 2) }}</spam>
+        <spam class="alert-info">Sanaf:</spam>
+        <spam class="alert-success" title="Sanaf - 5%">
+            {{ Prop::numeroVen($tSanaf5PorCiento, 2) }}</spam>
+        <br>
+        <spam class="alert-info">Captador:</spam>
+        <spam class="alert-success" title="Captador PRBR">
+            {{ Prop::numeroVen($tCaptadorPrbr, 2) }}
+            @if (0 < $tCaptadorPrbrSel)
+            ({{ Prop::numeroVen($tCaptadorPrbrSel, 2) }} [{{ $tLadosCap }}])
+            @endif
+        </spam>
+        <spam class="alert-info">Gerente:</spam>
         <spam class="alert-success" title="Gerente">
-            {{ $tGerente }}</spam>
-        <spam class="alert-info" title="Cerrador PRBR">
-            {{ $tCerradorPrbr }}</spam>
+            {{ Prop::numeroVen($tGerente, 2) }}</spam>
+        <spam class="alert-info">Cerrador:</spam>
+        <spam class="alert-success" title="Cerrador PRBR">
+            {{ Prop::numeroVen($tCerradorPrbr, 2) }}
+            @if (0 < $tCerradorPrbrSel)
+            ({{ Prop::numeroVen($tCerradorPrbrSel, 2) }} [{{ $tLadosCer }}])
+            @endif
+        </spam>
+        @if (0 < $tBonificaciones)
+        <spam class="alert-info">Bons:</spam>
         <spam class="alert-success" title="Bonificaciones">
-            {{ $tBonificaciones }}</spam>
-        <spam class="alert-info" title="Comision bancaria">
-            {{ $tComisionBancaria }}</spam>
+            {{ Prop::numeroVen($tBonificaciones, 2) }}</spam>
+        @endif
+        @if (0 < $tComisionBancaria)
+        <spam class="alert-info">Cons:</spam>
+        <spam class="alert-success" title="Comision bancaria">
+            {{ Prop::numeroVen($tComisionBancaria, 2) }}</spam>
+        @endif
+        <spam class="alert-info">Neto:</spam>
+        <spam class="alert-success" title="Ingreso neto de la oficina">
+            {{ Prop::numeroVen($tIngresoNetoOfici, 2) }}</spam>
       </div>
     </form>
 </div>
@@ -144,11 +163,11 @@
                 Franquic
             </th>
             <th scope="col">
-                Regalia
+                Regalia<br>
                 SANAF-5%
             </th>
             <th scope="col">
-                Montos
+                Montos<br>
                 Base
             </th>
             <th scope="col" title="Pago asesor captador, gerente y cerrador.">
@@ -165,7 +184,8 @@
         <?php $var++;   // Variable para manejar el estilo de cada fila. ?>
         <tr class="
         @if ('I' == $propiedad->estatus)
-            table-light
+            {{--table-light--}}
+            table-active
         @elseif ('P' == $propiedad->estatus)
             table-warning
         @elseif ('S' == $propiedad->estatus)
@@ -179,7 +199,7 @@
         @endif
         ">
             <td title="{{ $propiedad->id }}) {{ $propiedad->estatus_alfa }}
-Reporte en casa nacional: {{ $propiedad->reporte_casa_nacional }}
+Reporte en casa nacional: {{ $propiedad->reporte_casa_nacional_ven }}
 Estatus en sistema C21: {{ $propiedad->estatus_c21_alfa.(($propiedad->pagado_casa_nacional)?' y PAGADO A CASA NACIONAL':'') }}
 {{ (($propiedad->factura_AyS)?'Factura A & S: '.$propiedad->factura_AyS.'.':'') }}">
                 <spam class="float-right"> {{ $propiedad->codigo }} </spam>
@@ -204,20 +224,29 @@ Estatus en sistema C21: {{ $propiedad->estatus_c21_alfa.(($propiedad->pagado_cas
         <?php $propiedad->mMoZero = false;  // Si el monto es 0, mostrar 'espacio vacio'. ?>
         <?php $propiedad->espMonB = false;  // Eliminar espacio entre simbolo de la moneda y el monto. ?>
 
-                <spam class="float-right">
+                <spam class="float-right" title="Precio del inmueble">
                     {{ $propiedad->precio_ven }}
+                </spam><br>
+                <spam title="Comisi&oacute;n((H)">
+                    Com:{{ $propiedad->comision_p }}
+                </spam><br>
+                <spam class="float-right" title="IVA(J)">
+                    IVA:{{ $propiedad->iva_p }}
+                </spam><br>
+                <spam class="float-right" title="Compartido con IVA(L)">
+                    {{ $propiedad->compartido_con_iva }}
                 </spam>
             </td>
 
             <td title="Compartido con otra oficina
                   s/IVA(M):{{ $propiedad->compartido_sin_iva }};
-                  IVA:{{ $propiedad->iva_p }};
- Compartido c/IVA(L):{{ $propiedad->compartido_con_iva }}"
+ Reserva s/IVA(I):{{ $propiedad->reserva_sin_iva }}
+ Reserva c/IVA(K):{{ $propiedad->reserva_con_iva }}"
             >
                 {{ $propiedad->lados }}
             </td>
 
-            <td title="Porcentaje reportado a casa nacional: {{ $propiedad->reportado_casa_nacional_p }}">
+            <td title="Franquicia">
                 <spam class="float-right" title="Franquicia de reserva sin IVA(O) ({{ $propiedad->porc_franquicia_p }})">
                     {{ $propiedad->franquicia_reservado_sin_iva }} 
                 </spam><br>
@@ -226,7 +255,10 @@ Estatus en sistema C21: {{ $propiedad->estatus_c21_alfa.(($propiedad->pagado_cas
                 </spam><br>
                 <spam class="float-right" title="Franquicia a pagar reportada(Q) ({{ $propiedad->reportado_casa_nacional_p }})">
                     {{ $propiedad->franquicia_pagar_reportada }}
-                </spam>
+                </spam><br>
+                <spam title="Porcentaje reportado a casa nacional(R)">
+                    RCN:{{ $propiedad->reportado_casa_nacional_p }}
+                </spam><br>
             </td>
 
             <td>
@@ -308,7 +340,9 @@ Comisi&oacute;n del asesor cerrador."
         @endforeach
         </tbody>
     </table>
+    @if ($paginar)
     {{ $propiedades->links() }}
+    @endif
     @else
         <p>No hay propiedades registradas.</p>
     @endif

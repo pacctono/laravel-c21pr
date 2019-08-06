@@ -35,7 +35,8 @@ class User extends Authenticatable
     ];
 
     protected $casts = [
-        'is_admin' => 'boolean'
+        'is_admin' => 'boolean',
+        'socio' => 'boolean'
     ];
 
     public function contactos()    // user_id

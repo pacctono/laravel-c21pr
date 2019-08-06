@@ -31,7 +31,8 @@ class UserSeeder extends Seeder
             'fecha_ingreso' => '2015-06-01',
             'fecha_nacimiento' => '1986-11-24',
             'password' => bcrypt('1234567'),
-            'is_admin' => true
+            'is_admin' => true,
+            'socio' => true
         ]);
 
         User::create([
@@ -44,7 +45,8 @@ class UserSeeder extends Seeder
             'fecha_ingreso' => '2015-06-01',
             'fecha_nacimiento' => '1986-10-15',
             'password' => bcrypt('1234567'),
-            'is_admin' => true
+            'is_admin' => true,
+            'socio' => true
         ]);
 
         User::create([
@@ -57,7 +59,8 @@ class UserSeeder extends Seeder
             'fecha_ingreso' => '2015-06-01',
             'fecha_nacimiento' => '1983-04-11',
             'password' => bcrypt('1234567'),
-            'is_admin' => true
+            'is_admin' => true,
+            'socio' => true
         ]);
 
         User::create([
@@ -70,7 +73,8 @@ class UserSeeder extends Seeder
             'fecha_ingreso' => '2015-06-01',
             'fecha_nacimiento' => '1988-05-07',
             'password' => bcrypt('1234567'),
-            'is_admin' => true
+            'is_admin' => true,
+            'socio' => true
         ]);
 
         User::create([

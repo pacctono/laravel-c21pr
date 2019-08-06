@@ -96,6 +96,9 @@
                 Tablas
               <span class="caret"></span></a>
               <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="{{ route('propiedades.grabar') }}">
+                  Grabar propiedades
+                </a></li>
                 <li><a class="dropdown-item" href="{{ route('deseo') }}">
                   Deseo
                 </a></li>

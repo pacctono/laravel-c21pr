@@ -30,6 +30,9 @@ class UserSeeder extends Seeder
             'licencia_mls' => '66133',
             'fecha_ingreso' => '2015-06-01',
             'fecha_nacimiento' => '1986-11-24',
+            'sexo' => 'M',
+            'direccion' => 'Barcelona',
+            'estado_civil' => 'C',
             'password' => bcrypt('1234567'),
             'is_admin' => true,
             'socio' => true
@@ -44,6 +47,9 @@ class UserSeeder extends Seeder
             'licencia_mls' => '66780',
             'fecha_ingreso' => '2015-06-01',
             'fecha_nacimiento' => '1986-10-15',
+            'sexo' => 'M',
+            'direccion' => 'Puerto La Cruz',
+            'estado_civil' => 'C',
             'password' => bcrypt('1234567'),
             'is_admin' => true,
             'socio' => true
@@ -58,6 +64,9 @@ class UserSeeder extends Seeder
             'licencia_mls' => '66132',
             'fecha_ingreso' => '2015-06-01',
             'fecha_nacimiento' => '1983-04-11',
+            'sexo' => 'F',
+            'direccion' => 'Barcelona',
+            'estado_civil' => 'C',
             'password' => bcrypt('1234567'),
             'is_admin' => true,
             'socio' => true
@@ -72,6 +81,9 @@ class UserSeeder extends Seeder
             'licencia_mls' => '66265',
             'fecha_ingreso' => '2015-06-01',
             'fecha_nacimiento' => '1988-05-07',
+            'sexo' => 'F',
+            'direccion' => 'Puerto La Cruz',
+            'estado_civil' => 'C',
             'password' => bcrypt('1234567'),
             'is_admin' => true,
             'socio' => true
@@ -85,6 +97,9 @@ class UserSeeder extends Seeder
             'email_c21' => 'dcarrero01@century21.com.ve',
             'fecha_ingreso' => '2015-06-01',
             'fecha_nacimiento' => '1967-02-09',
+            'sexo' => 'F',
+            'direccion' => 'Puerto La Cruz',
+            'estado_civil' => 'C',
             'password' => bcrypt('1234567'),
         ]);
 
@@ -100,6 +115,7 @@ class UserSeeder extends Seeder
             'direccion' => 'Lechería',
             'estado_civil' => 'C',
             'password' => bcrypt('1234567'),
+            'activo' => false,
         ]);
 
         User::create([
@@ -110,7 +126,11 @@ class UserSeeder extends Seeder
             'email_c21' => 'earias@century21.com.ve',
             'licencia_mls' => '66927',
             'fecha_nacimiento' => '1982-11-25',
+            'sexo' => 'M',
+            'direccion' => 'Lechería',
+            'estado_civil' => 'C',
             'password' => bcrypt('1234567'),
+            'activo' => false,
         ]);
 
         User::create([
@@ -121,6 +141,9 @@ class UserSeeder extends Seeder
             'email_c21' => 'yainagas@century21.com.ve',
             'licencia_mls' => '67663',
             'fecha_ingreso' => '2016-10-17',
+            'sexo' => 'F',
+            'direccion' => 'Lecheria',
+            'estado_civil' => 'C',
             'password' => bcrypt('1234567'),
         ]);
 
@@ -132,18 +155,64 @@ class UserSeeder extends Seeder
             'licencia_mls' => '68008',
             'fecha_ingreso' => '2016-10-17',
             'fecha_nacimiento' => '1990-04-28',
+            'sexo' => 'F',
+            'direccion' => 'Lecheria',
+            'estado_civil' => 'S',
             'password' => bcrypt('1234567'),
         ]);
 
         User::create([
-            'cedula' => '15394644',
-            'name' => 'Karel Carrizales',
-            'telefono' => '4241574563',
-            'email' => 'karelvictoria@gmail.com',
-            'email_c21' => 'kcarrizales@century21.com.ve',
-            'licencia_mls' => '68642',
-            'fecha_ingreso' => '2017-10-30',
-            'fecha_nacimiento' => '1982-12-22',
+            'cedula' => '12607515',
+            'name' => 'Yoselin Cordova',
+            'telefono' => '4141940259',
+            'email' => 'c21yoselincordova@gmail.com',
+            'licencia_mls' => '69020',
+            'fecha_ingreso' => '2019-05-18',
+            'fecha_nacimiento' => '1976-04-22',
+            'sexo' => 'F',
+            'direccion' => 'Puerto La Cruz',
+            'estado_civil' => 'S',
+            'password' => bcrypt('1234567'),
+        ]);
+
+        User::create([
+            'cedula' => '12915118',
+            'name' => 'Victor Villarroel',
+            'telefono' => '4166815315',
+            'email' => 'c21victorvillarroel@gmail.com',
+            'fecha_ingreso' => '2018-11-15',
+            'fecha_nacimiento' => '1976-06-01',
+            'sexo' => 'M',
+            'direccion' => 'Puerto La Cruz',
+            'estado_civil' => 'S',
+            'password' => bcrypt('1234567'),
+        ]);
+
+        User::create([
+            'cedula' => '24708720',
+            'name' => 'Jhon Rios',
+            'telefono' => '4129460770',
+            'email' => 'century21jrios@gmail.com',
+            'fecha_ingreso' => '2019-02-01',
+            'fecha_nacimiento' => '1994-11-16',
+            'sexo' => 'M',
+            'direccion' => 'Puerto La Cruz',
+            'estado_civil' => 'S',
+            'password' => bcrypt('1234567'),
+        ]);
+
+        User::create([
+            'cedula' => '20632471',
+            'name' => 'Hector Rodriguez',
+            'telefono' => '4127968869',
+            'email' => 'c21hectorrodriguez@gmail.com',
+            'email_c21' => 'hrodriguez02@century21.com.ve',
+            'licencia_mls' => '69542',
+            'fecha_ingreso' => '2019-03-15',
+            'fecha_nacimiento' => '1991-06-27',
+            'sexo' => 'M',
+            'direccion' => 'Barcelona',
+            'estado_civil' => 'S',
             'password' => bcrypt('1234567'),
         ]);
     }

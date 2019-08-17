@@ -30,6 +30,7 @@ class CreateUsersTable extends Migration
             $table->string('password', 160);
             $table->boolean('is_admin')->default(false);
             $table->boolean('socio')->default(false);
+            $table->boolean('activo')->default(true);
             $table->rememberToken();
             $table->timestamps();
         });

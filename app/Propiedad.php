@@ -74,6 +74,16 @@ class Propiedad extends Model
         return $this->belongsTo(User::class, 'asesor_cerrador_id');
     }
 
+    public function scopeValido($query)
+    {
+        return $query->where('estatus', '<>', 'S');
+    }
+
+    public function scopeNoValido($query)
+    {
+        return $query->where('estatus', 'S');
+    }
+
     public function scopeOfFecha($query, $fechaDesde, $fechaHasta)
     {
         return $query->whereBetween('created_at', [$fechaDesde, $fechaHasta]);
@@ -146,7 +156,7 @@ class Propiedad extends Model
     public function getReservaEnAttribute()
     {
         if (null == $this->fecha_reserva) return '';
-        return $this->fecha_reserva->timezone(Fecha::$ZONA)->format('d/m/Y');
+        return $this->fecha_reserva->format('d/m/Y');
     }
 
     public function getReservaDiaSemanaAttribute()
@@ -171,7 +181,7 @@ class Propiedad extends Model
     public function getFirmaEnAttribute()
     {
         if (null == $this->fecha_firma) return '';
-        return $this->fecha_firma->timezone(Fecha::$ZONA)->format('d/m/Y');
+        return $this->fecha_firma->format('d/m/Y');
     }
 
     public function getFirmaDiaSemanaAttribute()
@@ -241,6 +251,11 @@ class Propiedad extends Model
         return round((($this->comision)/100)*$this->precio, 2);
     }
 
+/*    public function getReservaSinIvaOrgAttribute()             // I
+    {
+        return round((($this->comision)/100)*$this->precio, 2);
+    }
+ */
     public function reservaConIva()             // K
     {
         return round(((100+$this->iva)/100)*$this->reservaSinIva(), 2);

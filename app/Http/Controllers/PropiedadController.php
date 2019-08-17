@@ -54,85 +54,69 @@ class PropiedadController extends Controller
         return $cols;
     }       // Final del metodo columnas.
 
-    protected function totales($propiedads, $cap=0, $cer=0)
-    {
-        $propiedades = clone $propiedads;
-
-        $filas = $propiedades->where('estatus','<>','S')->count();      // # propiedades para vista propiedades.index.
-        $tPrecio = $propiedades->where('estatus', '<>', 'S')->sum('precio'); // total precio para vista propiedades.index.
-        $tLados = (int)$propiedades->where('estatus', '<>', 'S')->sum('lados'); // total precio para vista propiedades.index.
-        $tCompartidoConIva = 0.00;          // 'L' de la hoja de calculo de Alirio.
-        $tFranquiciaSinIva = 0.00;          // 'O' de la hoja de calculo de Alirio.
-        $tFranquiciaConIva = 0.00;          // 'P' de la hoja de calculo de Alirio.
-        $tFranquiciaPagarR = 0.00;          // 'Q' de la hoja de calculo de Alirio.
-        $tRegalia          = 0.00;          // 'S'.
-        $tSanaf5PorCiento  = 0.00;          // 'T'.
-        $tOficinaBrutoReal = 0.00;          // 'U'.
-        $tBaseHonorariosSo = 0.00;          // 'V'.
-        $tBaseParaHonorari = 0.00;          // 'W'.
-        $tCaptadorPrbr     = 0.00;          // 'X'.
-        $tCaptadorPrbrSel  = 0.00;          // 'X'.
-        $tGerente          = 0.00;          // 'Y'.
-        $tCerradorPrbr     = 0.00;          // 'Z'.
-        $tCerradorPrbrSel  = 0.00;          // 'Z'.
-        $tBonificaciones   = 0.00;          // 'AA'.
-        $tComisionBancaria = $propiedades->sum('comision_bancaria');          // 'AB'.
-        $tIngresoNetoOfici = 0.00;          // 'AC'.
-        $tLadosCap         = 0.00;          // Lados captados.
-        $tLadosCer         = 0.00;          // Lados cerrados.
-        foreach ($propiedades->get() as $prop) {
-            if ('S' != $prop->estatus) {
-                $tCompartidoConIva += $prop->compartidoConIva();
-                $tFranquiciaSinIva += $prop->franquiciaReservadoSinIva();
-                $tFranquiciaConIva += $prop->franquiciaReservadoConIva();
-                $tFranquiciaPagarR += $prop->franquiciaPagarReportada();
-                $tRegalia          += $prop->regalia();
-                $tSanaf5PorCiento  += $prop->sanaf5PorCiento();
-                $tOficinaBrutoReal += $prop->oficinaBrutoReal();
-                $tBaseHonorariosSo += $prop->baseHonorariosSocios();
-                $tBaseParaHonorari += $prop->baseParaHonorarios();
-                $tCaptadorPrbr     += $prop->captadorPrbr();
-                $tGerente          += $prop->gerente();
-                $tCerradorPrbr     += $prop->cerradorPrbr();
-                $tBonificaciones   += $prop->bonificaciones();
-                $tIngresoNetoOfici += $prop->ingresoNetoOficina();
-                if ($cap == $prop->asesor_captador_id) {
-                    $tCaptadorPrbrSel  += $prop->captadorPrbr();
-                    $tLadosCap += 1;
-                }
-                if ($cer == $prop->asesor_cerrador_id) {
-                    $tCerradorPrbrSel  += $prop->cerradorPrbr();
-                    $tLadosCer += 1;
-                }
-            }
+    protected function totalizar($props, $metodo, $dec=2) {
+        $tot = 0.00;
+        foreach ($props->get() as $p) {
+            $tot += $p->$metodo();
         }
-        $tPrecio           = round($tPrecio, 0);
-        $tCompartidoConIva = round($tCompartidoConIva, 2);
-        $tFranquiciaSinIva = round($tFranquiciaSinIva, 2);
-        $tFranquiciaConIva = round($tFranquiciaConIva, 2);
-        $tFranquiciaPagarR = round($tFranquiciaPagarR, 2);
-        $tRegalia          = round($tRegalia, 2);
-        $tSanaf5PorCiento  = round($tSanaf5PorCiento, 2);
-        $tOficinaBrutoReal = round($tOficinaBrutoReal, 2);
-        $tBaseHonorariosSo = round($tBaseHonorariosSo, 2);
-        $tBaseParaHonorari = round($tBaseParaHonorari, 2);
-        $tCaptadorPrbr     = round($tCaptadorPrbr, 2);
-        $tGerente          = round($tGerente, 2);
-        $tCerradorPrbr     = round($tCerradorPrbr, 2);
-        if (0.00 < $tBonificaciones) $tBonificaciones   = round($tBonificaciones, 2);
-        if (0.00 < $tComisionBancaria) $tComisionBancaria = round($tComisionBancaria, 2);
-        $tIngresoNetoOfici = round($tIngresoNetoOfici, 2);
-        if (0.00 < $tCaptadorPrbrSel) $tCaptadorPrbrSel  = round($tCaptadorPrbrSel, 2);
-        if (0.00 < $tCerradorPrbrSel) $tCerradorPrbrSel  = round($tCerradorPrbrSel, 2);
+        return round($tot, 2);
+    }
+    protected function totales($propiedads, $valido=True, $cap=0, $cer=0)
+    {
+        $propiedades = clone $propiedads;               // Los query modifican el arreglo propiedades.
+        if ($valido) $propiedades = $propiedades->valido();
+        $arrRetorno  = [];                              // Inicializo arreglo a retornar.
 
-        //dd($cap, $cer, $tIngresoNetoOfici, $tCaptadorPrbrSel, $tCerradorPrbrSel);
-        return array ($filas, $tPrecio, $tCompartidoConIva, $tLados,
-                    $tFranquiciaSinIva, $tFranquiciaConIva, $tFranquiciaPagarR,
-                    $tRegalia, $tSanaf5PorCiento, $tOficinaBrutoReal,
-                    $tBaseHonorariosSo, $tBaseParaHonorari, $tCaptadorPrbr,
-                    $tGerente, $tCerradorPrbr, $tBonificaciones, $tComisionBancaria,
-                    $tIngresoNetoOfici, $tCaptadorPrbrSel, $tCerradorPrbrSel,
-                    $tLadosCap, $tLadosCer);
+        $filas = $propiedades->count();      // # propiedades para vista propiedades.index.
+        $tPrecio = $propiedades->sum('precio'); // total precio para vista propiedades.index.
+        $tLados = (int)$propiedades->sum('lados'); // total precio para vista propiedades.index.
+        array_push($arrRetorno, $filas, $tPrecio, $tLados);
+        $metodos = ['compartidoConIva', 'franquiciaReservadoSinIva',
+                    'franquiciaReservadoConIva', 'franquiciaPagarReportada',
+                    'regalia', 'sanaf5PorCiento', 'oficinaBrutoReal',
+                    'baseHonorariosSocios', 'baseParaHonorarios',
+                    'captadorPrbr', 'gerente', 'cerradorPrbr',
+                    'bonificaciones', 'ingresoNetoOficina'
+        ];
+        foreach ($metodos as $met) {
+//            ${'t' . ucfirst($met)} = $this->totalizar($propiedades, $met, 2);
+            $tot = $this->totalizar($propiedades, $met, 2);
+            $arrRetorno[] = $tot;
+        }
+        $arrRetorno[] = round($propiedades->sum('comision_bancaria'), 2);          // 'AB'.
+
+// Recalcula 'captadorPrbr'[12], 'gerente'[13], 'cerradorPrbr'[14]; solo, los valores de la oficina.
+        $props = clone $propiedades;                     // Los query modifican el arreglo propiedades.
+        $arrRetorno[12] = $this->totalizar($props
+                                ->where('asesor_captador_id', '>', 1), 'captadorPrBr', 2);
+/*        $props = clone $propiedades;                     // Los query modifican el arreglo propiedades.
+        $arrRetorno[13] = $this->totalizar($props->where('asesor_captador_id', '>', 1)
+                                ->orWhere('asesor_cerrador_id', '>', 1), 'gerente', 2);*/
+        $props = clone $propiedades;                     // Los query modifican el arreglo propiedades.
+        $arrRetorno[14] = $this->totalizar($props
+                                ->where('asesor_cerrador_id', '>', 1), 'cerradorPrBr', 2);
+
+        $props = clone $propiedades;                     // Los query modifican el arreglo propiedades.
+        if (0 < $cap) {
+            $tLadosCap = $props->where('asesor_captador_id', $cap)->count();
+            $tCaptadorPrbrSel = $this->totalizar($props
+                                        ->where('asesor_captador_id', $cap), 'captadorPrBr', 2);
+        } else {
+            $tLadosCap = $props->where('asesor_captador_id', '>', 1)->count();
+            $tCaptadorPrbrSel = 0.00;
+        }
+        $props = clone $propiedades;                     // Los query modifican el arreglo propiedades.
+        if (0 < $cer) {
+            $tLadosCer = $props->where('asesor_cerrador_id', $cer)->count();
+            $tCerradorPrbrSel = $this->totalizar($props
+                                        ->where('asesor_cerrador_id', $cer), 'cerradorPrBr', 2);
+        } else {
+            $tLadosCer = $props->where('asesor_cerrador_id', '>', 1)->count();
+            $tCerradorPrbrSel = 0.00;
+        }
+        array_push($arrRetorno, $tCaptadorPrbrSel, $tCerradorPrbrSel, $tLadosCap, $tLadosCer);
+        //dd($arrRetorno);
+        return $arrRetorno;
     }
     /**
      * Display a listing of the resource.
@@ -149,7 +133,7 @@ class PropiedadController extends Controller
         $ruta = request()->path();
         $dato = request()->all();
         //dd($dato);
-        if (0 == count($dato)) $paginar = True;
+        if (1 >= count($dato)) $paginar = True;
         else $paginar = False;
 // Todo se inicializa, cuando se selecciona 'periodos' desde el menú horizontal.
         if (('GET' == request()->method()) and ('' == $orden) and (0 == count($dato))) {
@@ -216,17 +200,20 @@ class PropiedadController extends Controller
             $propiedades = $propiedades
                             ->where('fecha_reserva', '<=', now(Fecha::$ZONA));
         }
+        if ((0 == $captador) and (0 == $cerrador)) {
+            $propiedades = $propiedades->orWhereNull('fecha_reserva');
+        }
         $propiedades = $propiedades->orderBy($orden);   // Ordenar los items de los propiedades.
         if ('user_id' == $orden) {              // Si se pidió ordenar por id de usuario,
             $propiedades = $propiedades->orderBy('fecha_reserva');   // ordenar por fecha_reserva en cada usuario.
         }
-        list ($filas, $tPrecio, $tCompartidoConIva, $tLados, $tFranquiciaSinIva,
+        list ($filas, $tPrecio, $tLados, $tCompartidoConIva, $tFranquiciaSinIva,
                 $tFranquiciaConIva, $tFranquiciaPagarR, $tRegalia, $tSanaf5PorCiento,
                 $tOficinaBrutoReal, $tBaseHonorariosSo, $tBaseParaHonorari,
                 $tCaptadorPrbr, $tGerente, $tCerradorPrbr, $tBonificaciones,
-                $tComisionBancaria, $tIngresoNetoOfici, $tCaptadorPrbrSel,
+                $tIngresoNetoOfici, $tComisionBancaria, $tCaptadorPrbrSel,
                 $tCerradorPrbrSel, $tLadosCap, $tLadosCer) =
-                $this->totales($propiedades, $captador, $cerrador);
+                $this->totales($propiedades, True, $captador, $cerrador);
         //$propiedades = $propiedades->paginate(10);      // Pagina la impresión de 10 en 10
         if ($paginar) $propiedades = $propiedades->paginate(10);      // Pagina la impresión de 10 en 10
         else $propiedades = $propiedades->get();                      // Mostrar todos los registros.
@@ -262,17 +249,135 @@ class PropiedadController extends Controller
             $users[0]['name'] = 'Asesor otra oficina';
             $propiedades = Propiedad::where('id', '>', 0);   // condición dummy, solo para continuar armando la consulta.
         } else {
-//            return redirect('/propiedades');
             return redirect()->back();
         }
-        //dd($users);
 
-/*        list ($filas, $tPrecio, $tFranquiciaSinIva, $tFranquiciaConIva, $tFranquiciaPagarR,
-                $tRegalia, $tSanaf5PorCiento, $tOficinaBrutoReal, $tBaseHonorariosSo,
-                $tBaseParaHonorari, $tIngresoNetoOfici, $tCaptadorPrbr, $tGerente,
-                $tCerradorPrbr, $tBonificaciones, $tComisionBancaria) =*/
-        $totales = json_encode($this->totales($propiedades));
-        //dd($totales);
+        $totales = '';
+/*
+ * Calculo de totales por 'asesor' (user).
+ */
+        foreach ($users as $user) {
+            $props = clone $propiedades;               // Los query modifican el arreglo propiedades.
+            $props = $props->where('asesor_captador_id', $user->id)
+                        ->orWhere('asesor_cerrador_id', $user->id);
+            $arreglo = $this->totales($props, True, $user->id, $user->id);
+            array_unshift($arreglo, 'A', $user->id);
+            $totales .= json_encode($arreglo) . "\n";
+        }
+/*
+ * Calculo de totales por mes.
+ */
+        $fecha = DB::select("SELECT DATE_FORMAT(fecha_reserva, '%Y') AS Agno,
+                                    DATE_FORMAT(fecha_reserva, '%m') AS Mes
+                             FROM   propiedads
+                            GROUP BY 1, 2");
+        $anoMes = Array();
+        foreach($fecha as $fila) {
+            if (array_key_exists($fila->Agno, $anoMes))
+                $anoMes[$fila->Agno][] = $fila->Mes;
+            else $anoMes[$fila->Agno][] = $fila->Mes;
+        }
+        foreach($anoMes as $agno=>$meses) {
+            foreach ($meses as $mes) {
+                $props = clone $propiedades;               // Los query modifican el arreglo propiedades.
+                if (is_null($agno) or is_null($mes)) {
+                    $props = $props->whereNull('fecha_reserva');
+                } else {
+                    $props = $props->whereYear('fecha_reserva', $agno)
+                                    ->whereMonth('fecha_reserva', $mes);
+                }
+                $arreglo = $this->totales($props);
+                if (is_null($agno) or is_null($mes)) {
+                    array_unshift($arreglo, 'M', FECHA::hoy()->format('Y') . '-' . '00');
+                } else {
+                    array_unshift($arreglo, 'M', $agno . '-' . $mes);
+                }
+                $totales .= json_encode($arreglo) . "\n";
+            }
+        }
+
+/*
+ * Calculo de totales por 'estatus'. cols es usado, al final, para grabar las tablas.
+ */
+        $cols = $this->columnas();
+        $estatus = $cols['estatus']['opcion'];
+        foreach ($estatus as $op=>$desc) {
+            $props = clone $propiedades;               // Los query modifican el arreglo propiedades.
+            $props = $props->where('estatus', $op);
+            $arreglo = $this->totales($props, False);
+            array_unshift($arreglo, 'E', $op);
+            $totales .= json_encode($arreglo) . "\n";
+        }
+/*
+ * Calculo de totales por 'asesor' (user) y mes.
+ */
+        foreach ($users as $id=>$user) {
+            foreach($anoMes as $agno=>$meses) {
+                foreach ($meses as $mes) {
+                    $props = clone $propiedades;               // Los query modifican el arreglo propiedades.
+                    if (is_null($agno) or is_null($mes)) {
+                        $props = $props->where(function ($Q) use ($user) {
+                                            $Q->where('asesor_captador_id', $user->id)
+                                                ->orWhere('asesor_cerrador_id', $user->id);
+                                        })
+                                        ->whereNull('fecha_reserva');
+                    } else {
+                        $props = $props->where(function ($Q) use ($user) {
+                                            $Q->where('asesor_captador_id', $user->id)
+                                                ->orWhere('asesor_cerrador_id', $user->id);
+                                        })
+                                        ->whereYear('fecha_reserva', $agno)
+                                        ->whereMonth('fecha_reserva', $mes);
+                    }
+                    $arreglo = $this->totales($props, True, $user->id, $user->id);
+                    if (is_null($agno) or is_null($mes)) {
+                        array_unshift($arreglo, 'AM', $user->id,
+                                            FECHA::hoy()->format('Y') . '-' . '00');
+                    } else {
+                        array_unshift($arreglo, 'AM', $user->id, $agno . '-' . $mes);
+                    }
+                    $totales .= json_encode($arreglo) . "\n";
+                }
+            }
+        }
+/*
+ * Calculo de totales por mes y asesor (user).
+ */
+        foreach($anoMes as $agno=>$meses) {
+            foreach ($meses as $mes) {
+                foreach ($users as $user) {
+                    $props = clone $propiedades;               // Los query modifican el arreglo propiedades.
+                    if (is_null($agno) or is_null($mes)) {
+                        $props = $props->where(function ($Q) use ($user) {
+                                            $Q->where('asesor_captador_id', $user->id)
+                                                ->orWhere('asesor_cerrador_id', $user->id);
+                                        })
+                                        ->whereNull('fecha_reserva');
+                    } else {
+                        $props = $props->where(function ($Q) use ($user) {
+                                            $Q->where('asesor_captador_id', $user->id)
+                                                ->orWhere('asesor_cerrador_id', $user->id);
+                                        })
+                                        ->whereYear('fecha_reserva', $agno)
+                                        ->whereMonth('fecha_reserva', $mes);
+                    }
+                    $arreglo = $this->totales($props, True, $user->id, $user->id);
+                    if (is_null($agno) or is_null($mes)) {
+                        array_unshift($arreglo, 'MA',
+                                            FECHA::hoy()->format('Y') . '-' . '00', $user->id);
+                    } else {
+                        array_unshift($arreglo, 'MA', $agno . '-' . $mes, $user->id);
+                    }
+                    $totales .= json_encode($arreglo) . "\n";
+                }
+            }
+        }
+/*
+ * Calculo de totales generales.
+ */
+        $arreglo = $this->totales($propiedades);
+        array_unshift($arreglo, 'T', 'T');
+        $totales .= json_encode($arreglo) . "\n";
         $propiedades = $propiedades->get();
         $props       = '';
         foreach ($propiedades as $p) {
@@ -298,73 +403,14 @@ class PropiedadController extends Controller
                         (($p->reporte_casa_nacional)?
                                 number_format($p->reporte_casa_nacional, 0, ',', '.'):''),
                         nulo($p->factura_AyS), nulo($p->comentarios))) . "\n";
-/*            $props       .= $p->id . ';' .                          // #0  A
-                        $p->codigo . ';' .                          // #1  B
-                        $p->reserva_en . ';' .                      // #2  C
-                        $p->firma_en . ';' .                        // #3  D
-                        $p->negociacion . ';' .                     // #4  E
-                        '"' . $p->nombre . '"' . ';' .              // #5  F
-                        $p->estatus . ';' .				            // #6
-                        $p->moneda . ';' .				            // #7
-                        $p->precio . ';' .				            // #8  G
-                        $p->comision . ';' .				        // #9  H
-                        $p->reservaSinIva() . ';' .		            // #10 I
-                        $p->iva . ';' .				                // #11 J
-                        $p->reservaConIva() . ';' .		            // #12 K
-                        $p->compartidoConIva() . ';' .		        // #13 L
-                        $p->compartidoSinIva() . ';' .		        // #14 M
-                        $p->lados . ';' .				            // #15 N
-                        $p->franquiciaReservadoSinIva() . ';' .		// #16 O
-                        $p->franquiciaReservadoConIva() . ';' .		// #17 P
-                        $p->porc_franquicia . ';' .				    // #18
-                        $p->franquiciaPagarReportada() . ';' .		// #19 Q
-                        $p->reportado_casa_nacional . ';' .			// #20 R
-                        $p->porc_regalia . ';' .				    // #21
-                        $p->regalia() . ';' .				        // #22 S
-                        $p->sanaf5PorCiento() . ';' .				// #23 T
-                        $p->oficinaBrutoReal() . ';' .				// #24 U
-                        $p->baseHonorariosSocios() . ';' .			// #25 V
-                        $p->baseParaHonorarios() . ';' .			// #26 W
-                        $p->asesor_captador_id . ';' .				// #27 AE
-                        $p->asesor_captador . ';' .				    // #28 AE
-                        $p->porc_captador_prbr . ';' .				// #29
-                        $p->captadorPrbr() . ';' .				    // #30 X
-                        $p->porc_gerente . ';' .			    	// #31
-                        $p->gerente() . ';' .				        // #32 Y
-                        $p->asesor_cerrador_id . ';' .				// #33 AF
-                        $p->asesor_cerrador . ';' .				    // #34 AF
-                        $p->porc_cerrador_prbr . ';' .				// #35
-                        $p->cerradorPrbr() . ';' .				    // #36 Z
-                        $p->porc_bonificacion . ';' .				// #37
-                        $p->bonificaciones() . ';' .				// #38 AA
-                        $p->comision_bancaria . ';' .				// #39 AB
-                        $p->ingresoNetoOficina() . ';' .			// #40 AC
-                        '"' . $p->numero_recibo . '"' . ';' .       // #41 AD
-                        '"' . $p->pago_gerente . '"' . ';' .        // #42 AG
-                        '"' . $p->factura_gerente . '"' . ';' .     // #43 AH
-                        '"' . $p->pago_asesores . '"' . ';' .       // #44 AI
-                        '"' . $p->factura_asesores . '"' . ';' .    // #45 AJ
-                        '"' . $p->pago_otra_oficina . '"' . ';' .   // #46 AK
-                        $p->pagado_casa_nacional . ';' .			// #47 AL
-                        $p->estatus_sistema_c21 . ';' .				// #48 AM
-                        $p->reporte_casa_nacional . ';' .			// #49 AN
-                        $p->factura_AyS . ';' .				        // #50 AP
-                        '"' . $p->comentarios . '"' . "\n";         // #51 AO*/
         }
-/*        $totales = $filas . ';' . $tPrecio . ';' . $tFranquiciaSinIva . ';' .
-		            $tFranquiciaConIva . ';' . $tFranquiciaPagarR . ';' .
-	            	$tRegalia . ';' . $tSanaf5PorCiento . ';' . $tOficinaBrutoReal .
-		            ';' . $tBaseHonorariosSo . ';' .  $tBaseParaHonorari . ';' .
-                    $tIngresoNetoOfici . ';' . $tCaptadorPrbr . ';' . $tGerente .
-                    ';' . $tCerradorPrbr . ';' . $tBonificaciones . ';' .
-                    $tComisionBancaria . "\n";*/
-        //dd($props);
 /*
  * Estos archivos grabados con Storage seran guardados en 'storage/app/public'
  * Usando: composer artisan storage:link, se crea un enlace que permite acceder
  * los archivos desde public/storage
  */
-        $cols = $this->columnas();
+        $control = FECHA::hoy()->format('d-m-Y');
+        Storage::put('public/control.txt', $control);
         Storage::put('public/asesores.txt', $users);
         Storage::put('public/propiedades.txt', $props);
         Storage::put('public/totales.txt', $totales);

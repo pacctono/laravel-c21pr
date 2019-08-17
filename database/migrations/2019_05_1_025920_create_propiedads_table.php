@@ -18,14 +18,14 @@ class CreatePropiedadsTable extends Migration
             $table->string('codigo', 6);
             $table->date('fecha_reserva')->nullable();
             $table->date('fecha_firma')->nullable();
-            $table->enum('negociacion', ['V', 'A'])->comment('[V]enta, [A]luiler');
+            $table->enum('negociacion', ['V', 'A'])->comment('[V]enta,[A]luiler');
             $table->string('nombre', 160);
             $table->enum('estatus', ['I', 'P', 'C', 'S'])
-                ->comment('[I]nmueble pendiente, Pagos pendientes, inmueble [C]errado y pagos realizados, [S]negociacion caida')
+                ->comment('[I]nmueble pendiente,Pagos pendientes,inmueble [C]errado y pagos realizados,[S]negociacion caida')
                 ->default('I');
             $table->unsignedInteger('user_id');
             $table->foreign('user_id')->references('id')->on('users');
-            $table->enum('moneda', ['$', 'Bs'])->default('$')->comment('$, Eu, Bs');
+            $table->enum('moneda', ['$', 'Eu', 'Bs'])->default('$')->comment('$,Eu,Bs');
             $table->float('precio', 20, 2)->comment('Precio del inmueble');
             $table->float('comision', 4, 2)->default(5.00)->comment('Porcentaje de comision');
 //            $table->float('reserva_sin_iva', 18, 2)->nullable();
@@ -117,7 +117,7 @@ class CreatePropiedadsTable extends Migration
                 ->comment('Forma de pago a la(s) otra(s) oficina(s)');
             $table->boolean('pagado_casa_nacional')->default(false);
             $table->enum('estatus_sistema_c21', ['V', 'A', 'P'])->default('P')
-                ->comment('[V]endido, (A)ctivo, [P]endiente');
+                ->comment('[V]endido,(A)ctivo,[P]endiente');
             $table->string('reporte_casa_nacional', 10)->nullable()
                 ->comment('Número de reporte a casa nacional');
             $table->string('comentarios', 600)->nullable();

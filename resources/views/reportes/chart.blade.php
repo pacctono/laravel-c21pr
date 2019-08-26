@@ -58,26 +58,62 @@
 <table class="table table-striped table-hover table-bordered">
   <thead class="thead-dark">
     <tr>
-      @if ('Conexion' == $muestra)
-      <th scope="col">Asesor</th>
+      <th scope="col">
+      @if (('Conexion' == $muestra) ||
+           ('Lados' == $muestra) ||
+           ('Comision' == $muestra))
+        Asesor
+      @elseif (('Negociaciones' == $muestra) ||
+           ('LadMes' == $muestra) ||
+           ('ComMes' == $muestra))
+        Mes
       @else
-      <th scope="col">{{ $muestra }}</th>
+        {{ $muestra }}
       @endif
+      </th>
+      <th scope="col">
       @if ('Conexion' == $muestra)
-      <th scope="col">Conexiones</th>
+        Conexiones
+      @elseif (('Lados' == $muestra) ||
+               ('Comision' == $muestra) ||
+               ('Negociaciones' == $muestra))
+        {{ $muestra }}
+      @elseif ('LadMes' == $muestra)
+        Lados
+      @elseif ('ComMes' == $muestra)
+        Comision
       @else
-      <th scope="col">Atendidos</th>
+        Atendidos
       @endif
+      </th>
+      <th scope="col">
+      @if (('Conexion' == $muestra) ||
+           ('Lados' == $muestra) ||
+           ('Comision' == $muestra))
+        Asesor
+      @elseif (('Negociaciones' == $muestra) ||
+           ('LadMes' == $muestra) ||
+           ('ComMes' == $muestra))
+        Mes
+      @else
+        {{ $muestra }}
+      @endif
+      </th>
+      <th scope="col">
       @if ('Conexion' == $muestra)
-      <th scope="col">Asesor</th>
+        Conexiones
+      @elseif (('Lados' == $muestra) ||
+               ('Comision' == $muestra) ||
+               ('Negociaciones' == $muestra))
+        {{ $muestra }}
+      @elseif ('LadMes' == $muestra)
+        Lados
+      @elseif ('ComMes' == $muestra)
+        Comision
       @else
-      <th scope="col">{{ $muestra }}</th>
+        Atendidos
       @endif
-      @if ('Conexion' == $muestra)
-      <th scope="col">Conexiones</th>
-      @else
-      <th scope="col">Atendidos</th>
-      @endif
+      </th>
     </tr>
   </thead>
   <tbody>
@@ -91,11 +127,33 @@
       {{ $elemento->fecha }}
     @elseif ('Origen' == $muestra)
       {{ $elemento->descripcion }}
+    @elseif (('Negociaciones' == $muestra) ||
+             ('ComMes' == $muestra) ||
+             ('LadMes' == $muestra))
+      @if (('' == $elemento->agno) || ('' == $elemento->mes))
+        Fecha no suministrada
+      @else
+        {{ $elemento->agno . '-' . $elemento->mes }}
+      @endif
     @else
       {{ $elemento->name }}
     @endif
       </td>
-      <td>{{ $elemento->atendidos }}</td>
+      <td>
+    @if ('Lados' == $muestra)
+      {{ $elemento->captadas + $elemento->cerradas }}
+    @elseif ('Comision' == $muestra)
+      {{ $elemento->comision }}
+    @elseif ('Negociaciones' == $muestra)
+      {{ $elemento->negociaciones }}
+    @elseif ('LadMes' == $muestra)
+      {{ $elemento->lados }}
+    @elseif ('ComMes' == $muestra)
+      {{ $elemento->comision }}
+    @else
+      {{ $elemento->atendidos }}
+    @endif
+      </td>
     @if (0 != ($loop->index % 2))
     </tr>
     @endif

@@ -25,40 +25,40 @@
 	<p>Comisi&oacute;n: <spam class="alert-info">
 	    {{ $propiedad->comision_p }}
         </spam>&nbsp;Reserva sin IVA:<spam class="alert-info">
-            {{ $propiedad->reserva_sin_iva }}
+            {{ $propiedad->reserva_sin_iva_ven }}
         </spam>&nbsp;Reserva con IVA:<spam class="alert-info">
-            {{ $propiedad->reserva_con_iva }}
+            {{ $propiedad->reserva_con_iva_ven }}
         </spam>&nbsp;<spam class="alert-info">(IVA:
             {{ $propiedad->iva_p }})
         </spam></p>
 	<p>Lados: <spam class="alert-info">
         {{ $propiedad->lados }}
         </spam>&nbsp;Compartido con otra oficina sin IVA:<spam class="alert-info">
-            {{ $propiedad->compartido_sin_iva }}
+            {{ $propiedad->compartido_sin_iva_ven }}
         </spam>&nbsp;Compartido con otra oficina con IVA:<spam class="alert-info">
-            {{ $propiedad->compartido_con_iva }}
+            {{ $propiedad->compartido_con_iva_ven }}
         </spam></p>
 	<p>Reportado a casa nacional: <spam class="alert-info">
         {{ $propiedad->reportado_casa_nacional_p }}
         </spam>&nbsp;Franquicia de reserva sin IVA:<spam class="alert-info">
-            {{ $propiedad->franquicia_reservado_sin_iva }}
+            {{ $propiedad->franquicia_reservado_sin_iva_ven }}
         </spam>&nbsp;Franquicia de reserva con IVA:<spam class="alert-info">
-            {{ $propiedad->franquicia_reservado_con_iva }}
+            {{ $propiedad->franquicia_reservado_con_iva_ven }}
         </spam></p>
 	<p>Franquicia a pagar reportada: <spam class="alert-info">
-            {{ $propiedad->franquicia_pagar_reportada }}
+            {{ $propiedad->franquicia_pagar_reportada_ven }}
         </spam>&nbsp;Regalia: <spam class="alert-info">
-            {{ $propiedad->regalia }}
+            {{ $propiedad->regalia_ven }}
             &nbsp;({{ $propiedad->porc_regalia_p }})
         </spam>&nbsp;SANAF 5%: <spam class="alert-info">
-            {{ $propiedad->sanaf_5_por_ciento }}
+            {{ $propiedad->sanaf_5_por_ciento_ven }}
         </spam></p>
     <p>Oficina bruto real: <spam class="alert-info">
-            {{ $propiedad->oficina_bruto_real }}
+            {{ $propiedad->oficina_bruto_real_ven }}
         </spam>&nbsp; Base para honorarios socios: <spam class="alert-info">
-            {{ $propiedad->base_honorarios_socios }}
+            {{ $propiedad->base_honorarios_socios_ven }}
         </spam>&nbsp; Base para honorarios: <spam class="alert-info">
-            {{ $propiedad->base_para_honorarios }}
+            {{ $propiedad->base_para_honorarios_ven }}
         </spam></p>
     <p>Asesor captador: <spam class="alert-info">
             {{ ('1' == $propiedad->asesor_captador_id)?
@@ -68,7 +68,7 @@
             [{{ (($propiedad->aplicar_porc_captador)?'*':'') .
                                             $propiedad->porc_captador_prbr_p }}]
         <spam class="alert-info">
-            {{ ($propiedad->captador_prbr) }}
+            {{ ($propiedad->captador_prbr_ven) }}
         </spam>&nbsp;Asesor cerrador: <spam class="alert-info">
             {{ ('1' == $propiedad->asesor_cerrador_id)?
                     $propiedad->asesor_cerrador:
@@ -77,19 +77,19 @@
             [{{ (($propiedad->aplicar_porc_cerrador)?'*':'') .
                                             $propiedad->porc_cerrador_prbr_p }}]
         <spam class="alert-info">
-            {{ ($propiedad->cerrador_prbr) }}
+            {{ ($propiedad->cerrador_prbr_ven) }}
         </spam></p>
     <p>GERENTE:
         [{{ (($propiedad->aplicar_porc_gerente)?'*':'') .
                                             $propiedad->porc_gerente_p }}]
         <spam class="alert-info">
-            {{ $propiedad->gerente }}
+            {{ $propiedad->gerente_ven }}
         </spam>&nbsp;Bonificaciones: <spam class="alert-info">
-            {{ $propiedad->bonificaciones }}
+            {{ $propiedad->bonificaciones_ven }}
         </spam>&nbsp;Comisi&oacute;n bancaria descontada: <spam class="alert-info">
             {{ $propiedad->comision_bancaria_ven }}
         </spam>&nbsp;Ingreso neto a oficina: <spam class="alert-info">
-            {{ $propiedad->ingreso_neto_oficina }}
+            {{ $propiedad->ingreso_neto_oficina_ven }}
         </spam></p>
     <p>Recibo No.: <spam class="alert-info">
         {{ ($propiedad->numero_recibo)?$propiedad->numero_recibo:'?' }}

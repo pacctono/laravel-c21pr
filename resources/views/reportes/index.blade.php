@@ -66,19 +66,35 @@
   <thead class="thead-dark">
     <tr>
       <th scope="col">
-      @if (('Conexion' == $muestra) || ('Cumpleanos' == $muestra))
-      Asesor
+      @if (('Conexion' == $muestra) ||
+           ('Cumpleanos' == $muestra) ||
+           ('Lados' == $muestra) ||
+           ('Comision' == $muestra))
+        Asesor
+      @elseif (('Negociaciones' == $muestra) ||
+           ('LadMes' == $muestra) ||
+           ('ComMes' == $muestra) ||
+           ('Cumpleanos' == $muestra))
+        Mes
       @else
-      {{ $muestra }}
+        {{ $muestra }}
       @endif
       </th>
       <th scope="col">
       @if ('Conexion' == $muestra)
-      Conexiones
+        Conexiones
       @elseif ('Cumpleanos' == $muestra)
-      Cumpleaños
+        Cumpleaños
+      @elseif (('Lados' == $muestra) ||
+               ('Comision' == $muestra) ||
+               ('Negociaciones' == $muestra))
+        {{ $muestra }}
+      @elseif ('LadMes' == $muestra)
+        Lados
+      @elseif ('ComMes' == $muestra)
+        Comision
       @else
-      Atendidos
+        Atendidos
       @endif
       </th>
     </tr>
@@ -92,6 +108,14 @@
       {{ $elemento->fecha }}
     @elseif ('Origen' == $muestra)
       {{ $elemento->descripcion }}
+    @elseif (('Negociaciones' == $muestra) ||
+             ('ComMes' == $muestra) ||
+             ('LadMes' == $muestra))
+      @if (('' == $elemento->agno) || ('' == $elemento->mes))
+        Fecha no suministrada
+      @else
+        {{ $elemento->agno . '-' . $elemento->mes }}
+      @endif
     @else
       {{ $elemento->name }}
     @endif
@@ -105,6 +129,16 @@
           <span class="oi oi-envelope-closed"></span>
       </a>
       @endif
+    @elseif ('Lados' == $muestra)
+      {{ $elemento->captadas + $elemento->cerradas }}
+    @elseif ('Comision' == $muestra)
+      {{ $elemento->comision }}
+    @elseif ('Negociaciones' == $muestra)
+      {{ $elemento->negociaciones }}
+    @elseif ('LadMes' == $muestra)
+      {{ $elemento->lados }}
+    @elseif ('ComMes' == $muestra)
+      {{ $elemento->comision }}
     @else
       {{ $elemento->atendidos }}
     @endif

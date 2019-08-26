@@ -251,22 +251,27 @@ class Propiedad extends Model
         return round((($this->comision)/100)*$this->precio, 2);
     }
 
-/*    public function getReservaSinIvaOrgAttribute()             // I
+    public function getReservaSinIvaAttribute()             // I
     {
         return round((($this->comision)/100)*$this->precio, 2);
     }
- */
+
     public function reservaConIva()             // K
     {
         return round(((100+$this->iva)/100)*$this->reservaSinIva(), 2);
     }
 
-    public function getReservaSinIvaAttribute() // Muestra col 'I'
+    public function getReservaConIvaAttribute()             // K
+    {
+        return round(((100+$this->iva)/100)*$this->reservaSinIva(), 2);
+    }
+
+    public function getReservaSinIvaVenAttribute() // Muestra col 'I'
     {
         return $this->agregarComaMoneda($this->reservaSinIva());
     }
 
-    public function getReservaConIvaAttribute() // Muestra col 'K'
+    public function getReservaConIvaVenAttribute() // Muestra col 'K'
     {
         return $this->agregarComaMoneda($this->reservaConIva());
     }
@@ -282,7 +287,12 @@ class Propiedad extends Model
         return round($this->reservaConIva()/$this->div(), 2);
     }
 
-    public function getCompartidoConIvaAttribute()  // 'L'
+    public function getCompartidoConIvaAttribute()                 // 'L'
+    {
+        return round($this->reservaConIva()/$this->div(), 2);
+    }
+
+    public function getCompartidoConIvaVenAttribute()  // 'L'
     {
         return $this->agregarComaMoneda($this->compartidoConIva());
     }
@@ -292,7 +302,12 @@ class Propiedad extends Model
         return round($this->reservaSinIva()/$this->div(), 2);
     }
 
-    public function getCompartidoSinIvaAttribute()  // 'M'
+    public function getCompartidoSinIvaAttribute()              // 'M'
+    {
+        return round($this->reservaSinIva()/$this->div(), 2);
+    }
+
+    public function getCompartidoSinIvaVenAttribute()  // 'M'
     {
         return $this->agregarComaMoneda($this->compartidoSinIva());
     }
@@ -309,6 +324,14 @@ class Propiedad extends Model
 
     public function getFranquiciaReservadoSinIvaAttribute()     // 'O'
     {
+	    $factor = $this->porc_franquicia/100;
+
+        $valor = $factor*$this->compartidoSinIva();
+        return round($valor, 2);
+    }
+
+    public function getFranquiciaReservadoSinIvaVenAttribute()     // 'O'
+    {
         return $this->agregarComaMoneda($this->franquiciaReservadoSinIva());
     }
 
@@ -319,7 +342,14 @@ class Propiedad extends Model
         return round($factor*$this->compartidoConIva(), 2);
     }
 
-    public function getFranquiciaReservadoConIvaAttribute()     // 'P'
+    public function getFranquiciaReservadoConIvaAttribute()                 // 'P'
+    {
+	    $factor = $this->porc_franquicia/100;
+
+        return round($factor*$this->compartidoConIva(), 2);
+    }
+
+    public function getFranquiciaReservadoConIvaVenAttribute()     // 'P'
     {
         return $this->agregarComaMoneda($this->franquiciaReservadoConIva());
     }
@@ -338,7 +368,16 @@ class Propiedad extends Model
 //	    else return round(($this->porc_franquicia/100) * $this->compartidoSinIva(), 2);
     }
 
-    public function getFranquiciaPagarReportadaAttribute()      // 'Q'
+    public function getFranquiciaPagarReportadaAttribute()                  // 'Q'
+    {
+//        if ($this->aplicar_porc_franquicia_pagar_reportada) {
+            $factor = ($this->porc_franquicia/100)*($this->reportado_casa_nacional/100);
+            return round(($factor*$this->precio)/$this->div(), 2);
+//        }
+//	    else return round(($this->porc_franquicia/100) * $this->compartidoSinIva(), 2);
+    }
+
+    public function getFranquiciaPagarReportadaVenAttribute()      // 'Q'
     {
         return $this->agregarComaMoneda($this->franquiciaPagarReportada());
     }
@@ -355,7 +394,14 @@ class Propiedad extends Model
         return round($factor*$this->franquiciaPagarReportada(), 2);
     }
 
-    public function getRegaliaAttribute()                       // 'S'
+    public function getRegaliaAttribute()                                   // 'S'
+    {
+        $factor = $this->porc_regalia/100;
+
+        return round($factor*$this->franquiciaPagarReportada(), 2);
+    }
+
+    public function getRegaliaVenAttribute()                       // 'S'
     {
         return $this->agregarComaMoneda($this->regalia());
     }
@@ -370,7 +416,17 @@ class Propiedad extends Model
         return round(($monto1 - $monto2), 2);
     }
 
-    public function getSanaf5PorCientoAttribute()               // 'T'
+    public function getSanaf5PorCientoAttribute()                          // 'T'
+    {
+        $factor1 = 20.0/100;
+        $factor2 = 0.1/100;
+        $monto1 = $factor1*$this->franquiciaPagarReportada();
+        $monto2 = $factor2*$this->reservaSinIva()/$this->div();
+
+        return round(($monto1 - $monto2), 2);
+    }
+
+    public function getSanaf5PorCientoVenAttribute()               // 'T'
     {
         return $this->agregarComaMoneda($this->sanaf5PorCiento());
     }
@@ -384,7 +440,13 @@ class Propiedad extends Model
         return round($valor, 2);
     }
 
-    public function getOficinaBrutoRealAttribute()              // 'U' = 'L' - 'Q'
+    public function getOficinaBrutoRealAttribute()                      // 'U' = 'L' - 'Q'
+    {
+        $valor = $this->compartidoConIva() - $this->franquiciaPagarReportada(); // L - Q
+        return round($valor, 2);
+    }
+
+    public function getOficinaBrutoRealVenAttribute()              // 'U' = 'L' - 'Q'
     {
         return $this->agregarComaMoneda($this->oficinaBrutoReal());
     }
@@ -394,7 +456,12 @@ class Propiedad extends Model
         return round($this->compartidoConIva() - $this->franquiciaReservadoConIva(), 2);
     }
 
-    public function getBaseHonorariosSociosAttribute()          // 'V' = 'L' - 'P'
+    public function getBaseHonorariosSociosAttribute()              // 'V' = 'L' - 'P'
+    {
+        return round($this->compartidoConIva() - $this->franquiciaReservadoConIva(), 2);
+    }
+
+    public function getBaseHonorariosSociosVenAttribute()          // 'V' = 'L' - 'P'
     {
         return $this->agregarComaMoneda($this->baseHonorariosSocios());
     }
@@ -407,7 +474,15 @@ class Propiedad extends Model
         return round($valor, 2);
     }
 
-    public function getBaseParaHonorariosAttribute()          // 'W' = 'M' - 'O'
+    public function getBaseParaHonorariosAttribute()                // 'W' = 'M' - 'O'
+    {
+        $valor = $this->compartidoSinIva() - $this->franquiciaReservadoSinIva();
+
+        if (0 == $this->iva) $valor /= ((100 + $this->IVA)/100);
+        return round($valor, 2);
+    }
+
+    public function getBaseParaHonorariosVenAttribute()          // 'W' = 'M' - 'O'
     {
         return $this->agregarComaMoneda($this->baseParaHonorarios());
     }
@@ -433,7 +508,22 @@ class Propiedad extends Model
         return round($valor, 2);
     }
 
-    public function getCaptadorPrbrAttribute()          	// 'X' = % * 'U' o exp('W')
+    public function getCaptadorPrbrAttribute()          	    // 'X' = % * 'U' o exp('W')
+    {
+        $factor1 = $this->porc_captador_prbr/100;
+        $factor2 = 0.002;					// 0,2%
+
+        if ((1 < $this->asesor_captador_id) and ($this->captador->socio))
+            $valor = $factor1 * $this->baseHonorariosSocios();
+        else {
+            $bph = $this->baseParaHonorarios();
+            $valor = ($factor1 * $bph) - ($factor2 * $bph) +
+                        ($this->iva/100.00) * ($factor1 * $bph);
+        }
+        return round($valor, 2);
+    }
+
+    public function getCaptadorPrbrVenAttribute()          	// 'X' = % * 'U' o exp('W')
     {
         return $this->agregarComaMoneda($this->captadorPrbr());
     }
@@ -455,7 +545,15 @@ class Propiedad extends Model
         return round($valor, 2);
     }
 
-    public function getGerenteAttribute()          		// 'Y' = % * 'U'
+    public function getGerenteAttribute()          		                // 'Y' = % * 'U'
+    {
+        $factor1 = $this->porc_gerente/100;
+
+        $valor = $factor1 * $this->baseHonorariosSocios();
+        return round($valor, 2);
+    }
+
+    public function getGerenteVenAttribute()          		// 'Y' = % * 'U'
     {
         return $this->agregarComaMoneda($this->gerente());
     }
@@ -482,7 +580,22 @@ class Propiedad extends Model
         return round($valor, 2);
     }
 
-    public function getCerradorPrbrAttribute()          	// 'Z' = % * 'U' o exp('W')
+    public function getCerradorPrbrAttribute()          	        // 'Z' = % * 'U' o exp('W')
+    {
+        $factor1 = $this->porc_cerrador_prbr/100;
+        $factor2 = 0.002;					// 0,2%
+
+        if ((1 < $this->asesor_cerrador_id) and ($this->cerrador->socio))
+            $valor = $factor1 * $this->baseHonorariosSocios();
+        else {
+            $bph = $this->baseParaHonorarios();
+            $valor = ($factor1 * $bph) - ($factor2 * $bph) +
+                        ($this->iva/100.00) * ($factor1 * $bph);
+        }
+        return round($valor, 2);
+    }
+
+    public function getCerradorPrbrVenAttribute()          	// 'Z' = % * 'U' o exp('W')
     {
         return $this->agregarComaMoneda($this->cerradorPrbr());
     }
@@ -499,7 +612,16 @@ class Propiedad extends Model
         return round($valor, 2);
     }
 
-    public function getBonificacionesAttribute()          		// 'AA' = % * 'W'
+    public function getBonificacionesAttribute()          		        // 'AA' = % * 'W'
+    {
+        $factor1 = $this->porc_bonificacion/100;
+        $bph = $this->baseParaHonorarios();
+
+        $valor = $factor1 * $bph;
+        return round($valor, 2);
+    }
+
+    public function getBonificacionesVenAttribute()          		// 'AA' = % * 'W'
     {
         $val = $this->bonificaciones();
 
@@ -522,7 +644,15 @@ class Propiedad extends Model
         return round($neto, 2);
     }
 
-    public function getIngresoNetoOficinaAttribute()        // 'AC' = L - Q - X - Y - Z
+    public function getIngresoNetoOficinaAttribute()                    // 'AC' = L - Q - X - Y - Z
+    {
+        $neto = $this->compartidoConIva() - $this->franquiciaPagarReportada() -
+                $this->captadorPrbr() - $this->gerente() - $this->cerradorPrbr() -
+                $this->bonificaciones() - $this->comision_bancaria;
+        return round($neto, 2);
+    }
+
+    public function getIngresoNetoOficinaVenAttribute()        // 'AC' = L - Q - X - Y - Z
     {
         return $this->agregarComaMoneda($this->ingresoNetoOficina());
     }
@@ -540,6 +670,130 @@ class Propiedad extends Model
 	    elseif ('P' == $this->estatus_sistema_c21) return 'Pendiente';
 	    elseif ('A' == $this->estatus_sistema_c21) return 'Activo';
 	    else return 'Nulo';
+    }
+
+    public static function sumaXAsesor($idAsesor, $tipoAsesor, $fecha='fecha_reserva',
+                                        $fecha_desde=null, $fecha_hasta=null)
+    {
+        if(null == $fecha_desde)
+            $fecha_desde = (new Carbon(Propiedad::min($fecha, Fecha::$ZONA)))->startOfDay();
+        if(null == $fecha_hasta)
+            $fecha_hasta = (new Carbon(Propiedad::max($fecha, Fecha::$ZONA)))->endOfDay();
+        return self::where('estatus', '!=', 'S')->where('asesor_' . $tipoAsesor . '_id', $idAsesor)
+                     ->get()->sum($tipoAsesor . '_prbr');
+    }
+
+    public static function ladosXMes($fecha='fecha_reserva', $fecha_desde=null, $fecha_hasta=null, $user=0)
+    {
+        if(null == $fecha_desde)
+            $fecha_desde = (new Carbon(Propiedad::min($fecha, Fecha::$ZONA)))->startOfDay();
+        if(null == $fecha_hasta)
+            $fecha_hasta = (new Carbon(Propiedad::max($fecha, Fecha::$ZONA)))->endOfDay();
+        If (0 == $user) {
+            $signo = '>';
+            $user = 1;
+        }
+        else $signo = '=';
+ 
+        $sql = self::select(DB::raw('sum(lados) as lados'),
+                                    DB::raw('YEAR(fecha_reserva) agno,
+                                    MONTH(fecha_reserva) mes'))
+                        ->where('estatus', '!=', 'S')
+                        ->whereBetween($fecha, [$fecha_desde, $fecha_hasta])
+                        ->where(function ($query) use ($user, $signo) {
+                                $query->where('asesor_captador_id', $signo, $user)
+                                        ->orWhere('asesor_cerrador_id', $signo, $user);
+                        })
+                        ->groupBy('agno', 'mes');
+        return $sql;
+    }
+
+    public static function negociacionesXMes($fecha='fecha_reserva', $fecha_desde=null, $fecha_hasta=null, $user=0)
+    {
+        if(null == $fecha_desde)
+            $fecha_desde = (new Carbon(Propiedad::min($fecha, Fecha::$ZONA)))->startOfDay();
+        if(null == $fecha_hasta)
+         $fecha_hasta = (new Carbon(Propiedad::max($fecha, Fecha::$ZONA)))->endOfDay();
+        If (0 == $user) {
+            $signo = '>';
+            $user = 1;
+        }
+        else $signo = '=';
+ 
+        $sql = self::select(DB::raw('count(*) as negociaciones'),
+                                    DB::raw('YEAR(fecha_reserva) agno,
+                                    MONTH(fecha_reserva) mes'))
+                        ->where('estatus', '!=', 'S')
+                        ->whereBetween($fecha, [$fecha_desde, $fecha_hasta])
+                        ->where(function ($query) use ($user, $signo) {
+                                $query->where('asesor_captador_id', $signo, $user)
+                                        ->orWhere('asesor_cerrador_id', $signo, $user);
+                        })
+                        ->groupBy('agno', 'mes');
+        return $sql;
+    }
+
+    public static function comisionXMes($fecha='fecha_reserva', $fecha_desde=null, $fecha_hasta=null, $user=0)
+    {
+        if(null == $fecha_desde) {
+            $fecha_desde = (new Carbon(Propiedad::min($fecha, Fecha::$ZONA)))->startOfDay();
+            $nulo = True;
+        } else $nulo = False;
+        if(null == $fecha_hasta) {
+            $fecha_hasta = (new Carbon(Propiedad::max($fecha, Fecha::$ZONA)))->endOfDay();
+            $nulo = True;
+        } else $nulo = False;
+        If (0 == $user) {
+            $signo = '>';
+            $user = 1;
+        }
+        else $signo = '=';
+        $agnoInicial = date('Y', strtotime($fecha_desde));
+        $mesInicial  = date('m', strtotime($fecha_desde));
+        $agnoFinal   = date('Y', strtotime($fecha_hasta));
+        $mesFinal    = date('m', strtotime($fecha_hasta));
+ 
+        $arrRetorno   = [];
+        if ($nulo) {
+            $captado = self::where('asesor_captador_id', $signo, $user)
+                            ->where('estatus', '!=', 'S')
+                            ->whereNull($fecha)
+                            ->get()->sum('captadorPrbr');
+            $cerrado = self::where('asesor_cerrador_id', $signo, $user)
+                            ->where('estatus', '!=', 'S')
+                            ->whereNull($fecha)
+                            ->get()->sum('cerradorPrbr');
+            $arrRetorno[] = (object)[
+                                'agno' => '',
+                                'mes' => '',
+                                'captado' => $captado,
+                                'cerrado' => $cerrado,
+                                'comision' => $captado + $cerrado,
+                            ];
+        }
+        for ($agno = $agnoInicial; $agno <= $agnoFinal; $agno++) {
+            for ($mes = $mesInicial; $mes <= 12; $mes++) {
+                if (($agnoFinal == $agno) and ($mes > $mesFinal)) break;
+                $captado = self::where('asesor_captador_id', $signo, $user)
+                                ->where('estatus', '!=', 'S')
+                                ->whereYear($fecha, $agno)
+                                ->whereMonth($fecha, $mes)
+                                ->get()->sum('captadorPrbr');
+                $cerrado = self::where('asesor_cerrador_id', $signo, $user)
+                                ->where('estatus', '!=', 'S')
+                                ->whereYear($fecha, $agno)
+                                ->whereMonth($fecha, $mes)
+                                ->get()->sum('cerradorPrbr');
+                $arrRetorno[] = (object)[
+                                    'agno' => $agno,
+                                    'mes' => (string)(int)$mes,
+                                    'captado' => $captado,
+                                    'cerrado' => $cerrado,
+                                    'comision' => $captado + $cerrado,
+                                ];
+            }
+        }
+        return collect($arrRetorno);
     }
 
     public function getCreadoEnAttribute()

@@ -7,6 +7,7 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Support\Facades\DB;
 use App\MisClases\Fecha;
+use App\Propiedad;
 
 class User extends Authenticatable
 {
@@ -33,11 +34,13 @@ class User extends Authenticatable
     protected $dates = [
         'created_at', 'updated_at', 'fecha_nacimiento', 'fecha_ingreso'
     ];
-
     protected $casts = [
         'is_admin' => 'boolean',
         'socio' => 'boolean',
         'activo' => 'boolean',
+    ];
+    protected $appends = [
+        'genero', 'edocivil',
     ];
 
     public function contactos()    // user_id
@@ -161,6 +164,43 @@ class User extends Authenticatable
         $fecha = (new Carbon($this->fecha_nacimiento, Fecha::$ZONA))->addYears($anos);
         if (now(Fecha::$ZONA) < $fecha) return $fecha;
         else return $fecha->addYears(1);
+    }
+
+    public function getComisionCaptadorAttribute()
+    {
+        return $this->captadorPropiedades()
+                    ->where('estatus', '!=', 'S')
+                    ->get()
+                    ->sum('captadorPrBr');
+    }
+
+    public function getComisionCerradorAttribute()
+    {
+        return $this->cerradorPropiedades()
+                    ->where('estatus', '!=', 'S')
+                    ->get()
+                    ->sum('cerradorPrBr');
+    }
+
+    public function getComisionAttribute()
+    {
+//        return $this->comision_captador() + $this->comision_cerrador();     // Asi no funciona.
+        return $this->getComisionCaptadorAttribute() + $this->getComisionCerradorAttribute();   // Funciona.
+    }
+
+    public static function ladosXAsesor($fecha='fecha_reserva', $fecha_desde=null, $fecha_hasta=null, $cond='>', $user=1)
+    {
+        if(null == $fecha_desde)
+            $fecha_desde = (new Carbon(Propiedad::min($fecha, Fecha::$ZONA)))->startOfDay();
+        if(null == $fecha_hasta)
+            $fecha_hasta = (new Carbon(Propiedad::max($fecha, Fecha::$ZONA)))->endOfDay();
+        return self::where('id', $cond, $user)
+                    ->withCount(['captadorPropiedades as captadas',
+                                'cerradorPropiedades as cerradas' => function ($query)
+                                        use ($fecha, $fecha_desde, $fecha_hasta) {  // 'use' permite heredar variables del scope del padre, donde el closure es definido.
+                            $query->where('estatus', '!=', 'S')
+                                  ->whereBetween($fecha, [$fecha_desde, $fecha_hasta]);
+                    }]);
     }
 
     public static function cumpleanos($fecha=null, $fecha_hasta=null) {

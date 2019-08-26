@@ -216,9 +216,9 @@ Estatus en sistema C21: {{ $propiedad->estatus_c21_alfa.(($propiedad->pagado_cas
             <td title="{{ $propiedad->comentarios }}">{{ $propiedad->nombre }}</td>
 
             <td title="Comisi&oacute;n: {{ $propiedad->comision_p }}
- Reserva s/IVA(I):{{ $propiedad->reserva_sin_iva }};
+ Reserva s/IVA(I):{{ $propiedad->reserva_sin_iva_ven }};
                   IVA:{{ $propiedad->iva_p }};
- Reserva c/IVA(K):{{ $propiedad->reserva_con_iva }}"
+ Reserva c/IVA(K):{{ $propiedad->reserva_con_iva_ven }}"
             >
 
         <?php $propiedad->mMoZero = false;  // Si el monto es 0, mostrar 'espacio vacio'. ?>
@@ -234,27 +234,27 @@ Estatus en sistema C21: {{ $propiedad->estatus_c21_alfa.(($propiedad->pagado_cas
                     IVA:{{ $propiedad->iva_p }}
                 </spam><br>
                 <spam class="float-right" title="Compartido con IVA(L)">
-                    {{ $propiedad->compartido_con_iva }}
+                    {{ $propiedad->compartido_con_iva_ven }}
                 </spam>
             </td>
 
             <td title="Compartido con otra oficina
-                  s/IVA(M):{{ $propiedad->compartido_sin_iva }};
- Reserva s/IVA(I):{{ $propiedad->reserva_sin_iva }}
- Reserva c/IVA(K):{{ $propiedad->reserva_con_iva }}"
+                  s/IVA(M):{{ $propiedad->compartido_sin_iva_ven }};
+ Reserva s/IVA(I):{{ $propiedad->reserva_sin_iva_ven }}
+ Reserva c/IVA(K):{{ $propiedad->reserva_con_iva_ven }}"
             >
                 {{ $propiedad->lados }}
             </td>
 
             <td title="Franquicia">
                 <spam class="float-right" title="Franquicia de reserva sin IVA(O) ({{ $propiedad->porc_franquicia_p }})">
-                    {{ $propiedad->franquicia_reservado_sin_iva }} 
+                    {{ $propiedad->franquicia_reservado_sin_iva_ven }} 
                 </spam><br>
                 <spam class="float-right" title="Franquicia de reserva con IVA(P) ({{ $propiedad->porc_franquicia_p }})">
-                    {{ $propiedad->franquicia_reservado_con_iva }}
+                    {{ $propiedad->franquicia_reservado_con_iva_ven }}
                 </spam><br>
                 <spam class="float-right" title="Franquicia a pagar reportada(Q) ({{ $propiedad->reportado_casa_nacional_p }})">
-                    {{ $propiedad->franquicia_pagar_reportada }}
+                    {{ $propiedad->franquicia_pagar_reportada_ven }}
                 </spam><br>
                 <spam title="Porcentaje reportado a casa nacional(R)">
                     RCN:{{ $propiedad->reportado_casa_nacional_p }}
@@ -263,26 +263,26 @@ Estatus en sistema C21: {{ $propiedad->estatus_c21_alfa.(($propiedad->pagado_cas
 
             <td>
                 <spam class="float-right" title="Porcentaje de REGALIA(S):{{ $propiedad->porc_regalia_p }}">
-                    {{ $propiedad->regalia }}
+                    {{ $propiedad->regalia_ven }}
                 </spam><br>
                 <spam class="float-right" title="SANAF 5 Porciento(T)">
-                    {{ $propiedad->sanaf_5_por_ciento }}
+                    {{ $propiedad->sanaf_5_por_ciento_ven }}
                 </spam>
             </td>
 
             <td>
                 <spam class="float-right" title="Oficina bruto real(U)">
-                    {{ $propiedad->oficina_bruto_real }}
+                    {{ $propiedad->oficina_bruto_real_ven }}
                 </spam><br>
                 <spam class="float-right" title="Base para honorarios socios(V)">
-                    {{ $propiedad->base_honorarios_socios }}
+                    {{ $propiedad->base_honorarios_socios_ven }}
                 </spam><br>
                 <spam class="float-right" title="Base para honorarios(W)">
-                    {{ $propiedad->base_para_honorarios }}
+                    {{ $propiedad->base_para_honorarios_ven }}
                 </spam><br>
                 <spam class="float-right" title="Ingreso neto a oficina(AC)
 {{ ($propiedad->numero_recibo)?('Recibo No.: '.$propiedad->numero_recibo):'' }}">
-                    {{ $propiedad->ingreso_neto_oficina }}
+                    {{ $propiedad->ingreso_neto_oficina_ven }}
                 </spam>
             </td>
 
@@ -291,16 +291,16 @@ Comisi&oacute;n del gerente y
 Comisi&oacute;n del asesor cerrador."
             >
                 <spam class="float-right" title="Captador PRBR(X){{ $propiedad->nombre_captador }}">
-                    {{ $propiedad->captador_prbr }}
+                    {{ $propiedad->captador_prbr_ven }}
                 </spam><br>
                 <spam class="float-right" title="Gerente(Y)">
-                    {{ $propiedad->gerente }}
+                    {{ $propiedad->gerente_ven }}
                 </spam><br>
                 <spam class="float-right" title="Cerrador PRBR(Z){{ $propiedad->nombre_cerrador }}">
-                    {{ $propiedad->cerrador_prbr }}
+                    {{ $propiedad->cerrador_prbr_ven }}
                 </spam><br>
                 <spam class="float-right" title="Bonificaciones">
-                    {{ $propiedad->bonificaciones }}
+                    {{ $propiedad->bonificaciones_ven }}
                 </spam>
             </td>
 

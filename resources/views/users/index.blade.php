@@ -20,12 +20,19 @@
             <th scope="col">Nombre</th>
             <th scope="col">Teléfono</th>
             <th scope="col">Correo</th>
+            @if (Auth::user()->is_admin)
+            <th scope="col">Comision</th>
+            @endif
             <th scope="col">Acciones</th>
         </tr>
         </thead>
         <tbody>
         @foreach ($users as $user)
-        <tr>
+        <tr
+        @if (!$user->activo)
+            class="table-danger" title="Asesor no est&aacute; activo"
+        @endif
+        >
             <th scope="row">{{ $user->id }}</th>
             <td>
                 @if (1 < $user->id)
@@ -37,6 +44,15 @@
                 @endif
             <td>{{ $user->telefono_f }}</td>
             <td>{{ $user->email }}</td>
+            @if (Auth::user()->is_admin)
+            <td class="float-right"
+                @if (1 == $user->id)
+                title="Este monto representa la 'comision' producida para 'Otra oficina'"
+                @endif
+            >
+                {{ Prop::numeroVen($user->comision, 2) }}{{-- 'Prop' es un alias definido en config/app.php --}}
+            </td>
+            @endif
             <td>
                 <form action="{{ route('users.destroy', $user) }}" method="POST"
                         id="forma.{{ $user->id }}" name="forma.{{ $user->id }}"

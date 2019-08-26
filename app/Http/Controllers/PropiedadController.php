@@ -54,53 +54,47 @@ class PropiedadController extends Controller
         return $cols;
     }       // Final del metodo columnas.
 
-    protected function totalizar($props, $metodo, $dec=2) {
+/*    protected function totalizar($props, $metodo, $dec=2) {
         $tot = 0.00;
         foreach ($props->get() as $p) {
             $tot += $p->$metodo();
         }
         return round($tot, 2);
-    }
+    }*/
     protected function totales($propiedads, $valido=True, $cap=0, $cer=0)
     {
         $propiedades = clone $propiedads;               // Los query modifican el arreglo propiedades.
         if ($valido) $propiedades = $propiedades->valido();
         $arrRetorno  = [];                              // Inicializo arreglo a retornar.
 
-        $filas = $propiedades->count();      // # propiedades para vista propiedades.index.
-        $tPrecio = $propiedades->sum('precio'); // total precio para vista propiedades.index.
-        $tLados = (int)$propiedades->sum('lados'); // total precio para vista propiedades.index.
-        array_push($arrRetorno, $filas, $tPrecio, $tLados);
-        $metodos = ['compartidoConIva', 'franquiciaReservadoSinIva',
-                    'franquiciaReservadoConIva', 'franquiciaPagarReportada',
-                    'regalia', 'sanaf5PorCiento', 'oficinaBrutoReal',
-                    'baseHonorariosSocios', 'baseParaHonorarios',
-                    'captadorPrbr', 'gerente', 'cerradorPrbr',
-                    'bonificaciones', 'ingresoNetoOficina'
-        ];
-        foreach ($metodos as $met) {
-//            ${'t' . ucfirst($met)} = $this->totalizar($propiedades, $met, 2);
-            $tot = $this->totalizar($propiedades, $met, 2);
-            $arrRetorno[] = $tot;
-        }
+        $arrRetorno[] = $propiedades->count();      // # propiedades para vista propiedades.index.
+        $arrRetorno[] = $propiedades->sum('precio'); // total precio para vista propiedades.index.
+        $arrRetorno[] = (int)$propiedades->sum('lados'); // total lados.
+        $arrRetorno[] = round($propiedades->get()->sum('compartido_con_iva'), 2); // total de un elemento calculado.
+        $arrRetorno[] = round($propiedades->get()->sum('franquiciaReservadoSinIva'), 2);
+        $arrRetorno[] = round($propiedades->get()->sum('franquiciaReservadoConIva'), 2);
+        $arrRetorno[] = round($propiedades->get()->sum('franquiciaPagarReportada'), 2);
+        $arrRetorno[] = round($propiedades->get()->sum('regalia'), 2);
+        $arrRetorno[] = round($propiedades->get()->sum('sanaf5PorCiento'), 2);
+        $arrRetorno[] = round($propiedades->get()->sum('oficinaBrutoReal'), 2);
+        $arrRetorno[] = round($propiedades->get()->sum('baseHonorariosSocios'), 2);
+        $arrRetorno[] = round($propiedades->get()->sum('baseParaHonorarios'), 2);
+        $props = clone $propiedades;
+        $arrRetorno[] = round($props->where('asesor_captador_id', '>', 1)
+                                          ->get()->sum('captadorPrbr'), 2);         // Indice = 12
+        $arrRetorno[] = round($propiedades->get()->sum('gerente'), 2);
+        $props = clone $propiedades;
+        $arrRetorno[] = round($props->where('asesor_cerrador_id', '>', 1)
+                                          ->get()->sum('cerradorPrbr'), 2);         // Indice = 14
+        $arrRetorno[] = round($propiedades->get()->sum('bonificaciones'), 2);
+        $arrRetorno[] = round($propiedades->get()->sum('ingresoNetoOficina'), 2);
         $arrRetorno[] = round($propiedades->sum('comision_bancaria'), 2);          // 'AB'.
-
-// Recalcula 'captadorPrbr'[12], 'gerente'[13], 'cerradorPrbr'[14]; solo, los valores de la oficina.
-        $props = clone $propiedades;                     // Los query modifican el arreglo propiedades.
-        $arrRetorno[12] = $this->totalizar($props
-                                ->where('asesor_captador_id', '>', 1), 'captadorPrBr', 2);
-/*        $props = clone $propiedades;                     // Los query modifican el arreglo propiedades.
-        $arrRetorno[13] = $this->totalizar($props->where('asesor_captador_id', '>', 1)
-                                ->orWhere('asesor_cerrador_id', '>', 1), 'gerente', 2);*/
-        $props = clone $propiedades;                     // Los query modifican el arreglo propiedades.
-        $arrRetorno[14] = $this->totalizar($props
-                                ->where('asesor_cerrador_id', '>', 1), 'cerradorPrBr', 2);
 
         $props = clone $propiedades;                     // Los query modifican el arreglo propiedades.
         if (0 < $cap) {
             $tLadosCap = $props->where('asesor_captador_id', $cap)->count();
-            $tCaptadorPrbrSel = $this->totalizar($props
-                                        ->where('asesor_captador_id', $cap), 'captadorPrBr', 2);
+            $tCaptadorPrbrSel = round($props->where('asesor_captador_id', $cap) // Aunque aplica el 'where' de
+                                            ->get()->sum('captadorPrBr'), 2);   // la linea anterior. Por si acaso.
         } else {
             $tLadosCap = $props->where('asesor_captador_id', '>', 1)->count();
             $tCaptadorPrbrSel = 0.00;
@@ -108,8 +102,8 @@ class PropiedadController extends Controller
         $props = clone $propiedades;                     // Los query modifican el arreglo propiedades.
         if (0 < $cer) {
             $tLadosCer = $props->where('asesor_cerrador_id', $cer)->count();
-            $tCerradorPrbrSel = $this->totalizar($props
-                                        ->where('asesor_cerrador_id', $cer), 'cerradorPrBr', 2);
+            $tCerradorPrbrSel = round($props->where('asesor_cerrador_id', $cer) // Aunque aplica el 'where' de
+                                            ->get()->sum('cerradorPrBr'), 2);   // la linea anterior. Por si acaso.
         } else {
             $tLadosCer = $props->where('asesor_cerrador_id', '>', 1)->count();
             $tCerradorPrbrSel = 0.00;
@@ -295,7 +289,7 @@ class PropiedadController extends Controller
                 $totales .= json_encode($arreglo) . "\n";
             }
         }
-
+        //dd($totales);
 /*
  * Calculo de totales por 'estatus'. cols es usado, al final, para grabar las tablas.
  */
@@ -308,10 +302,11 @@ class PropiedadController extends Controller
             array_unshift($arreglo, 'E', $op);
             $totales .= json_encode($arreglo) . "\n";
         }
+        //dd($totales);
 /*
  * Calculo de totales por 'asesor' (user) y mes.
  */
-        foreach ($users as $id=>$user) {
+        foreach ($users as $user) {
             foreach($anoMes as $agno=>$meses) {
                 foreach ($meses as $mes) {
                     $props = clone $propiedades;               // Los query modifican el arreglo propiedades.
@@ -340,6 +335,7 @@ class PropiedadController extends Controller
                 }
             }
         }
+        //dd($totales);
 /*
  * Calculo de totales por mes y asesor (user).
  */
@@ -372,6 +368,7 @@ class PropiedadController extends Controller
                 }
             }
         }
+        //dd($totales);
 /*
  * Calculo de totales generales.
  */
@@ -404,6 +401,9 @@ class PropiedadController extends Controller
                                 number_format($p->reporte_casa_nacional, 0, ',', '.'):''),
                         nulo($p->factura_AyS), nulo($p->comentarios))) . "\n";
         }
+        //dd($totales);
+        //dd($users);
+        $users = json_encode($users);
 /*
  * Estos archivos grabados con Storage seran guardados en 'storage/app/public'
  * Usando: composer artisan storage:link, se crea un enlace que permite acceder

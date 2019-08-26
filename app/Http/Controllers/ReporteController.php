@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Contacto;
+use App\Propiedad;
 use App\Deseo;
 use App\Origen;
 use App\Precio;
@@ -23,8 +24,129 @@ use App\MisClases\Fecha;
 class ReporteController extends Controller
 {
     protected $tipo   = 'Reporte';
+    protected $subTitulo1 = 'Contactos atendidos por ';
     protected $titulo = 'Listado de contactos iniciales ';
 
+    protected function prepararFechas($fecha, $asesor=0, $muestra=null)
+    {
+        $ZONA = Fecha::$ZONA;
+
+        if ('POST' == request()->method()) {
+            $fechas = request()->all();
+            $muestra = session('muestra', 'Asesor');
+            if (array_key_exists('asesor', $fechas)) $asesor = $fechas['asesor'];
+            list ($fecha_desde, $fecha_hasta) = Fecha::periodo($fechas);
+        } elseif (is_null($muestra)) {
+            if ('' != session('fecha_desde', '') and '' != session('fecha_hasta', ''))  {
+                $fecha_desde = session('fecha_desde');
+                $fecha_hasta = session('fecha_hasta');
+                $muestra = session('muestra', 'Asesor');
+            } else {
+                $muestra = 'Lados';
+                $fecha_desde = null;
+                $fecha_hasta = null;
+            }
+        } elseif ('Conexion' == $muestra) {
+            $fecha_desde = (new Carbon(Bitacora::min('created_at', $ZONA)))->startOfDay();
+            $fecha_hasta = (new Carbon(Bitacora::max('created_at', $ZONA)))->endOfDay();
+        } elseif ('Cumpleanos' == $muestra) {
+            $fecha_desde = Fecha::hoy();
+            $fecha_hasta = Fecha::hoy()->addDays(30)->endOfDay();
+        } elseif (('Negociaciones' == $muestra) or
+                  ('Lados' == $muestra) or ('Comision' == $muestra) or
+                  ('LadMes' == $muestra) or ('ComMes' == $muestra)) {
+            $fecha_desde = null;
+            $fecha_hasta = null;
+        } else {
+            $fecha_desde = (new Carbon(Contacto::min('created_at', $ZONA)))->startOfDay();
+            $fecha_hasta = (new Carbon(Contacto::max('created_at', $ZONA)))->endOfDay();
+        }
+
+        return array($muestra, $fecha_desde, $fecha_hasta);
+    }
+    protected function title($muestra, $fecha, $fecha_desde, $fecha_hasta, $asesor=0)
+    {
+        $ZONA = Fecha::$ZONA;
+
+        if ('Conexion' == $muestra)
+            $subTitulo1 = 'Conexiones por ';
+        elseif ('Cumpleanos' == $muestra)
+            $subTitulo1 = '';
+        elseif (('Lados' == $muestra) or
+                  ('LadMes' == $muestra))
+            $subTitulo1 = 'Lados por ';
+        elseif ('Negociaciones' == $muestra)
+            $subTitulo1 = 'Negociaciones por ';
+        elseif (('Comision' == $muestra) or
+                  ('ComMes' == $muestra))
+            $subTitulo1 = 'Comisiones por ';
+        else $subTitulo1 = $this->subTitulo1;
+        if (('Asesor' == $muestra) or
+            ('Conexion' == $muestra) or
+            ('Comision' == $muestra) or
+            ('Lados' == $muestra))
+            $subTitulo2 = 'Asesor ';
+        elseif ('Fecha' == $muestra) {
+            if (0 < $asesor) $subTitulo2 = ' de ' . User::find($asesor)->name . ' ';
+            else $subTitulo2 = $muestra;
+        }
+        elseif (('ComMes' == $muestra) or
+                ('LadMes' == $muestra) or
+                ('Negociaciones' == $muestra))
+            $subTitulo2 = 'Mes ';
+        else $subTitulo2 = $muestra;
+
+        return $subTitulo1 . $subTitulo2 . ' desde ' .
+                 ((is_null($fecha_desde))?
+                    (new Carbon(Propiedad::min($fecha, $ZONA)))->startOfDay()->format('d/m/Y'):
+                    $fecha_desde->format('d/m/Y'))
+                   . ' hasta ' .
+                 ((is_null($fecha_hasta))?
+                    (new Carbon(Propiedad::max($fecha, $ZONA)))->endOfDay()->format('d/m/Y'):
+                    $fecha_hasta->format('d/m/Y'));
+
+    }
+    protected function elemsReporte($muestra, $fecha, $fecha_desde, $fecha_hasta, $asesor=0)
+    {
+        switch ($muestra) {
+            case 'Asesor':
+                $elemsRep = User::contactosXAsesor($fecha_desde, $fecha_hasta);
+                break;
+            case 'Conexion':
+                $elemsRep = User::conexionXAsesor($fecha_desde, $fecha_hasta);
+                break;
+            case 'Cumpleanos':
+                $elemsRep = User::cumpleanos($fecha_desde, $fecha_hasta);
+                break;
+            case 'Origen':
+                $elemsRep = Origen::contactosXOrigen($fecha_desde, $fecha_hasta);
+                break;
+            case 'Fecha':
+                $elemsRep = Contacto::contactosXFecha($fecha_desde, $fecha_hasta, $asesor);
+                break;
+            case 'Lados':
+                $elemsRep = User::ladosXAsesor($fecha, $fecha_desde, $fecha_hasta);
+                break;
+            case 'Comision':
+                $elemsRep = User::where('id', '>', 1);
+                break;
+            case 'Negociaciones':
+                $elemsRep = Propiedad::negociacionesXMes($fecha, $fecha_desde, $fecha_hasta);
+                break;
+            case 'LadMes':
+                $elemsRep = Propiedad::ladosXMes($fecha, $fecha_desde, $fecha_hasta);
+                break;
+            case 'ComMes':
+                $elemsRep = Propiedad::comisionXMes($fecha, $fecha_desde, $fecha_hasta);
+                break;
+            default:        // 'Fecha'
+                dd(request()->method(), session('muestra', 'muestra sin asignar'), session('asesor', 'asesor sin asignar'));
+                $elemsRep = Contacto::contactosXFecha($fecha_desde, $fecha_hasta, $asesor);
+        } 
+        if ('ComMes' != $muestra) $elemsRep = $elemsRep->get();
+
+        return $elemsRep;
+    }
     public function index($muestra = 'Asesor')
     {
         if (!(Auth::check())) {
@@ -41,54 +163,21 @@ class ReporteController extends Controller
         } else {
             $asesor = Auth::user()->id;
         }
-        if ('POST' == request()->method()) {
-            $fechas = request()->all();
-            $muestra = session('muestra', 'Asesor');
-            if (array_key_exists('asesor', $fechas)) $asesor = $fechas['asesor'];
-            list ($fecha_desde, $fecha_hasta) = Fecha::periodo($fechas);
-        } elseif ('Conexion' == $muestra) {
-            $fecha_desde = (new Carbon(Bitacora::min('created_at', $ZONA)))->startOfDay();
-            $fecha_hasta = (new Carbon(Bitacora::max('created_at', $ZONA)))->endOfDay();
-        } elseif ('Cumpleanos' == $muestra) {
-            $fecha_desde = Fecha::hoy();
-            $fecha_hasta = Fecha::hoy()->addDays(30)->endOfDay();
-        } else {
-            $fecha_desde = (new Carbon(Contacto::min('created_at', $ZONA)))->startOfDay();
-            $fecha_hasta = (new Carbon(Contacto::max('created_at', $ZONA)))->endOfDay();
-        }
 
-        $title = $this->tipo . ' por ' . $muestra .
-                                    ((('Fecha'==$muestra) and (0<$asesor))?
-                                            (' de '.User::find($asesor)->name.' '):'') .
-                                    ' desde ' . $fecha_desde->format('d/m/Y') .
-                                    ' hasta ' . $fecha_hasta->format('d/m/Y');
+        $fecha = 'fecha_reserva';
+        list($muestra, $fecha_desde, $fecha_hasta) = $this->prepararFechas($fecha,
+                                                                        $asesor, $muestra);
+        $title = $this->title($muestra, $fecha, $fecha_desde, $fecha_hasta, $asesor);
 
         $hoy = Fecha::hoy()->format('d-m');
-        switch ($muestra) {
-            case 'Asesor':
-/*            $elemsRep = Contacto::select('user_id', DB::raw('count(*) as atendidos'))
-                                        ->whereBetween('created_at', [$fecha_desde, $fecha_hasta])
-                                        ->groupBy('user_id')->get();*/
-                $elemsRep = User::contactosXAsesor($fecha_desde, $fecha_hasta);
-                break;
-            case 'Conexion':
-                $elemsRep = User::conexionXAsesor($fecha_desde, $fecha_hasta);
-                break;
-            case 'Cumpleanos':
-                $elemsRep = User::cumpleanos($fecha_desde, $fecha_hasta);
-                break;
-            case 'Origen':
-                $elemsRep = Origen::contactosXOrigen($fecha_desde, $fecha_hasta);
-                break;
-            case 'Fecha':
-                $elemsRep = Contacto::contactosXFecha($fecha_desde, $fecha_hasta, $asesor);
-                break;
-            default:        // 'Fecha'
-                dd(request()->method(), session('muestra', 'muestra sin asignar'), session('asesor', 'asesor sin asignar'));
-                $elemsRep = Contacto::contactosXFecha($fecha_desde, $fecha_hasta, $asesor);
-        } 
-        $elemsRep = $elemsRep->get();
+        $elemsRep = $this->elemsReporte($muestra, $fecha, $fecha_desde, $fecha_hasta, $asesor);
 
+        if (is_null($fecha_desde))
+            $fecha_desde = (new Carbon(Propiedad::min($fecha, $ZONA)))->startOfDay();
+//        else $fecha_desde = $fecha_desde->format('d/m/Y');
+        if (is_null($fecha_hasta))
+            $fecha_hasta = (new Carbon(Propiedad::max($fecha, $ZONA)))->endOfDay();
+//        else $fecha_hasta = $fecha_hasta->format('d/m/Y');
         session(['fecha_desde' => $fecha_desde, 'fecha_hasta' => $fecha_hasta,
                     'muestra' => $muestra, 'asesor' => $asesor]);
         return view('reportes.index', compact('title', 'users', 'elemsRep', 'chart', 'muestra',
@@ -114,33 +203,20 @@ class ReporteController extends Controller
         } else {
             $asesor = Auth::user()->id;
         }
-        if ('POST' == request()->method()) {
-            $fechas = request()->all();
-            $muestra = session('muestra', 'Asesor');
-            if (array_key_exists('asesor', $fechas)) $asesor = $fechas['asesor'];
-            list ($fecha_desde, $fecha_hasta) = Fecha::periodo($fechas);
-        } elseif ('' != session('fecha_desde', '') and '' != session('fecha_hasta', ''))  {
-            $fecha_desde = session('fecha_desde');
-            $fecha_hasta = session('fecha_hasta');
-            $muestra = session('muestra', 'Asesor');
-        } elseif ('Conexion' == $muestra) {
-            $fecha_desde = (new Carbon(Bitacora::min('created_at')))->startOfDay();
-            $fecha_hasta = (new Carbon(Bitacora::max('created_at')))->endOfDay();
-        } else {
-            $fecha_desde = (new Carbon(Contacto::min('created_at')))->startOfDay();
-            $fecha_hasta = (new Carbon(Contacto::max('created_at')))->endOfDay();
-            $muestra = 'Asesor';
-        }
 
-        if (!(Auth::user()->is_admin) and (('Asesor' == $muestra) or ('Conexion' == $muestra))) {
+        $fecha = 'fecha_reserva';
+        list($muestra, $fecha_desde, $fecha_hasta) =
+                                        $this->prepararFechas($fecha, $asesor);
+        if (!isset($muestra)) $muestra = 'Asesor';
+
+        if (!(Auth::user()->is_admin) and (('Asesor' == $muestra) or ('Conexion' == $muestra) or
+                                        ('Negociaciones' == $muestra) or ('Lados' == $muestra) or
+                                        ('Comision' == $muestra) or ('LadMes' == $muestra) or
+                                        ('ComMes' == $muestra))) {
             return redirect()->back();
         }
 
-        $title = $this->tipo . ' por ' . $muestra .
-                                    ((('Fecha'==$muestra) and (0<$asesor))?
-                                            (' de '.User::find($asesor)->name.' '):'') .
-                                    ' desde ' . $fecha_desde->format('d/m/Y') .
-                                    ' hasta ' . $fecha_hasta->format('d/m/Y');
+        $title = $this->title($muestra, $fecha, $fecha_desde, $fecha_hasta, $asesor);
         $legenda = $title;
 
         if ('' == $tipo or $tipo == null) {
@@ -149,24 +225,7 @@ class ReporteController extends Controller
 
         $chart = new SampleChart;
 
-        switch ($muestra) {
-            case 'Asesor':
-                $elemsRep = User::contactosXAsesor($fecha_desde, $fecha_hasta);
-                break;
-            case 'Conexion':
-                $elemsRep = User::conexionXAsesor($fecha_desde, $fecha_hasta);
-                break;
-            case 'Origen':
-                $elemsRep = Origen::contactosXOrigen($fecha_desde, $fecha_hasta);
-                break;
-            case 'Fecha':
-                $elemsRep = Contacto::contactosXFecha($fecha_desde, $fecha_hasta, $asesor);
-                break;
-            default:        // 'Fecha'
-                dd(request()->method(), session('muestra', 'muestra sin asignar'), session('asesor', 'asesor sin asignar'));
-                $elemsRep = Contacto::contactosXFecha($fecha_desde, $fecha_hasta, $asesor);
-        } 
-        $elemsRep = $elemsRep->get();
+        $elemsRep = $this->elemsReporte($muestra, $fecha, $fecha_desde, $fecha_hasta, $asesor);
 
 // Add the dataset (we will go with the chart template approach)
         $arrEtiq  = array();
@@ -180,10 +239,29 @@ class ReporteController extends Controller
                 $arrEtiq[]  = $elemento->fecha;
             } elseif ('Origen' == $muestra) {
                 $arrEtiq[]  = $elemento->descripcion;
+            } elseif (('Negociaciones' == $muestra) or
+                      ('ComMes' == $muestra) or
+                      ('LadMes' == $muestra)) {
+                if (('' == $elemento->agno) || ('' == $elemento->mes))
+                    $arrEtiq[] = 'Fecha no suministrada';
+                else
+                    $arrEtiq[] = $elemento->agno . '-' . $elemento->mes;
             } else {
                 $arrEtiq[]  = substr($elemento->name, 0, 20);
             }
-            $arrData[]  = $elemento->atendidos;
+            if ('Lados' == $muestra) {
+                $arrData[] = $elemento->captadas + $elemento->cerradas;
+            } elseif ('Comision' == $muestra) {
+                $arrData[] = $elemento->comision;
+            } elseif ('Negociaciones' == $muestra) {
+                $arrData[] = $elemento->negociaciones;
+            } elseif ('LadMes' == $muestra) {
+                $arrData[] = $elemento->lados;
+            } elseif ('ComMes' == $muestra) {
+                $arrData[] = $elemento->comision;
+            } else {
+                $arrData[]  = $elemento->atendidos;
+            }
             $strColor   = str_pad(dechex($hexColor), 6, '0', STR_PAD_LEFT);
             $arrColor[] = '#' . $strColor;
 //            dd($elemsRep, $hexColor, dechex($intervalo));

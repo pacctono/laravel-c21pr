@@ -66,7 +66,7 @@
           @endforeach
             <li class="dropdown">
               <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-                Reportes
+                Rep.Contacto
               <span class="caret"></span></a>
               <ul class="dropdown-menu">
                 @if (Auth::user()->is_admin)
@@ -84,6 +84,36 @@
                 <li><a class="dropdown-item" href="{{ route('reportes', 'Conexion') }}">
                   Conexión X asesor
                 </a></li>
+                @endif
+                {{-- <li><a class="dropdown-item" href="{{ route('reportes', 'Cumpleanos') }}">
+                  Cumpleaños
+                </a></li> --}}
+              </ul>
+            </li>
+            <li class="dropdown">
+              <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                Rep.Propiedad
+              <span class="caret"></span></a>
+              <ul class="dropdown-menu">
+                @if (Auth::user()->is_admin)
+                <li><a class="dropdown-item" href="{{ route('reportes', 'Lados') }}">
+                  Lados X Asesor
+                </a></li>
+                <li><a class="dropdown-item" href="{{ route('reportes', 'Comision') }}">
+                  Comision X Asesor
+                </a></li>
+                <li><a class="dropdown-item" href="{{ route('reportes', 'Negociaciones') }}">
+                  Negociaciones X mes
+                </a></li>
+                <li><a class="dropdown-item" href="{{ route('reportes', 'LadMes') }}">
+                  Lados X mes
+                </a></li>
+                <li><a class="dropdown-item" href="{{ route('reportes', 'ComMes') }}">
+                  Comision X mes
+                </a></li>
+                {{-- <li><a class="dropdown-item" href="{{ route('reportes', 'Conexion') }}">
+                  Conexión X asesor
+                </a></li> --}}
                 @endif
                 <li><a class="dropdown-item" href="{{ route('reportes', 'Cumpleanos') }}">
                   Cumpleaños

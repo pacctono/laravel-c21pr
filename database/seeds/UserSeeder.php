@@ -173,6 +173,7 @@ class UserSeeder extends Seeder
             'direccion' => 'Puerto La Cruz',
             'estado_civil' => 'S',
             'password' => bcrypt('1234567'),
+            'activo' => false,
         ]);
 
         User::create([

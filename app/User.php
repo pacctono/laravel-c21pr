@@ -278,14 +278,16 @@ class User extends Authenticatable
     public function getGeneroAttribute()
     {
         if ('F' == $this->sexo) return 'Femenino';
-        if ('M' == $this->sexo) return 'Masculino';
-        return 'Ninguno';
+        elseif ('M' == $this->sexo) return 'Masculino';
+        else return 'Ninguno';
     }
 
     public function getEdocivilAttribute()
     {
-        if ('C' == $this->estado_civil) return 'Casado';
-        if ('S' == $this->estado_civil) return 'Soltero';
-        return 'Ninguno';
+        if ('F' == $this->sexo) $ultLetra = 'a';
+        elseif ('M' == $this->sexo) $ultLetra = 'o';
+        if ('C' == $this->estado_civil) return 'Casad' . $ultLetra;
+        elseif ('S' == $this->estado_civil) return 'Solter' . $ultLetra;
+        else return 'Ninguno';
     }
 }

@@ -71,24 +71,25 @@ class PropiedadController extends Controller
         $arrRetorno[] = $propiedades->sum('precio'); // total precio para vista propiedades.index.
         $arrRetorno[] = (int)$propiedades->sum('lados'); // total lados.
         $arrRetorno[] = round($propiedades->get()->sum('compartido_con_iva'), 2); // total de un elemento calculado.
-        $arrRetorno[] = round($propiedades->get()->sum('franquiciaReservadoSinIva'), 2);
-        $arrRetorno[] = round($propiedades->get()->sum('franquiciaReservadoConIva'), 2);
-        $arrRetorno[] = round($propiedades->get()->sum('franquiciaPagarReportada'), 2);
+        $arrRetorno[] = round($propiedades->get()->sum('franquicia_reservado_sin_iva'), 2);
+        $arrRetorno[] = round($propiedades->get()->sum('franquicia_reservado_con_iva'), 2);
+        $arrRetorno[] = round($propiedades->get()->sum('franquicia_pagar_reportada'), 2);
         $arrRetorno[] = round($propiedades->get()->sum('regalia'), 2);
-        $arrRetorno[] = round($propiedades->get()->sum('sanaf5PorCiento'), 2);
-        $arrRetorno[] = round($propiedades->get()->sum('oficinaBrutoReal'), 2);
-        $arrRetorno[] = round($propiedades->get()->sum('baseHonorariosSocios'), 2);
-        $arrRetorno[] = round($propiedades->get()->sum('baseParaHonorarios'), 2);
+        $arrRetorno[] = round($propiedades->get()->sum('sanaf5_por_ciento'), 2);
+        $arrRetorno[] = round($propiedades->get()->sum('oficina_bruto_real'), 2);
+        $arrRetorno[] = round($propiedades->get()->sum('base_honorarios_socios'), 2);
+        $arrRetorno[] = round($propiedades->get()->sum('base_para_honorarios'), 2);
         $props = clone $propiedades;
         $arrRetorno[] = round($props->where('asesor_captador_id', '>', 1)
-                                          ->get()->sum('captadorPrbr'), 2);         // Indice = 12
+                                          ->get()->sum('captador_prbr'), 2);            // Indice = 12
         $arrRetorno[] = round($propiedades->get()->sum('gerente'), 2);
         $props = clone $propiedades;
         $arrRetorno[] = round($props->where('asesor_cerrador_id', '>', 1)
-                                          ->get()->sum('cerradorPrbr'), 2);         // Indice = 14
+                                          ->get()->sum('cerrador_prbr'), 2);            // Indice = 14
         $arrRetorno[] = round($propiedades->get()->sum('bonificaciones'), 2);
-        $arrRetorno[] = round($propiedades->get()->sum('ingresoNetoOficina'), 2);
-        $arrRetorno[] = round($propiedades->sum('comision_bancaria'), 2);          // 'AB'.
+        $arrRetorno[] = round($propiedades->sum('comision_bancaria'), 2);               // 'AB'.
+        $arrRetorno[] = round($propiedades->get()->sum('ingreso_neto_oficina'), 2);
+        $arrRetorno[] = round($propiedades->get()->sum('precio_venta_real'), 2);        // Indice = 18
 
         $props = clone $propiedades;                     // Los query modifican el arreglo propiedades.
         if (0 < $cap) {
@@ -205,8 +206,8 @@ class PropiedadController extends Controller
                 $tFranquiciaConIva, $tFranquiciaPagarR, $tRegalia, $tSanaf5PorCiento,
                 $tOficinaBrutoReal, $tBaseHonorariosSo, $tBaseParaHonorari,
                 $tCaptadorPrbr, $tGerente, $tCerradorPrbr, $tBonificaciones,
-                $tIngresoNetoOfici, $tComisionBancaria, $tCaptadorPrbrSel,
-                $tCerradorPrbrSel, $tLadosCap, $tLadosCer) =
+                $tIngresoNetoOfici, $tComisionBancaria, $tPrecioVentaReal,
+                $tCaptadorPrbrSel, $tCerradorPrbrSel, $tLadosCap, $tLadosCer) =
                 $this->totales($propiedades, True, $captador, $cerrador);
         //$propiedades = $propiedades->paginate(10);      // Pagina la impresión de 10 en 10
         if ($paginar) $propiedades = $propiedades->paginate(10);      // Pagina la impresión de 10 en 10
@@ -221,9 +222,9 @@ class PropiedadController extends Controller
                     'tRegalia', 'tSanaf5PorCiento', 'tOficinaBrutoReal',
                     'tBaseHonorariosSo', 'tBaseParaHonorari', 'tIngresoNetoOfici',
                     'tCaptadorPrbr', 'tGerente', 'tCerradorPrbr', 'tBonificaciones',
-                    'tComisionBancaria', 'tCaptadorPrbrSel', 'tCerradorPrbrSel',
-                    'tLadosCap', 'tLadosCer', 'ruta', 'fecha_desde', 'fecha_hasta',
-                    'captador', 'cerrador', 'paginar'));
+                    'tComisionBancaria', 'tPrecioVentaReal', 'tCaptadorPrbrSel',
+                    'tCerradorPrbrSel', 'tLadosCap', 'tLadosCer', 'ruta',
+                    'fecha_desde', 'fecha_hasta', 'captador', 'cerrador', 'paginar'));
     }       // Final del metodo index.
 
     public function grabarArchivo()
@@ -381,20 +382,22 @@ class PropiedadController extends Controller
             $props .= json_encode(array ($p->id, $p->codigo, $p->reserva_en,
                         $p->firma_en, $p->negociacion, $p->nombre, $p->estatus,
                         $p->moneda, $p->precio, $p->comision,
-                        $p->reservaSinIva(), $p->iva, $p->reservaConIva(),
-                        $p->compartidoConIva(), $p->compartidoSinIva(),
-                        $p->lados, $p->franquiciaReservadoSinIva(),
-                        $p->franquiciaReservadoConIva(), $p->porc_franquicia,
-                        $p->franquiciaPagarReportada(), $p->reportado_casa_nacional,
-                        $p->porc_regalia, $p->regalia(), $p->sanaf5PorCiento(),
-                        $p->oficinaBrutoReal(), $p->baseHonorariosSocios(),
-                        $p->baseParaHonorarios(), $p->asesor_captador_id,
-                        $p->asesor_captador, $p->porc_captador_prbr, $p->captadorPrbr(),
-                        $p->porc_gerente, $p->gerente(), $p->asesor_cerrador_id,
-                        $p->asesor_cerrador, $p->porc_cerrador_prbr, $p->cerradorPrbr(),
-                        $p->porc_bonificacion, $p->bonificaciones(), nulo($p->comision_bancaria, 0),
-                        $p->ingresoNetoOficina(), nulo($p->numero_recibo), nulo($p->pago_gerente),
-                        nulo($p->factura_gerente), nulo($p->pago_asesores), nulo($p->factura_asesores),
+                        $p->reserva_sin_iva, $p->iva, $p->reserva_con_iva,
+                        $p->compartido_con_iva, $p->compartido_sin_iva,
+                        $p->lados, $p->franquicia_reservado_sin_iva,
+                        $p->franquicia_reservado_con_iva, $p->porc_franquicia,
+                        $p->franquicia_pagar_reportada, $p->reportado_casa_nacional,
+                        $p->porc_regalia, $p->regalia, $p->sanaf5_por_ciento,
+                        $p->oficina_bruto_real, $p->base_honorarios_socios,
+                        $p->base_para_honorarios, $p->asesor_captador_id,
+                        $p->asesor_captador, $p->porc_captador_prbr, $p->captador_prbr,
+                        $p->porc_gerente, $p->gerente, $p->asesor_cerrador_id,
+                        $p->asesor_cerrador, $p->porc_cerrador_prbr, $p->cerrador_prbr,
+                        $p->porc_bonificacion, $p->bonificaciones,
+                        nulo($p->comision_bancaria, 0), $p->ingreso_neto_oficina,
+                        $p->precio_venta_real, nulo($p->numero_recibo),
+                        nulo($p->pago_gerente), nulo($p->factura_gerente),
+                        nulo($p->pago_asesores), nulo($p->factura_asesores),
                         nulo($p->pago_otra_oficina), nulo($p->pagado_casa_nacional),
                         nulo($p->estatus_sistema_c21),
                         (($p->reporte_casa_nacional)?

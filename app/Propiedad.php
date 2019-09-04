@@ -503,7 +503,7 @@ class Propiedad extends Model
         else {
             $bph = $this->baseParaHonorarios();
             $valor = ($factor1 * $bph) - ($factor2 * $bph) +
-                        ($this->iva/100.00) * ($factor1 * $bph);
+                        ($factor1 * $bph * ($this->IVA/100.00));
         }
         return round($valor, 2);
     }
@@ -511,14 +511,14 @@ class Propiedad extends Model
     public function getCaptadorPrbrAttribute()          	    // 'X' = % * 'U' o exp('W')
     {
         $factor1 = $this->porc_captador_prbr/100;
-        $factor2 = 0.002;					// 0,2%
+        $factor2 = 0.01 * $factor1;					// 0,2%
 
         if ((1 < $this->asesor_captador_id) and ($this->captador->socio))
             $valor = $factor1 * $this->baseHonorariosSocios();
         else {
             $bph = $this->baseParaHonorarios();
             $valor = ($factor1 * $bph) - ($factor2 * $bph) +
-                        ($this->iva/100.00) * ($factor1 * $bph);
+                        ($factor1 * $bph * ($this->IVA/100.00));
         }
         return round($valor, 2);
     }
@@ -575,7 +575,7 @@ class Propiedad extends Model
         else {
             $bph = $this->baseParaHonorarios();
             $valor = ($factor1 * $bph) - ($factor2 * $bph) +
-                        ($this->iva/100.00) * ($factor1 * $bph);
+                        ($factor1 * $bph * ($this->IVA/100.00));
         }
         return round($valor, 2);
     }
@@ -590,7 +590,7 @@ class Propiedad extends Model
         else {
             $bph = $this->baseParaHonorarios();
             $valor = ($factor1 * $bph) - ($factor2 * $bph) +
-                        ($this->iva/100.00) * ($factor1 * $bph);
+                        ($factor1 * $bph * ($this->IVA/100.00));
         }
         return round($valor, 2);
     }
@@ -655,6 +655,35 @@ class Propiedad extends Model
     public function getIngresoNetoOficinaVenAttribute()        // 'AC' = L - Q - X - Y - Z
     {
         return $this->agregarComaMoneda($this->ingresoNetoOficina());
+    }
+/*
+    public function precioVentaReal()
+    {
+        $factor1 = 100.0/($this->IVA + 100.0);
+        $factor2 = 100.0/$this->comision;
+
+        if ($this->IVA == $this->iva)
+            $valor = $this->precio;
+        else
+            $valor = $this->getCompartidoConIvaAttribute() * $factor1 * $factor2;
+        return round($valor, 2);
+    }*/
+
+    public function getPrecioVentaRealAttribute()
+    {
+        $factor1 = 100.0/($this->IVA + 100.0);
+        $factor2 = 100.0/$this->comision;
+
+        if ($this->IVA == $this->iva)
+            $valor = $this->precio/$this->div();
+        else
+            $valor = $this->getCompartidoConIvaAttribute() * $factor1 * $factor2;
+        return round($valor, 2);
+    }
+
+    public function getPrecioVentaRealVenAttribute()
+    {
+        return $this->agregarComaMoneda($this->getPrecioVentaRealAttribute());
     }
 
     public function getReporteCasaNacionalVenAttribute()

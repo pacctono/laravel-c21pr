@@ -112,6 +112,9 @@
         <spam class="alert-info">Neto:</spam>
         <spam class="alert-success" title="Ingreso neto de la oficina">
             {{ Prop::numeroVen($tIngresoNetoOfici, 2) }}</spam>
+        <spam class="alert-info">PVR:</spam>
+        <spam class="alert-success" title="Precio de venta real">
+            {{ Prop::numeroVen($tPrecioVentaReal, 2) }}</spam>
       </div>
     </form>
 </div>
@@ -233,8 +236,8 @@ Estatus en sistema C21: {{ $propiedad->estatus_c21_alfa.(($propiedad->pagado_cas
                 <spam class="float-right" title="IVA(J)">
                     IVA:{{ $propiedad->iva_p }}
                 </spam><br>
-                <spam class="float-right" title="Compartido con IVA(L)">
-                    {{ $propiedad->compartido_con_iva_ven }}
+                <spam class="float-right" title="Precio de venta real">
+                    {{ $propiedad->precio_venta_real_ven }}
                 </spam>
             </td>
 
@@ -256,9 +259,9 @@ Estatus en sistema C21: {{ $propiedad->estatus_c21_alfa.(($propiedad->pagado_cas
                 <spam class="float-right" title="Franquicia a pagar reportada(Q) ({{ $propiedad->reportado_casa_nacional_p }})">
                     {{ $propiedad->franquicia_pagar_reportada_ven }}
                 </spam><br>
-                <spam title="Porcentaje reportado a casa nacional(R)">
-                    RCN:{{ $propiedad->reportado_casa_nacional_p }}
-                </spam><br>
+                <spam class="float-right" title="Compartido con IVA(L)">
+                    {{ $propiedad->compartido_con_iva_ven }}
+                </spam>
             </td>
 
             <td>
@@ -267,6 +270,9 @@ Estatus en sistema C21: {{ $propiedad->estatus_c21_alfa.(($propiedad->pagado_cas
                 </spam><br>
                 <spam class="float-right" title="SANAF 5 Porciento(T)">
                     {{ $propiedad->sanaf_5_por_ciento_ven }}
+                </spam><br>
+                <spam title="Porcentaje reportado a casa nacional(R)">
+                    RCN:{{ $propiedad->reportado_casa_nacional_p }}
                 </spam>
             </td>
 

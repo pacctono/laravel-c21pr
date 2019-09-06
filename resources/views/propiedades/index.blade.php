@@ -63,6 +63,7 @@
         @endif
         <button type="submit" class="btn btn-success">Mostrar</button>
         <br>
+
         TOTS: {{ $filas }} props
         <spam class="alert-success" title="Precio">
             {{ Prop::numeroVen($tPrecio, 0) }}</spam>{{-- 'Prop' es un alias definido en config/app.php --}}
@@ -105,7 +106,7 @@
             {{ Prop::numeroVen($tBonificaciones, 2) }}</spam>
         @endif
         @if (0 < $tComisionBancaria)
-        <spam class="alert-info">Cons:</spam>
+        <spam class="alert-info">Coms:</spam>
         <spam class="alert-success" title="Comision bancaria">
             {{ Prop::numeroVen($tComisionBancaria, 2) }}</spam>
         @endif
@@ -114,8 +115,12 @@
             {{ Prop::numeroVen($tIngresoNetoOfici, 2) }}</spam>
         <spam class="alert-info">PVR:</spam>
         <spam class="alert-success" title="Precio de venta real">
-            {{ Prop::numeroVen($tPrecioVentaReal, 2) }}</spam>
-      </div>
+            {{ Prop::numeroVen($tPrecioVentaReal, 2) }}
+            @if ((0 < $tPvrCaptadorPrbrSel) || (0 < $tPvrCerradorPrbrSel))
+            ({{ Prop::numeroVen($tPvrCaptadorPrbrSel+$tPvrCerradorPrbrSel, 2) }})
+            @endif
+            </spam>
+        </div>
     </form>
 </div>
 

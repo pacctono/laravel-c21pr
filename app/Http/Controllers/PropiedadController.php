@@ -90,26 +90,39 @@ class PropiedadController extends Controller
         $arrRetorno[] = round($propiedades->sum('comision_bancaria'), 2);               // 'AB'.
         $arrRetorno[] = round($propiedades->get()->sum('ingreso_neto_oficina'), 2);
         $arrRetorno[] = round($propiedades->get()->sum('precio_venta_real'), 2);        // Indice = 18
+/*        $proCap = clone $propiedades;
+        $proCer = clone $propiedades;
+        $arrRetorno[] = round($proCap->where('asesor_captador_id', '>', 1)
+                                          ->get()->sum('pvr_captador_prbr'), 2) +
+                        round($proCer->where('asesor_cerrador_id', '>', 1)
+                                          ->get()->sum('pvr_cerrador_prbr'), 2);*/
 
         $props = clone $propiedades;                     // Los query modifican el arreglo propiedades.
         if (0 < $cap) {
             $tLadosCap = $props->where('asesor_captador_id', $cap)->count();
             $tCaptadorPrbrSel = round($props->where('asesor_captador_id', $cap) // Aunque aplica el 'where' de
-                                            ->get()->sum('captadorPrBr'), 2);   // la linea anterior. Por si acaso.
+                                            ->get()->sum('captador_prbr'), 2);   // la linea anterior. Por si acaso.
+            $tPvrCaptadorPrbrSel = round($props->where('asesor_captador_id', $cap)
+                                            ->get()->sum('pvr_captador_prbr'), 2);
         } else {
             $tLadosCap = $props->where('asesor_captador_id', '>', 1)->count();
             $tCaptadorPrbrSel = 0.00;
+            $tPvrCaptadorPrbrSel = 0.00;
         }
         $props = clone $propiedades;                     // Los query modifican el arreglo propiedades.
         if (0 < $cer) {
             $tLadosCer = $props->where('asesor_cerrador_id', $cer)->count();
             $tCerradorPrbrSel = round($props->where('asesor_cerrador_id', $cer) // Aunque aplica el 'where' de
-                                            ->get()->sum('cerradorPrBr'), 2);   // la linea anterior. Por si acaso.
+                                            ->get()->sum('cerrador_prbr'), 2);   // la linea anterior. Por si acaso.
+            $tPvrCerradorPrbrSel = round($props->where('asesor_cerrador_id', $cer)
+                                            ->get()->sum('pvr_cerrador_prbr'), 2);
         } else {
             $tLadosCer = $props->where('asesor_cerrador_id', '>', 1)->count();
             $tCerradorPrbrSel = 0.00;
+            $tPvrCerradorPrbrSel = 0.00;
         }
-        array_push($arrRetorno, $tCaptadorPrbrSel, $tCerradorPrbrSel, $tLadosCap, $tLadosCer);
+        array_push($arrRetorno, $tCaptadorPrbrSel, $tCerradorPrbrSel,
+            $tLadosCap, $tLadosCer, $tPvrCaptadorPrbrSel, $tPvrCerradorPrbrSel);
         //dd($arrRetorno);
         return $arrRetorno;
     }
@@ -178,13 +191,19 @@ class PropiedadController extends Controller
                             ->whereNull('user_borro');
         }
 
-        if (0 < $captador) {      // Se selecciono un asesor captador o esta conectado.
-            $propiedades = $propiedades->where('asesor_captador_id', $captador);
+        if (0 < $captador) {        // Se selecciono un asesor captador o esta conectado.
+            if ($captador != $cerrador)     // Se selecciono un asesor cerrador o esta conectado.
+                $propiedades = $propiedades->where('asesor_captador_id', $captador);
+            else
+                $propiedades = $propiedades->where(
+                                    function ($query) use ($captador, $cerrador) {
+                                $query->where('asesor_captador_id', $captador)
+                                        ->orWhere('asesor_cerrador_id', $cerrador);
+                                });
         }
         if (0 < $cerrador) {      // Se selecciono un asesor cerrador o esta conectado.
-            if ($cerrador == $captador)
-                $propiedades = $propiedades->orWhere('asesor_cerrador_id', $cerrador);
-            else $propiedades = $propiedades->where('asesor_cerrador_id', $cerrador);
+            if ($cerrador != $captador)
+                $propiedades = $propiedades->where('asesor_cerrador_id', $cerrador);
         }
         if ('' != $fecha_desde and '' != $fecha_hasta) {    // Se seleccionaron fechas.
             $fecha_desde = substr($fecha_desde, 0, 10);
@@ -206,8 +225,9 @@ class PropiedadController extends Controller
                 $tFranquiciaConIva, $tFranquiciaPagarR, $tRegalia, $tSanaf5PorCiento,
                 $tOficinaBrutoReal, $tBaseHonorariosSo, $tBaseParaHonorari,
                 $tCaptadorPrbr, $tGerente, $tCerradorPrbr, $tBonificaciones,
-                $tIngresoNetoOfici, $tComisionBancaria, $tPrecioVentaReal,
-                $tCaptadorPrbrSel, $tCerradorPrbrSel, $tLadosCap, $tLadosCer) =
+                $tComisionBancaria, $tIngresoNetoOfici, $tPrecioVentaReal,
+                $tCaptadorPrbrSel, $tCerradorPrbrSel, $tLadosCap, $tLadosCer,
+                $tPvrCaptadorPrbrSel, $tPvrCerradorPrbrSel) =
                 $this->totales($propiedades, True, $captador, $cerrador);
         //$propiedades = $propiedades->paginate(10);      // Pagina la impresión de 10 en 10
         if ($paginar) $propiedades = $propiedades->paginate(10);      // Pagina la impresión de 10 en 10
@@ -223,7 +243,8 @@ class PropiedadController extends Controller
                     'tBaseHonorariosSo', 'tBaseParaHonorari', 'tIngresoNetoOfici',
                     'tCaptadorPrbr', 'tGerente', 'tCerradorPrbr', 'tBonificaciones',
                     'tComisionBancaria', 'tPrecioVentaReal', 'tCaptadorPrbrSel',
-                    'tCerradorPrbrSel', 'tLadosCap', 'tLadosCer', 'ruta',
+                    'tCerradorPrbrSel', 'tLadosCap', 'tLadosCer',
+                    'tPvrCaptadorPrbrSel', 'tPvrCerradorPrbrSel', 'ruta',
                     'fecha_desde', 'fecha_hasta', 'captador', 'cerrador', 'paginar'));
     }       // Final del metodo index.
 

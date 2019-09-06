@@ -41,6 +41,8 @@ class User extends Authenticatable
     ];
     protected $appends = [
         'genero', 'edocivil',
+        'comision_captador', 'comision_cerrador', 'comision',
+        'pvr_captador', 'pvr_cerrador', 'precio_venta_real',
     ];
 
     public function contactos()    // user_id
@@ -168,24 +170,46 @@ class User extends Authenticatable
 
     public function getComisionCaptadorAttribute()
     {
-        return $this->captadorPropiedades()
+        return round($this->captadorPropiedades()
                     ->where('estatus', '!=', 'S')
                     ->get()
-                    ->sum('captadorPrBr');
+                    ->sum('captador_prbr'), 2);
     }
 
     public function getComisionCerradorAttribute()
     {
-        return $this->cerradorPropiedades()
+        return round($this->cerradorPropiedades()
                     ->where('estatus', '!=', 'S')
                     ->get()
-                    ->sum('cerradorPrBr');
+                    ->sum('cerrador_prbr'), 2);
     }
 
     public function getComisionAttribute()
     {
-//        return $this->comision_captador() + $this->comision_cerrador();     // Asi no funciona.
-        return $this->getComisionCaptadorAttribute() + $this->getComisionCerradorAttribute();   // Funciona.
+        return round($this->getComisionCaptadorAttribute() +
+                    $this->getComisionCerradorAttribute(), 2);
+    }
+
+    public function getPvrCaptadorAttribute()
+    {
+        return round($this->captadorPropiedades()
+                    ->where('estatus', '!=', 'S')
+                    ->get()
+                    ->sum('pvr_captador_prbr'), 2);
+    }
+
+    public function getPvrCerradorAttribute()
+    {
+        return round($this->cerradorPropiedades()
+                    ->where('estatus', '!=', 'S')
+                    ->get()
+                    ->sum('pvr_cerrador_prbr'), 2);
+    }
+
+    public function getPrecioVentaRealAttribute()
+    {
+        return round($this->getPvrCaptadorAttribute() +
+                    $this->getPvrCerradorAttribute(), 2);
     }
 
     public static function ladosXAsesor($fecha='fecha_reserva', $fecha_desde=null, $fecha_hasta=null, $cond='>', $user=1)

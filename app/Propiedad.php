@@ -246,34 +246,34 @@ class Propiedad extends Model
         return number_format($this->iva, 2, ',', '.') . '%';
     }
 
-    public function reservaSinIva()             // I
+/*    public function reservaSinIva()             // I
     {
         return round((($this->comision)/100)*$this->precio, 2);
     }
-
+ */
     public function getReservaSinIvaAttribute()             // I
     {
         return round((($this->comision)/100)*$this->precio, 2);
     }
 
-    public function reservaConIva()             // K
+/*    public function reservaConIva()             // K
     {
         return round(((100+$this->iva)/100)*$this->reservaSinIva(), 2);
     }
-
+ */
     public function getReservaConIvaAttribute()             // K
     {
-        return round(((100+$this->iva)/100)*$this->reservaSinIva(), 2);
+        return round(((100+$this->iva)/100)*$this->getReservaSinIvaAttribute(), 2);
     }
 
     public function getReservaSinIvaVenAttribute() // Muestra col 'I'
     {
-        return $this->agregarComaMoneda($this->reservaSinIva());
+        return $this->agregarComaMoneda($this->getReservaSinIvaAttribute());
     }
 
     public function getReservaConIvaVenAttribute() // Muestra col 'K'
     {
-        return $this->agregarComaMoneda($this->reservaConIva());
+        return $this->agregarComaMoneda($this->getReservaConIvaAttribute());
     }
 
     public function div()                       // Creado desde 'lados', col N
@@ -282,76 +282,76 @@ class Propiedad extends Model
         else return 2;
     }
 
-    public function compartidoConIva()                 // 'L'
+/*    public function compartidoConIva()                 // 'L'
     {
-        return round($this->reservaConIva()/$this->div(), 2);
+        return round($this->getReservaConIvaAttribute()/$this->div(), 2);
     }
-
+ */
     public function getCompartidoConIvaAttribute()                 // 'L'
     {
-        return round($this->reservaConIva()/$this->div(), 2);
+        return round($this->getReservaConIvaAttribute()/$this->div(), 2);
     }
 
     public function getCompartidoConIvaVenAttribute()  // 'L'
     {
-        return $this->agregarComaMoneda($this->compartidoConIva());
+        return $this->agregarComaMoneda($this->getCompartidoConIvaAttribute());
     }
 
-    public function compartidoSinIva()              // 'M'
+/*    public function compartidoSinIva()              // 'M'
     {
-        return round($this->reservaSinIva()/$this->div(), 2);
+        return round($this->getReservaSinIvaAttribute()/$this->div(), 2);
     }
-
+ */
     public function getCompartidoSinIvaAttribute()              // 'M'
     {
-        return round($this->reservaSinIva()/$this->div(), 2);
+        return round($this->getReservaSinIvaAttribute()/$this->div(), 2);
     }
 
     public function getCompartidoSinIvaVenAttribute()  // 'M'
     {
-        return $this->agregarComaMoneda($this->compartidoSinIva());
+        return $this->agregarComaMoneda($this->getCompartidoSinIvaAttribute());
     }
 
-    public function franquiciaReservadoSinIva()     // 'O'
+/*    public function franquiciaReservadoSinIva()     // 'O'
     {
 	    $factor = $this->porc_franquicia/100;
 
 //        if ($this->aplicar_porc_franquicia)
-            $valor = $factor*$this->compartidoSinIva();
+            $valor = $factor*$this->getCompartidoSinIvaAttribute();
 //        else $valor = $factor*$this->compartidoConIva();
         return round($valor, 2);
     }
-
+ */
     public function getFranquiciaReservadoSinIvaAttribute()     // 'O'
     {
 	    $factor = $this->porc_franquicia/100;
 
-        $valor = $factor*$this->compartidoSinIva();
+        $valor = $factor*$this->getCompartidoSinIvaAttribute();
         return round($valor, 2);
     }
 
     public function getFranquiciaReservadoSinIvaVenAttribute()     // 'O'
     {
-        return $this->agregarComaMoneda($this->franquiciaReservadoSinIva());
+        return $this->agregarComaMoneda($this->getFranquiciaReservadoSinIvaAttribute());
     }
 
-    public function franquiciaReservadoConIva()                 // 'P'
+/*    public function franquiciaReservadoConIva()                 // 'P'
     {
 	    $factor = $this->porc_franquicia/100;
 
-        return round($factor*$this->compartidoConIva(), 2);
+        return round($factor*$this->getCompartidoConIvaAttribute(), 2);
     }
-
+ */
     public function getFranquiciaReservadoConIvaAttribute()                 // 'P'
     {
 	    $factor = $this->porc_franquicia/100;
 
-        return round($factor*$this->compartidoConIva(), 2);
+        return round($factor*$this->getCompartidoConIvaAttribute(), 2);
     }
 
     public function getFranquiciaReservadoConIvaVenAttribute()     // 'P'
     {
-        return $this->agregarComaMoneda($this->franquiciaReservadoConIva());
+        return $this->agregarComaMoneda($this->getFranquiciaReservadoConIvaAttribute());
     }
 
     public function getReportadoCasaNacionalPAttribute()        // 'R'
@@ -359,7 +359,7 @@ class Propiedad extends Model
         return number_format($this->reportado_casa_nacional, 2, ',', '.') . '%';
     }
 
-    public function franquiciaPagarReportada()                  // 'Q'
+/*    public function franquiciaPagarReportada()                  // 'Q'
     {
 //        if ($this->aplicar_porc_franquicia_pagar_reportada) {
             $factor = ($this->porc_franquicia/100)*($this->reportado_casa_nacional/100);
@@ -367,7 +367,7 @@ class Propiedad extends Model
 //        }
 //	    else return round(($this->porc_franquicia/100) * $this->compartidoSinIva(), 2);
     }
-
+ */
     public function getFranquiciaPagarReportadaAttribute()                  // 'Q'
     {
 //        if ($this->aplicar_porc_franquicia_pagar_reportada) {
@@ -379,7 +379,7 @@ class Propiedad extends Model
 
     public function getFranquiciaPagarReportadaVenAttribute()      // 'Q'
     {
-        return $this->agregarComaMoneda($this->franquiciaPagarReportada());
+        return $this->agregarComaMoneda($this->getFranquiciaPagarReportadaAttribute());
     }
 
     public function getPorcRegaliaPAttribute()
@@ -387,51 +387,51 @@ class Propiedad extends Model
         return number_format($this->porc_regalia, 2, ',', '.') . '%';
     }
 
-    public function regalia()                                   // 'S'
+/*    public function regalia()                                   // 'S'
     {
         $factor = $this->porc_regalia/100;
 
-        return round($factor*$this->franquiciaPagarReportada(), 2);
+        return round($factor*$this->getFranquiciaPagarReportadaAttribute(), 2);
     }
-
+ */
     public function getRegaliaAttribute()                                   // 'S'
     {
         $factor = $this->porc_regalia/100;
 
-        return round($factor*$this->franquiciaPagarReportada(), 2);
+        return round($factor*$this->getFranquiciaPagarReportadaAttribute(), 2);
     }
 
     public function getRegaliaVenAttribute()                       // 'S'
     {
-        return $this->agregarComaMoneda($this->regalia());
+        return $this->agregarComaMoneda($this->getRegaliaAttribute());
     }
 
-    public function sanaf5PorCiento()                          // 'T'
+/*    public function sanaf5PorCiento()                          // 'T'
     {
         $factor1 = 20.0/100;
         $factor2 = 0.1/100;
-        $monto1 = $factor1*$this->franquiciaPagarReportada();
-        $monto2 = $factor2*$this->reservaSinIva()/$this->div();
+        $monto1 = $factor1*$this->getFranquiciaPagarReportadaAttribute();
+        $monto2 = $factor2*$this->getReservaSinIvaAttribute()/$this->div();
 
         return round(($monto1 - $monto2), 2);
     }
-
+ */
     public function getSanaf5PorCientoAttribute()                          // 'T'
     {
         $factor1 = 20.0/100;
         $factor2 = 0.1/100;
-        $monto1 = $factor1*$this->franquiciaPagarReportada();
-        $monto2 = $factor2*$this->reservaSinIva()/$this->div();
+        $monto1 = $factor1*$this->getFranquiciaPagarReportadaAttribute();
+        $monto2 = $factor2*$this->getReservaSinIvaAttribute()/$this->div();
 
         return round(($monto1 - $monto2), 2);
     }
 
     public function getSanaf5PorCientoVenAttribute()               // 'T'
     {
-        return $this->agregarComaMoneda($this->sanaf5PorCiento());
+        return $this->agregarComaMoneda($this->getSanaf5PorCientoAttribute());
     }
 
-    public function oficinaBrutoReal()                      // 'U' = 'L' - 'Q'
+/*    public function oficinaBrutoReal()                      // 'U' = 'L' - 'Q'
     {
 //        if ($this->aplicar_franquicia_pagar_reportada_bruto)
             $valor = $this->compartidoConIva() - $this->franquiciaPagarReportada(); // L - Q
@@ -439,44 +439,47 @@ class Propiedad extends Model
 //            $valor = $this->compartidoConIva() - $this->franquiciaReservadoSinIva();// L - O
         return round($valor, 2);
     }
-
+ */
     public function getOficinaBrutoRealAttribute()                      // 'U' = 'L' - 'Q'
     {
-        $valor = $this->compartidoConIva() - $this->franquiciaPagarReportada(); // L - Q
+        $valor = $this->getCompartidoConIvaAttribute() -
+                $this->getFranquiciaPagarReportadaAttribute(); // L - Q
         return round($valor, 2);
     }
 
     public function getOficinaBrutoRealVenAttribute()              // 'U' = 'L' - 'Q'
     {
-        return $this->agregarComaMoneda($this->oficinaBrutoReal());
+        return $this->agregarComaMoneda($this->getOficinaBrutoRealAttribute());
     }
 
-    public function baseHonorariosSocios()              // 'V' = 'L' - 'P'
+/*    public function baseHonorariosSocios()              // 'V' = 'L' - 'P'
     {
         return round($this->compartidoConIva() - $this->franquiciaReservadoConIva(), 2);
     }
-
+ */
     public function getBaseHonorariosSociosAttribute()              // 'V' = 'L' - 'P'
     {
-        return round($this->compartidoConIva() - $this->franquiciaReservadoConIva(), 2);
+        return round($this->getCompartidoConIvaAttribute() -
+                        $this->getFranquiciaReservadoConIvaAttribute(), 2);
     }
 
     public function getBaseHonorariosSociosVenAttribute()          // 'V' = 'L' - 'P'
     {
-        return $this->agregarComaMoneda($this->baseHonorariosSocios());
+        return $this->agregarComaMoneda($this->getBaseHonorariosSociosAttribute());
     }
 
-    public function baseParaHonorarios()                // 'W' = 'M' - 'O'
+/*    public function baseParaHonorarios()                // 'W' = 'M' - 'O'
     {
         $valor = $this->compartidoSinIva() - $this->franquiciaReservadoSinIva();
 
         if (0 == $this->iva) $valor /= ((100 + $this->IVA)/100);
         return round($valor, 2);
     }
-
+ */
     public function getBaseParaHonorariosAttribute()                // 'W' = 'M' - 'O'
     {
-        $valor = $this->compartidoSinIva() - $this->franquiciaReservadoSinIva();
+        $valor = $this->getCompartidoSinIvaAttribute() -
+                $this->getFranquiciaReservadoSinIvaAttribute();
 
         if (0 == $this->iva) $valor /= ((100 + $this->IVA)/100);
         return round($valor, 2);
@@ -484,7 +487,7 @@ class Propiedad extends Model
 
     public function getBaseParaHonorariosVenAttribute()          // 'W' = 'M' - 'O'
     {
-        return $this->agregarComaMoneda($this->baseParaHonorarios());
+        return $this->agregarComaMoneda($this->getBaseParaHonorariosAttribute());
     }
 
     public function getPorcCaptadorPrbrPAttribute()
@@ -492,7 +495,7 @@ class Propiedad extends Model
         return $this->porc_captador_prbr . '%';
     }
 
-    public function captadorPrbr()          	    // 'X' = % * 'U' o exp('W')
+/*    public function captadorPrbr()          	    // 'X' = % * 'U' o exp('W')
     {
         $factor1 = $this->porc_captador_prbr/100;
         $factor2 = 0.002;					// 0,2%
@@ -507,16 +510,16 @@ class Propiedad extends Model
         }
         return round($valor, 2);
     }
-
+ */
     public function getCaptadorPrbrAttribute()          	    // 'X' = % * 'U' o exp('W')
     {
         $factor1 = $this->porc_captador_prbr/100;
         $factor2 = 0.01 * $factor1;					// 0,2%
 
         if ((1 < $this->asesor_captador_id) and ($this->captador->socio))
-            $valor = $factor1 * $this->baseHonorariosSocios();
+            $valor = $factor1 * $this->getBaseHonorariosSociosAttribute();
         else {
-            $bph = $this->baseParaHonorarios();
+            $bph = $this->getBaseParaHonorariosAttribute();
             $valor = ($factor1 * $bph) - ($factor2 * $bph) +
                         ($factor1 * $bph * ($this->IVA/100.00));
         }
@@ -525,7 +528,7 @@ class Propiedad extends Model
 
     public function getCaptadorPrbrVenAttribute()          	// 'X' = % * 'U' o exp('W')
     {
-        return $this->agregarComaMoneda($this->captadorPrbr());
+        return $this->agregarComaMoneda($this->getCaptadorPrbrAttribute());
     }
 
     public function getPorcGerentePAttribute()
@@ -533,7 +536,7 @@ class Propiedad extends Model
         return $this->porc_gerente . '%';
     }
 
-    public function gerente()          		                // 'Y' = % * 'U'
+/*    public function gerente()          		                // 'Y' = % * 'U'
     {
         $factor1 = $this->porc_gerente/100;
 
@@ -541,21 +544,21 @@ class Propiedad extends Model
 //            $valor = $factor1 * $this->oficinaBrutoReal();
 //        else
 //            $valor = $factor1 * $this->baseParaHonorarios();
-            $valor = $factor1 * $this->baseHonorariosSocios();
+            $valor = $factor1 * $this->getBaseHonorariosSociosAttribute();
         return round($valor, 2);
     }
-
+ */
     public function getGerenteAttribute()          		                // 'Y' = % * 'U'
     {
         $factor1 = $this->porc_gerente/100;
 
-        $valor = $factor1 * $this->baseHonorariosSocios();
+        $valor = $factor1 * $this->getBaseHonorariosSociosAttribute();
         return round($valor, 2);
     }
 
     public function getGerenteVenAttribute()          		// 'Y' = % * 'U'
     {
-        return $this->agregarComaMoneda($this->gerente());
+        return $this->agregarComaMoneda($this->getGerenteAttribute());
     }
 
     public function getPorcCerradorPrbrPAttribute()
@@ -563,7 +566,7 @@ class Propiedad extends Model
         return $this->porc_cerrador_prbr . '%';
     }
 
-    public function cerradorPrbr()          	        // 'Z' = % * 'U' o exp('W')
+/*    public function cerradorPrbr()          	        // 'Z' = % * 'U' o exp('W')
     {
         $factor1 = $this->porc_cerrador_prbr/100;
         $factor2 = 0.002;					// 0,2%
@@ -579,16 +582,16 @@ class Propiedad extends Model
         }
         return round($valor, 2);
     }
-
+ */
     public function getCerradorPrbrAttribute()          	        // 'Z' = % * 'U' o exp('W')
     {
         $factor1 = $this->porc_cerrador_prbr/100;
         $factor2 = 0.002;					// 0,2%
 
         if ((1 < $this->asesor_cerrador_id) and ($this->cerrador->socio))
-            $valor = $factor1 * $this->baseHonorariosSocios();
+            $valor = $factor1 * $this->getBaseHonorariosSociosAttribute();
         else {
-            $bph = $this->baseParaHonorarios();
+            $bph = $this->getBaseParaHonorariosAttribute();
             $valor = ($factor1 * $bph) - ($factor2 * $bph) +
                         ($factor1 * $bph * ($this->IVA/100.00));
         }
@@ -597,10 +600,10 @@ class Propiedad extends Model
 
     public function getCerradorPrbrVenAttribute()          	// 'Z' = % * 'U' o exp('W')
     {
-        return $this->agregarComaMoneda($this->cerradorPrbr());
+        return $this->agregarComaMoneda($this->getCerradorPrbrAttribute());
     }
 
-    public function bonificaciones()          		        // 'AA' = % * 'W'
+/*    public function bonificaciones()          		        // 'AA' = % * 'W'
     {
         $factor1 = $this->porc_bonificacion/100;
         $bph = $this->baseParaHonorarios();
@@ -611,11 +614,11 @@ class Propiedad extends Model
 //            $valor = 0.00;
         return round($valor, 2);
     }
-
+ */
     public function getBonificacionesAttribute()          		        // 'AA' = % * 'W'
     {
         $factor1 = $this->porc_bonificacion/100;
-        $bph = $this->baseParaHonorarios();
+        $bph = $this->getBaseParaHonorariosAttribute();
 
         $valor = $factor1 * $bph;
         return round($valor, 2);
@@ -623,7 +626,7 @@ class Propiedad extends Model
 
     public function getBonificacionesVenAttribute()          		// 'AA' = % * 'W'
     {
-        $val = $this->bonificaciones();
+        $val = $this->getBonificacionesAttribute();
 
         return $this->agregarComaMoneda($val);
     }
@@ -636,28 +639,30 @@ class Propiedad extends Model
         return $this->agregarComaMoneda($val);
     }
 
-    public function ingresoNetoOficina()                    // 'AC' = L - Q - X - Y - Z
+/*    public function ingresoNetoOficina()                    // 'AC' = L - Q - X - Y - Z
     {
         $neto = $this->compartidoConIva() - $this->franquiciaPagarReportada() -
-                $this->captadorPrbr() - $this->gerente() - $this->cerradorPrbr() -
-                $this->bonificaciones() - $this->comision_bancaria;
+                $this->getCaptadorPrbrAttribute() - $this->getGerenteAttribute() -
+                $this->getCerradorPrbrAttribute() - $this->getBonificacionesAttribute() -
+                $this->comision_bancaria;
         return round($neto, 2);
     }
-
+ */
     public function getIngresoNetoOficinaAttribute()                    // 'AC' = L - Q - X - Y - Z
     {
-        $neto = $this->compartidoConIva() - $this->franquiciaPagarReportada() -
-                $this->captadorPrbr() - $this->gerente() - $this->cerradorPrbr() -
-                $this->bonificaciones() - $this->comision_bancaria;
+        $neto = $this->getCompartidoConIvaAttribute() - $this->getFranquiciaPagarReportadaAttribute() -
+                $this->getCaptadorPrbrAttribute() - $this->getGerenteAttribute() -
+                $this->getCerradorPrbrAttribute() - $this->getBonificacionesAttribute() -
+                $this->comision_bancaria;
         return round($neto, 2);
     }
 
     public function getIngresoNetoOficinaVenAttribute()        // 'AC' = L - Q - X - Y - Z
     {
-        return $this->agregarComaMoneda($this->ingresoNetoOficina());
+        return $this->agregarComaMoneda($this->getIngresoNetoOficinaAttribute());
     }
-/*
-    public function precioVentaReal()
+
+ /*   public function precioVentaReal()
     {
         $factor1 = 100.0/($this->IVA + 100.0);
         $factor2 = 100.0/$this->comision;
@@ -667,23 +672,52 @@ class Propiedad extends Model
         else
             $valor = $this->getCompartidoConIvaAttribute() * $factor1 * $factor2;
         return round($valor, 2);
-    }*/
-
-    public function getPrecioVentaRealAttribute()
+    }
+ */
+    public function precioVentaReal()
     {
         $factor1 = 100.0/($this->IVA + 100.0);
         $factor2 = 100.0/$this->comision;
 
         if ($this->IVA == $this->iva)
-            $valor = $this->precio/$this->div();
+            $valor = $this->precio;
         else
-            $valor = $this->getCompartidoConIvaAttribute() * $factor1 * $factor2;
+            $valor = $this->getReservaConIvaAttribute() * $factor1 * $factor2;
         return round($valor, 2);
+    }
+
+    public function getPvrCaptadorPrbrAttribute()          	    // 'X' = % * 'U' o exp('W')
+    {
+        if (1 == $this->asesor_captador_id) $valor = 0.00;
+        else $valor = $this->precioVentaReal()/2;
+        return round($valor, 2);
+    }
+
+    public function getPvrCaptadorPrbrVenAttribute()
+    {
+        return $this->agregarComaMoneda($this->getPvrCaptadorPrbrAttribute());
+    }
+
+    public function getPvrCerradorPrbrAttribute()          	    // 'X' = % * 'U' o exp('W')
+    {
+        if (1 == $this->asesor_cerrador_id) $valor = 0.00;
+        else $valor = $this->precioVentaReal()/2;
+        return round($valor, 2);
+    }
+
+    public function getPrecioVentaRealAttribute()
+    {
+        return $this->getPvrCaptadorPrbrAttribute() + $this->getPvrCerradorPrbrAttribute();
     }
 
     public function getPrecioVentaRealVenAttribute()
     {
         return $this->agregarComaMoneda($this->getPrecioVentaRealAttribute());
+    }
+
+    public function getPvrCerradorPrbrVenAttribute()
+    {
+        return $this->agregarComaMoneda($this->getPvrCerradorPrbrAttribute());
     }
 
     public function getReporteCasaNacionalVenAttribute()

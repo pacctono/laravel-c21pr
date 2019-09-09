@@ -92,8 +92,8 @@
             <div class="form-group d-flex">
                 <label class="control-label col-sm-2" for="precio">*Precio:</label>
                 <input class="form-control col-sm-1" size="2" maxlength="2" required
-                    name="moneda" id="moneda" list="monedas"
-                    value="{{ old('comision', $cols['moneda']['xdef']) }}">
+                    name="moneda" id="moneda"
+                    value="{{ old('moneda', $cols['moneda']['xdef']) }}" list="monedas">
                 <datalist id="monedas">
                 @foreach ($cols['moneda']['opcion'] as $opcion => $muestra)
                     <option value="{{ $opcion }}">
@@ -103,7 +103,7 @@
                     name="precio" id="precio" required placeholder="Precio del inmueble"
                     value="{{ old('precio') }}">
                 <label class="control-label col-sm-2" for="comision">*Comision:</label>
-                <input type="float" class="form-control col-sm-1" size="5" maxlength="5"
+                <input type="float" class="form-control col-sm-1" size="6" maxlength="6"
                     name="comision" id="comision" required
                     value="{{ old('comision', $cols['comision']['xdef']) }}">%
                 <label class="control-label col-sm-2" for="iva">*IVA:</label>
@@ -175,7 +175,7 @@
                     name="porc_regalia" id="porc_regalia" required
                     value="{{ old('porc_regalia', $cols['porc_regalia']['xdef']) }}">%
                 {{--<label class="control-label col-sm-2">SANAF 5 %:</label>
-                <spam class="col-sm-2">&nbsp;</spam>
+                <span class="col-sm-2">&nbsp;</span>
                 <input type="float" class="form-control col-sm-2" size="18" maxlength="18"
                     name="sanaf_5_porciento" id="sanaf_5_porciento" placeholder="ddd.ddd,dd"
                     value="{{ old('sanaf_5_porciento') }}">--}}

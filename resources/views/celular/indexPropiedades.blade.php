@@ -4,35 +4,16 @@
 <div>
     <form method="POST" class="form-horizontal" action="{{ route('propiedades.post') }}"
           onSubmit="return alertaCampoRequerido()">
-          {{-- onSubmit="return confirm('Desde:|'+document.getElementById('fecha_desde').value+'|'+
-                            'Captador:|'+document.getElementById('captador').value+'|');"> --}}
       {!! csrf_field() !!}
 
       <div class="form-group col-md-12">
-      {{-- @foreach (['hoy', 'ayer', 'manana', 'esta_semana', 'semana_pasada', 'proxima_semana',
-                'este_mes', 'mes_pasado', 'proximo_mes', 'todo', 'intervalo'] as $intervalo)
-        <input type="radio" required name="periodo" id="_{{ $intervalo }}"
-                value="{{ $intervalo }}"
-        @if ($rPeriodo == $intervalo)
-          checked
-        @endif
-        >
-        <label>
-        @if ('manana' == $intervalo)
-        Mañana
-        @else
-        {{ str_replace('_', ' ', ucfirst($intervalo)) }}
-        @endif
-        </label>
-      @endforeach
-        <br> --}}
-        <label>Fecha de reserva desde:</label>
+        <label>Fecha de reserva:</label><br>
+        <label>Desde:</label>
         <input type="date" name="fecha_desde" id="fecha_desde" max="{{ now() }}"
-            value="{{ old('fecha_desde', $fecha_desde) }}">
-        {{-- $fecha_desde --}}
+            value="{{ old('fecha_desde', $fecha_desde) }}"><br>
         <label>Hasta:</label>
         <input type="date" name="fecha_hasta" id="fecha_hasta" max="{{ now() }}"
-            value="{{ old('fecha_hasta', $fecha_hasta) }}">
+            value="{{ old('fecha_hasta', $fecha_hasta) }}"><br>
         @if (Auth::user()->is_admin)
         <select name="captador" id="captador">
         <option value="0">Captador</option>
@@ -45,7 +26,7 @@
               {{ $user->name }}
             </option>
           @endforeach
-        </select>
+        </select><br>
         @endif
         @if (Auth::user()->is_admin)
         <select name="cerrador" id="cerrador">
@@ -59,99 +40,40 @@
               {{ $user->name }}
             </option>
           @endforeach
-        </select>
+        </select><br>
         @endif
         <button type="submit" class="btn btn-success">Mostrar</button>
         <br>
-
-        TOTS: {{ $filas }} props
-        <span class="alert-success" title="Precio">
-            {{ Prop::numeroVen($tPrecio, 0) }}</span>{{-- 'Prop' es un alias definido en config/app.php --}}
-        <span class="alert-info">Compartido con IVA:</span>
-        <span class="alert-success" title="Compartido con otra oficina con IVA">
-            {{ Prop::numeroVen($tCompartidoConIva, 2) }}</span>
-        <span class="alert-info">Lados:</span>
-        <span class="alert-success" title="Sumatoria de los lados">
-            {{ $tLados }}</span>
-        <span class="alert-info">Franq a pagar rep:</span>
-        <span class="alert-success" title="Franquicia a pagar reportada">
-            {{ Prop::numeroVen($tFranquiciaPagarR, 2) }}</span>
-        <span class="alert-info">Regalia:</span>
-        <span class="alert-success" title="Regalia">
-            {{ Prop::numeroVen($tRegalia, 2) }}</span>
-        <span class="alert-info">Sanaf:</span>
-        <span class="alert-success" title="Sanaf - 5%">
-            {{ Prop::numeroVen($tSanaf5PorCiento, 2) }}</span>
-        <br>
-        <span class="alert-info">Captador:</span>
-        <span class="alert-success" title="Captador PRBR">
-            {{ Prop::numeroVen($tCaptadorPrbr, 2) }}
-            @if (0 < $tCaptadorPrbrSel)
-            ({{ Prop::numeroVen($tCaptadorPrbrSel, 2) }} [{{ $tLadosCap }}])
-            @endif
-        </span>
-        <span class="alert-info">Gerente:</span>
-        <span class="alert-success" title="Gerente">
-            {{ Prop::numeroVen($tGerente, 2) }}</span>
-        <span class="alert-info">Cerrador:</span>
-        <span class="alert-success" title="Cerrador PRBR">
-            {{ Prop::numeroVen($tCerradorPrbr, 2) }}
-            @if (0 < $tCerradorPrbrSel)
-            ({{ Prop::numeroVen($tCerradorPrbrSel, 2) }} [{{ $tLadosCer }}])
-            @endif
-        </span>
-        @if (0 < $tBonificaciones)
-        <span class="alert-info">Bons:</span>
-        <span class="alert-success" title="Bonificaciones">
-            {{ Prop::numeroVen($tBonificaciones, 2) }}</span>
-        @endif
-        @if (0 < $tComisionBancaria)
-        <span class="alert-info">Coms:</span>
-        <span class="alert-success" title="Comision bancaria">
-            {{ Prop::numeroVen($tComisionBancaria, 2) }}</span>
-        @endif
-        <span class="alert-info">Neto:</span>
-        <span class="alert-success" title="Ingreso neto de la oficina">
-            {{ Prop::numeroVen($tIngresoNetoOfici, 2) }}</span>
-        <span class="alert-info">PVR:</span>
-        <span class="alert-success" title="Precio de venta real">
-            {{ Prop::numeroVen($tPrecioVentaReal, 2) }}
-            @if ((0 < $tPvrCaptadorPrbrSel) || (0 < $tPvrCerradorPrbrSel))
-            ({{ Prop::numeroVen($tPvrCaptadorPrbrSel+$tPvrCerradorPrbrSel, 2) }})
-            @endif
-            </span>
-        </div>
+      </div>
     </form>
 </div>
 
     <div class="d-flex justify-content-between align-items-end mb-1">
-        <h1 class="pb-1">{{ $title }}</h1>
+        <h1 class="pb-1">Propiedades</h1>
 
         <p>
-            <a href="{{ route('propiedades.create') }}" class="btn btn-primary">Crear Propiedad</a>
+            <a href="{{ route('propiedades.create') }}" class="btn btn-primary">Crear</a>
         </p>
     </div>
     @if ($propiedades->isNotEmpty())
     <table class="table table-striped table-hover table-bordered table-sm">
         <thead class="thead-dark">
         <tr>
-            <!-- th scope="col">#</th -->
             <th scope="col">
                 <a href="{{ route('propiedades.orden', 'codigo') }}" class="btn btn-link">
                     C&oacute;digo
                 </a>
             </th>
-            <th scope="col" title="Fecha de reserva y
-            Fecha de la firma">
+            {{-- <th scope="col">
                 <a href="{{ route('propiedades.orden', 'fecha_reserva') }}" class="btn btn-link">
                     Fechas
                 </a>
             </th>
-            <th scope="col" title="Tipo de negociaci&oacute;n">
+            <th scope="col">
                 <a href="{{ route('propiedades.orden', 'negociacion') }}" class="btn btn-link">
                     N
                 </a>
-            </th>
+            </th>--}}
             <th scope="col">
                 <a href="{{ route('propiedades.orden', 'nombre') }}" class="btn btn-link">
                     Nombre
@@ -162,12 +84,12 @@
                     Precio
                 </a>
             </th>
-            <th scope="col" title="Lados">
+            <th scope="col">
                 <a href="{{ route('propiedades.orden', 'lados') }}" class="btn btn-link">
                     L
                 </a>
             </th>
-            <th scope="col" title="Franquicia">
+            {{-- <th scope="col" title="Franquicia">
                 Franquic
             </th>
             <th scope="col">
@@ -181,7 +103,7 @@
             <th scope="col" title="Pago asesor captador, gerente y cerrador.">
                 Comis
             </th>
-            <th scope="col">Acciones</th>
+            <th scope="col">Acciones</th> --}}
         </tr>
         </thead>
         <tbody>
@@ -192,7 +114,6 @@
         <?php $var++;   // Variable para manejar el estilo de cada fila. ?>
         <tr class="
         @if ('I' == $propiedad->estatus)
-            {{--table-light--}}
             table-active
         @elseif ('P' == $propiedad->estatus)
             table-warning
@@ -206,55 +127,49 @@
             @endif
         @endif
         ">
-            <td title="{{ $propiedad->id }}) {{ $propiedad->estatus_alfa }}
-Reporte en casa nacional: {{ $propiedad->reporte_casa_nacional_ven }}
-Estatus en sistema C21: {{ $propiedad->estatus_c21_alfa.(($propiedad->pagado_casa_nacional)?' y PAGADO A CASA NACIONAL':'') }}
-{{ (($propiedad->factura_AyS)?'Factura A & S: '.$propiedad->factura_AyS.'.':'') }}">
-                <span class="float-right"> {{ $propiedad->codigo }} </span>
-            </td>
-
             <td>
-                <span title="Fecha de reserva">{{ $propiedad->reserva_en }}</span><br>
-                <span title="Fecha de la firma">{{ $propiedad->firma_en }}</span>
+                <a href="{{ route('propiedades.edit', [$propiedad->id, 'id']) }}"
+                    class="btn btn-link float-right">
+                    {{ $propiedad->codigo }}
+                </a>
             </td>
-
-            <td title="{{ $propiedad->negociacion_alfa }}">
-                {{ $propiedad->negociacion }}</td>
-
-            <td title="{{ $propiedad->comentarios }}">{{ $propiedad->nombre }}</td>
-
-            <td title="Comisi&oacute;n: {{ $propiedad->comision_p }}
- Reserva s/IVA(I):{{ $propiedad->reserva_sin_iva_ven }};
-                  IVA:{{ $propiedad->iva_p }};
- Reserva c/IVA(K):{{ $propiedad->reserva_con_iva_ven }}"
-            >
 
         <?php $propiedad->mMoZero = false;  // Si el monto es 0, mostrar 'espacio vacio'. ?>
         <?php $propiedad->espMonB = false;  // Eliminar espacio entre simbolo de la moneda y el monto. ?>
 
-                <span class="float-right" title="Precio del inmueble">
+            {{-- <td>
+                <span title="Fecha de reserva">{{ $propiedad->reserva_en }}</span><br>
+                <span title="Fecha de la firma">{{ $propiedad->firma_en }}</span>
+            </td>
+
+            <td>
+                {{ $propiedad->negociacion }}</td>--}}
+            <td>{{ $propiedad->nombre }}({{ $propiedad->negociacion }})
+            </td>
+
+            <td>
+
+                <span class="float-right">
                     {{ $propiedad->precio_ven }}
                 </span><br>
-                <span title="Comisi&oacute;n((H)">
+                <span>
                     Com:{{ $propiedad->comision_p }}
                 </span><br>
-                <span class="float-right" title="IVA(J)">
+                <span class="float-right">
                     IVA:{{ $propiedad->iva_p }}
                 </span><br>
-                <span class="float-right" title="Precio de venta real">
+                <span class="float-right">
                     {{ $propiedad->precio_venta_real_ven }}
                 </span>
             </td>
 
-            <td title="Compartido con otra oficina
-                  s/IVA(M):{{ $propiedad->compartido_sin_iva_ven }};
- Reserva s/IVA(I):{{ $propiedad->reserva_sin_iva_ven }}
- Reserva c/IVA(K):{{ $propiedad->reserva_con_iva_ven }}"
-            >
-                {{ $propiedad->lados }}
+            <td>
+                <a href="{{ route('propiedades.show', $propiedad) }}" class="btn btn-link float-right">
+                    {{ $propiedad->lados }}
+                </a>
             </td>
 
-            <td title="Franquicia">
+            {{-- <td title="Franquicia">
                 <span class="float-right" title="Franquicia de reserva sin IVA(O) ({{ $propiedad->porc_franquicia_p }})">
                     {{ $propiedad->franquicia_reservado_sin_iva_ven }} 
                 </span><br>
@@ -343,7 +258,7 @@ Comisi&oacute;n del asesor cerrador."
                     </a>
                     @endif
                 @endif
-            </td>
+            </td>--}}
         </tr>
 
         <?php $propiedad->espMonB = true; // Restablecer variable cambiada antes de <precio> ?>
@@ -354,6 +269,56 @@ Comisi&oacute;n del asesor cerrador."
     @if ($paginar)
     {{ $propiedades->links() }}
     @endif
+
+    <div class="form-group col-md-12">
+        TOTS: {{ $filas }} props
+        <span class="alert-success">
+            {{ Prop::numeroVen($tPrecio, 0) }}</span>{{-- 'Prop' es un alias definido en config/app.php --}}<br>
+        <span class="alert-info">Compartido con IVA:</span>
+        <span class="alert-success">
+            {{ Prop::numeroVen($tCompartidoConIva, 2) }}</span><br>
+        <span class="alert-info">Lados:</span>
+        <span class="alert-success">
+            {{ $tLados }}</span><br>
+        <span class="alert-info">Captador:</span>
+        <span class="alert-success">
+            {{ Prop::numeroVen($tCaptadorPrbr, 2) }}
+            @if (0 < $tCaptadorPrbrSel)
+            ({{ Prop::numeroVen($tCaptadorPrbrSel, 2) }} [{{ $tLadosCap }}])
+            @endif
+        </span><br>
+        <span class="alert-info">Gerente:</span>
+        <span class="alert-success">
+            {{ Prop::numeroVen($tGerente, 2) }}</span><br>
+        <span class="alert-info">Cerrador:</span>
+        <span class="alert-success">
+            {{ Prop::numeroVen($tCerradorPrbr, 2) }}
+            @if (0 < $tCerradorPrbrSel)
+            ({{ Prop::numeroVen($tCerradorPrbrSel, 2) }} [{{ $tLadosCer }}])
+            @endif
+        </span><br>
+        @if (0 < $tBonificaciones)
+        <span class="alert-info">Bons:</span>
+        <span class="alert-success">
+            {{ Prop::numeroVen($tBonificaciones, 2) }}</span><br>
+        @endif
+        @if (0 < $tComisionBancaria)
+        <span class="alert-info">Coms:</span>
+        <span class="alert-success">
+            {{ Prop::numeroVen($tComisionBancaria, 2) }}</span><br>
+        @endif
+        <span class="alert-info">Neto:</span>
+        <span class="alert-success">
+            {{ Prop::numeroVen($tIngresoNetoOfici, 2) }}</span><br>
+        <span class="alert-info">PVR:</span>
+        <span class="alert-success">
+            {{ Prop::numeroVen($tPrecioVentaReal, 2) }}
+            @if ((0 < $tPvrCaptadorPrbrSel) || (0 < $tPvrCerradorPrbrSel))
+            ({{ Prop::numeroVen($tPvrCaptadorPrbrSel+$tPvrCerradorPrbrSel, 2) }})
+            @endif
+            </span><br>
+    </div>
+
     @else
         <p>No hay propiedades registradas.</p>
     @endif

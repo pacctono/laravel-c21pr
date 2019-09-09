@@ -4,24 +4,24 @@
 <div class="card">
     <h4 class="card-header">Resultado de
         {{ $contacto->resultado->descripcion }}
-            el <spam class="alert-info">
+            el <span class="alert-info">
                 {{ $contacto->evento_dia_semana }}
                 {{ $contacto->evento_con_hora }}
-            </spam>
+            </span>
         con {{ $contacto->name }}
     </h4>
     <div class="card-body">
-        <p>Telefono de contacto: <spam class="alert-info">
+        <p>Telefono de contacto: <span class="alert-info">
             0{{ $contacto->telefono }}
-        </spam>.
+        </span>.
         </p>
-        <p>Correo de contacto: <spam class="alert-info">{{ $contacto->email }}
-        </spam>.
+        <p>Correo de contacto: <span class="alert-info">{{ $contacto->email }}
+        </span>.
         </p>
-        <p>Atendido por: <spam class="alert-info">[{{ $contacto->user_id }}] {{ $contacto->user->name }}
-        </spam></p>
-        <p>Dirección del contacto: <spam class="alert-info">{{ $contacto->direccion }}
-        </spam></p>
+        <p>Atendido por: <span class="alert-info">[{{ $contacto->user_id }}] {{ $contacto->user->name }}
+        </span></p>
+        <p>Dirección del contacto: <span class="alert-info">{{ $contacto->direccion }}
+        </span></p>
 
         <form method="POST" class="form align-items-end-horizontal"
                 action="{{ route('agenda.update', $id) }}">

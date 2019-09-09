@@ -4,50 +4,50 @@
 <div class="card">
     <h4 class="card-header">Contacto inicial: {{ $cliente->name }}</h4>
     <div class="card-body">
-        <p>Este nombre ha contactado: <spam class="alert-info">{{ $cliente->veces_name }}
+        <p>Este nombre ha contactado: <span class="alert-info">{{ $cliente->veces_name }}
         @if (1 >= $cliente->veces_name)
                 vez.
             @else
                 veces.
             @endif
-        </spam></p>
-        <p>Telefono de contacto: <spam class="alert-info">
+        </span></p>
+        <p>Telefono de contacto: <span class="alert-info">
             0{{ substr($cliente->telefono, 0, 3) }}-{{ substr($cliente->telefono, 3) }}
-        </spam></p>
-        <p>Este telefono ha contactado: <spam class="alert-info">{{ $cliente->veces_telefono }}
+        </span></p>
+        <p>Este telefono ha contactado: <span class="alert-info">{{ $cliente->veces_telefono }}
         @if (1 >= $cliente->veces_telefono)
                 vez.
             @else
                 veces.
             @endif
-        </spam></p>
-        <p>Correo de contacto: <spam class="alert-info">{{ $cliente->email }}
-        </spam></p>
-        <p>Este correo ha contactado: <spam class="alert-info">{{ $cliente->veces_email }}
+        </span></p>
+        <p>Correo de contacto: <span class="alert-info">{{ $cliente->email }}
+        </span></p>
+        <p>Este correo ha contactado: <span class="alert-info">{{ $cliente->veces_email }}
             @if (1 >= $cliente->veces_email)
                 vez.
             @else
                 veces.
             @endif
-        </spam></p>
-        <p>Atendido por: <spam class="alert-info">[{{ $cliente->user_id }}] {{ $cliente->user->name }}
-        </spam></p>
-        <p>Dirección: <spam class="alert-info">{{ $cliente->direccion }}
-        </spam></p>
-        <p>Desea: <spam class="alert-info">{{ $cliente->deseo->descripcion }}
-        </spam></p>
-        <p>Tipo: <spam class="alert-info">{{ $cliente->tipo->descripcion }}
-        </spam></p>
-        <p>Zona: <spam class="alert-info">{{ $cliente->zona->descripcion }}
-        </spam></p>
-        <p>Precio: <spam class="alert-info">{{ $cliente->precio->descripcion }}
-        </spam></p>
-        <p>Origen: <spam class="alert-info">{{ $cliente->origen->descripcion }}
-        </spam></p>
-        <p>Resultado: <spam class="alert-info">{{ $cliente->resultado->descripcion }}
-        </spam></p>
-        <p>Observaciones: <spam class="alert-info">{{ $cliente->observaciones }}
-        </spam></p>
+        </span></p>
+        <p>Atendido por: <span class="alert-info">[{{ $cliente->user_id }}] {{ $cliente->user->name }}
+        </span></p>
+        <p>Dirección: <span class="alert-info">{{ $cliente->direccion }}
+        </span></p>
+        <p>Desea: <span class="alert-info">{{ $cliente->deseo->descripcion }}
+        </span></p>
+        <p>Tipo: <span class="alert-info">{{ $cliente->tipo->descripcion }}
+        </span></p>
+        <p>Zona: <span class="alert-info">{{ $cliente->zona->descripcion }}
+        </span></p>
+        <p>Precio: <span class="alert-info">{{ $cliente->precio->descripcion }}
+        </span></p>
+        <p>Origen: <span class="alert-info">{{ $cliente->origen->descripcion }}
+        </span></p>
+        <p>Resultado: <span class="alert-info">{{ $cliente->resultado->descripcion }}
+        </span></p>
+        <p>Observaciones: <span class="alert-info">{{ $cliente->observaciones }}
+        </span></p>
         @if ($cliente->user_borro != null)
             <p>Este cliente fue borrado por {{ $cliente->userBorro->name }}
                 el {{ $diaSemana[$cliente->created_at->format('w')] }}, {{ $cliente->borrado_at->format('d/m/Y') }}.

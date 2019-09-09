@@ -42,6 +42,7 @@ class Propiedad extends Model
         'created_at',
         'updated_at'
     ];
+    protected $COMISION = 5.00;
     protected $IVA = 16.00;
     public $mMoZero = true;
     public $espMonB = true;
@@ -677,9 +678,9 @@ class Propiedad extends Model
     public function precioVentaReal()
     {
         $factor1 = 100.0/($this->IVA + 100.0);
-        $factor2 = 100.0/$this->comision;
+        $factor2 = 100.0/$this->COMISION;
 
-        if ($this->IVA == $this->iva)
+        if (($this->COMISION == $this->comision) and ($this->IVA == $this->iva))
             $valor = $this->precio;
         else
             $valor = $this->getReservaConIvaAttribute() * $factor1 * $factor2;

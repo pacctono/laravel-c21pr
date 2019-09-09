@@ -36,7 +36,8 @@
             <th scope="row">{{ $user->id }}</th>
             <td>
                 @if (1 < $user->id)
-                <a href="{{ route('reporte.contactosUser', [$user->id, 'id']) }}" class="btn btn-link">
+                <a href="{{ route('reporte.contactosUser', [$user->id, 'id']) }}" class="btn btn-link"
+                    title="Mostrar reporte de contactos del asesor.">
                 @endif
                     {{ $user->name }}
                 @if (1 < $user->id)

@@ -161,7 +161,11 @@
             <li class="nav-item dropdown">
               <button type="button" class="btn btn-info dropdown-toggle"
                               data-toggle="dropdown">
+              @if (1 < Auth::user()->id)
                 {{ Auth::user()->name }}
+              @else
+                Programador
+              @endif
               </button>
               <div class="dropdown-menu">
                 <a class="dropdown-item active" href="{{ route('logout') }}"

@@ -4,36 +4,36 @@
 <div class="card">
     <h4 class="card-header">Resultado de
         {{ $cita->contacto->resultado->descripcion }}
-            el <spam class="alert-info">
+            el <span class="alert-info">
                 {{ $cita->contacto->evento_dia_semana }}
                 {{ $cita->contacto->evento_con_hora }}
-            </spam>
+            </span>
         con {{ $cita->contacto->name }}
     </h4>
     <div class="card-body">
-        <p>Telefono de contacto: <spam class="alert-info">
+        <p>Telefono de contacto: <span class="alert-info">
             {{ $cita->contacto->telefono_f }}
-        </spam>.
+        </span>.
         </p>
-        <p>Correo de contacto: <spam class="alert-info">{{ $cita->contacto->email }}
-        </spam>.
+        <p>Correo de contacto: <span class="alert-info">{{ $cita->contacto->email }}
+        </span>.
         </p>
-        <p>Atendido por: <spam class="alert-info">
+        <p>Atendido por: <span class="alert-info">
             [{{ $cita->contacto->user_id }}]
             {{ $cita->contacto->user->name }}
-        </spam></p>
-        <p>Dirección del contacto: <spam class="alert-info">{{ $cita->contacto->direccion }}
-        </spam></p>
+        </span></p>
+        <p>Dirección del contacto: <span class="alert-info">{{ $cita->contacto->direccion }}
+        </span></p>
         @if (NULL == $cita->fecha_cita)
-        <p><spam class="alert-info">La cita, todavía no ha sido concretada.</spam></p>
+        <p><span class="alert-info">La cita, todavía no ha sido concretada.</span></p>
         @else
-        <p>La cita fue realizada: <spam class="alert-info">
+        <p>La cita fue realizada: <span class="alert-info">
             {{ $cita->cita_dia_semana }}
             {{ $cita->cita_con_hora }}
-        </spam></p>
-        <p>Comentarios de la cita realizada: <spam class="alert-info">
+        </span></p>
+        <p>Comentarios de la cita realizada: <span class="alert-info">
             {{ $cita->comentarios }}
-        </spam></p>
+        </span></p>
         @endif
         <p>
             <a href="{{ route('agenda') }}" class="btn btn-link">Regresar a la agenda</a>

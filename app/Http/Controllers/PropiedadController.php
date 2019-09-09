@@ -9,7 +9,8 @@ use Illuminate\Support\Facades\Auth;        // PC
 use Illuminate\Support\Facades\DB;          // PC
 use Illuminate\Support\Facades\Storage;     // PC
 use Carbon\Carbon;                          // PC
-use App\MisClases\Fecha;
+use App\MisClases\Fecha;                    // PC
+use Jenssegers\Agent\Agent;                 // PC
 
 class PropiedadController extends Controller
 {
@@ -229,14 +230,17 @@ class PropiedadController extends Controller
                 $tCaptadorPrbrSel, $tCerradorPrbrSel, $tLadosCap, $tLadosCer,
                 $tPvrCaptadorPrbrSel, $tPvrCerradorPrbrSel) =
                 $this->totales($propiedades, True, $captador, $cerrador);
-        //$propiedades = $propiedades->paginate(10);      // Pagina la impresión de 10 en 10
+        $agente = new Agent();
+        $movil  = $agente->isMobile() and true;             // Fuerzo booleana. No funciona al usar el metodo directamente.
+        $paginar = ($paginar)?!$movil:$paginar;
         if ($paginar) $propiedades = $propiedades->paginate(10);      // Pagina la impresión de 10 en 10
         else $propiedades = $propiedades->get();                      // Mostrar todos los registros.
 // Devolver las fechas sin la hora. Los diez primeros caracteres son: yyyy-mm-dd.
         session(['fecha_desde' => $fecha_desde,    // Asignar valores en sesión.
                     'fecha_hasta' => $fecha_hasta, 'captador' => $captador,
                     'cerrador' => $cerrador]);
-        return view('propiedades.index', compact('title', 'users', 'propiedades',
+        return view((($movil)?'celular.indexPropiedades':'propiedades.index'),
+                    compact('title', 'users', 'propiedades',
                     'filas', 'tPrecio', 'tCompartidoConIva', 'tLados',
                     'tFranquiciaSinIva', 'tFranquiciaConIva', 'tFranquiciaPagarR',
                     'tRegalia', 'tSanaf5PorCiento', 'tOficinaBrutoReal',
@@ -468,7 +472,10 @@ class PropiedadController extends Controller
         $exito = session('exito', '');
         session(['exito' => '']);
 
-        return view('propiedades.create', compact('title', 'users', 'cols', 'exito'));
+        $agente = new Agent();
+        $movil  = $agente->isMobile() and true;             // Fuerzo booleana. No funciona al usar el metodo directamente.
+        return view((($movil)?'celular.createPropiedades':'propiedades.create'),
+                    compact('title', 'users', 'cols', 'exito'));
     }
 
     /**
@@ -656,14 +663,20 @@ class PropiedadController extends Controller
         }
         
         //dd($propiedad);
-        if (1 == Auth::user()->is_admin) {
-            return view('propiedades.show', compact('propiedad', 'rutRetorno', 'col_id'));
+        if (Auth::user()->is_admin) {
+            $agente = new Agent();
+            $movil  = $agente->isMobile() and true;             // Fuerzo booleana. No funciona al usar el metodo directamente.
+            return view((($movil)?'celular.showPropiedad':'propiedades.show'),
+                        compact('propiedad', 'rutRetorno', 'col_id'));
         }
         if ($propiedad->user_borro != null) {
             return redirect()->back();
         }
         if ($propiedad->user->id == Auth::user()->id) {
-            return view('propiedades.show', compact('propiedad', 'rutRetorno', 'col_id'));
+            $agente = new Agent();
+            $movil  = $agente->isMobile() and true;             // Fuerzo booleana. No funciona al usar el metodo directamente.
+            return view((($movil)?'celular.showPropiedad':'propiedades.show'),
+                        compact('propiedad', 'rutRetorno', 'col_id'));
         } else {
             return redirect()->back();
         }
@@ -689,9 +702,11 @@ class PropiedadController extends Controller
         $users = User::get(['id', 'name']);     // Todos los usuarios (asesores).
         $users[0]['name'] = 'Asesor otra oficina';
 //        dd($propiedad);
-        if ((1 == Auth::user()->is_admin) or ($propiedad->user->id == Auth::user()->id)) {
-            return view('propiedades.edit', ['propiedad' => $propiedad, 'users' => $users,
-                                                'cols' => $cols, 'title' => $title]);
+        if ((Auth::user()->is_admin) or ($propiedad->user->id == Auth::user()->id)) {
+            $agente = new Agent();
+            $movil  = $agente->isMobile() and true;             // Fuerzo booleana. No funciona al usar el metodo directamente.
+            return view((($movil)?'celular.editPropiedades':'propiedades.edit'),
+                        ['propiedad' => $propiedad, 'users' => $users, 'cols' => $cols, 'title' => $title]);
         }
         return redirect('/propiedades');
     }

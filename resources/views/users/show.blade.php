@@ -18,46 +18,46 @@
         @endif
     </h4>
     <div class="card-body">
-        <p>Cédula de identidad: <spam class={{ $clase }}>{{ $user->cedula_f }}</spam></p>
-        <p>Telefono del asesor: <spam class={{ $clase }}>{{ $user->telefono_f }}</spam></p>
-        <p>Correo personal del asesor: <spam class={{ $clase }}>{{ $user->email }}</spam></p>
+        <p>Cédula de identidad: <span class={{ $clase }}>{{ $user->cedula_f }}</span></p>
+        <p>Telefono del asesor: <span class={{ $clase }}>{{ $user->telefono_f }}</span></p>
+        <p>Correo personal del asesor: <span class={{ $clase }}>{{ $user->email }}</span></p>
         <p>Fecha de nacimiento:
             @if ('' == $user->fecha_nacimiento or $user->fecha_nacimiento == null)
                 &nbsp;
             @else
-            <spam class={{ $clase }}>
+            <span class={{ $clase }}>
                 {{ $user->fecha_nacimiento_en }}
                 ({{ $user->edad }} años)
-            </spam>
+            </span>
             @endif
         </p>
-        <p>Correo century21 del asesor: <spam class={{ $clase }}>{{ $user->email_c21 }}</spam></p>
-        <p>Licencia MLS: <spam class={{ $clase }}>{{ $user->licencia_mls }}</spam></p>
+        <p>Correo century21 del asesor: <span class={{ $clase }}>{{ $user->email_c21 }}</span></p>
+        <p>Licencia MLS: <span class={{ $clase }}>{{ $user->licencia_mls }}</span></p>
         <p>Fecha de ingreso:
             @if ('' == $user->fecha_ingreso or $user->fecha_ingreso == null)
                 &nbsp;
             @else
-            <spam class={{ $clase }}>
+            <span class={{ $clase }}>
                 {{ $user->fecha_ingreso_en }}
                 ({{ $user->Tiempo_servicio }})
-            </spam>
+            </span>
             @endif
         </p>
 	    <p>
-            Sexo: <spam class={{ $clase }}>{{ $user->genero }}</spam>
-            Estado civil: <spam class={{ $clase }}>{{ $user->edocivil }}</spam>
+            Sexo: <span class={{ $clase }}>{{ $user->genero }}</span>
+            Estado civil: <span class={{ $clase }}>{{ $user->edocivil }}</span>
         </p>
     	<p>
-            Profesión: <spam class={{ $clase }}>{{ $user->profesion }}</spam>
+            Profesión: <span class={{ $clase }}>{{ $user->profesion }}</span>
         </p>
     	<p>
-            Dirección: <spam class={{ $clase }}>{{ $user->direccion }}</spam>
+            Dirección: <span class={{ $clase }}>{{ $user->direccion }}</span>
         </p>
         @if (null != $fechaUltLogin)
         <p>Fecha del último login:
-            <spam class={{ $clase }}>
+            <span class={{ $clase }}>
                 {{ $fechaUltLogin }}
-            </spam>
+            </span>
         </p>
         @endif
 

@@ -10,118 +10,117 @@
         @if (1 < $propiedad->user_id)
         ([{{ $propiedad->user_id }}] {{ substr($propiedad->user->name, 0, 20) }})
         @endif
-        </spam></p>
     </h4>
     <div class="card-body">
-        <p>Estatus del Inmueble: <spam class="alert-info">
+        <p>Estatus del Inmueble: <span class="alert-info">
             {{ $propiedad->estatus_alfa }}
-        </spam></p>
-        <p>Fecha de Reserva: <spam class="alert-info">
+        </span></p>
+        <p>Fecha de Reserva: <span class="alert-info">
             {{ $propiedad->reserva_en }}
-        </spam>&nbsp;
-        Fecha de la firma: <spam class="alert-info">
+        </span>&nbsp;
+        Fecha de la firma: <span class="alert-info">
             {{ $propiedad->firma_en }}
-        </spam></p>
-	<p>Comisi&oacute;n: <spam class="alert-info">
+        </span></p>
+	<p>Comisi&oacute;n: <span class="alert-info">
 	    {{ $propiedad->comision_p }}
-        </spam>&nbsp;Reserva sin IVA:<spam class="alert-info">
+        </span>&nbsp;Reserva sin IVA:<span class="alert-info">
             {{ $propiedad->reserva_sin_iva_ven }}
-        </spam>&nbsp;Reserva con IVA:<spam class="alert-info">
+        </span>&nbsp;Reserva con IVA:<span class="alert-info">
             {{ $propiedad->reserva_con_iva_ven }}
-        </spam>&nbsp;<spam class="alert-info">(IVA:
+        </span>&nbsp;<span class="alert-info">(IVA:
             {{ $propiedad->iva_p }})
-        </spam></p>
-	<p>Lados: <spam class="alert-info">
+        </span></p>
+	<p>Lados: <span class="alert-info">
         {{ $propiedad->lados }}
-        </spam>&nbsp;Compartido con otra oficina sin IVA:<spam class="alert-info">
+        </span>&nbsp;Compartido con otra oficina sin IVA:<span class="alert-info">
             {{ $propiedad->compartido_sin_iva_ven }}
-        </spam>&nbsp;Compartido con otra oficina con IVA:<spam class="alert-info">
+        </span>&nbsp;Compartido con otra oficina con IVA:<span class="alert-info">
             {{ $propiedad->compartido_con_iva_ven }}
-        </spam></p>
-	<p>Reportado a casa nacional: <spam class="alert-info">
+        </span></p>
+	<p>Reportado a casa nacional: <span class="alert-info">
         {{ $propiedad->reportado_casa_nacional_p }}
-        </spam>&nbsp;Franquicia de reserva sin IVA:<spam class="alert-info">
+        </span>&nbsp;Franquicia de reserva sin IVA:<span class="alert-info">
             {{ $propiedad->franquicia_reservado_sin_iva_ven }}
-        </spam>&nbsp;Franquicia de reserva con IVA:<spam class="alert-info">
+        </span>&nbsp;Franquicia de reserva con IVA:<span class="alert-info">
             {{ $propiedad->franquicia_reservado_con_iva_ven }}
-        </spam></p>
-	<p>Franquicia a pagar reportada: <spam class="alert-info">
+        </span></p>
+	<p>Franquicia a pagar reportada: <span class="alert-info">
             {{ $propiedad->franquicia_pagar_reportada_ven }}
-        </spam>&nbsp;Regalia: <spam class="alert-info">
+        </span>&nbsp;Regalia: <span class="alert-info">
             {{ $propiedad->regalia_ven }}
             &nbsp;({{ $propiedad->porc_regalia_p }})
-        </spam>&nbsp;SANAF 5%: <spam class="alert-info">
+        </span>&nbsp;SANAF 5%: <span class="alert-info">
             {{ $propiedad->sanaf_5_por_ciento_ven }}
-        </spam></p>
-    <p>Oficina bruto real: <spam class="alert-info">
+        </span></p>
+    <p>Oficina bruto real: <span class="alert-info">
             {{ $propiedad->oficina_bruto_real_ven }}
-        </spam>&nbsp; Base para honorarios socios: <spam class="alert-info">
+        </span>&nbsp; Base para honorarios socios: <span class="alert-info">
             {{ $propiedad->base_honorarios_socios_ven }}
-        </spam>&nbsp; Base para honorarios: <spam class="alert-info">
+        </span>&nbsp; Base para honorarios: <span class="alert-info">
             {{ $propiedad->base_para_honorarios_ven }}
-        </spam></p>
-    <p>Asesor captador: <spam class="alert-info">
+        </span></p>
+    <p>Asesor captador: <span class="alert-info">
             {{ ('1' == $propiedad->asesor_captador_id)?
                     $propiedad->asesor_captador:
                     $propiedad->captador->name }}
-        </spam>
+        </span>
             [{{ (($propiedad->aplicar_porc_captador)?'*':'') .
                                             $propiedad->porc_captador_prbr_p }}]
-        <spam class="alert-info">
+        <span class="alert-info">
             {{ ($propiedad->captador_prbr_ven) }}
-        </spam>&nbsp;Asesor cerrador: <spam class="alert-info">
+        </span>&nbsp;Asesor cerrador: <span class="alert-info">
             {{ ('1' == $propiedad->asesor_cerrador_id)?
                     $propiedad->asesor_cerrador:
                     $propiedad->cerrador->name }}
-        </spam>
+        </span>
             [{{ (($propiedad->aplicar_porc_cerrador)?'*':'') .
                                             $propiedad->porc_cerrador_prbr_p }}]
-        <spam class="alert-info">
+        <span class="alert-info">
             {{ ($propiedad->cerrador_prbr_ven) }}
-        </spam></p>
+        </span></p>
     <p>GERENTE:
         [{{ (($propiedad->aplicar_porc_gerente)?'*':'') .
                                             $propiedad->porc_gerente_p }}]
-        <spam class="alert-info">
+        <span class="alert-info">
             {{ $propiedad->gerente_ven }}
-        </spam>&nbsp;Bonificaciones: <spam class="alert-info">
+        </span>&nbsp;Bonificaciones: <span class="alert-info">
             {{ $propiedad->bonificaciones_ven }}
-        </spam>&nbsp;Comisi&oacute;n bancaria descontada: <spam class="alert-info">
+        </span>&nbsp;Comisi&oacute;n bancaria descontada: <span class="alert-info">
             {{ $propiedad->comision_bancaria_ven }}
-        </spam>&nbsp;Ingreso neto a oficina: <spam class="alert-info">
+        </span>&nbsp;Ingreso neto a oficina: <span class="alert-info">
             {{ $propiedad->ingreso_neto_oficina_ven }}
-        </spam></p>
-    <p>Recibo No.: <spam class="alert-info">
+        </span></p>
+    <p>Recibo No.: <span class="alert-info">
         {{ ($propiedad->numero_recibo)?$propiedad->numero_recibo:'?' }}
-        </spam>&nbsp;Pago Gerente: <spam class="alert-info">
+        </span>&nbsp;Pago Gerente: <span class="alert-info">
         {{ $propiedad->pago_gerente }}
-        </spam>&nbsp;Fact.: <spam class="alert-info">
+        </span>&nbsp;Fact.: <span class="alert-info">
         {{ ($propiedad->factura_gerente)?$propiedad->factura_gerente:'?' }}
-        </spam></p>
-    <p>Pago Asesores: <spam class="alert-info">
+        </span></p>
+    <p>Pago Asesores: <span class="alert-info">
         {{ $propiedad->pago_asesores }}
-        </spam>&nbsp;Fact.: <spam class="alert-info">
+        </span>&nbsp;Fact.: <span class="alert-info">
         {{ ($propiedad->factura_asesores)?$propiedad->factura_asesores:'?' }}
-        </spam></p>
+        </span></p>
     @if (1 == $propiedad->lados)
-    <p>Pago Otra oficina: <spam class="alert-info">
+    <p>Pago Otra oficina: <span class="alert-info">
         {{ $propiedad->pago_otra_oficina }}
-        </spam></p>
+        </span></p>
     @endif
-    <p>Pagado Casa Nacional: <spam class="alert-info">
+    <p>Pagado Casa Nacional: <span class="alert-info">
         {{ ($propiedad->pagado_casa_nacional)?'Si':'No' }}
-        </spam>&nbsp;Estatus sistema C21: <spam class="alert-info">
+        </span>&nbsp;Estatus sistema C21: <span class="alert-info">
         {{ $propiedad->estatus_c21_alfa }}
-        </spam>&nbsp;Reporte casa nacional: <spam class="alert-info">
+        </span>&nbsp;Reporte casa nacional: <span class="alert-info">
         {{ $propiedad->reporte_casa_nacional }}
-        </spam></p>
+        </span></p>
     @if ($propiedad->factura_AyS)
-    <p>Factura A & S: <spam class="alert-info">
+    <p>Factura A & S: <span class="alert-info">
         {{ $propiedad->factura_AyS }}
-        </spam></p>
+        </span></p>
     @endif
-    <p>Comentarios: <spam class="alert-info">{{ $propiedad->comentarios }}
-        </spam></p>
+    <p>Comentarios: <span class="alert-info">{{ $propiedad->comentarios }}
+        </span></p>
     @if (null != $propiedad->user_borro)
         <p>Esta propiedad fue borrada por {{ $propiedad->userBorro->name }} el
             {{ $propiedad->borrado_dia_semana }}

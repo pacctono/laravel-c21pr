@@ -12,20 +12,13 @@ class Propiedad extends Model
     protected $fillable = [
         'codigo', 'fecha_reserva', 'fecha_firma', 'negociacion',
         'nombre', 'estatus', 'user_id', 'moneda', 'precio', 'comision',
-//        'reserva_sin_iva', 'iva', 'reserva_con_iva', 'lados',
-        'iva', 'lados',
-//        'compartido_con_iva', 'compartido_sin_iva',
-        'porc_franquicia', 'aplicar_porc_franquicia',
+        'iva', 'lados', 'porc_franquicia', 'aplicar_porc_franquicia',
         'aplicar_porc_franquicia_pagar_reportada',
-//        'franquicia_sin_iva', 'franquicia_pagar_reportada',
-        'reportado_casa_nacional', 'porc_regalia', //'regalia',
-//        'sanaf_5_porciento', 'oficina_bruto_real',
-//        'base_para_honorarios',
+        'reportado_casa_nacional', 'porc_regalia',
         'porc_captador_prbr', 'aplicar_porc_captador', 'captador_prbr',
-        'porc_gerente', 'aplicar_porc_gerente', // 'gerente',
+        'porc_gerente', 'aplicar_porc_gerente',
         'porc_cerrador_pbr', 'aplicar_porc_cerrador', 'cerrador_pbr',
         'porc_bonificacion', 'aplicar_porc_bonificacion',
-//        'bonificacion', 'comision_bancaria', 'numero_recibo',
         'comision_bancaria', 'numero_recibo',
         'asesor_captador_id', 'asesor_captador',
         'asesor_cerrador_id', 'asesor_cerrador',
@@ -42,6 +35,7 @@ class Propiedad extends Model
         'created_at',
         'updated_at'
     ];
+    protected $META_2019 = 400000;
     protected $COMISION = 5.00;
     protected $IVA = 16.00;
     public $mMoZero = true;

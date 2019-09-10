@@ -4,9 +4,9 @@
 <div class="card">
     <h4 class="card-header">
         @if ($user->activo)
-            {{ $clase="alert-info" }}
+            <?php $clase = $clase="alert-info"; ?>
         @else
-            {{ $clase="table-danger" }}
+            <?php $clase = $clase="table-danger"; ?>
         @endif
         Asesor: {{ $user->name }}
         @if (!$user->activo)

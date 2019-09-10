@@ -181,14 +181,20 @@ class PropiedadController extends Controller
         if ('' == $orden or null == $orden) {
             $orden = 'id';
         }
-        if (1 == Auth::user()->is_admin) {
+        if (Auth::user()->is_admin) {
             $users   = User::get(['id', 'name']);     // Todos los usuarios (asesores).
             $users[0]['name'] = 'Asesor otra oficina';
             $propiedades = Propiedad::where('id', '>', 0);   // condición dummy, solo para continuar armando la consulta.
         } else {
             $user   = User::find(Auth::user()->id);
             $title .= ' de ' . $user->name;
-            $propiedades = $user()->propiedades()  // OJO: Deberia buscar todos los captados y cerrados por este id.
+            $asesor = $user->id;
+            $propiedades = Propiedad::where(
+                                    function ($query) use ($asesor) {
+                                $query->where('user_id', $asesor)
+                                        ->orWhere('asesor_captador_id', $asesor)
+                                        ->orWhere('asesor_cerrador_id', $asesor);
+                                })
                             ->whereNull('user_borro');
         }
 
@@ -215,7 +221,7 @@ class PropiedadController extends Controller
             $propiedades = $propiedades
                             ->where('fecha_reserva', '<=', now(Fecha::$ZONA));
         }
-        if ((0 == $captador) and (0 == $cerrador)) {
+        if (((0 == $captador) and (0 == $cerrador)) and (Auth::user()->is_admin)) {
             $propiedades = $propiedades->orWhereNull('fecha_reserva');
         }
         $propiedades = $propiedades->orderBy($orden);   // Ordenar los items de los propiedades.
@@ -672,7 +678,9 @@ class PropiedadController extends Controller
         if ($propiedad->user_borro != null) {
             return redirect()->back();
         }
-        if ($propiedad->user->id == Auth::user()->id) {
+        if (($propiedad->user_id == Auth::user()->id) or
+            ($propiedad->asesor_captador_id == Auth::user()->id) or
+            ($propiedad->asesor_cerrador_id == Auth::user()->id)) {
             $agente = new Agent();
             $movil  = $agente->isMobile() and true;             // Fuerzo booleana. No funciona al usar el metodo directamente.
             return view((($movil)?'celular.showPropiedad':'propiedades.show'),
@@ -702,7 +710,9 @@ class PropiedadController extends Controller
         $users = User::get(['id', 'name']);     // Todos los usuarios (asesores).
         $users[0]['name'] = 'Asesor otra oficina';
 //        dd($propiedad);
-        if ((Auth::user()->is_admin) or ($propiedad->user->id == Auth::user()->id)) {
+        if ((Auth::user()->is_admin) or ($propiedad->user_id == Auth::user()->id) or
+            ($propiedad->asesor_captador_id == Auth::user()->id) or
+            ($propiedad->asesor_cerrador_id == Auth::user()->id)) {
             $agente = new Agent();
             $movil  = $agente->isMobile() and true;             // Fuerzo booleana. No funciona al usar el metodo directamente.
             return view((($movil)?'celular.editPropiedades':'propiedades.edit'),
@@ -838,7 +848,7 @@ class PropiedadController extends Controller
             return redirect('login');
         }
 
-        if (1 != Auth::user()->is_admin) {
+        if (!(Auth::user()->is_admin)) {
             return redirect('/propiedades');
         }
         if ($propiedad->user_borro != null) {

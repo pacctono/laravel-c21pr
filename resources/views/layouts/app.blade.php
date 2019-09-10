@@ -164,7 +164,7 @@
               @if (1 < Auth::user()->id)
                 {{ Auth::user()->name }}
               @else
-                Programador
+                Administrador
               @endif
               </button>
               <div class="dropdown-menu">

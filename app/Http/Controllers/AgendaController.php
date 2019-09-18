@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use Carbon\Carbon;
 use App\MisClases\Fecha;
+use Jenssegers\Agent\Agent;                 // PC
 
 class AgendaController extends Controller
 {
@@ -31,6 +32,8 @@ class AgendaController extends Controller
         $title = $this->tipo;
         $ruta = request()->path();
         $periodo = request()->all();
+        $agente = new Agent();
+        $movil  = $agente->isMobile() and true;             // Fuerzo booleana. No funciona al usar el metodo directamente.
 //        dd($periodo);
 // Todo se inicializa, cuando se selecciona 'Agenda' desde el menú horizontal principal.
         if (('GET' == request()->method()) and ('' == $orden) and (0 == count($periodo))) {
@@ -47,13 +50,19 @@ class AgendaController extends Controller
             $fecha_desde = session('fecha_desde', '');
             $fecha_hasta = session('fecha_hasta', '');
             $asesor      = session('asesor', '0');
-        } else {
+        } else {    // Se ha solicitado una fecha o asesor especifico. Forma al inicio de la pagina.
+            if ($movil) $periodo['periodo'] = 'intervalo';
             $rPeriodo = $periodo['periodo'];            // Radio periodo.
-            if (isset($periodo['asesor'])) $asesor = $periodo['asesor'];
-            else $asesor = 0;
-
             $fecha_min = (new Carbon(Agenda::min('fecha_evento')));
             $fecha_max = (new Carbon(Agenda::max('fecha_evento')));
+            if (isset($periodo['asesor'])) {
+                $asesor = $periodo['asesor'];
+                if ((!isset($periodo['fecha_desde'])) or ('' == $periodo['fecha_desde']))
+                    $periodo['fecha_desde'] = $fecha_min;
+                if ((!isset($periodo['fecha_hasta'])) or ('' == $periodo['fecha_hasta']))
+                    $periodo['fecha_hasta'] = $fecha_max;
+            }
+            else $asesor = 0;
             list ($fecha_desde, $fecha_hasta) = Fecha::periodo($periodo, $fecha_min, $fecha_max);
         }
         //dd($periodo, $fecha_desde, $fecha_hasta);
@@ -97,12 +106,13 @@ class AgendaController extends Controller
         if ('user_id' == $orden) {              // Si se pidió ordenar por id de usuario,
             $agendas = $agendas->orderBy('fecha_evento');   // ordenar por fecha_evento en cada usuario.
         }
-        $agendas = $agendas->paginate(10);      // Pagina la impresión de 10 en 10
+        if ($movil) $agendas = $agendas->get();
+        else $agendas = $agendas->paginate(10);               // Pagina la impresión de 10 en 10
         session(['rPeriodo' => $rPeriodo, 'fecha_desde' => $fecha_desde,    // Asignar valores en sesión.
                     'fecha_hasta' => $fecha_hasta, 'asesor' => $asesor]);
         //if ('este_mes' == $rPeriodo) dd($agendas, $users, $fecha_desde, $fecha_hasta, $asesor);
         return view('agenda.index', compact('title', 'users', 'ruta', 'agendas',
-                    'rPeriodo', 'fecha_desde', 'fecha_hasta', 'asesor', 'alertar'));
+                    'rPeriodo', 'fecha_desde', 'fecha_hasta', 'asesor', 'alertar', 'movil'));
     }
 
     public function show(Contacto $contacto)

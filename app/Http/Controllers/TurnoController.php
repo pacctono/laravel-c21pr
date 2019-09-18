@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use App\MisClases\Fecha;
+use Jenssegers\Agent\Agent;                 // PC
 
 class TurnoController extends Controller
 {
@@ -24,6 +25,8 @@ class TurnoController extends Controller
         $title = 'Listado de ' . $this->tipo;
         $ruta = request()->path();
         $periodo = request()->all();
+        $agente = new Agent();
+        $movil  = $agente->isMobile() and true;             // Fuerzo booleana. No funciona al usar el metodo directamente.
 //        dd($periodo);
 // Todo se inicializa, cuando se selecciona 'turnos' desde el menú horizontal.
         if (('GET' == request()->method()) and ('' == $orden) and (0 == count($periodo))) {
@@ -48,13 +51,19 @@ class TurnoController extends Controller
             $fecha_desde = session('fecha_desde', '');
             $fecha_hasta = session('fecha_hasta', '');
             $asesor      = session('asesor', '0');
-        } else {
+        } else {    // Se ha solicitado una fecha o asesor especifico. Forma al inicio de la pagina.
+            if ($movil) $periodo['periodo'] = 'intervalo';
             $rPeriodo = $periodo['periodo'];            // Radio periodo.
-            if (isset($periodo['asesor'])) $asesor = $periodo['asesor'];
-            else $asesor = 0;
-
             $fecha_min = (new Carbon(Turno::min('turno')));
             $fecha_max = (new Carbon(Turno::max('turno')));
+            if (isset($periodo['asesor'])) {
+                $asesor = $periodo['asesor'];
+                if ((!isset($periodo['fecha_desde'])) or ('' == $periodo['fecha_desde']))
+                    $periodo['fecha_desde'] = $fecha_min;
+                if ((!isset($periodo['fecha_hasta'])) or ('' == $periodo['fecha_hasta']))
+                    $periodo['fecha_hasta'] = $fecha_max;
+            }
+            else $asesor = 0;
             list ($fecha_desde, $fecha_hasta) = Fecha::periodo($periodo, $fecha_min, $fecha_max);
         }
 //        dd($periodo, $fecha_desde, $fecha_hasta);
@@ -90,12 +99,13 @@ class TurnoController extends Controller
         if ('user_id' == $orden) {              // Si se pidió ordenar por id de usuario,
             $turnos = $turnos->orderBy('turno');   // ordenar por turno en cada usuario.
         }
-        $turnos = $turnos->paginate(10);      // Pagina la impresión de 10 en 10
+        if ($movil) $turnos = $turnos->get();
+        else $turnos = $turnos->paginate(10);               // Pagina la impresión de 10 en 10
 // Devolver las fechas sin la hora. Los diez primeros caracteres son: yyyy-mm-dd.
         session(['rPeriodo' => $rPeriodo, 'fecha_desde' => $fecha_desde,    // Asignar valores en sesión.
                     'fecha_hasta' => $fecha_hasta, 'asesor' => $asesor]);
         return view('turnos.index', compact('title', 'users', 'turnos', 'ruta', 'diaSemana',
-                'semanas', 'rPeriodo', 'fecha_desde', 'fecha_hasta', 'asesor', 'alertar'));
+                'semanas', 'rPeriodo', 'fecha_desde', 'fecha_hasta', 'asesor', 'alertar', 'movil'));
     }
 
     public function crear($semana = null)

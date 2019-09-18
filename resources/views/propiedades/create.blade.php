@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="card col-10">
+<div class="card col-12">
     <h4 class="card-header">{{ $title }}</h4>
     <div class="card-body">
     @if ($exito)
@@ -47,10 +47,10 @@
 
         <div class="row">
             <div class="form-group d-flex">
-              <label class="control-label col-sm-3" for="negociacion">
+              <label class="control-label col-sm-8" for="negociacion">
                 *Negociaci&oacute;n:
               </label>
-              <div class="form-control col-sm-2">
+              <div class="form-control col-sm-6">
                 <select name="negociacion" id="negociacion">
                   {{--<option value="">Tipo de negociacion?</option>--}}
                 {{-- @foreach (array('V' => 'Venta', 'A' => 'Alquiler') as $opcion => $muestra)--}}
@@ -63,14 +63,18 @@
                 @endforeach
                 </select>
               </div>
-                &nbsp;
-                <label class="control-label col-sm-2" for="fecha_reserva">Reserva:</label>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="form-group d-flex">
+                <label class="control-label col-sm-3" for="fecha_reserva">Fecha de reserva:</label>
                 <input type="date" class="form-control col-sm-3" name="fecha_reserva"
                         id="fecha_reserva" min="{{ now()->format('d/m/Y') }}"
                         max="{{ now()->addWeeks(4)->format('d/m/Y') }}"
                         value="{{ old('fecha_reserva') }}">
                 &nbsp;
-                <label class="control-label col-sm-2" for="fecha_firma">Firma:</label>
+                <label class="control-label col-sm-4" for="fecha_firma">Fecha de la firma:</label>
                 <input type="date" class="form-control col-sm-3" name="fecha_firma"
                     id="fecha_firma" min="{{ now()->addWeeks(-4)->format('d/m/Y') }}"
                     max="{{ now()->addWeeks(4)->format('d/m/Y') }}"
@@ -115,24 +119,30 @@
 
         <div class="row">
             <div class="form-group d-flex">
-                <label class="control-label col-sm-2" for="lados">Lados:</label>
-                <input type="number" class="form-control col-sm-2" size="1" maxlength="1"
+                <label class="control-label col-sm-8" for="lados">Lados:</label>
+                <input type="number" class="form-control col-sm-3" size="1" maxlength="1"
                     required name="lados" id="lados" value="{{ old('lados') }}">
-                <label class="control-label col-sm-3" for="porc_franquicia">*Franquicia:</label>
-                <input type="float" class="form-control col-sm-1" size="5" maxlength="5"
+            </div>
+        </div>
+
+        @if (Auth::user()->is_admin)
+        <div class="row">
+            <div class="form-group d-flex">
+                <label class="control-label col-sm-4" for="porc_franquicia">*Franquicia:</label>
+                <input type="float" class="form-control col-sm-2" size="5" maxlength="5"
                     name="porc_franquicia" id="porc_franquicia" placeholder="10" required
                     value="{{ old('porc_franquicia', $cols['porc_franquicia']['xdef']) }}">%
-                <label class="control-label col-sm-5" for="aplicar_porc_franquicia">
+                {{--<label class="control-label col-sm-5" for="aplicar_porc_franquicia">
                     Aplicar % reserva s/iva:</label>
                 <input type="checkbox" class="form-control col-sm-1"
                     name="aplicar_porc_franquicia" id="aplicar_porc_franquicia"
                     title="{{ $cols['aplicar_porc_franquicia']['come'] }}"
                     {{ old('aplicar_porc_franquicia',
-                        $cols['aplicar_porc_franquicia']['xdef']) ? "checked" : "" }}>
-            </div>
-        </div>
+                        $cols['aplicar_porc_franquicia']['xdef']) ? "checked" : "" }}>--}}
+            {{--</div>
+        </div>--}}
 
-        <div class="row">
+        {{--<div class="row">
             <div class="form-group d-flex">
                 <label class="control-label col-sm-12"
                     for="aplicar_porc_franquicia_pagar_reportada">
@@ -160,16 +170,21 @@
                         $cols['aplicar_franquicia_pagar_reportada_bruto']['xdef']) ?
                         "checked" : "" }}>
             </div>
-        </div>
+        </div>--}}
 
-        <div class="row">
-            <div class="form-group d-flex">
-                <label class="control-label col-sm-7" for="reportado_casa_nacional">
+        {{--<div class="row">
+            <div class="form-group d-flex">--}}
+                <label class="control-label col-sm-6" for="reportado_casa_nacional">
                     *Reportado casa nacional:</label>
                 <input type="float" class="form-control col-sm-2" size="5" maxlength="5"
                     name="reportado_casa_nacional" id="reportado_casa_nacional"
                     value="{{ old('reportado_casa_nacional',
                                 $cols['reportado_casa_nacional']['xdef']) }}">%
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="form-group d-flex">
                 <label class="control-label col-sm-3" for="porc_regalia">*Regalia:</label>
                 <input type="float" class="form-control col-sm-2" size="5" maxlength="5"
                     name="porc_regalia" id="porc_regalia" required
@@ -179,6 +194,23 @@
                 <input type="float" class="form-control col-sm-2" size="18" maxlength="18"
                     name="sanaf_5_porciento" id="sanaf_5_porciento" placeholder="ddd.ddd,dd"
                     value="{{ old('sanaf_5_porciento') }}">--}}
+            {{--</div>
+        </div>
+
+        <div class="row">
+            <div class="form-group d-flex">--}}
+                <label class="control-label col-sm-5" for="porc_gerente">
+                    *Porcentaje gerente:</label>
+                <input type="float" class="form-control col-sm-2" size="5" maxlength="5"
+                    name="porc_gerente" id="porc_gerente" required
+                    value="{{ old('porc_gerente', $cols['porc_gerente']['xdef']) }}">%
+                {{--<label class="control-label col-sm-5" for="aplicar_porc_captador">
+                    *Aplicar % captador PRBR:</label>
+                <input type="checkbox" class="form-control col-sm-1"
+                    name="aplicar_porc_captador" id="aplicar_porc_captador"
+                    title="{{ $cols['aplicar_porc_captador']['come'] }}"
+                    {{ old('aplicar_porc_captador',
+                        $cols['aplicar_porc_captador']['xdef']) ? "checked" : "" }}>--}}
             </div>
         </div>
 
@@ -190,77 +222,65 @@
                     name="porc_captador_prbr" id="porc_captador_prbr" required
                     value="{{ old('porc_captador_prbr',
                                 $cols['porc_captador_prbr']['xdef']) }}">%
-                <label class="control-label col-sm-5" for="aplicar_porc_captador">
-                    *Aplicar % captador PRBR:</label>
-                <input type="checkbox" class="form-control col-sm-1"
-                    name="aplicar_porc_captador" id="aplicar_porc_captador"
-                    title="{{ $cols['aplicar_porc_captador']['come'] }}"
-                    {{ old('aplicar_porc_captador',
-                        $cols['aplicar_porc_captador']['xdef']) ? "checked" : "" }}>
-            </div>
-        </div>
-
-        <div class="row">
-            <div class="form-group d-flex">
-                <label class="control-label col-sm-5" for="porc_gerente">
-                    *Porcentaje gerente:</label>
-                <input type="float" class="form-control col-sm-2" size="5" maxlength="5"
-                    name="porc_gerente" id="porc_gerente" required
-                    value="{{ old('porc_gerente', $cols['porc_gerente']['xdef']) }}">%
-                <label class="control-label col-sm-5" for="aplicar_porc_gerente">
+                {{--<label class="control-label col-sm-5" for="aplicar_porc_gerente">
                     *Aplicar % gerente:</label>
                 <input type="checkbox" class="form-control col-sm-1"
                     name="aplicar_porc_gerente" id="aplicar_porc_gerente"
                     title="{{ $cols['aplicar_porc_gerente']['come'] }}"
                     {{ old('aplicar_porc_gerente',
-                        $cols['aplicar_porc_gerente']['xdef']) ? "checked" : "" }}>
-            </div>
+                        $cols['aplicar_porc_gerente']['xdef']) ? "checked" : "" }}>--}}
+            {{--</div>
         </div>
 
         <div class="row">
-            <div class="form-group d-flex">
+            <div class="form-group d-flex">--}}
                 <label class="control-label col-sm-5" for="porc_cerrador_prbr">
                     *Porcentaje cerrador PRBR:</label>
                 <input type="float" class="form-control col-sm-2" size="5" maxlength="5"
                     name="porc_cerrador_prbr" id="porc_cerrador_prbr" required
                     value="{{ old('porc_cerrador_prbr',
                                 $cols['porc_cerrador_prbr']['xdef']) }}">%
-                <label class="control-label col-sm-5" for="aplicar_porc_cerrador">
+                {{--<label class="control-label col-sm-5" for="aplicar_porc_cerrador">
                     *Aplicar % cerrador PRBR:</label>
                 <input type="checkbox" class="form-control col-sm-1"
                     name="aplicar_porc_cerrador" id="aplicar_porc_cerrador"
                     title="{{ $cols['aplicar_porc_cerrador']['come'] }}"
                     {{ old('aplicar_porc_cerrador',
-                        $cols['aplicar_porc_cerrador']['xdef']) ? "checked" : "" }}>
+                        $cols['aplicar_porc_cerrador']['xdef']) ? "checked" : "" }}>--}}
             </div>
         </div>
 
         <div class="row">
             <div class="form-group d-flex">
-                <label class="control-label col-sm-5" for="porc_bonificacion">
+                <label class="control-label col-sm-4" for="porc_bonificacion">
                     *Porcentaje bonificacion:</label>
                 <input type="float" class="form-control col-sm-2" size="5" maxlength="5"
                     name="porc_bonificacion" id="porc_bonificacion" required
                     value="{{ old('porc_bonificacion',
                         $cols['porc_bonificacion']['xdef']) }}">%
-                <label class="control-label col-sm-5" for="aplicar_porc_bonificacion">
+                {{--<label class="control-label col-sm-5" for="aplicar_porc_bonificacion">
                     *Aplicar % bonificacion:</label>
                 <input type="checkbox" class="form-control col-sm-1"
                     name="aplicar_porc_bonificacion" id="aplicar_porc_bonificacion"
                     title="{{ $cols['aplicar_porc_bonificacion']['come'] }}"
                     {{ old('aplicar_porc_bonificacion',
-                        $cols['aplicar_porc_bonificacion']['xdef']) ? "checked" : "" }}>
+                        $cols['aplicar_porc_bonificacion']['xdef']) ? "checked" : "" }}>--}}
+            {{--</div>
+        </div>
+
+        <div class="row">
+            <div class="form-group d-flex">--}}
+                <label class="control-label col-sm-4" for="comision_bancaria">
+                    Comision bancaria:</label>
+                <input type="float" class="form-control col-sm-3" size="15" maxlength="15"
+                    name="comision_bancaria" id="comision_bancaria"
+                    placeholder="ddd.ddd,dd" value="{{ old('comision_bancaria') }}">
             </div>
         </div>
 
         <div class="row">
             <div class="form-group d-flex">
-                <label class="control-label col-sm-3" for="comision_bancaria">
-                    Comision bancaria:</label>
-                <input type="float" class="form-control col-sm-3" size="15" maxlength="15"
-                    name="comision_bancaria" id="comision_bancaria"
-                    placeholder="ddd.ddd,dd" value="{{ old('comision_bancaria') }}">
-                <label class="control-label col-sm-3" for="numero_recibo">
+                <label class="control-label col-sm-6" for="numero_recibo">
                     N&uacute;mero de recibo:</label>
                 <input type="text" class="form-control col-sm-4" size="30" maxlength="30"
                     name="numero_recibo" id="numero_recibo"
@@ -411,6 +431,17 @@
                     value="{{ old('comentarios') }}">
             </div>
         </div>
+        @else
+            <input type="hidden" name="porc_franquicia" value="{{ $cols['porc_franquicia']['xdef'] }}">
+            <input type="hidden" name="reportado_casa_nacional" value="{{ $cols['reportado_casa_nacional']['xdef'] }}">
+            <input type="hidden" name="porc_regalia" value="{{ $cols['porc_regalia']['xdef'] }}">
+            <input type="hidden" name="porc_gerente" value="{{ $cols['porc_gerente']['xdef'] }}">
+            <input type="hidden" name="porc_captador_prbr" value="{{ $cols['porc_captador_prbr']['xdef'] }}">
+            <input type="hidden" name="porc_cerrador_prbr" value="{{ $cols['porc_cerrador_prbr']['xdef'] }}">
+            <input type="hidden" name="porc_bonificacion" value="{{ $cols['porc_bonificacion']['xdef'] }}">
+            <input type="hidden" name="asesor_captador_id" value="{{ Auth::user()->id }}">
+            <input type="hidden" name="asesor_cerrador_id" value="{{ Auth::user()->id }}">
+        @endif
 
         <div class="row">
             <div class="form-group d-flex">

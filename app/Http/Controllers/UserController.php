@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
+use Jenssegers\Agent\Agent;                 // PC
 
 class UserController extends Controller
 {
@@ -38,10 +39,13 @@ class UserController extends Controller
         if ('' == $orden or $orden == null) {
             $orden = 'id';
         }
-        $users = User::orderBy($orden)->paginate(10);
+        $agente = new Agent();
+        $movil  = $agente->isMobile() and true;             // Fuerzo booleana. No funciona al usar el metodo directamente.
+        if ($movil) $users = User::orderBy($orden)->get();
+        else $users = User::orderBy($orden)->paginate(10);
         //dd($users);
 
-        return view('users.index', compact('title', 'users', 'alertar'));
+        return view('users.index', compact('title', 'users', 'alertar', 'movil'));
     }
 
     public function show(User $user)

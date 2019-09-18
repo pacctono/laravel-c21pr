@@ -21,8 +21,8 @@ class CreatePropiedadsTable extends Migration
             $table->enum('negociacion', ['V', 'A'])->comment('[V]enta,[A]luiler');
             $table->string('nombre', 160);
             $table->enum('estatus', ['I', 'P', 'C', 'S'])
-                ->comment('[I]nmueble pendiente,Pagos pendientes,inmueble [C]errado y pagos realizados,[S]negociacion caida')
-                ->default('I');
+                ->comment('[A]ctivo,[I]nmueble pendiente,Pagos pendientes,inmueble [C]errado y pagos realizados,[S]negociacion caida')
+                ->default('A');
             $table->unsignedInteger('user_id');
             $table->foreign('user_id')->references('id')->on('users');
             $table->enum('moneda', ['$', 'Eu', 'Bs'])->default('$')->comment('$,Eu,Bs');

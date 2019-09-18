@@ -14,6 +14,7 @@ use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;        // PC
 use Carbon\Carbon;                          // PC
+use Jenssegers\Agent\Agent;                 // PC
 
 class ContactoController extends Controller
 {
@@ -42,16 +43,21 @@ class ContactoController extends Controller
         if ('' == $orden or $orden == null) {
             $orden = 'id';
         }
-        if (1 == Auth::user()->is_admin) {
-            $contactos = Contacto::orderBy($orden)->paginate(10);
+
+        $agente = new Agent();
+        $movil  = $agente->isMobile() and true;             // Fuerzo booleana. No funciona al usar el metodo directamente.
+        if (Auth::user()->is_admin) {
+            $contactos = Contacto::orderBy($orden);
         } else {
-            $contactos = User::find(Auth::user()->id)->contactos()->whereNull('user_borro')->orderBy($orden)->paginate(10);
+            $contactos = User::find(Auth::user()->id)->contactos()->whereNull('user_borro')->orderBy($orden);
             //return redirect('/contactos/create');
         }
+        if ($movil) $contactos = $contactos->get();
+        else $contactos = $contactos->paginate(10);
     
         //dd(Auth::user()->id);
 
-        return view('contactos.index', compact('title', 'contactos', 'ruta', 'alertar'));
+        return view('contactos.index', compact('title', 'contactos', 'ruta', 'alertar', 'movil'));
     }
 
     public function filtro($filtro)

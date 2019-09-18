@@ -118,201 +118,213 @@
                 required name="lados" id="lados" value="{{ old('lados') }}">
         </div>
 
-        <div class="form-group d-flex">
-            <label class="control-label col-sm-3" for="porc_franquicia">*Franquicia:</label>
-            <input type="float" class="form-control col-sm-1" size="5" maxlength="5"
-                name="porc_franquicia" id="porc_franquicia" placeholder="10" required
-                value="{{ old('porc_franquicia', $cols['porc_franquicia']['xdef']) }}">%
-        </div>
+        @if (Auth::user()->is_admin)
+            <div class="form-group d-flex">
+                <label class="control-label col-sm-3" for="porc_franquicia">*Franquicia:</label>
+                <input type="float" class="form-control col-sm-1" size="5" maxlength="5"
+                    name="porc_franquicia" id="porc_franquicia" placeholder="10" required
+                    value="{{ old('porc_franquicia', $cols['porc_franquicia']['xdef']) }}">%
+            </div>
 
-        <div class="form-group d-flex">
-            <label class="control-label col-sm-7" for="reportado_casa_nacional">
-                *%Report CN:</label>
-            <input type="float" class="form-control col-sm-2" size="5" maxlength="5"
-                name="reportado_casa_nacional" id="reportado_casa_nacional"
-                value="{{ old('reportado_casa_nacional',
-                            $cols['reportado_casa_nacional']['xdef']) }}">%
-        </div>
+            <div class="form-group d-flex">
+                <label class="control-label col-sm-7" for="reportado_casa_nacional">
+                    *%Report CN:</label>
+                <input type="float" class="form-control col-sm-2" size="5" maxlength="5"
+                    name="reportado_casa_nacional" id="reportado_casa_nacional"
+                    value="{{ old('reportado_casa_nacional',
+                                $cols['reportado_casa_nacional']['xdef']) }}">%
+            </div>
 
-        <div class="form-group d-flex">
-            <label class="control-label col-sm-3" for="porc_regalia">*Regalia:</label>
-            <input type="float" class="form-control col-sm-2" size="5" maxlength="5"
-                name="porc_regalia" id="porc_regalia" required
-                value="{{ old('porc_regalia', $cols['porc_regalia']['xdef']) }}">%
-        </div>
+            <div class="form-group d-flex">
+                <label class="control-label col-sm-3" for="porc_regalia">*Regalia:</label>
+                <input type="float" class="form-control col-sm-2" size="5" maxlength="5"
+                    name="porc_regalia" id="porc_regalia" required
+                    value="{{ old('porc_regalia', $cols['porc_regalia']['xdef']) }}">%
+            </div>
 
-        <div class="form-group d-flex">
-            <label class="control-label col-sm-5" for="porc_captador_prbr">
-                *%Captador:</label>
-            <input type="float" class="form-control col-sm-2" size="5" maxlength="5"
-                name="porc_captador_prbr" id="porc_captador_prbr" required
-                value="{{ old('porc_captador_prbr',
-                            $cols['porc_captador_prbr']['xdef']) }}">%
-        </div>
+            <div class="form-group d-flex">
+                <label class="control-label col-sm-5" for="porc_captador_prbr">
+                    *%Captador:</label>
+                <input type="float" class="form-control col-sm-2" size="5" maxlength="5"
+                    name="porc_captador_prbr" id="porc_captador_prbr" required
+                    value="{{ old('porc_captador_prbr',
+                                $cols['porc_captador_prbr']['xdef']) }}">%
+            </div>
 
-        <div class="form-group d-flex">
-            <label class="control-label col-sm-2" for="porc_gerente">
-                *%Gerente:</label>
-            <input type="float" class="form-control col-sm-2" size="5" maxlength="5"
-                name="porc_gerente" id="porc_gerente" required
-                value="{{ old('porc_gerente', $cols['porc_gerente']['xdef']) }}">%
-        </div>
+            <div class="form-group d-flex">
+                <label class="control-label col-sm-2" for="porc_gerente">
+                    *%Gerente:</label>
+                <input type="float" class="form-control col-sm-2" size="5" maxlength="5"
+                    name="porc_gerente" id="porc_gerente" required
+                    value="{{ old('porc_gerente', $cols['porc_gerente']['xdef']) }}">%
+            </div>
 
-        <div class="form-group d-flex">
-            <label class="control-label col-sm-5" for="porc_cerrador_prbr">
-                *%Cerrador:</label>
-            <input type="float" class="form-control col-sm-2" size="5" maxlength="5"
-                name="porc_cerrador_prbr" id="porc_cerrador_prbr" required
-                value="{{ old('porc_cerrador_prbr',
-                            $cols['porc_cerrador_prbr']['xdef']) }}">%
-        </div>
+            <div class="form-group d-flex">
+                <label class="control-label col-sm-5" for="porc_cerrador_prbr">
+                    *%Cerrador:</label>
+                <input type="float" class="form-control col-sm-2" size="5" maxlength="5"
+                    name="porc_cerrador_prbr" id="porc_cerrador_prbr" required
+                    value="{{ old('porc_cerrador_prbr',
+                                $cols['porc_cerrador_prbr']['xdef']) }}">%
+            </div>
 
-        <div class="form-group d-flex">
-            <label class="control-label col-sm-5" for="porc_bonificacion">
-                *%Bonificacion:</label>
-            <input type="float" class="form-control col-sm-2" size="5" maxlength="5"
-                name="porc_bonificacion" id="porc_bonificacion" required
-                value="{{ old('porc_bonificacion',
-                    $cols['porc_bonificacion']['xdef']) }}">%
-        </div>
+            <div class="form-group d-flex">
+                <label class="control-label col-sm-5" for="porc_bonificacion">
+                    *%Bonificacion:</label>
+                <input type="float" class="form-control col-sm-2" size="5" maxlength="5"
+                    name="porc_bonificacion" id="porc_bonificacion" required
+                    value="{{ old('porc_bonificacion',
+                        $cols['porc_bonificacion']['xdef']) }}">%
+            </div>
 
-        <div class="form-group d-flex">
-            <label class="control-label col-sm-3" for="comision_bancaria">
-                Com bancaria:</label>
-            <input type="float" class="form-control col-sm-3" size="15" maxlength="15"
-                name="comision_bancaria" id="comision_bancaria"
-                placeholder="ddd.ddd,dd" value="{{ old('comision_bancaria') }}">
-        </div>
+            <div class="form-group d-flex">
+                <label class="control-label col-sm-3" for="comision_bancaria">
+                    Com bancaria:</label>
+                <input type="float" class="form-control col-sm-3" size="15" maxlength="15"
+                    name="comision_bancaria" id="comision_bancaria"
+                    placeholder="ddd.ddd,dd" value="{{ old('comision_bancaria') }}">
+            </div>
 
-        <div class="form-group d-flex">
-            <label class="control-label col-sm-3" for="numero_recibo">
-                # recibo:</label>
-            <input type="text" class="form-control col-sm-4" size="30" maxlength="30"
-                name="numero_recibo" id="numero_recibo"
-                placeholder="Numero del recibo"
-                value="{{ old('numero_recibo') }}">
-        </div>
+            <div class="form-group d-flex">
+                <label class="control-label col-sm-3" for="numero_recibo">
+                    # recibo:</label>
+                <input type="text" class="form-control col-sm-4" size="30" maxlength="30"
+                    name="numero_recibo" id="numero_recibo"
+                    placeholder="Numero del recibo"
+                    value="{{ old('numero_recibo') }}">
+            </div>
 
-        <div class="form-group d-flex">
-            <label class="control-label col-sm-3" for="asesor_captador_id">
-                *Captador:</label>
-            <select name="asesor_captador_id" id="asesor_captador_id">
-                @foreach ($users as $user)
-                <option value="{{ $user->id }}"
-                    @if (old("asesor_captador_id") == $user->id)
-                        selected
+            <div class="form-group d-flex">
+                <label class="control-label col-sm-3" for="asesor_captador_id">
+                    *Captador:</label>
+                <select name="asesor_captador_id" id="asesor_captador_id">
+                    @foreach ($users as $user)
+                    <option value="{{ $user->id }}"
+                        @if (old("asesor_captador_id") == $user->id)
+                            selected
+                        @endif
+                            >{{ $user->name }}</option>
+                    @endforeach
+                </select>
+            </div>
+
+            <div class="form-group d-flex">
+                <label class="control-label col-sm-3" for="asesor_cerrador_id">
+                    *Cerrador:</label>
+                <select name="asesor_cerrador_id" id="asesor_cerrador_id">
+                    @foreach ($users as $user)
+                    @if (old("asesor_cerrador_id") == $user->id)
+                    <option value="{{ $user->id }}" selected>{{ $user->name }}</option>
+                    @else
+                    <option value="{{ $user->id }}">{{ $user->name }}</option>
                     @endif
-                        >{{ $user->name }}</option>
+                    @endforeach
+                </select>
+            </div>
+
+            <div class="form-group d-flex">
+                <label class="control-label col-sm-2" for="pago_gerente">
+                    Pago gerente:</label>
+                <input type="text" class="form-control col-sm-4" size="40" maxlength="100"
+                    name="pago_gerente" id="pago_gerente"
+                    placeholder="Como se realizo pago a gerente" value="{{ old('pago_gerente') }}">
+            </div>
+
+            <div class="form-group d-flex">
+                <label class="control-label col-sm-2" for="factura_gerente">
+                    Fact gerente:</label>
+                <input type="text" class="form-control col-sm-3" size="40" maxlength="100"
+                    name="factura_gerente" id="factura_gerente"
+                    placeholder="Factura gerente" value="{{ old('factura_gerente') }}">
+            </div>
+
+            <div class="form-group d-flex">
+                <label class="control-label col-sm-2" for="pago_asesores">
+                    Pago asesores:</label>
+                <input type="text" class="form-control col-sm-4" size="40" maxlength="100"
+                    name="pago_asesores" id="pago_asesores"
+                    placeholder="Como se realizo el pago a los asesores"
+                    value="{{ old('pago_asesores') }}">
+            </div>
+
+            <div class="form-group d-flex">
+                <label class="control-label col-sm-3" for="factura_asesores">
+                    Fact asesores:</label>
+                <input type="text" class="form-control col-sm-3" size="40" maxlength="100"
+                    name="factura_asesores" id="factura_asesores"
+                    placeholder="Factura asesores" value="{{ old('factura_asesores') }}">
+            </div>
+
+            <div class="form-group d-flex">
+                <label class="control-label col-sm-3" for="pago_otra_oficina">
+                    Pago otra of:</label>
+                <input type="text" class="form-control col-sm-10" size="50" maxlength="100"
+                    name="pago_otra_oficina" id="pago_otra_oficina"
+                    placeholder="Como se realizo el pago a otra oficina"
+                    value="{{ old('pago_otra_oficina') }}">
+            </div>
+
+            <div class="form-group d-flex">
+                <label class="control-label col-sm-5" for="pagado_casa_nacional">
+                    *Pagado casa n:</label>
+                <input type="checkbox" class="form-control col-sm-1"
+                    name="pagado_casa_nacional" id="pagado_casa_nacional"
+                    {{ old('pagado_casa_nacional',
+                        $cols['pagado_casa_nacional']['xdef']) ? "checked" : "" }}>
+            </div>
+
+            <div class="form-group d-flex">
+                <label class="control-label col-sm-3" for="estatus_sistema_c21">
+                    *Estatus sist C21:</label>
+                <select name="estatus_sistema_c21" id="estatus_sistema_c21">
+                @foreach ($cols['estatus_sistema_c21']['opcion'] as $opcion => $muestra)
+                    <option value="{{$opcion}}"
+                    @if (old('estatus_sistema_c21',
+                        $cols['estatus_sistema_c21']['xdef']) == $opcion)
+                    selected
+                    @endif
+                    >{{$muestra}}</option>
                 @endforeach
-            </select>
-        </div>
+                </select>
+            </div>
 
-        <div class="form-group d-flex">
-            <label class="control-label col-sm-3" for="asesor_cerrador_id">
-                *Cerrador:</label>
-            <select name="asesor_cerrador_id" id="asesor_cerrador_id">
-                @foreach ($users as $user)
-                @if (old("asesor_cerrador_id") == $user->id)
-                <option value="{{ $user->id }}" selected>{{ $user->name }}</option>
-                @else
-                <option value="{{ $user->id }}">{{ $user->name }}</option>
-                @endif
-                @endforeach
-            </select>
-        </div>
+            <div class="form-group d-flex">
+                <label class="control-label col-sm-4" for="reporte_casa_nacional">
+                    Rep casa nac:</label>
+                <input type="text" class="form-control col-sm-2"
+                    name="reporte_casa_nacional" id="reporte_casa_nacional"
+                    size="10" maxlength="10" placeholder="numero"
+                    value="{{ old('reporte_casa_nacional') }}">
+            </div>
 
-        <div class="form-group d-flex">
-            <label class="control-label col-sm-2" for="pago_gerente">
-                Pago gerente:</label>
-            <input type="text" class="form-control col-sm-4" size="40" maxlength="100"
-                name="pago_gerente" id="pago_gerente"
-                placeholder="Como se realizo pago a gerente" value="{{ old('pago_gerente') }}">
-        </div>
+            <div class="form-group d-flex">
+                <label class="control-label col-sm-3" for="factura_AyS">
+                    Factura A&S:</label>
+                <input type="text" class="form-control col-sm-4"
+                    name="factura_AyS" id="factura_AyS"
+                    size="30" maxlength="100" placeholder="numero de factura"
+                    value="{{ old('factura_AyS') }}">
+            </div>
 
-        <div class="form-group d-flex">
-            <label class="control-label col-sm-2" for="factura_gerente">
-                Fact gerente:</label>
-            <input type="text" class="form-control col-sm-3" size="40" maxlength="100"
-                name="factura_gerente" id="factura_gerente"
-                placeholder="Factura gerente" value="{{ old('factura_gerente') }}">
-        </div>
-
-        <div class="form-group d-flex">
-            <label class="control-label col-sm-2" for="pago_asesores">
-                Pago asesores:</label>
-            <input type="text" class="form-control col-sm-4" size="40" maxlength="100"
-                name="pago_asesores" id="pago_asesores"
-                placeholder="Como se realizo el pago a los asesores"
-                value="{{ old('pago_asesores') }}">
-        </div>
-
-        <div class="form-group d-flex">
-            <label class="control-label col-sm-3" for="factura_asesores">
-                Fact asesores:</label>
-            <input type="text" class="form-control col-sm-3" size="40" maxlength="100"
-                name="factura_asesores" id="factura_asesores"
-                placeholder="Factura asesores" value="{{ old('factura_asesores') }}">
-        </div>
-
-        <div class="form-group d-flex">
-            <label class="control-label col-sm-3" for="pago_otra_oficina">
-                Pago otra of:</label>
-            <input type="text" class="form-control col-sm-10" size="50" maxlength="100"
-                name="pago_otra_oficina" id="pago_otra_oficina"
-                placeholder="Como se realizo el pago a otra oficina"
-                value="{{ old('pago_otra_oficina') }}">
-        </div>
-
-        <div class="form-group d-flex">
-            <label class="control-label col-sm-5" for="pagado_casa_nacional">
-                *Pagado casa n:</label>
-            <input type="checkbox" class="form-control col-sm-1"
-                name="pagado_casa_nacional" id="pagado_casa_nacional"
-                {{ old('pagado_casa_nacional',
-                    $cols['pagado_casa_nacional']['xdef']) ? "checked" : "" }}>
-        </div>
-
-        <div class="form-group d-flex">
-            <label class="control-label col-sm-3" for="estatus_sistema_c21">
-                *Estatus sist C21:</label>
-            <select name="estatus_sistema_c21" id="estatus_sistema_c21">
-            @foreach ($cols['estatus_sistema_c21']['opcion'] as $opcion => $muestra)
-                <option value="{{$opcion}}"
-                @if (old('estatus_sistema_c21',
-                    $cols['estatus_sistema_c21']['xdef']) == $opcion)
-                selected
-                @endif
-                >{{$muestra}}</option>
-            @endforeach
-            </select>
-        </div>
-
-        <div class="form-group d-flex">
-            <label class="control-label col-sm-4" for="reporte_casa_nacional">
-                Rep casa nac:</label>
-            <input type="text" class="form-control col-sm-2"
-                name="reporte_casa_nacional" id="reporte_casa_nacional"
-                size="10" maxlength="10" placeholder="numero"
-                value="{{ old('reporte_casa_nacional') }}">
-        </div>
-
-        <div class="form-group d-flex">
-            <label class="control-label col-sm-3" for="factura_AyS">
-                Factura A&S:</label>
-            <input type="text" class="form-control col-sm-4"
-                name="factura_AyS" id="factura_AyS"
-                size="30" maxlength="100" placeholder="numero de factura"
-                value="{{ old('factura_AyS') }}">
-        </div>
-
-        <div class="form-group d-flex">
-            <label class="control-label col-sm-3" for="comentarios">
-                Comentarios:</label>
-            <input type="text" class="form-control col-sm-10"
-                name="comentarios" id="comentarios"
-                size="60" maxlength="600" placeholder="comentarios........."
-                value="{{ old('comentarios') }}">
-        </div>
+            <div class="form-group d-flex">
+                <label class="control-label col-sm-3" for="comentarios">
+                    Comentarios:</label>
+                <input type="text" class="form-control col-sm-10"
+                    name="comentarios" id="comentarios"
+                    size="60" maxlength="600" placeholder="comentarios........."
+                    value="{{ old('comentarios') }}">
+            </div>
+        @else
+            <input type="hidden" name="porc_franquicia" value="{{ $cols['porc_franquicia']['xdef'] }}">
+            <input type="hidden" name="reportado_casa_nacional" value="{{ $cols['reportado_casa_nacional']['xdef'] }}">
+            <input type="hidden" name="porc_regalia" value="{{ $cols['porc_regalia']['xdef'] }}">
+            <input type="hidden" name="porc_gerente" value="{{ $cols['porc_gerente']['xdef'] }}">
+            <input type="hidden" name="porc_captador_prbr" value="{{ $cols['porc_captador_prbr']['xdef'] }}">
+            <input type="hidden" name="porc_cerrador_prbr" value="{{ $cols['porc_cerrador_prbr']['xdef'] }}">
+            <input type="hidden" name="porc_bonificacion" value="{{ $cols['porc_bonificacion']['xdef'] }}">
+            <input type="hidden" name="asesor_captador_id" value="{{ Auth::user()->id }}">
+            <input type="hidden" name="asesor_cerrador_id" value="{{ Auth::user()->id }}">
+        @endif
 
         <div class="form-group d-flex">
             <button type="submit" class="btn btn-success col-sm-5">

@@ -2,10 +2,20 @@
 
 @section('content')
     <div class="d-flex justify-content-between align-items-end mb-1">
+        @if ($movil)
+        <h4 class="pb-1">{{ substr($title, 11) }}</h4>
+        @else
         <h1 class="pb-1">{{ $title }}</h1>
+        @endif
 
         <p>
-            <a href="{{ route('contactos.create') }}" class="btn btn-primary">Crear Contacto Inicial</a>
+            <a href="{{ route('contactos.create') }}" class="btn btn-primary">
+            @if ($movil)
+                Crear
+            @else
+                Crear Contacto Inicial
+            @endif
+            </a>
         </p>
     </div>
     @if ($alertar)
@@ -21,6 +31,11 @@
                     Nombre
                 </a>
             </th>
+            @if ($movil)
+            <th scope="col">
+                Contacto
+            </th>
+            @else
             <th scope="col">
                 <a href="{{ route('contactos.orden', 'telefono') }}" class="btn btn-link">
                     Telefono
@@ -44,17 +59,39 @@
             </th>
             @endif
             <th scope="col">Acciones</th>
+            @endif
         </tr>
         </thead>
         <tbody>
         @foreach ($contactos as $contacto)
         <tr>
-            <!-- th scope="row">{{ $contacto->id }}</th -->
-            <td>{{ $contacto->name }}</td>
+            {{--<td scope="row">{{ $contacto->id }}</td>--}}
             <td>
-                {{ $contacto->telefono_f }}
+                {{--@if ($movil)
+                <a href="{{ route('contactos.show', $contacto) }}" class="btn btn-link">
+                    {{ substr($contacto->name, 0, 30) }}
+                </a>
+                @else--}}
+                {{ $contacto->name }}
+                {{--@endif--}}
             </td>
-            <td>{{ $contacto->email }}</td>
+            <td>
+                @if ($movil)
+                <a href="{{ route('contactos.show', $contacto) }}" class="btn btn-link">
+                @endif
+                {{ $contacto->telefono_f }}
+                @if ($movil)
+                </a>
+                @endif
+            @if ($movil)
+            <br>
+            @else
+            </td>
+            <td>
+            @endif
+                {{ $contacto->email }}
+            </td>
+            @if (!$movil)
             <td>
                 {{ $contacto->creado_dia_semana }}
                 {{ $contacto->creado_en }}
@@ -94,11 +131,14 @@
                     @endif
                 @endif
             </td>
+            @endif
         </tr>
         @endforeach
         </tbody>
     </table>
+    @if (!$movil)
     {{ $contactos->links() }}
+    @endif
     @else
         <p>No hay contactos iniciales registrados.</p>
     @endif

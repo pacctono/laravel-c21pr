@@ -14,9 +14,21 @@
         <label>Hasta:</label>
         <input type="date" name="fecha_hasta" id="fecha_hasta" max="{{ now() }}"
             value="{{ old('fecha_hasta', $fecha_hasta) }}"><br>
-        @if (Auth::user()->is_admin)
+
+        <select name="estatus" id="estatus">
+            <option value="">Estatus</option>
+        @foreach ($arrEstatus as $opcion => $muestra)
+            <option value="{{$opcion}}"
+        @if (old('estatus', $estatus) == $opcion)
+            selected
+        @endif
+            >{{ substr($muestra, 0, 35) }}</option>
+        @endforeach
+        </select><br>
+
+    @if (Auth::user()->is_admin)
         <select name="captador" id="captador">
-        <option value="0">Captador</option>
+            <option value="0">Captador</option>
           @foreach ($users as $user)
             <option value="{{ $user->id }}"
             @if (old("captador", $captador) == $user->id)
@@ -27,10 +39,9 @@
             </option>
           @endforeach
         </select><br>
-        @endif
-        @if (Auth::user()->is_admin)
+
         <select name="cerrador" id="cerrador">
-          <option value="0">Cerrador</option>
+            <option value="0">Cerrador</option>
           @foreach ($users as $user)
             <option value="{{ $user->id }}"
             @if (old("cerrador", $cerrador) == $user->id)
@@ -41,19 +52,21 @@
             </option>
           @endforeach
         </select><br>
-        @endif
+    @endif
         <button type="submit" class="btn btn-success">Mostrar</button>
         <br>
       </div>
     </form>
 </div>
 
-    <div class="d-flex justify-content-between align-items-end mb-1">
-        <h1 class="pb-1">Propiedades</h1>
-
-        <p>
-            <a href="{{ route('propiedades.create') }}" class="btn btn-primary">Crear</a>
-        </p>
+    <div class="row">
+        <div class="col-sm-2">
+            <h5 class="pb-1">{{ substr($title, 11) }}</h5>
+        </div>
+        <div class="col-sm-2 offset-sm-2">
+            <a href="{{ route('propiedades.create') }}" class="btn btn-primary float-right">
+                Crear</a>
+        </div>
     </div>
     @if ($propiedades->isNotEmpty())
     <table class="table table-striped table-hover table-bordered table-sm">
@@ -64,16 +77,6 @@
                     C&oacute;digo
                 </a>
             </th>
-            {{-- <th scope="col">
-                <a href="{{ route('propiedades.orden', 'fecha_reserva') }}" class="btn btn-link">
-                    Fechas
-                </a>
-            </th>
-            <th scope="col">
-                <a href="{{ route('propiedades.orden', 'negociacion') }}" class="btn btn-link">
-                    N
-                </a>
-            </th>--}}
             <th scope="col">
                 <a href="{{ route('propiedades.orden', 'nombre') }}" class="btn btn-link">
                     Nombre
@@ -89,21 +92,6 @@
                     L
                 </a>
             </th>
-            {{-- <th scope="col" title="Franquicia">
-                Franquic
-            </th>
-            <th scope="col">
-                Regalia<br>
-                SANAF-5%
-            </th>
-            <th scope="col">
-                Montos<br>
-                Base
-            </th>
-            <th scope="col" title="Pago asesor captador, gerente y cerrador.">
-                Comis
-            </th>
-            <th scope="col">Acciones</th> --}}
         </tr>
         </thead>
         <tbody>
@@ -128,7 +116,7 @@
         @endif
         ">
             <td>
-                <a href="{{ route('propiedades.edit', [$propiedad->id, 'id']) }}"
+                <a href="{{ route('propiedades.show', $propiedad) }}"
                     class="btn btn-link float-right">
                     {{ $propiedad->codigo }}
                 </a>
@@ -137,18 +125,10 @@
         <?php $propiedad->mMoZero = false;  // Si el monto es 0, mostrar 'espacio vacio'. ?>
         <?php $propiedad->espMonB = false;  // Eliminar espacio entre simbolo de la moneda y el monto. ?>
 
-            {{-- <td>
-                <span title="Fecha de reserva">{{ $propiedad->reserva_en }}</span><br>
-                <span title="Fecha de la firma">{{ $propiedad->firma_en }}</span>
-            </td>
-
-            <td>
-                {{ $propiedad->negociacion }}</td>--}}
             <td>{{ $propiedad->nombre }}({{ $propiedad->negociacion }})
             </td>
 
             <td>
-
                 <span class="float-right">
                     {{ $propiedad->precio_ven }}
                 </span><br>
@@ -164,101 +144,12 @@
             </td>
 
             <td>
-                <a href="{{ route('propiedades.show', $propiedad) }}" class="btn btn-link float-right">
+                <a href="{{ route('propiedades.edit', [$propiedad->id, 'id']) }}"
+                    class="btn btn-link float-right">
                     {{ $propiedad->lados }}
                 </a>
             </td>
 
-            {{-- <td title="Franquicia">
-                <span class="float-right" title="Franquicia de reserva sin IVA(O) ({{ $propiedad->porc_franquicia_p }})">
-                    {{ $propiedad->franquicia_reservado_sin_iva_ven }} 
-                </span><br>
-                <span class="float-right" title="Franquicia de reserva con IVA(P) ({{ $propiedad->porc_franquicia_p }})">
-                    {{ $propiedad->franquicia_reservado_con_iva_ven }}
-                </span><br>
-                <span class="float-right" title="Franquicia a pagar reportada(Q) ({{ $propiedad->reportado_casa_nacional_p }})">
-                    {{ $propiedad->franquicia_pagar_reportada_ven }}
-                </span><br>
-                <span class="float-right" title="Compartido con IVA(L)">
-                    {{ $propiedad->compartido_con_iva_ven }}
-                </span>
-            </td>
-
-            <td>
-                <span class="float-right" title="Porcentaje de REGALIA(S):{{ $propiedad->porc_regalia_p }}">
-                    {{ $propiedad->regalia_ven }}
-                </span><br>
-                <span class="float-right" title="SANAF 5 Porciento(T)">
-                    {{ $propiedad->sanaf_5_por_ciento_ven }}
-                </span><br>
-                <span title="Porcentaje reportado a casa nacional(R)">
-                    RCN:{{ $propiedad->reportado_casa_nacional_p }}
-                </span>
-            </td>
-
-            <td>
-                <span class="float-right" title="Oficina bruto real(U)">
-                    {{ $propiedad->oficina_bruto_real_ven }}
-                </span><br>
-                <span class="float-right" title="Base para honorarios socios(V)">
-                    {{ $propiedad->base_honorarios_socios_ven }}
-                </span><br>
-                <span class="float-right" title="Base para honorarios(W)">
-                    {{ $propiedad->base_para_honorarios_ven }}
-                </span><br>
-                <span class="float-right" title="Ingreso neto a oficina(AC)
-{{ ($propiedad->numero_recibo)?('Recibo No.: '.$propiedad->numero_recibo):'' }}">
-                    {{ $propiedad->ingreso_neto_oficina_ven }}
-                </span>
-            </td>
-
-            <td title="Comisi&oacute;n del asesor captador
-Comisi&oacute;n del gerente y
-Comisi&oacute;n del asesor cerrador."
-            >
-                <span class="float-right" title="Captador PRBR(X){{ $propiedad->nombre_captador }}">
-                    {{ $propiedad->captador_prbr_ven }}
-                </span><br>
-                <span class="float-right" title="Gerente(Y)">
-                    {{ $propiedad->gerente_ven }}
-                </span><br>
-                <span class="float-right" title="Cerrador PRBR(Z){{ $propiedad->nombre_cerrador }}">
-                    {{ $propiedad->cerrador_prbr_ven }}
-                </span><br>
-                <span class="float-right" title="Bonificaciones">
-                    {{ $propiedad->bonificaciones_ven }}
-                </span>
-            </td>
-
-            <td class="d-flex align-items-end">
-                <a href="{{ route('propiedades.show', $propiedad) }}" class="btn btn-link" 
-                        title="Mostrar los datos de esta propiedad.">
-                    <span class="oi oi-eye"></span>
-                </a>
-                <a href="{{ route('propiedades.edit', $propiedad) }}" class="btn btn-link"
-                        title="Editar los datos de esta propiedad.">
-                    <span class="oi oi-pencil"></span>
-                </a>
-
-                @if (1 == Auth::user()->is_admin)
-                <form action="{{ route('propiedades.destroy', $propiedad) }}" method="POST" 
-                        class="form-inline mt-0 mt-md-0"
-                        onSubmit="return confirm('Realmente, desea borrar (borrado lógico) los datos de esta propiedad de la base de datos?')">
-                    {{ csrf_field() }}
-                    {{ method_field('DELETE') }}
-                    <button class="btn btn-link" title="Borrar (lógico) propiedad.">
-                        <span class="oi oi-trash" title="Borrar">
-                        </span>
-                    </button>
-                </form>
-                    @if ((4 <= $propiedad->resultado_id) and (7 >= $propiedad->resultado_id))
-                    <a href="{{ route('agenda.emailcita', $propiedad) }}" class="btn btn-link"
-                            title="Enviar correo a '{{ $propiedad->user->name }}', sobre cita con esta propiedad">
-                        <span class="oi oi-envelope-closed"></span>
-                    </a>
-                    @endif
-                @endif
-            </td>--}}
         </tr>
 
         <?php $propiedad->espMonB = true; // Restablecer variable cambiada antes de <precio> ?>
@@ -270,53 +161,102 @@ Comisi&oacute;n del asesor cerrador."
     {{ $propiedades->links() }}
     @endif
 
-    <div class="form-group col-md-12">
+    <div class="col-md-12">
         TOTS: {{ $filas }} props
-        <span class="alert-success">
+        <span class="alert-success" title="Precio">
             {{ Prop::numeroVen($tPrecio, 0) }}</span>{{-- 'Prop' es un alias definido en config/app.php --}}<br>
-        <span class="alert-info">Compartido con IVA:</span>
-        <span class="alert-success">
-            {{ Prop::numeroVen($tCompartidoConIva, 2) }}</span><br>
-        <span class="alert-info">Lados:</span>
-        <span class="alert-success">
-            {{ $tLados }}</span><br>
-        <span class="alert-info">Captador:</span>
-        <span class="alert-success">
-            {{ Prop::numeroVen($tCaptadorPrbr, 2) }}
-            @if (0 < $tCaptadorPrbrSel)
-            ({{ Prop::numeroVen($tCaptadorPrbrSel, 2) }} [{{ $tLadosCap }}])
-            @endif
-        </span><br>
-        <span class="alert-info">Gerente:</span>
-        <span class="alert-success">
-            {{ Prop::numeroVen($tGerente, 2) }}</span><br>
-        <span class="alert-info">Cerrador:</span>
-        <span class="alert-success">
-            {{ Prop::numeroVen($tCerradorPrbr, 2) }}
-            @if (0 < $tCerradorPrbrSel)
-            ({{ Prop::numeroVen($tCerradorPrbrSel, 2) }} [{{ $tLadosCer }}])
-            @endif
-        </span><br>
-        @if (0 < $tBonificaciones)
-        <span class="alert-info">Bons:</span>
-        <span class="alert-success">
-            {{ Prop::numeroVen($tBonificaciones, 2) }}</span><br>
-        @endif
-        @if (0 < $tComisionBancaria)
-        <span class="alert-info">Coms:</span>
-        <span class="alert-success">
-            {{ Prop::numeroVen($tComisionBancaria, 2) }}</span><br>
-        @endif
-        <span class="alert-info">Neto:</span>
-        <span class="alert-success">
-            {{ Prop::numeroVen($tIngresoNetoOfici, 2) }}</span><br>
-        <span class="alert-info">PVR:</span>
-        <span class="alert-success">
-            {{ Prop::numeroVen($tPrecioVentaReal, 2) }}
-            @if ((0 < $tPvrCaptadorPrbrSel) || (0 < $tPvrCerradorPrbrSel))
-            ({{ Prop::numeroVen($tPvrCaptadorPrbrSel+$tPvrCerradorPrbrSel, 2) }})
-            @endif
+        @if (Auth::user()->is_admin)
+            <span class="alert-info">Compartido con IVA:</span>
+            <span class="alert-success" title="Compartido con otra oficina con IVA">
+                {{ Prop::numeroVen($tCompartidoConIva, 2) }}</span><br>
+            <span class="alert-info">Lados:</span>
+            <span class="alert-success" title="Sumatoria de los lados">
+                {{ $tLados }}</span><br>
+            <span class="alert-info">Franquicia pagar reportada:</span>
+            <span class="alert-success" title="Franquicia a pagar reportada">
+                {{ Prop::numeroVen($tFranquiciaPagarR, 2) }}</span><br>
+            <span class="alert-info">Regalia:</span>
+            <span class="alert-success" title="Regalia">
+                {{ Prop::numeroVen($tRegalia, 2) }}</span><br>
+            <span class="alert-info">Sanaf:</span>
+            <span class="alert-success" title="Sanaf - 5%">
+                {{ Prop::numeroVen($tSanaf5PorCiento, 2) }}</span><br>
+            <span class="alert-info">Captador:</span>
+            <span class="alert-success" title="Captador PRBR">
+                {{ Prop::numeroVen($tCaptadorPrbr, 2) }}
+                @if (0 < $tCaptadorPrbrSel)
+                ({{ Prop::numeroVen($tCaptadorPrbrSel, 2) }} [{{ $tLadosCap }}])
+                @endif
             </span><br>
+            <span class="alert-info">Cerrador:</span>
+            <span class="alert-success" title="Cerrador PRBR">
+                {{ Prop::numeroVen($tCerradorPrbr, 2) }}
+                @if (0 < $tCerradorPrbrSel)
+                ({{ Prop::numeroVen($tCerradorPrbrSel, 2) }} [{{ $tLadosCer }}])
+                @endif
+            </span><br>
+        @else
+            <span class="alert-info">Lados:</span>
+            <span class="alert-success" title="Sumatoria de los lados">
+                {{ $tLadosCap + $tLadosCer }}</span><br>
+            @if (0 < $tCaptadorPrbrSel)
+                <span class="alert-info">Captador:</span>
+                <span class="alert-success" title="Captador PRBR">
+                    {{ Prop::numeroVen($tCaptadorPrbrSel, 2) }}
+                </span><br>
+            @endif
+            @if (0 < $tCerradorPrbrSel)
+            <span class="alert-info">Cerrador:</span>
+            <span class="alert-success" title="Cerrador PRBR">
+                {{ Prop::numeroVen($tCerradorPrbrSel, 2) }}
+            </span><br>
+            @endif
+        @endif
+        @if (0 < $tBonificaciones)
+            <span class="alert-info">Bonificaciones:</span>
+            <span class="alert-success" title="Bonificaciones">
+                {{ Prop::numeroVen($tBonificaciones, 2) }}</span><br>
+        @endif
+        @if (Auth::user()->is_admin)
+            <span class="alert-info">Gerente:</span>
+            <span class="alert-success" title="Gerente">
+                {{ Prop::numeroVen($tGerente, 2) }}</span><br>
+            @if (0 < $tComisionBancaria)
+                <span class="alert-info">Coms:</span>
+                <span class="alert-success" title="Comision bancaria">
+                    {{ Prop::numeroVen($tComisionBancaria, 2) }}</span><br>
+            @endif
+            <span class="alert-info">Neto:</span>
+            <span class="alert-success" title="Ingreso neto de la oficina">
+                {{ Prop::numeroVen($tIngresoNetoOfici, 2) }}</span><br>
+            <span class="alert-info">Precio Venta Real:</span>
+            <span class="alert-success" title="Precio de venta real">
+                {{ Prop::numeroVen($tPrecioVentaReal, 2) }}
+                @if ((0 < $tPvrCaptadorPrbrSel) || (0 < $tPvrCerradorPrbrSel))
+                    ({{ Prop::numeroVen($tPvrCaptadorPrbrSel+$tPvrCerradorPrbrSel, 2) }})
+                @endif
+            </span><br>
+            <span class="alert-info">Total Comision:</span>
+            <span class="alert-success" title="Total de comisiones: Captado + Cerrado">
+                {{ Prop::numeroVen($tCaptadorPrbr+$tCerradorPrbr, 2) }}
+                @if ((0 < $tCaptadorPrbrSel) or (0 < $tCerradorPrbrSel))
+                    ({{ Prop::numeroVen($tCaptadorPrbr+$tCerradorPrbrSel, 2) }} [{{ $tLadosCap+$tLadosCer }}])
+                @endif
+            </span>
+        @else
+            @if ((0 < $tPvrCaptadorPrbrSel) || (0 < $tPvrCerradorPrbrSel))
+                <span class="alert-info">Precio Venta Real:</span>
+                <span class="alert-success" title="Precio de venta real">
+                    {{ Prop::numeroVen($tPvrCaptadorPrbrSel+$tPvrCerradorPrbrSel, 2) }}
+                </span><br>
+            @endif
+            @if ((0 < $tCaptadorPrbrSel) or (0 < $tCerradorPrbrSel))
+                <span class="alert-info">Total Comision:</span>
+                <span class="alert-success" title="Total de comisiones: Captado + Cerrado">
+                        {{ Prop::numeroVen($tCaptadorPrbr+$tCerradorPrbrSel, 2) }}
+                </span>
+            @endif
+        @endif
     </div>
 
     @else
@@ -331,11 +271,12 @@ Comisi&oacute;n del asesor cerrador."
 function alertaCampoRequerido() {
   var fecha_desde = document.getElementById('fecha_desde').value;
   var fecha_hasta = document.getElementById('fecha_hasta').value;
+  var estatus = document.getElementById('estatus').value;
   var captador = document.getElementById('captador').value;
   var cerrador = document.getElementById('cerrador').value;
 
-  if (('' == fecha_desde) && (0 == captador) && (0 == cerrador)) {
-    alert("Usted debe suministrar la fecha de reserva 'Desde' o el 'captador' o el 'cerrador'");
+  if (('' == fecha_desde) && ('' == estatus) && (0 == captador) && (0 == cerrador)) {
+    alert("Usted debe suministrar la fecha de reserva 'Desde' o el 'estatus' o el 'captador' o el 'cerrador'");
     return false;
   }
   return true;

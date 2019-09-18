@@ -101,22 +101,26 @@
                 <input type="number" class="form-control col-sm-2" size="1" maxlength="1"
                     required name="lados" id="lados"
                     value="{{ old('lados', $propiedad->lados) }}">
+            </div>
+
+            @if (Auth::user()->is_admin)
+            <div class="form-group d-flex">
                 <label class="control-label col-sm-2" for="porc_franquicia">
                     *Franquicia:
                 </label>
                 <input type="float" class="form-control col-sm-1" size="5" maxlength="5"
                     name="porc_franquicia" id="porc_franquicia" required
                     value="{{ old('porc_franquicia', $propiedad->porc_franquicia) }}">%
-                <label class="control-label col-sm-4" for="aplicar_porc_franquicia">
+                {{--<label class="control-label col-sm-4" for="aplicar_porc_franquicia">
                     *Aplicar % franquicia:</label>
                 <input type="checkbox" class="form-control col-sm-1"
                     name="aplicar_porc_franquicia" id="aplicar_porc_franquicia"
                     title="{{ $cols['aplicar_porc_franquicia']['come'] }}"
                     {{ old('aplicar_porc_franquicia',
-                    $propiedad->aplicar_porc_franquicia) ? "checked" : "" }}>
-            </div>
+                    $propiedad->aplicar_porc_franquicia) ? "checked" : "" }}>--}}
+            <!--/div-->
 
-            <div class="form-group d-flex">
+            {{--<div class="form-group d-flex">
                 <label class="control-label col-sm-11"
                     for="aplicar_porc_franquicia_pagar_reportada">
                     Aplicar formula con precio para franquicia a pagar reportada:</label>
@@ -138,23 +142,31 @@
                     title="{{ $cols['aplicar_franquicia_pagar_reportada_bruto']['come'] }}"
                     {{ old('aplicar_franquicia_pagar_reportada_bruto',
                     $propiedad->aplicar_franquicia_pagar_reportada_bruto) ? "checked" : "" }}>
-            </div>
+            </div>--}}
 
-            <div class="form-group d-flex">
+            <!--div class="form-group d-flex"-->
                 <label class="control-label col-sm-4" for="reportado_casa_nacional">
                     *Reportado casa nacional:</label>
                 <input type="float" class="form-control col-sm-1" size="5" maxlength="5"
                     name="reportado_casa_nacional" id="reportado_casa_nacional"
                     value="{{ old('reportado_casa_nacional',
                         $propiedad->reportado_casa_nacional) }}">%
+            </div>
+
+            <div class="form-group d-flex">
                 <label class="control-label col-sm-2" for="porc_regalia">*Regalia:</label>
                 <input type="float" class="form-control col-sm-1" size="5" maxlength="5"
                     name="porc_regalia" id="porc_regalia"
                     required value="{{ old('porc_regalia', $propiedad->porc_regalia) }}">%
-                <label class="control-label col-sm-3" for="sanaf_5_porciento">
+                <label class="control-label col-sm-4" for="porc_gerente">
+                    *Porcentaje gerente:</label>
+                <input type="float" class="form-control col-sm-1" size="5" maxlength="5"
+                    name="porc_gerente" id="porc_gerente" required
+                    value="{{ old('porc_gerente', $propiedad->porc_gerente) }}">%
+                {{--<label class="control-label col-sm-3" for="sanaf_5_porciento">
                     SANAF-5-PORCIENTO:
                 </label>
-                <span class="col-sm-2">{{ $propiedad->sanaf_5_porciento }}</span>
+                <span class="col-sm-2">{{ $propiedad->sanaf_5_porciento }}</span>--}}
                 {{--<input type="float" class="form-control col-sm-2" size="18" maxlength="18"
                     name="sanaf_5_porciento" id="sanaf_5_porciento"
                     value="{{ old('sanaf_5_porciento', $propiedad->sanaf_5_porciento) }}">--}}
@@ -166,43 +178,38 @@
                 <input type="float" class="form-control col-sm-1" size="5" maxlength="5"
                     name="porc_captador_prbr" id="porc_captador_prbr" required
                     value="{{ old('porc_captador_prbr', $propiedad->porc_captador_prbr) }}">%
-                <label class="control-label col-sm-5" for="aplicar_porc_captador">
+                {{--<label class="control-label col-sm-5" for="aplicar_porc_captador">
                     *Aplicar % captador PRBR:</label>
                 <input type="checkbox" class="form-control col-sm-1"
                     name="aplicar_porc_captador" id="aplicar_porc_captador"
                     title="{{ $cols['aplicar_porc_captador']['come'] }}"
                     {{ old('aplicar_porc_captador',
-                        $propiedad->aplicar_porc_captador) ? "checked" : "" }}>
-            </div>
+                        $propiedad->aplicar_porc_captador) ? "checked" : "" }}>--}}
+            {{--</div>
 
-            <div class="form-group d-flex">
-                <label class="control-label col-sm-4" for="porc_gerente">
-                    *Porcentaje gerente:</label>
-                <input type="float" class="form-control col-sm-1" size="5" maxlength="5"
-                    name="porc_gerente" id="porc_gerente" required
-                    value="{{ old('porc_gerente', $propiedad->porc_gerente) }}">%
-                <label class="control-label col-sm-5" for="aplicar_porc_gerente">
+            <div class="form-group d-flex">--}}
+                {{--<label class="control-label col-sm-5" for="aplicar_porc_gerente">
                     *Aplicar % gerente:</label>
                 <input type="checkbox" class="form-control col-sm-1"
                     name="aplicar_porc_gerente" id="aplicar_porc_gerente"
                     title="{{ $cols['aplicar_porc_gerente']['come'] }}"
                     {{ old('aplicar_porc_gerente',
-                        $propiedad->aplicar_porc_gerente) ? "checked" : "" }}>
-            </div>
+                        $propiedad->aplicar_porc_gerente) ? "checked" : "" }}>--}}
+            {{--</div>
 
-            <div class="form-group d-flex">
+            <div class="form-group d-flex">--}}
                 <label class="control-label col-sm-4" for="porc_cerrador_prbr">
                     *Porcentaje cerrador PRBR:</label>
                 <input type="float" class="form-control col-sm-1" size="5" maxlength="5"
                     name="porc_cerrador_prbr" id="porc_cerrador_prbr" required
                     value="{{ old('porc_cerrador_prbr', $propiedad->porc_cerrador_prbr) }}">%
-                <label class="control-label col-sm-5" for="aplicar_porc_cerrador">
+                {{--<label class="control-label col-sm-5" for="aplicar_porc_cerrador">
                     *Aplicar % cerrador PRBR:</label>
                 <input type="checkbox" class="form-control col-sm-1"
                     name="aplicar_porc_cerrador" id="aplicar_porc_cerrador"
                     title="{{ $cols['aplicar_porc_cerrador']['come'] }}"
                     {{ old('aplicar_porc_cerrador',
-                        $propiedad->aplicar_porc_cerrador) ? "checked" : "" }}>
+                        $propiedad->aplicar_porc_cerrador) ? "checked" : "" }}>--}}
             </div>
 
             <div class="form-group d-flex">
@@ -211,21 +218,21 @@
                 <input type="float" class="form-control col-sm-1" size="5" maxlength="5"
                     name="porc_bonificacion" id="porc_bonificacion" required
                     value="{{ old('porc_bonificacion', $propiedad->porc_bonificacion) }}">%
-                <label class="control-label col-sm-5" for="aplicar_porc_bonificacion">
+                {{--<label class="control-label col-sm-5" for="aplicar_porc_bonificacion">
                     *Aplicar % bonificacion:</label>
                 <input type="checkbox" class="form-control col-sm-1"
                     name="aplicar_porc_bonificacion" id="aplicar_porc_bonificacion"
                     title="{{ $cols['aplicar_porc_bonificacion']['come'] }}"
                     {{ old('aplicar_porc_bonificacion',
-                        $propiedad->aplicar_porc_bonificacion) ? "checked" : "" }}>
-            </div>
-
-            <div class="form-group d-flex">
+                        $propiedad->aplicar_porc_bonificacion) ? "checked" : "" }}>--}}
                 <label class="control-label col-sm-3" for="comision_bancaria">
                     Comision bancaria:</label>
                 <input type="float" class="form-control col-sm-3" size="15" maxlength="15"
                     name="comision_bancaria" id="comision_bancaria"
                     value="{{ old('comision_bancaria', $propiedad->comision_bancaria) }}">
+            </div>
+
+            <div class="form-group d-flex">
                 <label class="control-label col-sm-3" for="numero_recibo">
                     N&uacute;mero de recibo:</label>
                 <input type="text" class="form-control col-sm-3" size="30" maxlength="30"
@@ -359,6 +366,18 @@
                     name="comentarios" id="comentarios" size="50" maxlength="600"
                     value="{{ old('comentarios', $propiedad->comentarios) }}">
             </div>
+            @else
+                <input type="hidden" name="porc_franquicia" value="{{ $propiedad->porc_franquicia }}">
+                <input type="hidden" name="reportado_casa_nacional" value="{{ $propiedad->reportado_casa_nacional }}">
+                <input type="hidden" name="porc_regalia" value="{{ $propiedad->porc_regalia }}">
+                <input type="hidden" name="porc_gerente" value="{{ $propiedad->porc_gerente }}">
+                <input type="hidden" name="porc_captador_prbr" value="{{ $propiedad->porc_captador_prbr }}">
+                <input type="hidden" name="porc_cerrador_prbr" value="{{ $propiedad->porc_cerrador_prbr }}">
+                <input type="hidden" name="porc_bonificacion" value="{{ $propiedad->porc_bonificacion }}">
+                <input type="hidden" name="asesor_captador_id" value="{{ $propiedad->asesor_captador_id }}">
+                <input type="hidden" name="asesor_cerrador_id" value="{{ $propiedad->asesor_cerrador_id }}">
+                <input type="hidden" name="estatus_sistema_c21" value="{{ $propiedad->estatus_sistema_c21 }}">
+            @endif
 
             <div class="form-group d-flex">
                 <button type="submit" class="btn btn-primary col-sm-5">

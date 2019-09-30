@@ -3,15 +3,18 @@
 @section('content')
 @if ($cumpleaneros->isNotEmpty())
 
-<div class="d-flex justify-content-between align-items-end mb-1 col-sm-6">
-<table class="table table-striped table-hover table-bordered">
-  <tr><td colspan="2" class="justify-content-center">Próximos cumpleaños</td></tr>
+<div class="mb-0 col-lg-8">
+  <div class="row">
+    <div class="col-lg-8 justify-content-center bg-suave">
+      Pr&oacute;ximos cumplea&ntilde;os
+    </div>
+  </div>
   @foreach ($cumpleaneros as $cumpleano)
-    <tr>
-      <td class="col-sm-4">
+  <div class="row">
+    <div class="col-lg-4">
       {{ $cumpleano->name }}
-      </td>
-      <td class="col-sm-2">
+    </div>
+    <div class="col-lg-4">
       {{ $cumpleano->fecha_cumpleanos->format('d-m') }}
       @if ($hoy == $cumpleano->fecha_cumpleanos->format('d-m'))
       <a href="{{ route('agenda.cumpleano', $cumpleano) }}" class="btn btn-link"
@@ -19,11 +22,11 @@
           <span class="oi oi-envelope-closed"></span>
       </a>
       @endif
-      </td>
-    </tr>
+    </div>
+  </div>
   @endForeach
-</table>
 </div>
+
 @else
 <div class="container">
     <div id="myCarousel" class="carousel slide" data-ride="carousel">

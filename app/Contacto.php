@@ -5,21 +5,23 @@ namespace App;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use App\MisClases\Fecha;
 
 class Contacto extends Model
 {
+    use SoftDeletes;
+
     protected $fillable = [
         'cedula', 'name', 'veces_name', 'telefono', 'veces_telefono',
         'user_id', 'email', 'veces_email', 'direccion', 'deseo_id',
         'tipo_id', 'zona_id', 'precio_id', 'origen_id', 'resultado_id',
-        'fecha_evento', 'observaciones', 'user_actualizo', 'user_borro',
-        'borrado_at'
+        'fecha_evento', 'observaciones', 'user_actualizo', 'user_borro'
     ];
     protected $dates = [        // Mutan a una instancia de Carbon.
         'created_at',
         'updated_at',
-        'borrado_at',
+        'deleted_at',
         'fecha_evento'
     ];
 
@@ -193,21 +195,21 @@ class Contacto extends Model
 
     public function getBorradoEnAttribute()
     {
-        if (null == $this->borrado_at) return '';
-        return $this->borrado_at->timezone(Fecha::$ZONA)->format('d/m/Y');
+        if (null == $this->deleted_at) return '';
+        return $this->deleted_at->timezone(Fecha::$ZONA)->format('d/m/Y');
     }
 
     public function getBorradoDiaSemanaAttribute()
     {
-        if (null == $this->borrado_at) return '';
-        return substr(Fecha::$diaSemana[$this->borrado_at->timezone(Fecha::$ZONA)
+        if (null == $this->deleted_at) return '';
+        return substr(Fecha::$diaSemana[$this->deleted_at->timezone(Fecha::$ZONA)
                         ->dayOfWeek], 0, 3);
     }
 
     public function getBorradoConHoraAttribute()
     {
-        if (null == $this->borrado_at) return '';
-        return $this->borrado_at->timezone(Fecha::$ZONA)->format('d/m/Y h:i a');
+        if (null == $this->deleted_at) return '';
+        return $this->deleted_at->timezone(Fecha::$ZONA)->format('d/m/Y h:i a');
     }
 
     public function getEventoEnAttribute()

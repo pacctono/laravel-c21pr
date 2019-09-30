@@ -15,26 +15,20 @@ class TipoSeeder extends Seeder
        Tipo::create([
            'descripcion' => 'Casa',
        ]);
-   
        Tipo::create([
            'descripcion' => 'Apartamento',
        ]);
-   
        Tipo::create([
            'descripcion' => 'Local',
        ]);
-   
        Tipo::create([
            'descripcion' => 'Edificio',
        ]);
-   
        Tipo::create([
            'descripcion' => 'Terreno',
        ]);
-   
        Tipo::create([
            'descripcion' => 'Otro',
        ]);
-   
    }
 }

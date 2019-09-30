@@ -5,6 +5,7 @@ namespace App;
 use Carbon\Carbon;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\DB;
 use App\MisClases\Fecha;
 use App\Propiedad;
@@ -12,6 +13,7 @@ use App\Propiedad;
 class User extends Authenticatable
 {
     use Notifiable;
+    use SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
@@ -32,7 +34,7 @@ class User extends Authenticatable
         'password', 'remember_token',
     ];
     protected $dates = [
-        'created_at', 'updated_at', 'fecha_nacimiento', 'fecha_ingreso'
+        'created_at', 'updated_at', 'deleted_at', 'fecha_nacimiento', 'fecha_ingreso'
     ];
     protected $casts = [
         'is_admin' => 'boolean',

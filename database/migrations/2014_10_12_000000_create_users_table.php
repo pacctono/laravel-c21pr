@@ -18,8 +18,8 @@ class CreateUsersTable extends Migration
             $table->decimal('cedula', 8, 0)->nullable();
             $table->string('name', 160);
             $table->string('telefono', 10);
-            $table->string('email', 100)->unique();
-            $table->string('email_c21', 100)->nullable()->unique();
+            $table->string('email', 160)->unique();
+            $table->string('email_c21', 160)->nullable()->unique();
             $table->string('licencia_mls', 6)->nullable();
             $table->date('fecha_ingreso')->nullable();
             $table->date('fecha_nacimiento')->nullable();
@@ -32,6 +32,7 @@ class CreateUsersTable extends Migration
             $table->boolean('socio')->default(false);
             $table->boolean('activo')->default(true);
             $table->rememberToken();
+            $table->softDeletes();
             $table->timestamps();
         });
     }

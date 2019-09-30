@@ -48,7 +48,9 @@
             Estado civil: <span class={{ $clase }}>{{ $user->edocivil }}</span>
         </p>
     	<p>
+        @if ($user->profesion)
             Profesión: <span class={{ $clase }}>{{ $user->profesion }}</span>
+        @endif
         </p>
     	<p>
             Dirección: <span class={{ $clase }}>{{ $user->direccion }}</span>

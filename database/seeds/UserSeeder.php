@@ -216,5 +216,16 @@ class UserSeeder extends Seeder
             'estado_civil' => 'S',
             'password' => bcrypt('1234567'),
         ]);
+
+        User::create([
+            'cedula' => '11111111',
+            'name' => 'Miguel',
+            'telefono' => '4122222222',
+            'email' => 'miguel@gmail.com',
+            'email_c21' => 'miguel@century21.com.ve',
+            'sexo' => 'M',
+            'estado_civil' => 'S',
+            'password' => bcrypt('1234567'),
+        ]);
     }
 }

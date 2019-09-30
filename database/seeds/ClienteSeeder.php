@@ -13,6 +13,12 @@ class ClienteSeeder extends Seeder
      */
     public function run()
     {
-        factory(Cliente::class, 200)->create();
+        Cliente::create([
+            'cedula' => '11111111',
+            'rif' => 'V111111111',
+            'name' => 'Otro',
+            'user_id' => 1,
+        ]);
+        factory(Cliente::class, 20)->create();
     }
 }

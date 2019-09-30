@@ -1,6 +1,12 @@
 .bg-suave{
  background-color:#e6ffff
 }
+.borde-arriba{
+ border-top:solid 1px #000000
+}
+.borde-abajo{
+ border-bottom:solid 1px #000000
+}
 .ft-grande{
  font-size: 125%;
 }

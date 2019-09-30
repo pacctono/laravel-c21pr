@@ -31,16 +31,12 @@
                     Nombre
                 </a>
             </th>
-            @if ($movil)
-            <th scope="col">
-                Contacto
-            </th>
-            @else
             <th scope="col">
                 <a href="{{ route('contactos.orden', 'telefono') }}" class="btn btn-link">
                     Telefono
                 </a>
             </th>
+            @if (!$movil)
             <th scope="col">
                 <a href="{{ route('contactos.orden', 'email') }}" class="btn btn-link">
                     Correo
@@ -67,31 +63,21 @@
         <tr>
             {{--<td scope="row">{{ $contacto->id }}</td>--}}
             <td>
-                {{--@if ($movil)
-                <a href="{{ route('contactos.show', $contacto) }}" class="btn btn-link">
+                @if ($movil)
+                <a href="{{ route('contactos.show', $contacto) }}" class="btn btn-link" style="text-decoration:none">
                     {{ substr($contacto->name, 0, 30) }}
                 </a>
-                @else--}}
+                @else
                 {{ $contacto->name }}
-                {{--@endif--}}
+                @endif
             </td>
             <td>
-                @if ($movil)
-                <a href="{{ route('contactos.show', $contacto) }}" class="btn btn-link">
-                @endif
                 {{ $contacto->telefono_f }}
-                @if ($movil)
-                </a>
-                @endif
-            @if ($movil)
-            <br>
-            @else
-            </td>
-            <td>
-            @endif
-                {{ $contacto->email }}
             </td>
             @if (!$movil)
+            <td>
+                {{ $contacto->email }}
+            </td>
             <td>
                 {{ $contacto->creado_dia_semana }}
                 {{ $contacto->creado_en }}

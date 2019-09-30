@@ -25,6 +25,7 @@
                     Telefono
                 </a>
             </th>
+        @if (!$movil)
             <th scope="col">
                 <a href="{{ route($rutRetorno, [$id, 'email']) }}" class="btn btn-link">
                     Correo
@@ -41,15 +42,25 @@
                 </a>
             </th>
             <th scope="col">Acción</th>
+        @endif (!$movil)
         </tr>
         </thead>
         <tbody>
         @foreach ($contactos as $contacto)
         <tr>
-            <td>{{ $contacto->name }}</td>
+            <td>
+            @if ($movil)
+                <a href="{{ route('contactos.muestra', [$contacto, $rutRetorno]) }}" class="btn btn-link">
+                    {{ $contacto->name }}
+                </a>
+            @else ($movil)
+                {{ $contacto->name }}
+            @endif ($movil)
+            </td>
             <td>
                 {{ $contacto->telefono_f }}
             </td>
+        @if (!$movil)
             <td>{{ $contacto->email }}</td>
             <td>
                 {{ $contacto->creado_dia_semana }}
@@ -70,6 +81,7 @@
                     </a>
                 @endif
             </td>
+        @endif (!$movil)
         </tr>
         @endforeach
         </tbody>

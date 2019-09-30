@@ -12,29 +12,5 @@ class PropiedadSeeder extends Seeder
      */
     public function run()
     {
-        Propiedad::create([
-            'descripcion' => 'Casa',
-        ]);
-    
-        Propiedad::create([
-            'descripcion' => 'Apartamento',
-        ]);
-    
-        Propiedad::create([
-            'descripcion' => 'Local',
-        ]);
-    
-        Propiedad::create([
-            'descripcion' => 'Edificio',
-        ]);
-    
-        Propiedad::create([
-            'descripcion' => 'Terreno',
-        ]);
-    
-        Propiedad::create([
-            'descripcion' => 'Otro',
-        ]);
-    
     }
 }

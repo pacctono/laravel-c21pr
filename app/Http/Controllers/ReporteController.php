@@ -4,12 +4,17 @@ namespace App\Http\Controllers;
 
 use App\Contacto;
 use App\Propiedad;
+use App\Cliente;
 use App\Deseo;
 use App\Origen;
 use App\Precio;
 use App\Tipo;
 use App\Resultado;
 use App\Zona;
+use App\Caracteristica;
+use App\Ciudad;
+use App\Estado;
+use App\Municipio;
 use App\Venezueladdn;
 use App\Turno;
 use App\Bitacora;
@@ -20,12 +25,14 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use App\MisClases\Fecha;
+use Jenssegers\Agent\Agent;                 // PC
 
 class ReporteController extends Controller
 {
     protected $tipo   = 'Reporte';
     protected $subTitulo1 = 'Contactos atendidos por ';
     protected $titulo = 'Listado de contactos iniciales ';
+    protected $titProp = 'Listado de propiedades ';
 
     protected function prepararFechas($fecha, $asesor=0, $muestra=null)
     {
@@ -319,7 +326,7 @@ class ReporteController extends Controller
 	    $tipo .= 's';						// route 'users'
         return view('reportes.contactos', compact('title', 'contactos', 'tipo', 'rutRetorno', 'id'));
     }
-
+/*
     public function contactosXDeseo($id = 0, $orden = 'id')
     {
         if (!(Auth::check())) {
@@ -474,5 +481,63 @@ class ReporteController extends Controller
 
 	    $rutRetorno = 'reporte.contactos' . ucfirst($tipo);
         return view('reportes.contactos', compact('title', 'contactos', 'tipo', 'rutRetorno', 'id'));
+    }*/
+
+    public function contactosX($id = 0, $orden = 'id')
+    {
+        if (!(Auth::check())) {
+            return redirect('login');
+        }
+        if (!(Auth::user()->is_admin)) {
+            return redirect()->back();
+        }
+        if ((0 == $id) or (null == $id)) {
+            return redirect()->back();
+        }
+
+        $ruta = request()->path();
+        $tipo = strtolower(substr($ruta, 18, strpos($ruta, '/', 18)-18));
+	$modelo = 'App\\' . ucfirst($tipo);
+        $title = $this->titulo . 'con el ' . $tipo . ': ' . $modelo::find($id)->descripcion;
+
+        if ('' == $orden or $orden == null) {
+            $orden = 'id';
+        }
+	    $tipoId = $tipo . '_id';
+        $contactos = Contacto::where($tipoId, $id)->orderBy($orden)->paginate(10);
+
+	    $rutRetorno = 'reporte.contactos' . substr($modelo, 4);
+        $agente = new Agent();
+        $movil  = $agente->isMobile() and true;             // Fuerzo booleana. No funciona al usar el metodo directamente.
+        return view('reportes.contactos', compact('title', 'contactos', 'tipo', 'rutRetorno', 'id', 'movil'));
+    }
+
+    public function propiedadesX($id = 0, $orden = 'id')
+    {
+        if (!(Auth::check())) {
+            return redirect('login');
+        }
+        if (!(Auth::user()->is_admin)) {
+            return redirect()->back();
+        }
+        if ((0 == $id) or (null == $id)) {
+            return redirect()->back();
+        }
+
+        $ruta = request()->path();
+        $tipo = strtolower(substr($ruta, 20, strpos($ruta, '/', 20)-20));
+	$modelo = 'App\\' . ucfirst($tipo);
+        $title = $this->titProp . 'con ' . $tipo . ': ' . $modelo::find($id)->descripcion;
+
+        if ('' == $orden or $orden == null) {
+            $orden = 'id';
+        }
+	    $tipoId = $tipo . '_id';
+        $propiedades = Propiedad::where($tipoId, $id)->orderBy($orden)->paginate(10);
+
+	    $rutRetorno = 'reporte.propiedades' . substr($modelo, 4);
+        $agente = new Agent();
+        $movil  = $agente->isMobile() and true;             // Fuerzo booleana. No funciona al usar el metodo directamente.
+        return view('reportes.propiedades', compact('title', 'propiedades', 'tipo', 'rutRetorno', 'id', 'movil'));
     }
 }

@@ -28,19 +28,19 @@
           <div class="form-group col-lg-3 d-flex">
             <label class="control-label" for="cedula">Cedula</label>
             <input type="text" class="form-control" size="8" maxlength="8" minlength="6" 
-                    name="cedula" id="cedula" placeholder="12345678" value="{{ old('cedula') }}">
+                    name="cedula" id="cedula" placeholder="numero de cedula" value="{{ old('cedula') }}">
           </div>
           <div class="form-group col-lg-9 d-flex">
             <label class="control-label" for="name">Nombre</label>
             <input type="text" class="form-control" required size="30" maxlength="30" 
-                    name="name" id="name" placeholder="Pedro Perez" value="{{ old('name') }}">
+                    name="name" id="name" placeholder="Nombre del contacto inicial" value="{{ old('name') }}">
           </div>
         </div>
 
-        <div class="form-row my-0 py-0">
+        <div class="form-row bg-suave my-0 py-0">
           <div class="form-group col-lg-4 d-flex">
             <label class="control-label" for="telefono">Teléfono</label>
-            <select class="form-control name="ddn" id="ddn">
+            <select class="form-control" name="ddn" id="ddn">
               <option value="">ddn</option>
             @foreach ($ddns as $ddn)
             @if (old('ddn', '414') == $ddn->ddn)
@@ -51,24 +51,24 @@
             @endforeach
             </select>
             <input class="form-control" type="text" size="7" maxlength="7" name="telefono"
-                    id="telefono" placeholder="1234567" value="{{ old('telefono') }}">
+                    id="telefono" placeholder="numero sin area" value="{{ old('telefono') }}">
           </div>
           <div class="form-group col-lg-8 d-flex">
-            <label class="control-label" for="email">Correo</label>
-            <input type="email" class="form-control" size="30" maxlength="30" name="email" 
-                    id="email" placeholder="pedro@example.com" value="{{ old('email') }}">
+            <label class="control-label" for="email">Correo electr&oacute;nico</label>
+            <input type="email" class="form-control col-lg-6" size="30" maxlength="30" name="email" 
+                    id="email" placeholder="correo electronico" value="{{ old('email') }}">
           </div>
         </div>
 
         <div class="form-row my-0 py-0">
           <div class="form-group col-lg-12 d-flex">
-            <label class="control-label" for="direccion">Dirección</label>
+            <label class="control-label" for="direccion">Direcci&oacute;n</label>
             <textarea class="form-control" rows="3" maxlength="190" name="direccion" 
               id="direccion" placeholder="Calle, Casa, Apto, Edificio, Barrio, Ciudad">{{ old('direccion') }}</textarea>
           </div>
         </div>
 
-        <div class="form-row my-0 py-0">
+        <div class="form-row bg-suave my-0 py-0">
           <div class="form-group col-lg-3 d-flex">
             <label class="control-label" for="deseo">Desea</label>
             <select class="form-control" name="deseo_id" id="deseo">

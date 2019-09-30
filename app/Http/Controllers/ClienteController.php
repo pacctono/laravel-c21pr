@@ -294,11 +294,9 @@ class ClienteController extends Controller
 
         $data['user_borro'] = Auth::user()->id;
         //$data['borrado_at'] = Carbon::now();
-        $data['borrado_at'] = new Carbon();
+        //$data['borrado_at'] = new Carbon();
 
-        //dd($data);
-
-        $cliente->update($data);
+        $cliente->delete();
 
         return redirect()->route('clientes.index');
     }

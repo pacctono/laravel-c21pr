@@ -21,7 +21,7 @@ class CreateTurnosTable extends Migration
             $table->unsignedInteger('user_creo');
             $table->unsignedInteger('user_actualizo')->nullable();
             $table->unsignedInteger('user_borro')->nullable();
-            $table->datetime('borrado_at')->nullable();
+            $table->softDeletes();
             $table->timestamps();
         });
     }

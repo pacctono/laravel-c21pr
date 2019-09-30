@@ -28,7 +28,7 @@
             <label class="control-label col-sm-3" for="codigo">*C&oacute;digo:</label>
             <input type="text" class="form-control col-sm-3" size="8" maxlength="8"
                     minlength="6" name="codigo" id="codigo" required
-                    placeholder="12345678" value="{{ old('codigo') }}">
+                    placeholder="Codigo MLS" value="{{ old('codigo') }}">
         </div>
 
         <div class="form-group d-flex">

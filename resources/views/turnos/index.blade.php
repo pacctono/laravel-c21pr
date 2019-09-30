@@ -62,11 +62,11 @@
     </form>
 </div>
 
-<div class="d-flex justify-content-between align-items-end mb-1">
+<div class="d-flex justify-content-between align-items-end my-0">
   @if ($movil)
-    <h4 class="pb-1">{{ substr($title, 11) }}</h4>
+    <h4 class="pb-0">{{ substr($title, 11) }}</h4>
   @else
-    <h1 class="pb-1">{{ $title }}</h1>
+    <h1 class="pb-0">{{ $title }}</h1>
   @endif
 
     @if (Auth::user()->is_admin)
@@ -92,8 +92,8 @@
 @endif
 @if ($turnos->isNotEmpty())
 <table class="table table-striped table-hover table-bordered">
-  <thead class="thead-dark">
-    <tr>
+  <thead class="thead-dark my-0 py-0">
+    <tr class="my-0 py-0">
       <th scope="col">
         <a href="{{ route('turnos.orden', 'turno') }}" class="btn btn-link">
           Fecha

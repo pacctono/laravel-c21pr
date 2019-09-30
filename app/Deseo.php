@@ -8,11 +8,6 @@ class Deseo extends Model
 {
     protected $fillable = ['descripcion'];
 
-    public function clientes()    // cliente_id
-    {
-        return $this->hasMany(Cliente::class); // Si llave foranea, diferente a esperada, usamos 2do parametro.
-    }
-
     public function contactos()    // deseo_id
     {
         return $this->hasMany(Contacto::class); // Si llave foranea, diferente a esperada, usamos 2do parametro.

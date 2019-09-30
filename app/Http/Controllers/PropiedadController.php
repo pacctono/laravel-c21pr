@@ -4,6 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Propiedad;
 use App\User;
+use App\Tipo;
+use App\Ciudad;
+use App\Caracteristica;
+use App\Municipio;
+use App\Estado;
+use App\Cliente;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;        // PC
 use Illuminate\Support\Facades\DB;          // PC
@@ -141,7 +147,7 @@ class PropiedadController extends Controller
         $title = 'Listado de ' . $this->tipoPlural;
         $ruta = request()->path();
         $dato = request()->all();
-        //dd($dato);
+        //dd($ruta, $dato);
         if (1 >= count($dato)) $paginar = True;
         else $paginar = False;
 // Todo se inicializa, cuando se selecciona 'periodos' desde el menú horizontal.
@@ -304,7 +310,7 @@ class PropiedadController extends Controller
         $agente = new Agent();
         $movil  = $agente->isMobile() and true;             // Fuerzo booleana. No funciona al usar el metodo directamente.
         $paginar = ($paginar)?!$movil:$paginar;
-        if ($paginar) $propiedades = $propiedades->paginate(10);      // Pagina la impresión de 10 en 10
+        if ($paginar) $propiedades = $propiedades->paginate(Propiedad::$lineasXPagina);      // Pagina la impresión de 10 en 10
         else $propiedades = $propiedades->get();                      // Mostrar todos los registros.
 // Devolver las fechas sin la hora. Los diez primeros caracteres son: yyyy-mm-dd.
         $cols = $this->columnas();
@@ -480,14 +486,18 @@ class PropiedadController extends Controller
         $props       = '';
         foreach ($propiedades as $p) {
             $props .= json_encode(array ($p->id, $p->codigo, $p->reserva_en,
-                        $p->firma_en, $p->negociacion, $p->nombre, $p->estatus,
-                        $p->moneda, $p->precio, $p->comision,
+                        $p->firma_en, $p->negociacion, $p->nombre,
+                        $p->tipo_id, $p->metraje, $p->habitaciones, $p->banos,
+                        $p->niveles, $p->puestos, $p->anoc, $p->caracteristica_id,
+                        $p->descripcion, $p->direccion, $p->ciudad_id, $p->codigo_postal,
+                        $p->municipio_id, $p->estado_id, $p->cliente_id,
+                        $p->estatus, $p->moneda, $p->precio, $p->comision,
                         $p->reserva_sin_iva, $p->iva, $p->reserva_con_iva,
                         $p->compartido_con_iva, $p->compartido_sin_iva,
                         $p->lados, $p->franquicia_reservado_sin_iva,
                         $p->franquicia_reservado_con_iva, $p->porc_franquicia,
                         $p->franquicia_pagar_reportada, $p->reportado_casa_nacional,
-                        $p->porc_regalia, $p->regalia, $p->sanaf5_por_ciento,
+                        $p->porc_regalia, $p->porc_compartido, $p->regalia, $p->sanaf5_por_ciento,
                         $p->oficina_bruto_real, $p->base_honorarios_socios,
                         $p->base_para_honorarios, $p->asesor_captador_id,
                         $p->asesor_captador, $p->porc_captador_prbr, $p->captador_prbr,
@@ -549,8 +559,16 @@ class PropiedadController extends Controller
 
         $agente = new Agent();
         $movil  = $agente->isMobile() and true;             // Fuerzo booleana. No funciona al usar el metodo directamente.
-        return view((($movil)?'celular.createPropiedades':'propiedades.create'),
-                    compact('title', 'users', 'cols', 'exito'));
+        $tipos = Tipo::all();
+        $ciudades = Ciudad::all();
+        $caracteristicas = Caracteristica::all();
+        $municipios = Municipio::all();
+        $estados = Estado::all();
+        $clientes = Cliente::all();
+//        return view((($movil)?'celular.createPropiedades':'propiedades.create'),
+        return view('propiedades.create',
+                    compact('title', 'users', 'tipos', 'ciudades', 'caracteristicas',
+                    'municipios', 'estados', 'clientes', 'cols', 'exito'));
     }
 
     /**
@@ -568,26 +586,35 @@ class PropiedadController extends Controller
             'fecha_firma' => ['sometimes', 'nullable', 'date'],
             'negociacion' => 'required',
             'nombre' => 'required',
+            'tipo_id' => '',
+            'metraje' => '',
+            'habitaciones' => '',
+            'banos' => '',
+            'niveles' => '',
+            'puestos' => '',
+            'anoc' => '',
+            'caracteristica_id' => '',
+            'descripcion' => '',
+            'direccion' => '',
+            'ciudad_id' => '',
+            'codigo_postal' => '',
+            'municipio_id' => '',
+            'estado_id' => '',
+            'cliente_id' => '',
             'estatus' => 'required',
             'moneda' => 'required',
             'precio' => 'required',
             'comision' => 'required',
             'iva' => 'required',
-            'lados' => '',
+            'lados' => ['in:1,2'],
             'porc_franquicia' => 'required',
-            'aplicar_porc_franquicia' => '',
-            'aplicar_porc_franquicia_pagar_reportada' => '',
-            'aplicar_franquicia_pagar_reportada_bruto' => '',
             'reportado_casa_nacional' => 'required',
             'porc_regalia' => 'required',
+            'porc_compartido' => 'required',
             'porc_captador_prbr' => 'required',
-            'aplicar_porc_captador' => '',
             'porc_gerente' => 'required',
-            'aplicar_porc_gerente' => '',
             'porc_cerrador_prbr' => 'required',
-            'aplicar_porc_cerrador' => '',
             'porc_bonificacion' => 'required',
-            'aplicar_porc_bonificacion' => '',
             'comision_bancaria' => '',
             'numero_recibo' => '',
             'asesor_captador_id' => 'required',
@@ -615,9 +642,11 @@ class PropiedadController extends Controller
             'precio.required' => 'El campo <precio> es obligatorio',
             'comision.required' => 'El campo <comision> es obligatorio',
             'iva.required' => 'El campo <iva> es obligatorio',
+            'lados.in' => 'El campo <lados> solo puede contener el valor 1 o 2',
             'porc_franquicia.required' => 'El campo <% franquicia> es obligatorio',
             'reportado_casa_nacional.required' => 'El campo <Reportado casa nacional> es obligatorio',
             'porc_regalia.required' => 'El campo <% Regalia> es obligatorio',
+            'porc_compartido' => 'El campo <% compartido> es obligatorio',
             'porc_captador_prbr.required' => 'El campo <Porcentaje captador PRBR> es obligatorio',
             'porc_gerente.required' => 'El campo <Porcentaje gerente> es obligatorio',
             'porc_cerrador_prbr.required' => 'El campo <Porcentaje cerrador PRBR> es obligatorio',
@@ -626,56 +655,31 @@ class PropiedadController extends Controller
             'asesor_cerrador_id.required' => 'El campo <Asesor cerrador> es obligatorio',
         ]);
 
-        //$data['user_id'] = Auth::user()->id;
-        //$data['user_id'] = intval($data['user_id']);
-
-/*        if (null != $data['fecha_reserva'])
-            $data['fecha_reserva'] = Carbon::createFromFormat('Y-m-d', $data['fecha_reserva']);
-        if (null != $data['fecha_firma'])
-            $data['fecha_firma'] = Carbon::createFromFormat('Y-m-d', $data['fecha_firma']);*/
+        $cols = $this->columnas();
         //dd($data);
-        if (!array_key_exists('estatus', $data)) $data['estatus'] = 'A';
-        if (!array_key_exists('estatus_sistema_c21', $data)) $data['estatus_sistema_c21'] = 'A';
-        if (!array_key_exists('aplicar_porc_franquicia', $data))
-            $data['aplicar_porc_franquicia'] = false;
-        elseif ('on' == $data['aplicar_porc_franquicia'])
-            $data['aplicar_porc_franquicia'] = true;
-        if (!array_key_exists('aplicar_porc_franquicia_pagar_reportada', $data))
-            $data['aplicar_porc_franquicia_pagar_reportada'] = false;
-        elseif ('on' == $data['aplicar_porc_franquicia_pagar_reportada'])
-            $data['aplicar_porc_franquicia_pagar_reportada'] = true;
-        if (!array_key_exists('aplicar_franquicia_pagar_reportada_bruto', $data))
-            $data['aplicar_franquicia_pagar_reportada_bruto'] = false;
-        elseif ('on' == $data['aplicar_franquicia_pagar_reportada_bruto'])
-            $data['aplicar_franquicia_pagar_reportada_bruto'] = true;
-        if (!array_key_exists('aplicar_porc_captador', $data))
-            $data['aplicar_porc_captador'] = false;
-        elseif ('on' == $data['aplicar_porc_captador'])
-            $data['aplicar_porc_captador'] = true;
-        if (!array_key_exists('aplicar_porc_gerente', $data))
-            $data['aplicar_porc_gerente'] = false;
-        elseif ('on' == $data['aplicar_porc_gerente'])
-            $data['aplicar_porc_gerente'] = true;
-        if (!array_key_exists('aplicar_porc_cerrador', $data))
-            $data['aplicar_porc_cerrador'] = false;
-        elseif ('on' == $data['aplicar_porc_cerrador'])
-            $data['aplicar_porc_cerrador'] = true;
-        if (!array_key_exists('aplicar_porc_bonificacion', $data))
-            $data['aplicar_porc_bonificacion'] = false;
-        elseif ('on' == $data['aplicar_porc_bonificacion'])
-            $data['aplicar_porc_bonificacion'] = true;
-/*        if (!array_key_exists('pagado_casa_nacional', $data))
-            $data['pagado_casa_nacional'] = false;
-        elseif ('on' == $data['pagado_casa_nacional'])
-            $data['pagado_casa_nacional'] = true;*/
-
         propiedad::create([
             'codigo' => $data['codigo'],
             'fecha_reserva' => $data['fecha_reserva'],
             'fecha_firma' => $data['fecha_firma'],
             'negociacion' => $data['negociacion'],
             'nombre' => $data['nombre'],
-            'estatus' => $data['estatus'],
+            'tipo_id' => (isset($data['tipo_id'])?$data['tipo_id']:$cols['tipo_id']['xdef']),
+            'metraje' => (isset($data['metraje'])?$data['metraje']:null),
+            'habitaciones' => (isset($data['habitaciones'])?$data['habitaciones']:null),
+            'banos' => (isset($data['banos'])?$data['banos']:null),
+            'niveles' => (isset($data['niveles'])?$data['niveles']:null),
+            'puestos' => (isset($data['puestos'])?$data['puestos']:null),
+            'anoc' => (isset($data['anoc'])?$data['anoc']:null),
+            'caracteristica_id' =>
+                (isset($data['caracteristica_id'])?$data['caracteristica_id']:$cols['caracteristica_id']['xdef']),
+            'descripcion' => (isset($data['descripcion'])?$data['descripcion']:null),
+            'direccion' => (isset($data['direccion'])?$data['direccion']:null),
+            'ciudad_id' => (isset($data['ciudad_id'])?$data['ciudad_id']:$cols['ciudad_id']['xdef']),
+            'codigo_postal' => (isset($data['codigo_postal'])?$data['codigo_postal']:null),
+            'municipio_id' => (isset($data['municipio_id'])?$data['municipio_id']:$cols['municipio_id']['xdef']),
+            'estado_id' => (isset($data['estado_id'])?$data['estado_id']:$cols['estado_id']['xdef']),
+            'cliente_id' => (isset($data['cliente_id'])?$data['cliente_id']:$cols['cliente_id']['xdef']),
+            'estatus' => (isset($data['estatus'])?$data['estatus']:$cols['estatus']['xdef']),
             'user_id' => Auth::user()->id,
             'moneda' => $data['moneda'],
             'precio' => $data['precio'],
@@ -683,19 +687,13 @@ class PropiedadController extends Controller
             'iva' => $data['iva'],
             'lados' => $data['lados'],
             'porc_franquicia' => $data['porc_franquicia'],
-            'aplicar_porc_franquicia' => $data['aplicar_porc_franquicia'],
-            'aplicar_porc_franquicia_pagar_reportada' => $data['aplicar_porc_franquicia_pagar_reportada'],
-            'aplicar_franquicia_pagar_reportada_bruto' => $data['aplicar_franquicia_pagar_reportada_bruto'],
             'reportado_casa_nacional' => $data['reportado_casa_nacional'],
             'porc_regalia' => $data['porc_regalia'],
+            'porc_compartido' => $data['porc_compartido'],
             'porc_captador_prbr' => $data['porc_captador_prbr'],
-            'aplicar_porc_captador' => $data['aplicar_porc_captador'],
             'porc_gerente' => $data['porc_gerente'],
-            'aplicar_porc_gerente' => $data['aplicar_porc_gerente'],
             'porc_cerrador_prbr' => $data['porc_cerrador_prbr'],
-            'aplicar_porc_cerrador' => $data['aplicar_porc_cerrador'],
             'porc_bonificacion' => $data['porc_bonificacion'],
-            'aplicar_porc_bonificacion' => $data['aplicar_porc_bonificacion'],
             'comision_bancaria' => (isset($data['comision_bancaria'])?$data['comision_bancaria']:null),
             'numero_recibo' => (isset($data['numero_recibo'])?$data['numero_recibo']:null),
             'asesor_captador_id' => $data['asesor_captador_id'],
@@ -709,7 +707,8 @@ class PropiedadController extends Controller
             'pago_otra_oficina' => (isset($data['pago_otra_oficina'])?$data['pago_otra_oficina']:null),
             'pagado_casa_nacional' => (isset($data['pagado_casa_nacional']) and
                                         ('on' == $data['pagado_casa_nacional'])),
-            'estatus_sistema_c21' => $data['estatus_sistema_c21'],
+            'estatus_sistema_c21' =>
+            (isset($data['estatus_sistema_c21'])?$data['estatus_sistema_c21']:$cols['estatus_sistema_c21']['xdef']),
             'reporte_casa_nacional' => (isset($data['reporte_casa_nacional'])?$data['reporte_casa_nacional']:null),
             'comentarios' => (isset($data['comentarios'])?$data['comentarios']:null),
             'factura_AyS' => (isset($data['factura_AyS'])?$data['factura_AyS']:null),
@@ -733,16 +732,34 @@ class PropiedadController extends Controller
         }
 
         $col_id = '';
-        if (17 < strlen($rutRetorno)) {     // 17 = longitud de 'propiedades.index'
-            $col_id = strtolower(substr($rutRetorno, 19)) . '_id';
+        $restoRuta = '';
+        if ((0 == stripos($rutRetorno, 'propiedades')) or (0 == stripos($rutRetorno, 'reporte'))) {
+            if (17 < strlen($rutRetorno)) {     // 17 = len(propiedades.index)
+                $col_id = strtolower(substr($rutRetorno, 19)) . '_id';  // 19 = len(reporte.propiedades)
+// $col_id sera 'caracteristica', 'ciudad', 'municipio', 'estado', 'tipo', etc.
+            }
+            $id = $propiedad->id;   // Desde aqui se busca la pagina a la que se volvera.
+            $lineas = Propiedad::$lineasXPagina;
+            $pagina = round((($id/$lineas)+0.5), 0, PHP_ROUND_HALF_DOWN);
+//            if (0 < ($id%$lineas)) $pagina++;
+            if (1 < $pagina) $restoRuta = '?page=' . $pagina;
         }
         
         //dd($propiedad);
+        //dd($rutRetorno, $col_id);
+        $agente = new Agent();
+        $movil  = $agente->isMobile() and true;             // Fuerzo booleana. No funciona al usar el metodo directamente.
+        $tipos = Tipo::all();
+        $ciudades = Ciudad::all();
+        $caracteristicas = Caracteristica::all();
+        $municipios = Municipio::all();
+        $estados = Estado::all();
+        $clientes = Cliente::all();
         if (Auth::user()->is_admin) {
-            $agente = new Agent();
-            $movil  = $agente->isMobile() and true;             // Fuerzo booleana. No funciona al usar el metodo directamente.
-            return view((($movil)?'celular.showPropiedad':'propiedades.show'),
-                        compact('propiedad', 'rutRetorno', 'col_id'));
+//            return view((($movil)?'celular.showPropiedad':'propiedades.show'),
+            return view('propiedades.show',
+                        compact('propiedad', 'rutRetorno', 'restoRuta', 'col_id', 'movil', 'tipos',
+                        'ciudades', 'caracteristicas', 'municipios', 'estados', 'clientes'));
         }
         if ($propiedad->user_borro != null) {
             return redirect()->back();
@@ -750,10 +767,10 @@ class PropiedadController extends Controller
         if (($propiedad->user_id == Auth::user()->id) or
             ($propiedad->asesor_captador_id == Auth::user()->id) or
             ($propiedad->asesor_cerrador_id == Auth::user()->id)) {
-            $agente = new Agent();
-            $movil  = $agente->isMobile() and true;             // Fuerzo booleana. No funciona al usar el metodo directamente.
-            return view((($movil)?'celular.showPropiedad':'propiedades.show'),
-                        compact('propiedad', 'rutRetorno', 'col_id'));
+//            return view((($movil)?'celular.showPropiedad':'propiedades.show'),
+            return view('propiedades.show',
+                        compact('propiedad', 'rutRetorno', 'col_id', 'tipos',
+                        'ciudades', 'caracteristicas', 'municipios', 'estados', 'clientes'));
         } else {
             return redirect()->back();
         }
@@ -778,14 +795,23 @@ class PropiedadController extends Controller
         $title = 'Editar ' . $this->tipo;
         $users = User::get(['id', 'name']);     // Todos los usuarios (asesores).
         $users[0]['name'] = 'Asesor otra oficina';
+        $tipos = Tipo::all();
+        $caracteristicas = Caracteristica::all();
+        $ciudades = Ciudad::all();
+        $municipios = Municipio::all();
+        $estados = Estado::all();
+        $clientes = Cliente::all();
 //        dd($propiedad);
         if ((Auth::user()->is_admin) or ($propiedad->user_id == Auth::user()->id) or
             ($propiedad->asesor_captador_id == Auth::user()->id) or
             ($propiedad->asesor_cerrador_id == Auth::user()->id)) {
             $agente = new Agent();
             $movil  = $agente->isMobile() and true;             // Fuerzo booleana. No funciona al usar el metodo directamente.
-            return view((($movil)?'celular.editPropiedades':'propiedades.edit'),
-                        ['propiedad' => $propiedad, 'users' => $users, 'cols' => $cols, 'title' => $title]);
+//            return view((($movil)?'celular.editPropiedades':'propiedades.edit'),
+            return view('propiedades.edit',
+//                        ['propiedad' => $propiedad, 'users' => $users, 'cols' => $cols, 'title' => $title]);
+                    compact('propiedad', 'title', 'users', 'tipos', 'ciudades', 'caracteristicas',
+                            'municipios', 'estados', 'clientes', 'cols'));
         }
         return redirect('/propiedades');
     }
@@ -805,6 +831,21 @@ class PropiedadController extends Controller
             'fecha_firma' => ['sometimes', 'nullable', 'date'],
             'negociacion' => 'required',
             'nombre' => 'required',
+            'tipo_id' => '',
+            'metraje' => '',
+            'habitaciones' => '',
+            'banos' => '',
+            'niveles' => '',
+            'puestos' => '',
+            'anoc' => '',
+            'caracteristica_id' => '',
+            'descripcion' => '',
+            'direccion' => '',
+            'ciudad_id' => '',
+            'codigo_postal' => '',
+            'municipio_id' => '',
+            'estado_id' => '',
+            'cliente_id' => '',
             'estatus' => 'required',
             'moneda' => 'required',
             'precio' => 'required',
@@ -812,19 +853,13 @@ class PropiedadController extends Controller
             'iva' => 'required',
             'lados' => '',
             'porc_franquicia' => 'required',
-            'aplicar_porc_franquicia' => '',
-            'aplicar_porc_franquicia_pagar_reportada' => '',
-            'aplicar_franquicia_pagar_reportada_bruto' => '',
             'reportado_casa_nacional' => 'required',
             'porc_regalia' => 'required',
+            'porc_compartido' => 'required',
             'porc_captador_prbr' => 'required',
-            'aplicar_porc_captador' => '',
             'porc_gerente' => 'required',
-            'aplicar_porc_gerente' => '',
             'porc_cerrador_prbr' => 'required',
-            'aplicar_porc_cerrador' => '',
             'porc_bonificacion' => 'required',
-            'aplicar_porc_bonificacion' => '',
             'comision_bancaria' => '',
             'numero_recibo' => '',
             'asesor_captador_id' => 'required',
@@ -854,6 +889,7 @@ class PropiedadController extends Controller
             'porc_franquicia.required' => 'El campo <% franquicia> es obligatorio',
             'reportado_casa_nacional.required' => 'El campo <Reportado casa nacional> es obligatorio',
             'porc_regalia.required' => 'El campo <% Regalia> es obligatorio',
+            'porc_compartido' => 'El campo <% compartido> es obligatorio',
             'porc_captador_prbr.required' => 'El campo <Porcentaje captador PRBR> es obligatorio',
             'porc_gerente.required' => 'El campo <Porcentaje gerente> es obligatorio',
             'porc_cerrador_prbr.required' => 'El campo <Porcentaje cerrador PRBR> es obligatorio',
@@ -864,35 +900,7 @@ class PropiedadController extends Controller
         ]);
 
         //print_r($data);
-        if (!array_key_exists('estatus', $data)) $data['estatus'] = 'I';
-        if (!array_key_exists('aplicar_porc_franquicia', $data))
-            $data['aplicar_porc_franquicia'] = false;
-        elseif ('on' == $data['aplicar_porc_franquicia'])
-            $data['aplicar_porc_franquicia'] = true;
-        if (!array_key_exists('aplicar_porc_franquicia_pagar_reportada', $data))
-            $data['aplicar_porc_franquicia_pagar_reportada'] = false;
-        elseif ('on' == $data['aplicar_porc_franquicia_pagar_reportada'])
-            $data['aplicar_porc_franquicia_pagar_reportada'] = true;
-        if (!array_key_exists('aplicar_franquicia_pagar_reportada_bruto', $data))
-            $data['aplicar_franquicia_pagar_reportada_bruto'] = false;
-        elseif ('on' == $data['aplicar_franquicia_pagar_reportada_bruto'])
-            $data['aplicar_franquicia_pagar_reportada_bruto'] = true;
-        if (!array_key_exists('aplicar_porc_captador', $data))
-            $data['aplicar_porc_captador'] = false;
-        elseif ('on' == $data['aplicar_porc_captador'])
-            $data['aplicar_porc_captador'] = true;
-        if (!array_key_exists('aplicar_porc_gerente', $data))
-            $data['aplicar_porc_gerente'] = false;
-        elseif ('on' == $data['aplicar_porc_gerente'])
-            $data['aplicar_porc_gerente'] = true;
-        if (!array_key_exists('aplicar_porc_cerrador', $data))
-            $data['aplicar_porc_cerrador'] = false;
-        elseif ('on' == $data['aplicar_porc_cerrador'])
-            $data['aplicar_porc_cerrador'] = true;
-        if (!array_key_exists('aplicar_porc_bonificacion', $data))
-            $data['aplicar_porc_bonificacion'] = false;
-        elseif ('on' == $data['aplicar_porc_bonificacion'])
-            $data['aplicar_porc_bonificacion'] = true;
+        if (!array_key_exists('estatus', $data)) $data['estatus'] = 'A';
         if (!array_key_exists('pagado_casa_nacional', $data))
             $data['pagado_casa_nacional'] = false;
         elseif ('on' == $data['pagado_casa_nacional'])
@@ -926,10 +934,10 @@ class PropiedadController extends Controller
 
         $data['user_borro'] = Auth::user()->id;
         //$data['borrado_at'] = Carbon::now();
-        $data['borrado_at'] = new Carbon();
+        //$data['borrado_at'] = new Carbon();
 
         //dd($data);
-        $propiedad->update($data);
+        $propiedad->delete();
 
         return redirect()->route('propiedades.index');
     }

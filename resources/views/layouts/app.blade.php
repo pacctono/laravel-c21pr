@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description" content="">
     <meta name="author" content="">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="icon" href="favicon.ico">
 
     <title>{{ config('app.name', 'Laravel') }}</title>
@@ -16,17 +17,10 @@
     <!-- Custom styles for this template -->
     <link href="{{ asset('css/style.css') }}" rel="stylesheet">
     <link href="{{ asset('css/c21pr.css') }}" rel="stylesheet">
-    <script>
-//      var $;
+    <script src="{{ asset('js/app.js') }}"></script>
 
-      window.onload = function() {
-//        if (!$) { $ = document.getElementById; }
-        if (fnWinOnLoad) fnWinOnLoad();
-      }
-      window.onunload = function() {
-        if (fnWinOnUnload) fnWinOnUnload();
-      }
-    </script>
+    @yield('jshead')
+
   </head>
 
   <body>
@@ -68,12 +62,15 @@
           @endforeach
             <li class="dropdown">
               <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-                Rep.Contacto
+                Estadisticas
               <span class="caret"></span></a>
               <ul class="dropdown-menu">
                 @if (Auth::user()->is_admin)
                 <li><a class="dropdown-item" href="{{ route('reportes', 'Asesor') }}">
                   Contactos X asesor
+                </a></li>
+                <li><a class="dropdown-item" href="{{ route('reportes', 'Conexion') }}">
+                  Conexión X asesor
                 </a></li>
                 @endif
                 <li><a class="dropdown-item" href="{{ route('reportes', 'Fecha') }}">
@@ -83,21 +80,6 @@
                 <li><a class="dropdown-item" href="{{ route('reportes', 'Origen') }}">
                   Contactos X origen
                 </a></li>
-                <li><a class="dropdown-item" href="{{ route('reportes', 'Conexion') }}">
-                  Conexión X asesor
-                </a></li>
-                @endif
-                {{-- <li><a class="dropdown-item" href="{{ route('reportes', 'Cumpleanos') }}">
-                  Cumpleaños
-                </a></li> --}}
-              </ul>
-            </li>
-            <li class="dropdown">
-              <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-                Rep.Propiedad
-              <span class="caret"></span></a>
-              <ul class="dropdown-menu">
-                @if (Auth::user()->is_admin)
                 <li><a class="dropdown-item" href="{{ route('reportes', 'Lados') }}">
                   Lados X Asesor
                 </a></li>
@@ -113,10 +95,26 @@
                 <li><a class="dropdown-item" href="{{ route('reportes', 'ComMes') }}">
                   Comision X mes
                 </a></li>
-                {{-- <li><a class="dropdown-item" href="{{ route('reportes', 'Conexion') }}">
-                  Conexión X asesor
-                </a></li> --}}
                 @endif
+              </ul>
+            </li>
+            @if (Auth::user()->is_admin)
+            <li class="dropdown">
+              <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                Administraci&oacute;n
+              <span class="caret"></span></a>
+              <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="#{{-- route('reportes', 'Cumpleanos') --}}">
+                  Conciliaci&oacute;n
+                </a></li>
+              </ul>
+            </li>
+            @endif (Auth::user()->is_admin)
+            <li class="dropdown">
+              <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                Reportes
+              <span class="caret"></span></a>
+              <ul class="dropdown-menu">
                 <li><a class="dropdown-item" href="{{ route('reportes', 'Cumpleanos') }}">
                   Cumpleaños
                 </a></li>
@@ -131,23 +129,35 @@
                 <li><a class="dropdown-item" href="{{ route('propiedades.grabar') }}">
                   Grabar propiedades
                 </a></li>
+                <li><a class="dropdown-item" href="{{ route('caracteristica') }}">
+                  Caracteristica
+                </a></li>
+                <li><a class="dropdown-item" href="{{ route('ciudad') }}">
+                  Ciudad
+                </a></li>
                 <li><a class="dropdown-item" href="{{ route('deseo') }}">
                   Deseo
+                </a></li>
+                <li><a class="dropdown-item" href="{{ route('estado') }}">
+                  Estado
+                </a></li>
+                <li><a class="dropdown-item" href="{{ route('municipio') }}">
+                  Municipio
+                </a></li>
+                <li><a class="dropdown-item" href="{{ route('origen') }}">
+                  Origen
+                </a></li>
+                <li><a class="dropdown-item" href="{{ route('precio') }}">
+                  Precio
+                </a></li>
+                <li><a class="dropdown-item" href="{{ route('resultado') }}">
+                  Resultado
                 </a></li>
                 <li><a class="dropdown-item" href="{{ route('tipo') }}">
                   Tipo de propiedad
                 </a></li>
                 <li><a class="dropdown-item" href="{{ route('zona') }}">
                   Zona
-                </a></li>
-                <li><a class="dropdown-item" href="{{ route('precio') }}">
-                  Precio
-                </a></li>
-                <li><a class="dropdown-item" href="{{ route('origen') }}">
-                  Origen
-                </a></li>
-                <li><a class="dropdown-item" href="{{ route('resultado') }}">
-                  Resultado
                 </a></li>
               </ul>
             </li>
@@ -213,6 +223,6 @@
     <!--script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script-->
     <!--script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script-->
     <!--script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script-->
-    <script src="{{ asset('js/app.js') }}"></script>
+    <!--script src="{{ asset('js/app.js') }}"></script-->
   </body>
 </html>

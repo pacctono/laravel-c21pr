@@ -146,23 +146,35 @@ Route::post('/reportes/chart/{chart}', 'ReporteController@chart')
 Route::get('/reportes/contactosUser/{id}/{orden}', 'ReporteController@contactosXUser')
     ->name('reporte.contactosUser');
 
-Route::get('/reportes/contactosDeseo/{id}/{orden}', 'ReporteController@contactosXDeseo')
+Route::get('/reportes/contactosDeseo/{id}/{orden}', 'ReporteController@contactosX')
     ->name('reporte.contactosDeseo');
 
-Route::get('/reportes/contactosTipo/{id}/{orden}', 'ReporteController@contactosXTipo')
+Route::get('/reportes/contactosTipo/{id}/{orden}', 'ReporteController@contactosX')
     ->name('reporte.contactosTipo');
 
-Route::get('/reportes/contactosOrigen/{id}/{orden}', 'ReporteController@contactosXOrigen')
+Route::get('/reportes/contactosOrigen/{id}/{orden}', 'ReporteController@contactosX')
     ->name('reporte.contactosOrigen');
 
-Route::get('/reportes/contactosPrecio/{id}/{orden}', 'ReporteController@contactosXPrecio')
+Route::get('/reportes/contactosPrecio/{id}/{orden}', 'ReporteController@contactosX')
     ->name('reporte.contactosPrecio');
 
-Route::get('/reportes/contactosZona/{id}/{orden}', 'ReporteController@contactosXZona')
+Route::get('/reportes/contactosZona/{id}/{orden}', 'ReporteController@contactosX')
     ->name('reporte.contactosZona');
 
-Route::get('/reportes/contactosResultado/{id}/{orden}', 'ReporteController@contactosXResultado')
+Route::get('/reportes/contactosResultado/{id}/{orden}', 'ReporteController@contactosX')
     ->name('reporte.contactosResultado');
+
+Route::get('/reportes/propiedadesCaracteristica/{id}/{orden}', 'ReporteController@propiedadesX')
+    ->name('reporte.propiedadesCaracteristica');
+
+Route::get('/reportes/propiedadesCiudad/{id}/{orden}', 'ReporteController@propiedadesX')
+    ->name('reporte.propiedadesCiudad');
+
+Route::get('/reportes/propiedadesMunicipio/{id}/{orden}', 'ReporteController@propiedadesX')
+    ->name('reporte.propiedadesMunicipio');
+
+Route::get('/reportes/propiedadesEstado/{id}/{orden}', 'ReporteController@propiedadesX')
+    ->name('reporte.propiedadesEstado');
 
 Route::get('/origenes', 'OrigenController@index')
     ->name('origen');
@@ -294,6 +306,94 @@ Route::put('/resultados/{resultado}', 'ResultadoController@update');
 
 Route::delete('/resultados/{resultado}', 'ResultadoController@destroy')
     ->name('resultado.destroy')
+    ->middleware('admin');
+
+Route::get('/caracteristicas', 'CaracteristicaController@index')
+    ->name('caracteristica');
+
+Route::get('/caracteristicas/{caracteristica}', 'CaracteristicaController@show')
+    ->where('caracteristica', '[0-9]+')
+    ->name('caracteristica.show');
+
+Route::get('/caracteristicas/nuevo', 'CaracteristicaController@create')
+    ->name('caracteristica.crear')
+    ->middleware('admin');
+
+Route::post('/caracteristicas', 'CaracteristicaController@store');
+
+Route::get('/caracteristicas/{caracteristica}/editar', 'CaracteristicaController@edit')
+    ->name('caracteristica.edit');
+
+Route::put('/caracteristicas/{caracteristica}', 'CaracteristicaController@update');
+
+Route::delete('/caracteristicas/{caracteristica}', 'CaracteristicaController@destroy')
+    ->name('caracteristica.destroy')
+    ->middleware('admin');
+
+Route::get('/ciudades', 'CiudadController@index')
+    ->name('ciudad');
+
+Route::get('/ciudades/{ciudad}', 'CiudadController@show')
+    ->where('ciudad', '[0-9]+')
+    ->name('ciudad.show');
+
+Route::get('/ciudades/nuevo', 'CiudadController@create')
+    ->name('ciudad.crear')
+    ->middleware('admin');
+
+Route::post('/ciudades', 'CiudadController@store');
+
+Route::get('/ciudades/{ciudad}/editar', 'CiudadController@edit')
+    ->name('ciudad.edit');
+
+Route::put('/ciudades/{ciudad}', 'CiudadController@update');
+
+Route::delete('/ciudades/{ciudad}', 'CiudadController@destroy')
+    ->name('ciudad.destroy')
+    ->middleware('admin');
+
+Route::get('/estados', 'EstadoController@index')
+    ->name('estado');
+
+Route::get('/estados/{estado}', 'EstadoController@show')
+    ->where('estado', '[0-9]+')
+    ->name('estado.show');
+
+Route::get('/estados/nuevo', 'EstadoController@create')
+    ->name('estado.crear')
+    ->middleware('admin');
+
+Route::post('/estados', 'EstadoController@store');
+
+Route::get('/estados/{estado}/editar', 'EstadoController@edit')
+    ->name('estado.edit');
+
+Route::put('/estados/{estado}', 'EstadoController@update');
+
+Route::delete('/estados/{estado}', 'EstadoController@destroy')
+    ->name('estado.destroy')
+    ->middleware('admin');
+
+Route::get('/municipios', 'MunicipioController@index')
+    ->name('municipio');
+
+Route::get('/municipios/{municipio}', 'MunicipioController@show')
+    ->where('municipio', '[0-9]+')
+    ->name('municipio.show');
+
+Route::get('/municipios/nuevo', 'MunicipioController@create')
+    ->name('municipio.crear')
+    ->middleware('admin');
+
+Route::post('/municipios', 'MunicipioController@store');
+
+Route::get('/municipios/{municipio}/editar', 'MunicipioController@edit')
+    ->name('municipio.edit');
+
+Route::put('/municipios/{municipio}', 'MunicipioController@update');
+
+Route::delete('/municipios/{municipio}', 'MunicipioController@destroy')
+    ->name('municipio.destroy')
     ->middleware('admin');
 
 Route::get('/emailcita/{contacto}', 'AgendaController@emailcita')

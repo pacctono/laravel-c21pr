@@ -3,15 +3,18 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use App\MisClases\Fecha;
 
 class Turno extends Model
 {
+    use SoftDeletes;
+
     protected $fillable = [
-        'turno', 'user_id', 'user_creo', 'user_actualizo', 'user_borro', 'borrado_at'
+        'turno', 'user_id', 'user_creo', 'user_actualizo', 'user_borro'
     ];
     protected $dates = [
-        'turno', 'borrado_at', 'turno', 'updated_at'
+        'turno', 'deleted_at', 'updated_at'
     ];
 
     public function user()    // user_id

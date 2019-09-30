@@ -2,22 +2,22 @@
 
 namespace App\Http\Controllers;
 
-use App\Tipo;
+use App\Estado;
 use App\Bitacora;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Jenssegers\Agent\Agent;                 // PC
 
-class TipoController extends Controller
+class EstadoController extends Controller
 {
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    protected $tipo = 'Tipos';
-    protected $ruta = 'tipo';
-    protected $enlace = 'contactos';
+    protected $tipo = 'Estados';
+    protected $ruta = 'estado';
+    protected $enlace = 'propiedades';
     protected $vistaCrear  = 'tabla.crear';
     protected $vistaIndice = 'tabla.index';
     protected $vistaEditar = 'tabla.edit';
@@ -34,8 +34,8 @@ class TipoController extends Controller
         $tipo = $this->tipo;
         $elemento = $this->ruta;
         $enlace   = $this->enlace;
-        $metBorradas = $enlace . 'Borrados';
-        $title = 'Listado de ' . $tipo;
+        $metBorradas = $enlace . 'Borradas';
+        $title    = 'Listado de ' . $tipo;
         $rutCrear = $elemento . '.crear';
         $rutMostrar = $elemento . '.show';
         $rutEditar = $elemento . '.edit';
@@ -46,8 +46,8 @@ class TipoController extends Controller
         if ('' == $orden or $orden == null) {
             $orden = 'id';
         }
-        $arreglo = Tipo::orderBy($orden)->paginate(10);
-
+        $arreglo = Estado::orderBy($orden)->paginate(10);
+//        dd($arreglo);
         return view($this->vistaIndice, compact('title', 'arreglo', 'tipo', 'elemento', 'enlace', 'movil',
                                         'metBorradas', 'rutCrear', 'rutMostrar', 'rutEditar', 'rutBorrar'));
     }
@@ -81,7 +81,7 @@ class TipoController extends Controller
             'descripcion.required' => 'El campo descripcion es obligatorio',
         ]);
 
-        Tipo::create([
+        Estado::create([
             'descripcion' => $data['descripcion'],
         ]);
 
@@ -91,10 +91,10 @@ class TipoController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  \App\Tipo  $tipo
+     * @param  \App\Estado  $estado
      * @return \Illuminate\Http\Response
      */
-    public function show(Tipo $tipo)
+    public function show(Estado $estado)
     {
         //
     }
@@ -102,17 +102,18 @@ class TipoController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Tipo  $tipo
+     * @param  \App\Estado  $estado
      * @return \Illuminate\Http\Response
      */
-    public function edit(Tipo $tipo)
+    public function edit(Estado $estado)
     {
-        $plural = strtolower($this->tipo);
-        $singular = substr($this->tipo, 0, -1);
+        $tipo = $this->tipo;
+        $plural = strtolower($tipo);
+        $singular = substr($tipo, 0, -1);
         $title = 'Editar ' . $singular;
         $ruta = $this->ruta;
-        $objModelo = $tipo;
-        $rutActualizar = '/' . strtolower($this->tipo) . '/' . $tipo->id;
+        $objModelo = $estado;
+        $rutActualizar = '/' . strtolower($tipo) . '/' . $estado->id;
 
         return view($this->vistaEditar, compact('objModelo', 'title', 'ruta', 'rutActualizar',
                                         'singular', 'plural'));
@@ -122,10 +123,10 @@ class TipoController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Tipo  $tipo
+     * @param  \App\Estado  $estado
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Tipo $tipo)
+    public function update(Request $request, Estado $estado)
     {
         $data = request()->validate([   // Si ocurre error, laravel nos envia al url anterior.
             'descripcion' => 'required',
@@ -133,7 +134,7 @@ class TipoController extends Controller
             'descripcion.required' => 'El campo descripcion es obligatorio',
         ]);
         //dd($data);
-        $tipo->update($data);
+        $estado->update($data);
 
         return redirect()->route($this->ruta);
     }
@@ -141,36 +142,27 @@ class TipoController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Tipo  $tipo
+     * @param  \App\Estado  $estado
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Tipo $tipo)
+    public function destroy(Estado $estado)
     {
-        if (0 < ($tipo->contactos->count() - $tipo->contactosBorrados($tipo->id)->count())) {
-            return redirect()->route($this->ruta);  // Existen contactos asignados a este tipo.
+        if (0 < ($estado->propiedades->count()-$estado->propiedadesBorrados($estado->id)->count())) {
+            return redirect()->route($this->ruta);  // Existen propiedades asignados a este usuario.
         }
-        if (0 < ($tipo->propiedades->count() - $tipo->propiedadesBorradas($tipo->id)->count())) {
-            return redirect()->route($this->ruta);  // Existen propiedades asignados a este tipo.
-        }
-        if (0 < $tipo->contactosBorrados($tipo->id)->count()) {    // Existen contactos borrados (logico).
-            $contactos = $tipo->contactos;         // Todos los contactos con este tipo, estan borrados.
-            foreach ($contactos as $contacto) {     // Ciclo para borrar fisicamente los contactos.
-                $contacto->delete();
-            }
-        }
-        if (0 < $tipo->propiedadesBorradas($tipo->id)->count()) {    // Existen propiedades borrados (logico).
-            $propiedades = $tipo->propiedades;         // Todos los propiedades con este tipo, estan borrados.
+        if (0 < $estado->propiedadesBorrados($estado->id)->count()) {    // Existen propiedades borrados (logico).
+            $propiedades = $estado->propiedades;         // Todos los propiedades con este estado, estan borrados.
             foreach ($propiedades as $propiedad) {     // Ciclo para borrar fisicamente los propiedades.
                 $propiedad->delete();
             }
         }
         $usuario = Auth::user()->id;
-        $datos = 'id:'.$tipo->id.', descripcion:'.$tipo->descripcion;
-        $tipo->delete();
+        $datos = 'id:'.$estado->id.', descripcion:'.$estado->descripcion;
+        $estado->delete();
 
         Bitacora::create([
             'user_id' => $usuario,
-            'tx_modelo' => 'Tipo',
+            'tx_modelo' => 'Estado',
             'tx_data' => $datos,
             'tx_tipo' => 'B',
         ]);

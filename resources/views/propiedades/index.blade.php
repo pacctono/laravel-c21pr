@@ -3,158 +3,174 @@
 @section('content')
 <div>
     <form method="POST" class="form-horizontal" action="{{ route('propiedades.post') }}"
-          onSubmit="return alertaCampoRequerido()">
-      {!! csrf_field() !!}
+            onSubmit="return alertaCampoRequerido()">
+        {!! csrf_field() !!}
 
-      <div class="form-group col-md-12">
-        <label title="Fecha de la firma desde">Desde:</label>
-        <input type="date" name="fecha_desde" id="fecha_desde" max="{{ now() }}"
-            title="Fecha de la firma desde" value="{{ old('fecha_desde', $fecha_desde) }}">
-        {{-- $fecha_desde --}}
-        <label title="Fecha de la firma hasta">Hasta:</label>
-        <input type="date" name="fecha_hasta" id="fecha_hasta" max="{{ now() }}"
-            title="Fecha de la firma hasta" value="{{ old('fecha_hasta', $fecha_hasta) }}">
-
-        <select name="estatus" id="estatus">
-            <option value="">Estatus</option>
-        @foreach ($arrEstatus as $opcion => $muestra)
-            <option value="{{$opcion}}"
-        @if (old('estatus', $estatus) == $opcion)
-            selected
-        @endif
-            >{{ substr($muestra, 0, 35) }}</option>
-        @endforeach
-        </select>
+    <div class="form-row my-0 py-0 mx-1 px-1">
+        <div class="form-group form-inline my-0 py-0 mx-0 px-0">
+            <label class="control-label" for="fecha_desde" title="Fecha de la firma desde">
+                Desde</label>
+            <input class="form-control form-control-sm" type="date" name="fecha_desde"
+                id="fecha_desde" max="{{ now() }}" title="Fecha de la firma desde"
+                value="{{ old('fecha_desde', $fecha_desde) }}">
+            {{-- $fecha_desde --}}
+        </div>
+        <div class="form-group form-inline my-0 py-0 mx-0 px-0">
+            <label class="control-label" for="fecha_hasta" title="Fecha de la firma hasta">
+                Hasta</label>
+            <input class="form-control form-control-sm" type="date" name="fecha_hasta"
+                id="fecha_hasta" max="{{ now() }}" title="Fecha de la firma hasta"
+                value="{{ old('fecha_hasta', $fecha_hasta) }}">
+        </div>
+        <div class="form-group form-inline my-0 py-0 mx-0 px-0">
+            <select class="form-control form-control-sm" name="estatus" id="estatus">
+                <option value="">Estatus</option>
+            @foreach ($arrEstatus as $opcion => $muestra)
+                <option value="{{$opcion}}"
+            @if (old('estatus', $estatus) == $opcion)
+                selected
+            @endif
+                >{{ substr($muestra, 0, 35) }}</option>
+            @endforeach
+            </select>
+        </div>
 
     @if (Auth::user()->is_admin)
-        <select name="captador" id="captador">
-            <option value="0">Captador</option>
-        @foreach ($users as $user)
-            <option value="{{ $user->id }}"
-            @if (old("captador", $captador) == $user->id)
-            selected
-            @endif
-            >
-            {{ $user->name }}
-            </option>
-        @endforeach
-        </select>
-
-        <select name="cerrador" id="cerrador">
-            <option value="0">Cerrador</option>
-        @foreach ($users as $user)
-            <option value="{{ $user->id }}"
-            @if (old("cerrador", $cerrador) == $user->id)
-            selected
-            @endif
-            >
-            {{ $user->name }}
-            </option>
-        @endforeach
-        </select>
-    @endif
-        <button type="submit" class="btn btn-success">Mostrar</button>
-      </div>
+        <div class="form-group form-inline my-0 py-0 mx-0 px-0">
+            <select class="form-control form-control-sm" name="captador" id="captador">
+                <option value="0">Captador</option>
+            @foreach ($users as $user)
+                <option value="{{ $user->id }}"
+                @if (old("captador", $captador) == $user->id)
+                selected
+                @endif
+                >
+                {{ $user->name }}
+                </option>
+            @endforeach
+            </select>
+        </div>
+        <div class="form-group form-inline my-0 py-0 mx-0 px-0">
+            <select class="form-control form-control-sm" name="cerrador" id="cerrador">
+                <option value="0">Cerrador</option>
+            @foreach ($users as $user)
+                <option value="{{ $user->id }}"
+                @if (old("cerrador", $cerrador) == $user->id)
+                    selected
+                @endif
+                >
+                {{ $user->name }}
+                </option>
+            @endforeach
+            </select>
+        </div>
+    @endif (Auth::user()->is_admin)
+        <div class="form-group form-inline my-0 py-0 mx-0 px-0">
+            <button type="submit" class="btn btn-success">Mostrar</button>
+        </div>
+    </div>
     </form>
 
-    <div class="col-md-12">
+    <div class="row my-0 py-0 mx-1 px-1">
         TOTS: {{ $filas }} props
-        <span class="alert-success" title="Precio">
+        <span class="alert-success mx-0 px-1" title="Precio">
             {{ Prop::numeroVen($tPrecio, 0) }}</span>{{-- 'Prop' es un alias definido en config/app.php --}}
-        @if (Auth::user()->is_admin)
-            <span class="alert-info">Compartido con IVA:</span>
-            <span class="alert-success" title="Compartido con otra oficina con IVA">
-                {{ Prop::numeroVen($tCompartidoConIva, 2) }}</span>
-            <span class="alert-info">Lados:</span>
-            <span class="alert-success" title="Sumatoria de los lados">
-                {{ $tLados }}</span>
-            <span class="alert-info">Franq a pagar rep:</span>
-            <span class="alert-success" title="Franquicia a pagar reportada">
-                {{ Prop::numeroVen($tFranquiciaPagarR, 2) }}</span>
-            <span class="alert-info">Regalia:</span>
-            <span class="alert-success" title="Regalia">
-                {{ Prop::numeroVen($tRegalia, 2) }}</span>
-            <span class="alert-info">Sanaf:</span>
-            <span class="alert-success" title="Sanaf - 5%">
-                {{ Prop::numeroVen($tSanaf5PorCiento, 2) }}</span>
-            <br>
-            <span class="alert-info">Captador:</span>
-            <span class="alert-success" title="Captador PRBR">
-                {{ Prop::numeroVen($tCaptadorPrbr, 2) }}
-                @if (0 < $tCaptadorPrbrSel)
-                ({{ Prop::numeroVen($tCaptadorPrbrSel, 2) }} [{{ $tLadosCap }}])
-                @endif
-            </span>
-            <span class="alert-info">Cerrador:</span>
-            <span class="alert-success" title="Cerrador PRBR">
-                {{ Prop::numeroVen($tCerradorPrbr, 2) }}
-                @if (0 < $tCerradorPrbrSel)
-                ({{ Prop::numeroVen($tCerradorPrbrSel, 2) }} [{{ $tLadosCer }}])
-                @endif
-            </span>
-        @else
-            <span class="alert-info">Lados:</span>
-            <span class="alert-success" title="Sumatoria de los lados">
-                {{ $tLadosCap + $tLadosCer }}</span>
+    @if (Auth::user()->is_admin)
+        <span class="alert-info mx-0 px-1">Compartido con IVA:</span>
+        <span class="alert-success mx-0 px-1" title="Compartido con otra oficina con IVA">
+            {{ Prop::numeroVen($tCompartidoConIva, 2) }}</span>
+        <span class="alert-info mx-0 px-1">Lados:</span>
+        <span class="alert-success mx-0 px-1" title="Sumatoria de los lados">
+            {{ $tLados }}</span>
+        <span class="alert-info mx-0 px-1">Franq a pagar rep:</span>
+        <span class="alert-success mx-0 px-1" title="Franquicia a pagar reportada">
+            {{ Prop::numeroVen($tFranquiciaPagarR, 2) }}</span>
+        <span class="alert-info mx-0 px-1">Regalia:</span>
+        <span class="alert-success mx-0 px-1" title="Regalia">
+            {{ Prop::numeroVen($tRegalia, 2) }}</span>
+        <span class="alert-info mx-0 px-1">Sanaf:</span>
+        <span class="alert-success mx-0 px-1" title="Sanaf - 5%">
+            {{ Prop::numeroVen($tSanaf5PorCiento, 2) }}</span>
+    </div>
+    <div class="row my-0 py-0 mx-1 px-1">
+        <span class="alert-info mx-0 px-1">Captador:</span>
+        <span class="alert-success mx-0 px-1" title="Captador PRBR">
+            {{ Prop::numeroVen($tCaptadorPrbr, 2) }}
             @if (0 < $tCaptadorPrbrSel)
-                <span class="alert-info">Captador:</span>
-                <span class="alert-success" title="Captador PRBR">
-                    {{ Prop::numeroVen($tCaptadorPrbrSel, 2) }}
-                </span>
+            ({{ Prop::numeroVen($tCaptadorPrbrSel, 2) }} [{{ $tLadosCap }}])
             @endif
+        </span>
+        <span class="alert-info mx-0 px-1">Cerrador:</span>
+        <span class="alert-success mx-0 px-1" title="Cerrador PRBR">
+            {{ Prop::numeroVen($tCerradorPrbr, 2) }}
             @if (0 < $tCerradorPrbrSel)
-            <span class="alert-info">Cerrador:</span>
-            <span class="alert-success" title="Cerrador PRBR">
-                {{ Prop::numeroVen($tCerradorPrbrSel, 2) }}
-            </span>
+            ({{ Prop::numeroVen($tCerradorPrbrSel, 2) }} [{{ $tLadosCer }}])
             @endif
+        </span>
+    @else (Auth::user()->is_admin)
+        <span class="alert-info mx-0 px-1">Lados:</span>
+        <span class="alert-success mx-0 px-1" title="Sumatoria de los lados">
+            {{ $tLadosCap + $tLadosCer }}</span>
+    @if (0 < $tCaptadorPrbrSel)
+        <span class="alert-info mx-0 px-1">Captador:</span>
+        <span class="alert-success mx-0 px-1" title="Captador PRBR">
+            {{ Prop::numeroVen($tCaptadorPrbrSel, 2) }}
+        </span>
+    @endif (0 < $tCaptadorPrbrSel)
+    @if (0 < $tCerradorPrbrSel)
+        <span class="alert-info mx-0 px-1">Cerrador:</span>
+        <span class="alert-success mx-0 px-1" title="Cerrador PRBR">
+            {{ Prop::numeroVen($tCerradorPrbrSel, 2) }}
+        </span>
+    @endif (0 < $tCerradorPrbrSel)
+    @endif (Auth::user()->is_admin)
+    @if (0 < $tBonificaciones)
+        <span class="alert-info mx-0 px-1">Bons:</span>
+        <span class="alert-success mx-0 px-1" title="Bonificaciones">
+            {{ Prop::numeroVen($tBonificaciones, 2) }}</span>
+    @endif
+    @if (Auth::user()->is_admin)
+        <span class="alert-info mx-0 px-1">Gerente:</span>
+        <span class="alert-success mx-0 px-1" title="Gerente">
+            {{ Prop::numeroVen($tGerente, 2) }}</span>
+        @if (0 < $tComisionBancaria)
+            <span class="alert-info mx-0 px-1">Coms:</span>
+            <span class="alert-success mx-0 px-1" title="Comision bancaria">
+                {{ Prop::numeroVen($tComisionBancaria, 2) }}</span>
         @endif
-        @if (0 < $tBonificaciones)
-            <span class="alert-info">Bons:</span>
-            <span class="alert-success" title="Bonificaciones">
-                {{ Prop::numeroVen($tBonificaciones, 2) }}</span>
-        @endif
-        @if (Auth::user()->is_admin)
-            <span class="alert-info">Gerente:</span>
-            <span class="alert-success" title="Gerente">
-                {{ Prop::numeroVen($tGerente, 2) }}</span>
-            @if (0 < $tComisionBancaria)
-                <span class="alert-info">Coms:</span>
-                <span class="alert-success" title="Comision bancaria">
-                    {{ Prop::numeroVen($tComisionBancaria, 2) }}</span>
-            @endif
-            <span class="alert-info">Neto:</span>
-            <span class="alert-success" title="Ingreso neto de la oficina">
-                {{ Prop::numeroVen($tIngresoNetoOfici, 2) }}</span>
-            <span class="alert-info">PrVeRe:</span>
-            <span class="alert-success" title="Precio de venta real">
-                {{ Prop::numeroVen($tPrecioVentaReal, 2) }}
-                @if ((0 < $tPvrCaptadorPrbrSel) || (0 < $tPvrCerradorPrbrSel))
-                    ({{ Prop::numeroVen($tPvrCaptadorPrbrSel+$tPvrCerradorPrbrSel, 2) }})
-                @endif
-            </span>
-            <br>
-            <span class="alert-info">Tot Comision:</span>
-            <span class="alert-success" title="Total de comisiones: Captado + Cerrado">
-                {{ Prop::numeroVen($tCaptadorPrbr+$tCerradorPrbr, 2) }}
-                @if ((0 < $tCaptadorPrbrSel) or (0 < $tCerradorPrbrSel))
-                    ({{ Prop::numeroVen($tCaptadorPrbr+$tCerradorPrbrSel, 2) }} [{{ $tLadosCap+$tLadosCer }}])
-                @endif
-            </span>
-        @else
+        <span class="alert-info mx-0 px-1">Neto:</span>
+        <span class="alert-success mx-0 px-1" title="Ingreso neto de la oficina">
+            {{ Prop::numeroVen($tIngresoNetoOfici, 2) }}</span>
+        <span class="alert-info mx-0 px-1">PrVeRe:</span>
+        <span class="alert-success mx-0 px-1" title="Precio de venta real">
+            {{ Prop::numeroVen($tPrecioVentaReal, 2) }}
             @if ((0 < $tPvrCaptadorPrbrSel) || (0 < $tPvrCerradorPrbrSel))
-                <span class="alert-info">PrVeRe:</span>
-                <span class="alert-success" title="Precio de venta real">
-                    {{ Prop::numeroVen($tPvrCaptadorPrbrSel+$tPvrCerradorPrbrSel, 2) }}
-                </span>
+                ({{ Prop::numeroVen($tPvrCaptadorPrbrSel+$tPvrCerradorPrbrSel, 2) }})
             @endif
-            @if ((0 < $tCaptadorPrbrSel) or (0 < $tCerradorPrbrSel))
-                <span class="alert-info">Tot Comision:</span>
-                <span class="alert-success" title="Total de comisiones: Captado + Cerrado">
-                        {{ Prop::numeroVen($tCaptadorPrbr+$tCerradorPrbrSel, 2) }}
-                </span>
-            @endif
+        </span>
+    </div>
+    <div class="row my-0 py-0 mx-1 px-1">
+        <span class="alert-info mx-0 px-1">Tot Comision:</span>
+        <span class="alert-success mx-0 px-1" title="Total de comisiones: Captado + Cerrado">
+            {{ Prop::numeroVen($tCaptadorPrbr+$tCerradorPrbr, 2) }}
+        @if ((0 < $tCaptadorPrbrSel) or (0 < $tCerradorPrbrSel))
+            ({{ Prop::numeroVen($tCaptadorPrbr+$tCerradorPrbrSel, 2) }} [{{ $tLadosCap+$tLadosCer }}])
         @endif
+        </span>
+    @else (Auth::user()->is_admin)
+    @if ((0 < $tPvrCaptadorPrbrSel) || (0 < $tPvrCerradorPrbrSel))
+        <span class="alert-info mx-0 px-1">PrVeRe:</span>
+        <span class="alert-success mx-0 px-1" title="Precio de venta real">
+            {{ Prop::numeroVen($tPvrCaptadorPrbrSel+$tPvrCerradorPrbrSel, 2) }}
+        </span>
+    @endif ((0 < $tPvrCaptadorPrbrSel) || (0 < $tPvrCerradorPrbrSel))
+    @if ((0 < $tCaptadorPrbrSel) or (0 < $tCerradorPrbrSel))
+        <span class="alert-info mx-0 px-1">Tot Comision:</span>
+        <span class="alert-success mx-0 px-1" title="Total de comisiones: Captado + Cerrado">
+                {{ Prop::numeroVen($tCaptadorPrbr+$tCerradorPrbrSel, 2) }}
+        </span>
+    @endif ((0 < $tCaptadorPrbrSel) or (0 < $tCerradorPrbrSel))
+    @endif (Auth::user()->is_admin)
     </div>
 </div>
 
@@ -171,7 +187,6 @@
     <table class="table table-striped table-hover table-bordered table-sm">
         <thead class="thead-dark">
         <tr>
-            <!-- th scope="col">#</th -->
             <th scope="col">
                 <a href="{{ route('propiedades.orden', 'codigo') }}" class="btn btn-link">
                     C&oacute;digo
@@ -238,27 +253,21 @@
         </thead>
         <tbody>
 
-        <?php $var = 0; // Variable para manejar el estilo de cada fila. ?>
-
         @foreach ($propiedades as $propiedad)
-        <?php $var++;   // Variable para manejar el estilo de cada fila. ?>
         <tr class="
         @if ('I' == $propiedad->estatus)
-            {{--table-light--}}
             table-active
         @elseif ('P' == $propiedad->estatus)
             table-warning
-        @elseif ('S' == $propiedad->estatus)
+        @elseif (('S' == $propiedad->estatus) || ($propiedad->user_borro || $propiedad->deleted_at))
             table-danger
+        @elseif (0 == ($loop->index % 2))
+            table-primary
         @else
-            @if (0 == ($var % 2))
-                table-primary
-            @else
-                table-info
-            @endif
+            table-info
         @endif
         ">
-            <td title="{{ $propiedad->id }}) {{ $propiedad->estatus_alfa }}
+            <td title="{{ $propiedad->id }}) {{ (($propiedad->user_borro || $propiedad->deleted_at)?'Borrado':$propiedad->estatus_alfa) }}
 Reporte en casa nacional: {{ $propiedad->reporte_casa_nacional_ven }}
 Estatus en sistema C21: {{ $propiedad->estatus_c21_alfa.(($propiedad->pagado_casa_nacional)?' y PAGADO A CASA NACIONAL':'') }}
 {{ (($propiedad->factura_AyS)?'Factura A & S: '.$propiedad->factura_AyS.'.':'') }}">
@@ -418,12 +427,14 @@ Estatus en sistema C21: {{ $propiedad->estatus_c21_alfa.(($propiedad->pagado_cas
                         title="Mostrar los datos de esta propiedad.">
                     <span class="oi oi-eye"></span>
                 </a>
+                @if (!($propiedad->user_borro || $propiedad->deleted_at))
                 <a href="{{ route('propiedades.edit', $propiedad) }}" class="btn btn-link"
                         title="Editar los datos de esta propiedad.">
                     <span class="oi oi-pencil"></span>
                 </a>
+                @endif
 
-                @if (1 == Auth::user()->is_admin)
+                @if ((1 == Auth::user()->is_admin) && !($propiedad->user_borro || $propiedad->deleted_at))
                 <form action="{{ route('propiedades.destroy', $propiedad) }}" method="POST" 
                         class="form-inline mt-0 mt-md-0"
                         onSubmit="return confirm('Realmente, desea borrar (borrado lógico) los datos de esta propiedad de la base de datos?')">
@@ -434,12 +445,6 @@ Estatus en sistema C21: {{ $propiedad->estatus_c21_alfa.(($propiedad->pagado_cas
                         </span>
                     </button>
                 </form>
-                    @if ((4 <= $propiedad->resultado_id) and (7 >= $propiedad->resultado_id))
-                    <a href="{{ route('agenda.emailcita', $propiedad) }}" class="btn btn-link"
-                            title="Enviar correo a '{{ $propiedad->user->name }}', sobre cita con esta propiedad">
-                        <span class="oi oi-envelope-closed"></span>
-                    </a>
-                    @endif
                 @endif
             </td>
         </tr>

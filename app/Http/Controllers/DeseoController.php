@@ -6,6 +6,7 @@ use App\Deseo;
 use App\Bitacora;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Jenssegers\Agent\Agent;                 // PC
 
 class DeseoController extends Controller
 {
@@ -16,6 +17,7 @@ class DeseoController extends Controller
      */
     protected $tipo = 'Deseos';
     protected $ruta = 'deseo';
+    protected $enlace = 'contactos';
     protected $vistaCrear  = 'tabla.crear';
     protected $vistaIndice = 'tabla.index';
     protected $vistaEditar = 'tabla.edit';
@@ -31,19 +33,23 @@ class DeseoController extends Controller
 
         $tipo = $this->tipo;
         $elemento = $this->ruta;
+        $enlace   = $this->enlace;
+        $metBorradas = $enlace . 'Borrados';
         $title = 'Listado de ' . $tipo;
         $rutCrear = $elemento . '.crear';
         $rutMostrar = $elemento . '.show';
         $rutEditar = $elemento . '.edit';
         $rutBorrar = $elemento . '.destroy';
+        $agente = new Agent();
+        $movil  = $agente->isMobile() and true;             // Fuerzo booleana. No funciona al usar el metodo directamente.
 
         if ('' == $orden or $orden == null) {
             $orden = 'id';
         }
         $arreglo = Deseo::orderBy($orden)->paginate(10);
 //        dd($arreglo);
-        return view($this->vistaIndice, compact('title', 'arreglo', 'tipo', 'elemento',
-                                        'rutCrear', 'rutMostrar', 'rutEditar', 'rutBorrar'));
+        return view($this->vistaIndice, compact('title', 'arreglo', 'tipo', 'elemento', 'enlace', 'movil',
+                                        'metBorradas', 'rutCrear', 'rutMostrar', 'rutEditar', 'rutBorrar'));
     }
 
     /**
@@ -141,7 +147,7 @@ class DeseoController extends Controller
      */
     public function destroy(Deseo $deseo)
     {
-        if (0 < ($deseo->contactos->count()-$deseo->contactosBorrados($deseo->id)->count())) {
+        if (0 < ($deseo->contactos->count() - $deseo->contactosBorrados($deseo->id)->count())) {
             return redirect()->route($this->ruta);  // Existen contactos asignados a este usuario.
         }
         if (0 < $deseo->contactosBorrados($deseo->id)->count()) {    // Existen contactos borrados (logico).

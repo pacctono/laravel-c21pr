@@ -6,6 +6,7 @@ use App\Origen;
 use App\Bitacora;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Jenssegers\Agent\Agent;                 // PC
 
 class OrigenController extends Controller
 {
@@ -16,6 +17,7 @@ class OrigenController extends Controller
      */
     protected $tipo = 'Origenes';
     protected $ruta = 'origen';
+    protected $enlace = 'contactos';
     protected $vistaCrear  = 'tabla.crear';
     protected $vistaIndice = 'tabla.index';
     protected $vistaEditar = 'tabla.edit';
@@ -31,19 +33,23 @@ class OrigenController extends Controller
 
         $tipo = $this->tipo;
         $elemento = $this->ruta;
+        $enlace   = $this->enlace;
+        $metBorradas = $enlace . 'Borrados';
         $title = 'Listado de ' . $tipo;
         $rutCrear = $elemento . '.crear';
         $rutMostrar = $elemento . '.show';
         $rutEditar = $elemento . '.edit';
         $rutBorrar = $elemento . '.destroy';
+        $agente = new Agent();
+        $movil  = $agente->isMobile() and true;             // Fuerzo booleana. No funciona al usar el metodo directamente.
 
         if ('' == $orden or $orden == null) {
             $orden = 'id';
         }
         $arreglo = Origen::orderBy($orden)->paginate(10);
 
-        return view($this->vistaIndice, compact('title', 'arreglo', 'tipo', 'elemento',
-                                        'rutCrear', 'rutMostrar', 'rutEditar', 'rutBorrar'));
+        return view($this->vistaIndice, compact('title', 'arreglo', 'tipo', 'elemento', 'enlace', 'movil',
+                                        'metBorradas', 'rutCrear', 'rutMostrar', 'rutEditar', 'rutBorrar'));
     }
 
     /**

@@ -30,10 +30,8 @@
             <th scope="col">#</th>
         @endif
             <th scope="col">Nombre</th>
-        @if ($movil)
-            <th scope="col">Contacto</th>
-        @else
             <th scope="col">Teléfono</th>
+        @if (!$movil)
             <th scope="col">Correo</th>
         @if (Auth::user()->is_admin)
             <th scope="col">Comision</th>
@@ -53,6 +51,11 @@
             <td scope="row">{{ $user->id }}</td>
         @endif
             <td>
+            @if ($movil)
+                <a href="{{ route('users.show', $user) }}" class="btn btn-link" style="text-decoration:none;">
+                    {{ $user->name }}
+                </a>
+            @else
             @if (1 < $user->id)
                 <a href="{{ route('reporte.contactosUser', [$user->id, 'id']) }}" class="btn btn-link"
                     title="Mostrar reporte de contactos del asesor.">
@@ -61,16 +64,13 @@
             @if (1 < $user->id)
                 </a>
             @endif
+            @endif
             <td>{{ $user->telefono_f }}
-        @if ($movil)
-            <br>
-        @else
-            </td>
-            <td>
-        @endif
-                {{ $user->email }}
             </td>
         @if (!$movil)
+            <td>
+                {{ $user->email }}
+            </td>
         @if (Auth::user()->is_admin)
             <td class="float-right"
             @if (1 == $user->id)

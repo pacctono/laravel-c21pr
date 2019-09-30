@@ -8,7 +8,7 @@ class Zona extends Model
 {
     protected $fillable = ['descripcion'];
 
-    public function contactos()    // contacto_id
+    public function contactos()    // zona_id
     {
         return $this->hasMany(Contacto::class); // Si llave foranea, diferente a esperada, usamos 2do parametro.
     }

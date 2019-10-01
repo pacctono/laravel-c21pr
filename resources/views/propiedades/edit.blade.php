@@ -193,7 +193,7 @@
             <div class="form-row py-0">
                 <div class="form-group col-lg-12 d-flex mx-1 px-2">
                     <label class="control-label" for="descripcion" id="etiqDescripcion">Descripci&oacute;n</label>
-                    <textarea class="form-control form-control-sm" rows="3" name="descripcion" id="descripcion"
+                    <textarea class="form-control form-control-sm" rows="5" name="descripcion" id="descripcion"
                     placeholder="Descripcion detallada de la propiedad">{{ $propiedad->descripcion }}</textarea>
                 </div>
             </div>

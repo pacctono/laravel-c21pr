@@ -1,0 +1,394 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <meta name="csrf-token" content="n2CfcKwjb93jBMDE4sm8Mk6WzF1uVBonLui57WjU">
+    <link rel="icon" href="favicon.ico">
+
+    <title>Century21 Puente Real</title>
+
+    <!-- Bootstrap core CSS -->
+    <!--link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous"-->
+    <link href="http://c21pr.vb/css/app.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/open-iconic/1.1.1/font/css/open-iconic-bootstrap.css" integrity="sha256-CNwnGWPO03a1kOlAsGaH5g8P3dFaqFqqGFV/1nkX5OU=" crossorigin="anonymous" />
+    <!-- Custom styles for this template -->
+    <link href="http://c21pr.vb/css/style.css" rel="stylesheet">
+    <link href="http://c21pr.vb/css/c21pr.css" rel="stylesheet">
+    <script src="http://c21pr.vb/js/app.js"></script>
+    <script>
+        $(document).ready(function(){
+            $("fieldset.datos").children("div").hide();
+            $("#datosPropiedad").click(function(event){
+                $("fieldset.datos").children("div").toggle(1000);
+                event.preventDefault();
+            })
+        })
+    </script>
+  </head>
+
+  <body>
+    <!-- Begin page content -->
+    <main role="main" class="container">
+        <div class="row mt-1">  <!-- margen de arriba (top margin) es 1 -->
+            <div class="col-lg-12"> <!-- Cambie de sm a lg el 15/09/2019 -->
+                          <div class="card">
+    <h4 class="card-header">Crear Propiedad</h4>
+    <div class="card-body">
+            <form method="POST" class="form align-items-end-horizontal"
+        action="http://c21pr.vb/propiedades" onSubmit="return fnSometerForma()">
+        <input type="hidden" name="_token" value="n2CfcKwjb93jBMDE4sm8Mk6WzF1uVBonLui57WjU">
+
+        <div class="form-row my-0 py-0 bg-suave">
+            <div class="form-group form-inline mx-1 px-2">
+                <label class="control-label" for="codigo">*C&oacute;digo</label>
+                <input type="text" class="form-control form-control-sm" size="8" maxlength="8"
+                        minlength="6" name="codigo" id="codigo" required
+                        placeholder="Codigo MLS" value="">
+            </div>
+
+            <div class="form-group form-inline mx-1 px-2">
+                <label class="control-label" for="estatus">*Estatus</label>
+                <select class="form-control form-control-sm" name="estatus" id="estatus">
+                                  <option value="A"
+                                      selected
+                                      >[A]ctivo</option>
+                                  <option value="I"
+                                      >[I]nmueble pendiente</option>
+                                  <option value="P"
+                                      >Pagos pendientes</option>
+                                  <option value="C"
+                                      >inmueble [C]errado y pagos realizados</option>
+                                  <option value="S"
+                                      >[S]negociacion caida</option>
+                                </select>
+            </div>
+
+            <div class="form-group form-inline mx-1 px-2">
+              <label class="control-label" for="negociacion">
+                *Negociaci&oacute;n
+              </label>
+                <select class="form-control form-control-sm" name="negociacion" id="negociacion">
+                                  <option value="V"
+                                      >[V]enta</option>
+                                  <option value="A"
+                                      >[A]luiler</option>
+                                </select>
+            </div>
+        </div>
+
+        <div class="form-row my-0 py-0">
+            <div class="form-group form-inline mx-1 px-2">
+                <label class="control-label" for="fecha_reserva">Fecha de reserva</label>
+                <input type="date" class="form-control form-control-sm" name="fecha_reserva"
+                        id="fecha_reserva" min="26/09/2019"
+                        max="24/10/2019"
+                        value="">
+            </div>
+
+            <div class="form-group form-inline mx-1 px-2">
+                <label class="control-label" for="fecha_firma">Fecha de la firma</label>
+                <input type="date" class="form-control form-control-sm" name="fecha_firma"
+                    id="fecha_firma" min="29/08/2019"
+                    max="24/10/2019"
+                    value="">
+            </div>
+        </div>
+
+        <div class="form-row my-0 py-0 bg-suave">
+            <div class="form-group form-inline mx-1 px-2">
+                <label class="control-label" for="nombre">*Nombre</label>
+                <input type="text" class="form-control form-control-sm" size="80" maxlength="150"
+                    name="nombre" id="nombre" required
+                    placeholder="nombre de la propiedad"
+                    value="">
+            </div>
+        </div>
+
+        <div class="form-row my-0 py-0">
+            <div class="form-group form-inline mx-1 px-2">
+                <label class="control-label" for="precio">*Precio</label>
+                <input class="form-control form-control-sm" size="2" maxlength="2" required
+                    name="moneda" id="moneda"
+                    value="$" list="monedas">
+                <datalist id="monedas">
+                                    <option value="$">
+                                    <option value="Eu">
+                                    <option value="Bs">
+                                    <option value="Rf">
+                                </datalist>
+                <input type="float" class="form-control form-control-sm" size="20" maxlength="20"
+                    name="precio" id="precio" required placeholder="Precio del inmueble"
+                    value="">
+            </div>
+
+            <div class="form-group form-inline mx-1 px-2">
+                <label class="control-label" for="comision">*Comision</label>
+                <input type="float" class="form-control form-control-sm" size="6" maxlength="6"
+                    name="comision" id="comision" required
+                    value="5.00">%
+            </div>
+
+            <div class="form-group form-inline mx-1 px-2">
+                <label class="control-label" for="iva">*IVA</label>
+                <input type="float" class="form-control form-control-sm" size="5" maxlength="5"
+                    required name="iva" id="iva"
+                    value="16.00">%
+            </div>
+
+            <div class="form-group form-inline mx-1 px-2">
+                <label class="control-label" for="lados">Lados</label>
+                <input type="number" class="form-control form-control-sm" size="1" maxlength="1"
+                    required name="lados" id="lados" value="">
+            </div>
+        </div>
+
+        <fieldset class="datos" style="border:solid 2px #000000">
+            <legend>
+                <button id="datosPropiedad" class="btn btn-success">
+                    Datos de la propiedad
+                </button>
+            </legend>
+        <div class="form-row py-0">
+            <div class="form-group form-inline mx-1 px-2">
+                <label class="control-label" for="tipo_id">Tipo</label>
+                <select class="form-control form-control-sm" name="tipo_id" id="tipo_id">
+                    <option value="">Qué tipo?</option>
+                                                    <option value="1">Casa</option>
+                                                                    <option value="2">Apartamento</option>
+                                                                    <option value="3">Local</option>
+                                                                    <option value="4">Edificio</option>
+                                                                    <option value="5">Terreno</option>
+                                                                    <option value="6" selected>Otro</option>
+                                                </select>
+            </div>
+
+            <div class="form-group form-inline mx-1 px-2">
+                <label class="control-label" for="metraje">Metraje</label>
+                <input type="float" class="form-control form-control-sm" size="8" maxlength="11"
+                    name="metraje" id="metraje"
+                    value="">
+            </div>
+
+            <div class="form-group form-inline mx-1 px-2">
+                <label class="control-label" for="habitaciones">Habitaciones</label>
+                <input type="integer" class="form-control form-control-sm" size="2" maxlength="3"
+                    name="habitaciones" id="habitaciones"
+                    value="">
+            </div>
+
+            <div class="form-group form-inline mx-1 px-2">
+                <label class="control-label" for="banos">Ba&ntilde;os</label>
+                <input type="integer" class="form-control form-control-sm" size="1" maxlength="2"
+                    name="banos" id="banos"
+                    value="">
+            </div>
+        </div>
+
+        <div class="form-row my-0 py-0">
+            <div class="form-group form-inline mx-1 px-2">
+                <label class="control-label" for="niveles">Niveles</label>
+                <input type="float" class="form-control form-control-sm" size="2" maxlength="3"
+                    name="niveles" id="niveles"
+                    value="">
+            </div>
+
+            <div class="form-group form-inline mx-1 px-2">
+                <label class="control-label" for="puestos">Puestos de estacionamiento</label>
+                <input type="integer" class="form-control form-control-sm" size="2" maxlength="3"
+                    name="puestos" id="puestos"
+                    value="">
+            </div>
+
+            <div class="form-group form-inline mx-1 px-2">
+                <label class="control-label" for="anoc">A&ntilde;o de construccion</label>
+                <input type="integer" class="form-control form-control-sm" size="4" maxlength="4"
+                    name="anoc" id="anoc"
+                    value="">
+            </div>
+
+            <div class="form-group form-inline mx-1 px-2">
+                <label class="control-label" for="caracteristica">Caracteristicas</label>
+                
+                <select class="form-control" name="caracteristica_id" id="tipo_id">
+                    <option value="">Qué caracteristica?</option>
+                                                    <option value="1" selected>Otra
+                    </option>
+                                                                    <option value="2">Obra gris
+                    </option>
+                                                                    <option value="3">Obra limpia
+                    </option>
+                                                                    <option value="4">Amoblado
+                    </option>
+                                                                    <option value="5">Completo
+                    </option>
+                                                </select>
+            </div>
+        </div>
+
+        <div class="form-row my-0 py-0">
+            <div class="form-group col-lg-12 d-flex mx-1 px-2">
+                <label class="control-label" for="descripcion id="etiqDescripcion"">Descripci&oacute;n</label>
+                <textarea class="form-control form-control-sm" rows="3" name="descripcion" id="descripcion"
+                placeholder="Descripcion detallada de la propiedad"></textarea>
+            </div>
+        </div>
+
+        <div class="form-row my-0 py-0">
+            <div class="form-group col-lg-12 d-flex mx-1 px-2">
+                <label class="control-label" for="direccion" id="etiqDireccion">Direcci&oacute;n</label>
+                <textarea class="form-control form-control-sm" rows="3" name="direccion" id="direccion"
+                placeholder="Calle, Casa, Apto, Edificio, Barrio, etc."></textarea>
+            </div>
+        </div>
+
+        <div class="form-row my-0 py-0">
+            <div class="form-group form-inline mx-1 px-2">
+                <label class="control-label" for="ciudad_id">Ciudad</label>
+                <select class="form-control form-control-sm" name="ciudad_id" id="ciudad_id">
+                    <option value="">Qué ciudad?</option>
+                                                    <option value="1" selected>Otra</option>
+                                                                    <option value="2">Anaco</option>
+                                                                    <option value="3">Barcelona</option>
+                                                                    <option value="4">Lechería</option>
+                                                                    <option value="5">Piritu</option>
+                                                                    <option value="6">Puerto La Cruz</option>
+                                                </select>
+            </div>
+
+            <div class="form-group form-inline mx-1 px-2">
+                <label class="control-label" for="codigo_postal">Codigo postal</label>
+                <input type="float" class="form-control form-control-sm" size="8" maxlength="11"
+                    name="codigo_postal" id="codigo_postal"
+                    value="">
+            </div>
+
+            <div class="form-group form-inline mx-1 px-2">
+                <label class="control-label" for="municipio_id">Municipio</label>
+                
+                <select class="form-control form-control-sm" name="municipio_id" id="municipio_id">
+                    <option value="">Qué municipio?</option>
+                                                    <option value="1" selected>Otro</option>
+                                                                    <option value="2">Anaco</option>
+                                                                    <option value="3">Aragua</option>
+                                                                    <option value="4">Bolivar</option>
+                                                                    <option value="5">Bruzual</option>
+                                                                    <option value="6">Carvajal</option>
+                                                                    <option value="7">Cajigal</option>
+                                                                    <option value="8">Diego Bautista Urbaneja</option>
+                                                                    <option value="9">Freites</option>
+                                                                    <option value="10">Guanta</option>
+                                                                    <option value="11">Independencia</option>
+                                                                    <option value="12">Libertad</option>
+                                                                    <option value="13">McGregor</option>
+                                                                    <option value="14">Miranda</option>
+                                                                    <option value="15">Monagas</option>
+                                                                    <option value="16">Peñalver</option>
+                                                                    <option value="17">Píritu</option>
+                                                                    <option value="18">San Juan de Capistrano</option>
+                                                                    <option value="19">Santa Ana</option>
+                                                                    <option value="20">Simón Bolívar</option>
+                                                                    <option value="21">Simón Rodríguez</option>
+                                                                    <option value="22">Sotillo</option>
+                                                </select>
+            </div>
+
+            <div class="form-group form-inline mx-1 px-2">
+                <label class="control-label" for="estado_id">Estado</label>
+                
+                <select class="form-control form-control-sm" name="estado_id" id="estado_id">
+                    <option value="">Qué estado?</option>
+                                                    <option value="1" selected>Otro</option>
+                                                                    <option value="2">Amazonas</option>
+                                                                    <option value="3">Anzoátegui</option>
+                                                                    <option value="4">Apure</option>
+                                                                    <option value="5">Aragua</option>
+                                                                    <option value="6">Barinas</option>
+                                                                    <option value="7">Bolívar</option>
+                                                                    <option value="8">Carabobo</option>
+                                                                    <option value="9">Cojedes</option>
+                                                                    <option value="10">Delta Amacuro</option>
+                                                                    <option value="11">Distrito Capital</option>
+                                                                    <option value="12">Falcón</option>
+                                                                    <option value="13">Guárico</option>
+                                                                    <option value="14">Lara</option>
+                                                                    <option value="15">Mérida</option>
+                                                                    <option value="16">Miranda</option>
+                                                                    <option value="17">Monagas</option>
+                                                                    <option value="18">Nueva Esparta</option>
+                                                                    <option value="19">Portuguesa</option>
+                                                                    <option value="20">Sucre</option>
+                                                                    <option value="21">Táchira</option>
+                                                                    <option value="22">Trujillo</option>
+                                                                    <option value="23">Vargas</option>
+                                                                    <option value="24">Yaracuy</option>
+                                                                    <option value="25">Zulia</option>
+                                                </select>
+            </div>
+        </div>
+
+        <div class="form-row my-0 py-0">
+            <div class="form-group form-inline mx-1 px-2">
+                <label class="control-label" for="cliente_id">Cliente</label>
+                
+                <select class="form-control form-control-sm" name="cliente_id" id="cliente_id">
+                    <option value="">Qué cliente?</option>
+                                                    <option value="1" selected>Otro</option>
+                                                                    <option value="2">Dr. Susie Hahn</option>
+                                                                    <option value="3">Mrs. Juana Rodriguez</option>
+                                                                    <option value="4">Maximilian Haag PhD</option>
+                                                                    <option value="5">Vada Herman</option>
+                                                                    <option value="6">Dr. Paolo Kunze</option>
+                                                                    <option value="7">Miss Mossie Hane MD</option>
+                                                                    <option value="8">Mr. Demario Quigley</option>
+                                                                    <option value="9">Judson Lehner</option>
+                                                                    <option value="10">Marion Kuhic</option>
+                                                                    <option value="11">Liana Harber</option>
+                                                                    <option value="12">Prof. Walton Hand V</option>
+                                                                    <option value="13">Mr. Chance Hills</option>
+                                                                    <option value="14">Destiney Rath</option>
+                                                                    <option value="15">Tevin Auer</option>
+                                                                    <option value="16">Madge Kuphal</option>
+                                                                    <option value="17">Miss Kattie Powlowski DDS</option>
+                                                                    <option value="18">Ethel Gottlieb</option>
+                                                                    <option value="19">Rebeka Reilly PhD</option>
+                                                                    <option value="20">Merle Kunze</option>
+                                                                    <option value="21">Prof. Gerardo Kerluke MD</option>
+                                                </select>
+            </div>
+        </div>
+        </fieldset>
+
+                    <input type="hidden" name="porc_franquicia" value="10.00">
+            <input type="hidden" name="reportado_casa_nacional" value="5.00">
+            <input type="hidden" name="porc_regalia" value="80.00">
+            <input type="hidden" name="porc_gerente" value="10.00">
+            <input type="hidden" name="porc_compartido" value="50.00">
+            <input type="hidden" name="porc_captador_prbr" value="20.00">
+            <input type="hidden" name="porc_cerrador_prbr" value="20.00">
+            <input type="hidden" name="porc_bonificacion" value="0.00">
+            <input type="hidden" name="asesor_captador_id" value="6">
+            <input type="hidden" name="asesor_cerrador_id" value="6">
+        
+        <div class="form-row my-0 py-0">
+            <div class="form-group form-inline mx-1 px-2">
+                <button type="submit" class="btn btn-success">
+                    Agregar propiedad
+                </button>
+                <a href="http://c21pr.vb/propiedades" class="btn btn-link">
+                    Regresar al listado de propiedades
+                </a>
+            </div>
+        </div>
+    </form>
+    </div>
+</div>
+                        </div>
+        </div>
+     </main>
+
+  </body>
+</html>
+

@@ -73,101 +73,104 @@
 
     <div class="row my-0 py-0 mx-1 px-1">
         TOTS: {{ $filas }} props
-        <span class="alert-success mx-0 px-1" title="Precio">
+        <span class="alert-success mx-1 px-1" title="Precio">
             {{ Prop::numeroVen($tPrecio, 0) }}</span>{{-- 'Prop' es un alias definido en config/app.php --}}
     @if (Auth::user()->is_admin)
-        <span class="alert-info mx-0 px-1">Compartido con IVA:</span>
-        <span class="alert-success mx-0 px-1" title="Compartido con otra oficina con IVA">
+        <span class="alert-info ml-1 mr-0 px-1">Compartido con IVA:</span>
+        <span class="alert-success ml-0 mr-1 px-1" title="Compartido con otra oficina con IVA">
             {{ Prop::numeroVen($tCompartidoConIva, 2) }}</span>
-        <span class="alert-info mx-0 px-1">Lados:</span>
-        <span class="alert-success mx-0 px-1" title="Sumatoria de los lados">
+        <span class="alert-info ml-1 mr-0 px-1">Lados:</span>
+        <span class="alert-success ml-0 mr-1 px-1" title="Sumatoria de los lados">
             {{ $tLados }}</span>
-        <span class="alert-info mx-0 px-1">Franq a pagar rep:</span>
-        <span class="alert-success mx-0 px-1" title="Franquicia a pagar reportada">
+        <span class="alert-info ml-1 mr-0 px-1">Franq a pagar rep:</span>
+        <span class="alert-success ml-0 mr-1 px-1" title="Franquicia a pagar reportada">
             {{ Prop::numeroVen($tFranquiciaPagarR, 2) }}</span>
-        <span class="alert-info mx-0 px-1">Regalia:</span>
-        <span class="alert-success mx-0 px-1" title="Regalia">
+        <span class="alert-info ml-1 mr-0 px-1">Regalia:</span>
+        <span class="alert-success ml-0 mr-1 px-1" title="Regalia">
             {{ Prop::numeroVen($tRegalia, 2) }}</span>
-        <span class="alert-info mx-0 px-1">Sanaf:</span>
-        <span class="alert-success mx-0 px-1" title="Sanaf - 5%">
+        <span class="alert-info ml-1 mr-0 px-1">Sanaf:</span>
+        <span class="alert-success ml-0 mr-1 px-1" title="Sanaf - 5%">
             {{ Prop::numeroVen($tSanaf5PorCiento, 2) }}</span>
     </div>
     <div class="row my-0 py-0 mx-1 px-1">
-        <span class="alert-info mx-0 px-1">Captador:</span>
-        <span class="alert-success mx-0 px-1" title="Captador PRBR">
+        <span class="alert-info ml-1 mr-0 px-1">Captador:</span>
+        <span class="alert-success ml-0 mr-1 px-1" title="Captador PRBR">
             {{ Prop::numeroVen($tCaptadorPrbr, 2) }}
             @if (0 < $tCaptadorPrbrSel)
             ({{ Prop::numeroVen($tCaptadorPrbrSel, 2) }} [{{ $tLadosCap }}])
             @endif
         </span>
-        <span class="alert-info mx-0 px-1">Cerrador:</span>
-        <span class="alert-success mx-0 px-1" title="Cerrador PRBR">
+        <span class="alert-info ml-1 mr-0 px-1">Cerrador:</span>
+        <span class="alert-success ml-0 mr-1 px-1" title="Cerrador PRBR">
             {{ Prop::numeroVen($tCerradorPrbr, 2) }}
             @if (0 < $tCerradorPrbrSel)
             ({{ Prop::numeroVen($tCerradorPrbrSel, 2) }} [{{ $tLadosCer }}])
             @endif
         </span>
     @else (Auth::user()->is_admin)
-        <span class="alert-info mx-0 px-1">Lados:</span>
-        <span class="alert-success mx-0 px-1" title="Sumatoria de los lados">
+        <span class="alert-info ml-1 mr-0 px-1">Lados:</span>
+        <span class="alert-success ml-0 mr-1 px-1" title="Sumatoria de los lados">
             {{ $tLadosCap + $tLadosCer }}</span>
     @if (0 < $tCaptadorPrbrSel)
-        <span class="alert-info mx-0 px-1">Captador:</span>
-        <span class="alert-success mx-0 px-1" title="Captador PRBR">
+        <span class="alert-info ml-1 mr-0 px-1">Captador:</span>
+        <span class="alert-success ml-0 mr-1 px-1" title="Captador PRBR">
             {{ Prop::numeroVen($tCaptadorPrbrSel, 2) }}
         </span>
     @endif (0 < $tCaptadorPrbrSel)
     @if (0 < $tCerradorPrbrSel)
-        <span class="alert-info mx-0 px-1">Cerrador:</span>
-        <span class="alert-success mx-0 px-1" title="Cerrador PRBR">
+        <span class="alert-info ml-1 mr-0 px-1">Cerrador:</span>
+        <span class="alert-success ml-0 mr-1 px-1" title="Cerrador PRBR">
             {{ Prop::numeroVen($tCerradorPrbrSel, 2) }}
         </span>
     @endif (0 < $tCerradorPrbrSel)
     @endif (Auth::user()->is_admin)
     @if (0 < $tBonificaciones)
-        <span class="alert-info mx-0 px-1">Bons:</span>
-        <span class="alert-success mx-0 px-1" title="Bonificaciones">
+        <span class="alert-info ml-1 mr-0 px-1">Bons:</span>
+        <span class="alert-success ml-0 mr-1 px-1" title="Bonificaciones">
             {{ Prop::numeroVen($tBonificaciones, 2) }}</span>
     @endif
     @if (Auth::user()->is_admin)
-        <span class="alert-info mx-0 px-1">Gerente:</span>
-        <span class="alert-success mx-0 px-1" title="Gerente">
+        <span class="alert-info ml-1 mr-0 px-1">Gerente:</span>
+        <span class="alert-success ml-0 mr-1 px-1" title="Gerente">
             {{ Prop::numeroVen($tGerente, 2) }}</span>
         @if (0 < $tComisionBancaria)
-            <span class="alert-info mx-0 px-1">Coms:</span>
-            <span class="alert-success mx-0 px-1" title="Comision bancaria">
+            <span class="alert-info ml-1 mr-0 px-1">Coms:</span>
+            <span class="alert-success ml-0 mr-1 px-1" title="Comision bancaria">
                 {{ Prop::numeroVen($tComisionBancaria, 2) }}</span>
         @endif
-        <span class="alert-info mx-0 px-1">Neto:</span>
-        <span class="alert-success mx-0 px-1" title="Ingreso neto de la oficina">
+        <span class="alert-info ml-1 mr-0 px-1">Neto:</span>
+        <span class="alert-success ml-0 mr-1 px-1" title="Ingreso neto de la oficina">
             {{ Prop::numeroVen($tIngresoNetoOfici, 2) }}</span>
-        <span class="alert-info mx-0 px-1">PrVeRe:</span>
-        <span class="alert-success mx-0 px-1" title="Precio de venta real">
+        <span class="alert-info ml-1 mr-0 px-1">PrVeRe:</span>
+        <span class="alert-success ml-0 mr-1 px-1" title="Precio de venta real">
             {{ Prop::numeroVen($tPrecioVentaReal, 2) }}
             @if ((0 < $tPvrCaptadorPrbrSel) || (0 < $tPvrCerradorPrbrSel))
                 ({{ Prop::numeroVen($tPvrCaptadorPrbrSel+$tPvrCerradorPrbrSel, 2) }})
             @endif
         </span>
+    @if ((0 < $tCaptadorPrbrSel) || (0 < $tCerradorPrbrSel))
+        {{-- $tCaptadorPrbrSel }}-{{ $tCerradorPrbr --}}
     </div>
     <div class="row my-0 py-0 mx-1 px-1">
-        <span class="alert-info mx-0 px-1">Tot Comision:</span>
-        <span class="alert-success mx-0 px-1" title="Total de comisiones: Captado + Cerrado">
+    @endif ((0 != $tCaptadorPrbrSel) || (0 != $tCerradorPrbr))
+        <span class="alert-info ml-1 mr-0 px-1">Tot Comision:</span>
+        <span class="alert-success ml-0 mr-1 px-1" title="Total de comisiones: Captado + Cerrado">
             {{ Prop::numeroVen($tCaptadorPrbr+$tCerradorPrbr, 2) }}
         @if ((0 < $tCaptadorPrbrSel) or (0 < $tCerradorPrbrSel))
-            ({{ Prop::numeroVen($tCaptadorPrbr+$tCerradorPrbrSel, 2) }} [{{ $tLadosCap+$tLadosCer }}])
+            ({{ Prop::numeroVen($tCaptadorPrbrSel+$tCerradorPrbrSel, 2) }} [{{ $tLadosCap+$tLadosCer }}])
         @endif
         </span>
     @else (Auth::user()->is_admin)
     @if ((0 < $tPvrCaptadorPrbrSel) || (0 < $tPvrCerradorPrbrSel))
-        <span class="alert-info mx-0 px-1">PrVeRe:</span>
-        <span class="alert-success mx-0 px-1" title="Precio de venta real">
+        <span class="alert-info ml-1 mr-0 px-1">PrVeRe:</span>
+        <span class="alert-success ml-0 mr-1 px-1" title="Precio de venta real">
             {{ Prop::numeroVen($tPvrCaptadorPrbrSel+$tPvrCerradorPrbrSel, 2) }}
         </span>
     @endif ((0 < $tPvrCaptadorPrbrSel) || (0 < $tPvrCerradorPrbrSel))
     @if ((0 < $tCaptadorPrbrSel) or (0 < $tCerradorPrbrSel))
-        <span class="alert-info mx-0 px-1">Tot Comision:</span>
-        <span class="alert-success mx-0 px-1" title="Total de comisiones: Captado + Cerrado">
-                {{ Prop::numeroVen($tCaptadorPrbr+$tCerradorPrbrSel, 2) }}
+        <span class="alert-info ml-1 mr-0 px-1">Tot Comision:</span>
+        <span class="alert-success ml-0 mr-1 px-1" title="Total de comisiones: Captado + Cerrado">
+                {{ Prop::numeroVen($tCaptadorPrbrSel+$tCerradorPrbrSel, 2) }}
         </span>
     @endif ((0 < $tCaptadorPrbrSel) or (0 < $tCerradorPrbrSel))
     @endif (Auth::user()->is_admin)
@@ -176,7 +179,11 @@
 
     <div class="row">
         <div class="col-sm-8">
+        @if ($movil)
+            <h5 class="pb-1">{{ substr($title, 11) }}</h5>
+        @else ($movil)
             <h1 class="pb-1">{{ $title }}</h1>
+        @endif ($movil)
         </div>
         <div class="col-sm-4">
             <a href="{{ route('propiedades.create') }}" class="btn btn-primary float-right">
@@ -192,6 +199,7 @@
                     C&oacute;digo
                 </a>
             </th>
+        @if (!$movil)
             <th scope="col" title="Fecha de reserva">
                 <a href="{{ route('propiedades.orden', 'fecha_reserva') }}" class="btn btn-link">
                     Reserva
@@ -201,7 +209,7 @@
         @else
             </th>
             <th scope="col" title="Fecha de la firma">
-        @endif
+        @endif (Auth::user()->is_admin)
                 <a href="{{ route('propiedades.orden', 'fecha_firma') }}" class="btn btn-link">
                     Firma
                 </a>
@@ -211,6 +219,7 @@
                     N
                 </a>
             </th>
+        @endif (!$movil)
             <th scope="col">
                 <a href="{{ route('propiedades.orden', 'nombre') }}" class="btn btn-link">
                     Nombre
@@ -226,6 +235,7 @@
                     L
                 </a>
             </th>
+        @if (!$movil)
         @if (Auth::user()->is_admin)
             <th scope="col" title="Franquicia">
                 Franquic
@@ -249,6 +259,7 @@
             <th scope="col" title="Puntos por esta propiedad">Puntos</th>
         @endif
             <th scope="col">Acciones</th>
+        @endif (!$movil)
         </tr>
         </thead>
         <tbody>
@@ -267,6 +278,14 @@
             table-info
         @endif
         ">
+        @if ($movil)
+            <td>
+                <a href="{{ route('propiedades.show', $propiedad) }}" class="btn btn-link">
+                    <span class="float-right"> {{ $propiedad->codigo }} </span>
+                </a>
+            </td>
+            <td>
+        @else ($movil)
             <td title="{{ $propiedad->id }}) {{ (($propiedad->user_borro || $propiedad->deleted_at)?'Borrado':$propiedad->estatus_alfa) }}
 Reporte en casa nacional: {{ $propiedad->reporte_casa_nacional_ven }}
 Estatus en sistema C21: {{ $propiedad->estatus_c21_alfa.(($propiedad->pagado_casa_nacional)?' y PAGADO A CASA NACIONAL':'') }}
@@ -279,10 +298,10 @@ Estatus en sistema C21: {{ $propiedad->estatus_c21_alfa.(($propiedad->pagado_cas
                     {{ $propiedad->reserva_en }}</span>
         @if (Auth::user()->is_admin)
                 <br>
-        @else
+        @else (Auth::user()->is_admin)
             </td>
             <td>
-        @endif
+        @endif (Auth::user()->is_admin)
                 <span title="Fecha de la firma">
                     {{ $propiedad->firma_en }}</span>
             </td>
@@ -292,22 +311,27 @@ Estatus en sistema C21: {{ $propiedad->estatus_c21_alfa.(($propiedad->pagado_cas
 
             @if (Auth::user()->is_admin)
             <td title="{{ $propiedad->comentarios }}">
-            @else
+            @else (Auth::user()->is_admin)
             <td>
-            @endif
+            @endif (Auth::user()->is_admin)
+        @endif ($movil)
             {{ $propiedad->nombre }}</td>
 
         <?php $propiedad->mMoZero = false;  // Si el monto es 0, mostrar 'espacio vacio'. ?>
         <?php $propiedad->espMonB = false;  // Eliminar espacio entre simbolo de la moneda y el monto. ?>
 
+        @if ($movil)
+            <td>
+        @else ($movil)
             @if (Auth::user()->is_admin)
             <td title="Comisi&oacute;n: {{ $propiedad->comision_p }}
  Reserva s/IVA(I):{{ $propiedad->reserva_sin_iva_ven }};
                   IVA:{{ $propiedad->iva_p }};
  Reserva c/IVA(K):{{ $propiedad->reserva_con_iva_ven }}">
-            @else
+            @else (Auth::user()->is_admin)
             <td>
-            @endif
+            @endif (Auth::user()->is_admin)
+        @endif ($movil)
                 <span class="float-right" title="Precio del inmueble">
                     {{ $propiedad->precio_ven }}
                 </span>
@@ -322,8 +346,14 @@ Estatus en sistema C21: {{ $propiedad->estatus_c21_alfa.(($propiedad->pagado_cas
                 <span class="float-right" title="Precio de venta real">
                     {{ $propiedad->precio_venta_real_ven }}
                 </span>
-            @endif
+            @endif (Auth::user()->is_admin)
             </td>
+        @if ($movil)
+            <td>
+                <a href="{{ route('propiedades.edit', $propiedad) }}" class="btn btn-link">
+                    <span class="float-right"> {{ $propiedad->lados }}</span>
+                </a>
+        @else ($movil)
             @if (Auth::user()->is_admin)
             <td
                 title="Compartido con otra oficina
@@ -334,8 +364,10 @@ Estatus en sistema C21: {{ $propiedad->estatus_c21_alfa.(($propiedad->pagado_cas
             <td>
             @endif
                 <span class="float-right"> {{ $propiedad->lados }}</span>
+        @endif ($movil)
             </td>
 
+        @if (!$movil)
             @if (!(Auth::user()->is_admin))
                 <td><span class="float-right">{{ $propiedad->comision_p }}</span></td>
                 <td><span class="float-right">{{ $propiedad->iva_p }}</span></td>
@@ -447,6 +479,7 @@ Estatus en sistema C21: {{ $propiedad->estatus_c21_alfa.(($propiedad->pagado_cas
                 </form>
                 @endif
             </td>
+        @endif (!$movil)
         </tr>
 
         <?php $propiedad->espMonB = true; // Restablecer variable cambiada antes de <precio> ?>

@@ -119,7 +119,7 @@
             <div class="form-group form-inline mx-1 px-2">
                 <label class="control-label" for="lados">Lados</label>
                 <input type="number" class="form-control form-control-sm" size="1" maxlength="1"
-                    required name="lados" id="lados" value="{{ old('lados') }}">
+                    required name="lados" id="lados" value="{{ old('lados', $cols['lados']['xdef']) }}">
             </div>
         </div>
 
@@ -203,7 +203,7 @@
         <div class="form-row my-0 py-0">
             <div class="form-group col-lg-12 d-flex mx-1 px-2">
                 <label class="control-label" for="descripcion" id="etiqDescripcion">Descripci&oacute;n</label>
-                <textarea class="form-control form-control-sm" rows="3" name="descripcion" id="descripcion"
+                <textarea class="form-control form-control-sm" rows="5" name="descripcion" id="descripcion"
                 placeholder="Descripcion detallada de la propiedad">{{ old('descripcion') }}</textarea>
             </div>
         </div>

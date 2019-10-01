@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Storage;     // PC
 use App\MisClases\Fecha;
 
 class Propiedad extends Model
@@ -32,7 +33,7 @@ class Propiedad extends Model
         'fecha_reserva', 'fecha_firma',
         'deleted_at', 'created_at', 'updated_at'
     ];
-    public static $lineasXPagina = 10;
+    public static $lineasXPagina = 10;      // Puede definirse como constante: const LINEASXPAGINA = 10;
     protected $META_2019 = 400000;
     protected $COMISION = 5.00;
     protected $IVA = 16.00;
@@ -99,12 +100,12 @@ class Propiedad extends Model
 
     public function scopeValido($query)
     {
-        return $query->where('estatus', '<>', 'S');
+        return $query->whereIn('estatus', ['P', 'C']);
     }
 
     public function scopeNoValido($query)
     {
-        return $query->where('estatus', 'S');
+        return $query->whereNotIn('estatus', ['P', 'C']);
     }
 
     public function scopeOfFecha($query, $fechaDesde, $fechaHasta)
@@ -614,18 +615,18 @@ class Propiedad extends Model
 	    else return 'Nulo';
     }
 
-    public static function sumaXAsesor($idAsesor, $tipoAsesor, $fecha='fecha_reserva',
+    public static function sumaXAsesor($idAsesor, $tipoAsesor, $fecha='fecha_firma',
                                         $fecha_desde=null, $fecha_hasta=null)
     {
         if(null == $fecha_desde)
             $fecha_desde = (new Carbon(Propiedad::min($fecha, Fecha::$ZONA)))->startOfDay();
         if(null == $fecha_hasta)
             $fecha_hasta = (new Carbon(Propiedad::max($fecha, Fecha::$ZONA)))->endOfDay();
-        return self::where('estatus', '!=', 'S')->where('asesor_' . $tipoAsesor . '_id', $idAsesor)
+        return self::whereIn('estatus', ['P', 'C'])->where('asesor_' . $tipoAsesor . '_id', $idAsesor)
                      ->get()->sum($tipoAsesor . '_prbr');
     }
 
-    public static function ladosXMes($fecha='fecha_reserva', $fecha_desde=null, $fecha_hasta=null, $user=0)
+    public static function ladosXMes($fecha='fecha_firma', $fecha_desde=null, $fecha_hasta=null, $user=0)
     {
         if(null == $fecha_desde)
             $fecha_desde = (new Carbon(Propiedad::min($fecha, Fecha::$ZONA)))->startOfDay();
@@ -638,9 +639,9 @@ class Propiedad extends Model
         else $signo = '=';
  
         $sql = self::select(DB::raw('sum(lados) as lados'),
-                                    DB::raw('YEAR(fecha_reserva) agno,
-                                    MONTH(fecha_reserva) mes'))
-                        ->where('estatus', '!=', 'S')
+                                    DB::raw('YEAR(fecha_firma) agno,
+                                    MONTH(fecha_firma) mes'))
+                        ->whereIn('estatus', ['P', 'C'])
                         ->whereBetween($fecha, [$fecha_desde, $fecha_hasta])
                         ->where(function ($query) use ($user, $signo) {
                                 $query->where('asesor_captador_id', $signo, $user)
@@ -650,7 +651,7 @@ class Propiedad extends Model
         return $sql;
     }
 
-    public static function negociacionesXMes($fecha='fecha_reserva', $fecha_desde=null, $fecha_hasta=null, $user=0)
+    public static function negociacionesXMes($fecha='fecha_firma', $fecha_desde=null, $fecha_hasta=null, $user=0)
     {
         if(null == $fecha_desde)
             $fecha_desde = (new Carbon(Propiedad::min($fecha, Fecha::$ZONA)))->startOfDay();
@@ -663,9 +664,9 @@ class Propiedad extends Model
         else $signo = '=';
  
         $sql = self::select(DB::raw('count(*) as negociaciones'),
-                                    DB::raw('YEAR(fecha_reserva) agno,
-                                    MONTH(fecha_reserva) mes'))
-                        ->where('estatus', '!=', 'S')
+                                    DB::raw('YEAR(fecha_firma) agno,
+                                    MONTH(fecha_firma) mes'))
+                        ->whereIn('estatus', ['P', 'C'])
                         ->whereBetween($fecha, [$fecha_desde, $fecha_hasta])
                         ->where(function ($query) use ($user, $signo) {
                                 $query->where('asesor_captador_id', $signo, $user)
@@ -675,7 +676,7 @@ class Propiedad extends Model
         return $sql;
     }
 
-    public static function comisionXMes($fecha='fecha_reserva', $fecha_desde=null, $fecha_hasta=null, $user=0)
+    public static function comisionXMes($fecha='fecha_firma', $fecha_desde=null, $fecha_hasta=null, $user=0)
     {
         if(null == $fecha_desde) {
             $fecha_desde = (new Carbon(Propiedad::min($fecha, Fecha::$ZONA)))->startOfDay();
@@ -698,11 +699,11 @@ class Propiedad extends Model
         $arrRetorno   = [];
         if ($nulo) {
             $captado = self::where('asesor_captador_id', $signo, $user)
-                            ->where('estatus', '!=', 'S')
+                            ->whereIn('estatus', ['P', 'C'])
                             ->whereNull($fecha)
                             ->get()->sum('captadorPrbr');
             $cerrado = self::where('asesor_cerrador_id', $signo, $user)
-                            ->where('estatus', '!=', 'S')
+                            ->whereIn('estatus', ['P', 'C'])
                             ->whereNull($fecha)
                             ->get()->sum('cerradorPrbr');
             $arrRetorno[] = (object)[
@@ -717,12 +718,12 @@ class Propiedad extends Model
             for ($mes = $mesInicial; $mes <= 12; $mes++) {
                 if (($agnoFinal == $agno) and ($mes > $mesFinal)) break;
                 $captado = self::where('asesor_captador_id', $signo, $user)
-                                ->where('estatus', '!=', 'S')
+                                ->whereIn('estatus', ['P', 'C'])
                                 ->whereYear($fecha, $agno)
                                 ->whereMonth($fecha, $mes)
                                 ->get()->sum('captadorPrbr');
                 $cerrado = self::where('asesor_cerrador_id', $signo, $user)
-                                ->where('estatus', '!=', 'S')
+                                ->whereIn('estatus', ['P', 'C'])
                                 ->whereYear($fecha, $agno)
                                 ->whereMonth($fecha, $mes)
                                 ->get()->sum('cerradorPrbr');
@@ -737,6 +738,308 @@ class Propiedad extends Model
         }
         return collect($arrRetorno);
     }
+
+    public static function columnas()
+    {
+        $valores = DB::select("SELECT COLUMN_NAME, COLUMN_DEFAULT, IS_NULLABLE,
+                                        DATA_TYPE, COLUMN_TYPE, COLUMN_COMMENT
+                               FROM   INFORMATION_SCHEMA.COLUMNS
+                               WHERE  TABLE_NAME = 'propiedads'");
+        $cols = Array();
+        foreach($valores as $fila) {
+            if ('enum' == $fila->DATA_TYPE) {
+                $tipos = explode(',',           // Crea arreglo de los valores 'enum' separados por ,
+                    str_replace('"', '',                        // Elimina "s
+                        str_replace("'", "",                    // Elimina 's
+                            substr($fila->COLUMN_TYPE, 5, -1)   // Elimina enum( y )
+                        )
+                    )
+                );
+                if ((1 < strlen($fila->COLUMN_COMMENT)) and
+                    strpos($fila->COLUMN_COMMENT, ',', 1)) {
+                    $come = explode(',', $fila->COLUMN_COMMENT);
+                } else $come = $tipos;        // Esto solo debe ocurrir si la col es enum.
+                $tipo = Array();
+                for ($j=0; $j<count($tipos); $j++) {
+                    if ($j < count($come)) $tipo[$tipos[$j]] = $come[$j];
+                    else $tipo[$tipos[$j]] = 'S/DESC';
+                }
+            } else {
+                $tipo = $fila->COLUMN_TYPE;
+                $come = $fila->COLUMN_COMMENT;
+            }
+            $cols[$fila->COLUMN_NAME] = array(
+                'tipo' => $fila->DATA_TYPE,
+                'xdef' => $fila->COLUMN_DEFAULT,
+                'opcion' => $tipo,
+                'come' => $come,
+            );
+        }
+        return $cols;
+    }       // Final del metodo columnas.
+
+    public static function totales($propiedads, $valido=True, $cap=0, $cer=0)
+    {
+        $propiedades = clone $propiedads;               // Los query modifican el arreglo propiedades.
+        if ($valido) $propiedades = $propiedades->whereIn('estatus', ['P', 'C']);
+        $arrRetorno  = [];                              // Inicializo arreglo a retornar.
+
+        $arrRetorno[] = $propiedades->count();      // # propiedades para vista propiedades.index.
+        $arrRetorno[] = $propiedades->sum('precio'); // total precio para vista propiedades.index.
+        $arrRetorno[] = (int)$propiedades->sum('lados'); // total lados.
+        $arrRetorno[] = round($propiedades->get()->sum('compartido_con_iva'), 2); // total de un elemento calculado.
+        $arrRetorno[] = round($propiedades->get()->sum('franquicia_reservado_sin_iva'), 2);
+        $arrRetorno[] = round($propiedades->get()->sum('franquicia_reservado_con_iva'), 2);
+        $arrRetorno[] = round($propiedades->get()->sum('franquicia_pagar_reportada'), 2);
+        $arrRetorno[] = round($propiedades->get()->sum('regalia'), 2);
+        $arrRetorno[] = round($propiedades->get()->sum('sanaf5_por_ciento'), 2);
+        $arrRetorno[] = round($propiedades->get()->sum('oficina_bruto_real'), 2);
+        $arrRetorno[] = round($propiedades->get()->sum('base_honorarios_socios'), 2);
+        $arrRetorno[] = round($propiedades->get()->sum('base_para_honorarios'), 2);
+        $props = clone $propiedades;
+        $arrRetorno[] = round($props->where('asesor_captador_id', '>', 1)
+                                          ->get()->sum('captador_prbr'), 2);            // Indice = 12
+        $arrRetorno[] = round($propiedades->get()->sum('gerente'), 2);
+        $props = clone $propiedades;
+        $arrRetorno[] = round($props->where('asesor_cerrador_id', '>', 1)
+                                          ->get()->sum('cerrador_prbr'), 2);            // Indice = 14
+        $arrRetorno[] = round($propiedades->get()->sum('bonificaciones'), 2);
+        $arrRetorno[] = round($propiedades->sum('comision_bancaria'), 2);               // 'AB'.
+        $arrRetorno[] = round($propiedades->get()->sum('ingreso_neto_oficina'), 2);
+        $arrRetorno[] = round($propiedades->get()->sum('precio_venta_real'), 2);        // Indice = 18
+/*        $proCap = clone $propiedades;
+        $proCer = clone $propiedades;
+        $arrRetorno[] = round($proCap->where('asesor_captador_id', '>', 1)
+                                          ->get()->sum('pvr_captador_prbr'), 2) +
+                        round($proCer->where('asesor_cerrador_id', '>', 1)
+                                          ->get()->sum('pvr_cerrador_prbr'), 2);*/
+
+        $props = clone $propiedades;                     // Los query modifican el arreglo propiedades.
+        if (0 < $cap) {
+            $tLadosCap = $props->where('asesor_captador_id', $cap)->count();
+            $tCaptadorPrbrSel = round($props->where('asesor_captador_id', $cap) // Aunque aplica el 'where' de
+                                            ->get()->sum('captador_prbr'), 2);   // la linea anterior. Por si acaso.
+            $tPvrCaptadorPrbrSel = round($props->where('asesor_captador_id', $cap)
+                                            ->get()->sum('pvr_captador_prbr'), 2);
+        } else {
+            $tLadosCap = $props->where('asesor_captador_id', '>', 1)->count();
+            $tCaptadorPrbrSel = 0.00;
+            $tPvrCaptadorPrbrSel = 0.00;
+        }
+        $props = clone $propiedades;                     // Los query modifican el arreglo propiedades.
+        if (0 < $cer) {
+            $tLadosCer = $props->where('asesor_cerrador_id', $cer)->count();
+            $tCerradorPrbrSel = round($props->where('asesor_cerrador_id', $cer) // Aunque aplica el 'where' de
+                                            ->get()->sum('cerrador_prbr'), 2);   // la linea anterior. Por si acaso.
+            $tPvrCerradorPrbrSel = round($props->where('asesor_cerrador_id', $cer)
+                                            ->get()->sum('pvr_cerrador_prbr'), 2);
+        } else {
+            $tLadosCer = $props->where('asesor_cerrador_id', '>', 1)->count();
+            $tCerradorPrbrSel = 0.00;
+            $tPvrCerradorPrbrSel = 0.00;
+        }
+        /*dd($arrRetorno[12], $arrRetorno[14], $arrRetorno[18], $tCaptadorPrbrSel,
+                $tCerradorPrbrSel, $tLadosCap, $tLadosCer,
+                $tCaptadorPrbrSel, $tCerradorPrbrSel,
+                $tPvrCaptadorPrbrSel + $tPvrCerradorPrbrSel);*/
+        array_push($arrRetorno, $tCaptadorPrbrSel, $tCerradorPrbrSel,
+            $tLadosCap, $tLadosCer, $tPvrCaptadorPrbrSel, $tPvrCerradorPrbrSel);
+        //dd($arrRetorno);
+        return $arrRetorno;
+    }   // totales
+
+    public static function grabarArchivo()
+    {
+        function nulo($valor, $def='') {
+            if (is_null($valor)) {
+                $valor = $def;
+            }
+            return $valor;
+        }
+        $users   = User::get();                     // Todos los usuarios (asesores).
+        $users[0]['name'] = 'Asesor otra oficina';
+        $propiedades = Propiedad::where('id', '>', 0);   // condición dummy, solo para continuar armando la consulta.
+
+        $totales = '';
+/*
+ * Calculo de totales por 'asesor' (user).
+ */
+        foreach ($users as $user) {
+            $props = clone $propiedades;               // Los query modifican el arreglo propiedades.
+            $props = $props->where('asesor_captador_id', $user->id)
+                        ->orWhere('asesor_cerrador_id', $user->id);
+            $arreglo = self::totales($props, True, $user->id, $user->id);
+            array_unshift($arreglo, 'A', $user->id);
+            $totales .= json_encode($arreglo) . "\n";
+        }
+/*
+ * Calculo de totales por mes.
+ */
+        $fecha = DB::select("SELECT DATE_FORMAT(fecha_firma, '%Y') AS Agno,
+                                    DATE_FORMAT(fecha_firma, '%m') AS Mes
+                             FROM   propiedads
+                            GROUP BY 1, 2");
+        $anoMes = Array();
+        foreach($fecha as $fila) {
+            if (array_key_exists($fila->Agno, $anoMes))
+                $anoMes[$fila->Agno][] = $fila->Mes;
+            else $anoMes[$fila->Agno][] = $fila->Mes;
+        }
+        foreach($anoMes as $agno=>$meses) {
+            foreach ($meses as $mes) {
+                $props = clone $propiedades;               // Los query modifican el arreglo propiedades.
+                if (is_null($agno) or is_null($mes)) {
+                    $props = $props->whereNull('fecha_firma');
+                } else {
+                    $props = $props->whereYear('fecha_firma', $agno)
+                                    ->whereMonth('fecha_firma', $mes);
+                }
+                $arreglo = self::totales($props);
+                if (is_null($agno) or is_null($mes)) {
+                    array_unshift($arreglo, 'M', FECHA::hoy()->format('Y') . '-' . '00');
+                } else {
+                    array_unshift($arreglo, 'M', $agno . '-' . $mes);
+                }
+                $totales .= json_encode($arreglo) . "\n";
+            }
+        }
+        //dd($totales);
+/*
+ * Calculo de totales por 'estatus'. cols es usado, al final, para grabar las tablas.
+ */
+        $cols = self::columnas();
+        $estatus = $cols['estatus']['opcion'];
+        foreach ($estatus as $op=>$desc) {
+            $props = clone $propiedades;               // Los query modifican el arreglo propiedades.
+            $props = $props->where('estatus', $op);
+            $arreglo = self::totales($props, False);
+            array_unshift($arreglo, 'E', $op);
+            $totales .= json_encode($arreglo) . "\n";
+        }
+        //dd($totales);
+/*
+ * Calculo de totales por 'asesor' (user) y mes.
+ */
+        foreach ($users as $user) {
+            foreach($anoMes as $agno=>$meses) {
+                foreach ($meses as $mes) {
+                    $props = clone $propiedades;               // Los query modifican el arreglo propiedades.
+                    if (is_null($agno) or is_null($mes)) {
+                        $props = $props->where(function ($Q) use ($user) {
+                                            $Q->where('asesor_captador_id', $user->id)
+                                                ->orWhere('asesor_cerrador_id', $user->id);
+                                        })
+                                        ->whereNull('fecha_firma');
+                    } else {
+                        $props = $props->where(function ($Q) use ($user) {
+                                            $Q->where('asesor_captador_id', $user->id)
+                                                ->orWhere('asesor_cerrador_id', $user->id);
+                                        })
+                                        ->whereYear('fecha_firma', $agno)
+                                        ->whereMonth('fecha_firma', $mes);
+                    }
+                    $arreglo = self::totales($props, True, $user->id, $user->id);
+                    if (is_null($agno) or is_null($mes)) {
+                        array_unshift($arreglo, 'AM', $user->id,
+                                            FECHA::hoy()->format('Y') . '-' . '00');
+                    } else {
+                        array_unshift($arreglo, 'AM', $user->id, $agno . '-' . $mes);
+                    }
+                    $totales .= json_encode($arreglo) . "\n";
+                }
+            }
+        }
+        //dd($totales);
+/*
+ * Calculo de totales por mes y asesor (user).
+ */
+        foreach($anoMes as $agno=>$meses) {
+            foreach ($meses as $mes) {
+                foreach ($users as $user) {
+                    $props = clone $propiedades;               // Los query modifican el arreglo propiedades.
+                    if (is_null($agno) or is_null($mes)) {
+                        $props = $props->where(function ($Q) use ($user) {
+                                            $Q->where('asesor_captador_id', $user->id)
+                                                ->orWhere('asesor_cerrador_id', $user->id);
+                                        })
+                                        ->whereNull('fecha_firma');
+                    } else {
+                        $props = $props->where(function ($Q) use ($user) {
+                                            $Q->where('asesor_captador_id', $user->id)
+                                                ->orWhere('asesor_cerrador_id', $user->id);
+                                        })
+                                        ->whereYear('fecha_firma', $agno)
+                                        ->whereMonth('fecha_firma', $mes);
+                    }
+                    $arreglo = self::totales($props, True, $user->id, $user->id);
+                    if (is_null($agno) or is_null($mes)) {
+                        array_unshift($arreglo, 'MA',
+                                            FECHA::hoy()->format('Y') . '-' . '00', $user->id);
+                    } else {
+                        array_unshift($arreglo, 'MA', $agno . '-' . $mes, $user->id);
+                    }
+                    $totales .= json_encode($arreglo) . "\n";
+                }
+            }
+        }
+        //dd($totales);
+/*
+ * Calculo de totales generales.
+ */
+        $arreglo = self::totales($propiedades);
+        array_unshift($arreglo, 'T', 'T');
+        $totales .= json_encode($arreglo) . "\n";
+        $propiedades = $propiedades->get();
+        $props       = '';
+        foreach ($propiedades as $p) {
+            $props .= json_encode(array ($p->id, $p->codigo, $p->reserva_en,
+                        $p->firma_en, $p->negociacion, $p->nombre,
+                        $p->tipo_id, $p->metraje, $p->habitaciones, $p->banos,
+                        $p->niveles, $p->puestos, $p->anoc, $p->caracteristica_id,
+                        $p->descripcion, $p->direccion, $p->ciudad_id, $p->codigo_postal,
+                        $p->municipio_id, $p->estado_id, $p->cliente_id,
+                        $p->estatus, $p->moneda, $p->precio, $p->comision,
+                        $p->reserva_sin_iva, $p->iva, $p->reserva_con_iva,
+                        $p->compartido_con_iva, $p->compartido_sin_iva,
+                        $p->lados, $p->franquicia_reservado_sin_iva,
+                        $p->franquicia_reservado_con_iva, $p->porc_franquicia,
+                        $p->franquicia_pagar_reportada, $p->reportado_casa_nacional,
+                        $p->porc_regalia, $p->porc_compartido, $p->regalia, $p->sanaf5_por_ciento,
+                        $p->oficina_bruto_real, $p->base_honorarios_socios,
+                        $p->base_para_honorarios, $p->asesor_captador_id,
+                        $p->asesor_captador, $p->porc_captador_prbr, $p->captador_prbr,
+                        $p->porc_gerente, $p->gerente, $p->asesor_cerrador_id,
+                        $p->asesor_cerrador, $p->porc_cerrador_prbr, $p->cerrador_prbr,
+                        $p->porc_bonificacion, $p->bonificaciones,
+                        nulo($p->comision_bancaria, 0), $p->ingreso_neto_oficina,
+                        $p->precio_venta_real, nulo($p->numero_recibo),
+                        nulo($p->pago_gerente), nulo($p->factura_gerente),
+                        nulo($p->pago_asesores), nulo($p->factura_asesores),
+                        nulo($p->pago_otra_oficina), nulo($p->pagado_casa_nacional),
+                        nulo($p->estatus_sistema_c21),
+                        (($p->reporte_casa_nacional)?
+                                number_format($p->reporte_casa_nacional, 0, ',', '.'):''),
+                        nulo($p->factura_AyS), nulo($p->comentarios))) . "\n";
+        }
+        //dd($totales);
+        //dd($users);
+        $users = json_encode($users);
+/*
+ * Estos archivos grabados con Storage seran guardados en 'storage/app/public'
+ * Usando: composer artisan storage:link, se crea un enlace que permite acceder
+ * los archivos desde public/storage
+ */
+        $control = FECHA::hoy()->format('d-m-Y');
+        Storage::put('public/control.txt', $control);
+        Storage::put('public/asesores.txt', $users);
+        Storage::put('public/propiedades.txt', $props);
+        Storage::put('public/totales.txt', $totales);
+        foreach($cols as $nombCol => $arr) {
+            if ('enum' == $arr['tipo']) {
+                Storage::put('public/' . $nombCol . '.txt', json_encode($arr['opcion']));
+            }
+        }
+    }       // Final del metodo grabarArchivo.
 
     public function getCreadoEnAttribute()
     {

@@ -32,7 +32,7 @@ class CreatePropiedadsTable extends Migration
             $table->unsignedInteger('caracteristica_id')->default(1)
                 ->comment('Caracteristicas de la construcccion');
             $table->foreign('caracteristica_id')->references('id')->on('caracteristicas');
-            $table->string('descripcion', 190)->nullable()
+            $table->string('descripcion', 5000)->nullable()
                 ->comment('Descripcion de la propiedad');
             $table->string('direccion', 190)->nullable()
                 ->comment('Direccion de la propiedad');
@@ -47,7 +47,7 @@ class CreatePropiedadsTable extends Migration
                 ->comment('Informacion del cliente: cedula, rif, telefono, nombre, fecha de nacimiento');
             $table->foreign('cliente_id')->references('id')->on('clientes');
             $table->enum('estatus', ['A', 'I', 'P', 'C', 'S'])
-                ->comment('[A]ctivo,[I]nmueble pendiente,Pagos pendientes,inmueble [C]errado y pagos realizados,[S]negociacion caida')
+                ->comment('[A]ctivo,[I]nmueble pendiente,[P]agos pendientes,inmueble [C]errado y pagos realizados,[S]negociacion caida')
                 ->default('A');
             $table->unsignedInteger('user_id');
             $table->foreign('user_id')->references('id')->on('users');
@@ -55,7 +55,7 @@ class CreatePropiedadsTable extends Migration
             $table->float('precio', 20, 2)->comment('Precio del inmueble');
             $table->float('comision', 4, 2)->default(5.00)->comment('Porcentaje de comision');
             $table->float('iva', 4, 2)->default(16.00)->comment('Porcenteje IVA');
-            $table->smallInteger('lados')->default(2)->nullable()
+            $table->smallInteger('lados')->default(1)->nullable()
                 ->comment('Inicialmente no se sabe si ambos lados quedaran en la oficina');
             $table->float('porc_franquicia', 4, 2)
                 ->default(10.00)->comment('Porcentaje para franquicia');

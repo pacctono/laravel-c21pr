@@ -12,9 +12,11 @@ use Faker\Generator as Faker;
 $factory->define(Cliente::class, function (Faker $faker) {
     $cedula = $faker->randomNumber(8);
     $nacionalidad = array('V', 'E');
+
     $ddns = DB::table('venezueladdns')->distinct()->pluck('ddn')->all();
     $ddn = $faker->randomElement($ddns);
     $telefono = $ddn . $faker->unique()->randomNumber(7, true);
+
     return [
         'cedula' => $cedula,
         'rif' => $faker->randomElement($nacionalidad) . $cedula . $faker->randomNumber(1),

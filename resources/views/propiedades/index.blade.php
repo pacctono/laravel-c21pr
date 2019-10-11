@@ -6,14 +6,19 @@
             onSubmit="return alertaCampoRequerido()">
         {!! csrf_field() !!}
 
-    <div class="form-row my-0 py-0 mx-1 px-1">
-        <div class="form-group form-inline my-0 py-0 mx-0 px-0">
+        <div class="form-row my-0 py-0 mx-1 px-1">
+    @include('include.fechas', ['tipoFecha' => 'de la firma '])
+    @include('include.estatus')
+    @includeWhen(Auth::user()->is_admin, 'include.asesor', ['berater' => 'captador'])   {{-- Obligatorio pasar la variable 'berater' --}}
+    @includeWhen(Auth::user()->is_admin, 'include.asesor', ['berater' => 'cerrador'])   {{-- berater (asesor en aleman) --}}
+    @include('include.botonMostrar')
+        </div>
+        {{--<div class="form-group form-inline my-0 py-0 mx-0 px-0">
             <label class="control-label" for="fecha_desde" title="Fecha de la firma desde">
                 Desde</label>
             <input class="form-control form-control-sm" type="date" name="fecha_desde"
                 id="fecha_desde" max="{{ now() }}" title="Fecha de la firma desde"
                 value="{{ old('fecha_desde', $fecha_desde) }}">
-            {{-- $fecha_desde --}}
         </div>
         <div class="form-group form-inline my-0 py-0 mx-0 px-0">
             <label class="control-label" for="fecha_hasta" title="Fecha de la firma hasta">
@@ -21,8 +26,8 @@
             <input class="form-control form-control-sm" type="date" name="fecha_hasta"
                 id="fecha_hasta" max="{{ now() }}" title="Fecha de la firma hasta"
                 value="{{ old('fecha_hasta', $fecha_hasta) }}">
-        </div>
-        <div class="form-group form-inline my-0 py-0 mx-0 px-0">
+        </div>--}}
+        {{--<div class="form-group form-inline my-0 py-0 mx-0 px-0">
             <select class="form-control form-control-sm" name="estatus" id="estatus">
                 <option value="">Estatus</option>
             @foreach ($arrEstatus as $opcion => $muestra)
@@ -33,9 +38,9 @@
                 >{{ substr($muestra, 0, 35) }}</option>
             @endforeach
             </select>
-        </div>
+        </div>--}}
 
-    @if (Auth::user()->is_admin)
+    {{--@if (Auth::user()->is_admin)
         <div class="form-group form-inline my-0 py-0 mx-0 px-0">
             <select class="form-control form-control-sm" name="captador" id="captador">
                 <option value="0">Captador</option>
@@ -68,14 +73,15 @@
         <div class="form-group form-inline my-0 py-0 mx-0 px-0">
             <button type="submit" class="btn btn-success">Mostrar</button>
         </div>
-    </div>
+    </div>--}}
     </form>
 
-    <div class="row my-0 py-0 mx-1 px-1">
+    @includeIf('include.totalesPropiedad')
+    {{--<div class="row my-0 py-0 mx-1 px-1">
         TOTS: {{ $filas }} props
         <span class="alert-success mx-1 px-1" title="Precio">
             {{ Prop::numeroVen($tPrecio, 0) }}</span>{{-- 'Prop' es un alias definido en config/app.php --}}
-    @if (Auth::user()->is_admin)
+    {{--@if (Auth::user()->is_admin)
         <span class="alert-info ml-1 mr-0 px-1">Compartido con IVA:</span>
         <span class="alert-success ml-0 mr-1 px-1" title="Compartido con otra oficina con IVA">
             {{ Prop::numeroVen($tCompartidoConIva, 2) }}</span>
@@ -150,7 +156,7 @@
         </span>
     @if ((0 < $tCaptadorPrbrSel) || (0 < $tCerradorPrbrSel))
         {{-- $tCaptadorPrbrSel }}-{{ $tCerradorPrbr --}}
-    </div>
+    {{--</div>
     <div class="row my-0 py-0 mx-1 px-1">
     @endif ((0 != $tCaptadorPrbrSel) || (0 != $tCerradorPrbr))
         <span class="alert-info ml-1 mr-0 px-1">Tot Comision:</span>
@@ -174,7 +180,7 @@
         </span>
     @endif ((0 < $tCaptadorPrbrSel) or (0 < $tCerradorPrbrSel))
     @endif (Auth::user()->is_admin)
-    </div>
+    </div>--}}
 </div>
 
     <div class="row">
@@ -317,6 +323,7 @@ Estatus en sistema C21: {{ $propiedad->estatus_c21_alfa.(($propiedad->pagado_cas
         @endif ($movil)
             {{ $propiedad->nombre }}</td>
 
+        <?php $propiedad->asesor = Auth::user()->id;  // Usuario conectado. ?>
         <?php $propiedad->mMoZero = false;  // Si el monto es 0, mostrar 'espacio vacio'. ?>
         <?php $propiedad->espMonB = false;  // Eliminar espacio entre simbolo de la moneda y el monto. ?>
 
@@ -451,17 +458,21 @@ Estatus en sistema C21: {{ $propiedad->estatus_c21_alfa.(($propiedad->pagado_cas
             @endif
             </td>
             @if (!Auth::user()->is_admin)
-            <td><span class="float-right">puntos</span></td-->
+            <td><span class="float-right">
+                {{ (($propiedad->asesor_captador_id == Auth::user()->id)?$propiedad->puntos_captador:0.00) +
+                   (($propiedad->asesor_cerrador_id == Auth::user()->id)?$propiedad->puntos_cerrador:0.00) }}
+                </span>
+            </td>
             @endif
 
             <td class="d-flex align-items-end">
                 <a href="{{ route('propiedades.show', $propiedad) }}" class="btn btn-link" 
-                        title="Mostrar los datos de esta propiedad.">
+                        title="Mostrar los datos de esta propiedad ({{ $propiedad->nombre }}).">
                     <span class="oi oi-eye"></span>
                 </a>
                 @if (!($propiedad->user_borro || $propiedad->deleted_at))
                 <a href="{{ route('propiedades.edit', $propiedad) }}" class="btn btn-link"
-                        title="Editar los datos de esta propiedad.">
+                        title="Editar los datos de esta propiedad ({{ $propiedad->nombre }}).">
                     <span class="oi oi-pencil"></span>
                 </a>
                 @endif
@@ -473,7 +484,7 @@ Estatus en sistema C21: {{ $propiedad->estatus_c21_alfa.(($propiedad->pagado_cas
                     {{ csrf_field() }}
                     {{ method_field('DELETE') }}
                     <button class="btn btn-link" title="Borrar (lógico) propiedad.">
-                        <span class="oi oi-trash" title="Borrar">
+                        <span class="oi oi-trash" title="Borrar {{ $propiedad->nombre }}">
                         </span>
                     </button>
                 </form>

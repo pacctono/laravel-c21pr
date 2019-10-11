@@ -11,15 +11,18 @@ use App\Resultado;
 use App\Zona;
 use App\Venezueladdn;
 use App\User;
+use App\Bitacora;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;        // PC
 use Carbon\Carbon;                          // PC
 use Jenssegers\Agent\Agent;                 // PC
+use App\MisClases\General;                  // PC
 
 class ContactoController extends Controller
 {
     protected $tipo = 'Contacto Inicial';
     protected $tipoPlural = 'Contactos Iniciales';
+    protected $lineasXPagina = General::LINEASXPAGINA;
     /**
      * Display a listing of the resource.
      *
@@ -40,7 +43,7 @@ class ContactoController extends Controller
             $orden = '';
             $alertar = 1;
         }
-        if ('' == $orden or $orden == null) {
+        if ('' == $orden or is_null($orden)) {
             $orden = 'id';
         }
 
@@ -49,11 +52,12 @@ class ContactoController extends Controller
         if (Auth::user()->is_admin) {
             $contactos = Contacto::orderBy($orden);
         } else {
-            $contactos = User::find(Auth::user()->id)->contactos()->whereNull('user_borro')->orderBy($orden);
+            $contactos = User::find(Auth::user()->id)
+                                ->contactos()->whereNull('user_borro')->orderBy($orden);
             //return redirect('/contactos/create');
         }
         if ($movil) $contactos = $contactos->get();
-        else $contactos = $contactos->paginate(10);
+        else $contactos = $contactos->paginate($this->lineasXPagina);
     
         //dd(Auth::user()->id);
 
@@ -69,13 +73,19 @@ class ContactoController extends Controller
         $title = 'Listado de ' . $this->tipo;
         $ruta = request()->path();
 
-        if ('' == $filtro or $filtro == null) {
+        if ('' == $filtro or is_null($filtro)) {
             $filtro = 'created_at';
         }
         if (1 == Auth::user()->is_admin) {
-            $contactos = Contacto::whereNull('user_borro')->orderBy($filtro)->paginate(10);
+            $contactos = Contacto::whereNull('user_borro')
+                                    ->orderBy($filtro)
+                                    ->paginate($this->lineasXPagina);
         } else {
-            $contactos = User::find(Auth::user()->id)->contactos()->whereNull('user_borro')->orderBy($filtro)->paginate(10);
+            $contactos = User::find(Auth::user()->id)
+                                ->contactos()
+                                ->whereNull('user_borro')
+                                ->orderBy($filtro)
+                                ->paginate($this->lineasXPagina);
             //return redirect('/contactos/create');
         }
     
@@ -158,7 +168,7 @@ class ContactoController extends Controller
         //$data['user_id'] = intval($data['user_id']);
         //dd($data);
 
-        if (null != $data['ddn'] and '' != $data['ddn'] and null != $data['telefono'] and
+        if (!(is_null($data['ddn'])) and '' != $data['ddn'] and !(is_null($data['telefono'])) and
                                                         '' != $data['telefono']) {
             $data['telefono'] = $data['ddn'] . $data['telefono'];
         } else {
@@ -168,7 +178,7 @@ class ContactoController extends Controller
         $data['veces_name'] = Contacto::ofVeces($data['name'], 'name') + 1;
         $data['veces_telefono'] = Contacto::ofVeces($data['telefono'], 'telefono') + 1;
         $data['veces_email'] = Contacto::ofVeces($data['email'], 'email') + 1;
-        if (null != $data['fecha_evento']) {
+        if (!(is_null($data['fecha_evento']))) {
 // El tipo 'time' decuelve la hora militar (formato de 24 horas) por eso 'H:i' no incluye am/pm.
             $data['fecha_evento'] = Carbon::createFromFormat('Y-m-d H:i', $data['fecha_evento'] . ' ' . $data['hora_evento']);
         }
@@ -216,7 +226,7 @@ class ContactoController extends Controller
         if (1 == Auth::user()->is_admin) {
             return view('contactos.show', compact('contacto', 'rutRetorno', 'col_id'));
         }
-        if ($contacto->user_borro != null) {
+        if (!(is_null($contacto->user_borro))) {
             return redirect()->back();
         }
         if ($contacto->user->id == Auth::user()->id) {
@@ -237,7 +247,7 @@ class ContactoController extends Controller
         if (!(Auth::check())) {
             return redirect('login');
         }
-        if ($contacto->user_borro != null) {
+        if (!(is_null($contacto->user_borro))) {
             return redirect('/contactos');
         }
 
@@ -245,7 +255,7 @@ class ContactoController extends Controller
 
         $ddns = Venezueladdn::distinct()->get(['ddn'])->all();
 
-        if ((1 == Auth::user()->is_admin) or ($contacto->user->id == Auth::user()->id)) {
+        if ((Auth::user()->is_admin) or ($contacto->user->id == Auth::user()->id)) {
             return view('contactos.edit', ['contacto' => $contacto, 'title' => $title,
                         'ddns' => $ddns]);
         }
@@ -278,7 +288,7 @@ class ContactoController extends Controller
 
         //dd($data);
 
-        if (null != $data['ddn'] and '' != $data['ddn'] and null != $data['telefono'] and
+        if (!(is_null($data['ddn'])) and '' != $data['ddn'] and !(is_null($data['telefono'])) and
                                                         '' != $data['telefono']) {
             $data['telefono'] = $data['ddn'] . $data['telefono'];
         } else {
@@ -287,20 +297,20 @@ class ContactoController extends Controller
         unset($data['ddn']);
 
 /*        foreach (['telefono', 'email', 'direccion', 'observaciones'] as $col) {
-            if ('' == $data[$col] or $data[$col] == null) {
+            if ('' == $data[$col] or is_null($data[$col])) {
                 unset($data[$col]);
             }
         }*/
-        if ('' == $data['telefono'] or $data['telefono'] == null) {
+        if ('' == $data['telefono'] or is_null($data['telefono'])) {
             $data['veces_telefono'] = 0;
         }
-        if ('' == $data['email'] or $data['email'] == null) {
+        if ('' == $data['email'] or is_null($data['email'])) {
             $data['veces_email'] = 0;
         }
-/*        if ('' == $data['direccion'] or $data['direccion'] == null) {
+/*        if ('' == $data['direccion'] or is_null($data['direccion'])) {
             unset($data['direccion']);
         }
-        if ('' == $data['observaciones'] or $data['observaciones'] == null) {
+        if ('' == $data['observaciones'] or is_null($data['observaciones'])) {
             unset($data['observaciones']);
         }*/
         $data['user_actualizo'] = Auth::user()->id;
@@ -308,6 +318,13 @@ class ContactoController extends Controller
         //dd($data);
 
         $contacto->update($data);
+
+        Bitacora::create([
+            'user_id' => Auth::user()->id,
+            'tx_modelo' => 'Contacto',
+            'tx_data' => $data,
+            'tx_tipo' => 'A',
+        ]);
 
         return redirect()->route('contactos.show', ['contacto' => $contacto]);
     }
@@ -324,18 +341,28 @@ class ContactoController extends Controller
             return redirect('login');
         }
 
-        if (1 != Auth::user()->is_admin) {
+        if (!Auth::user()->is_admin) {
             return redirect('/contactos');
         }
-        if ($contacto->user_borro != null) {
+        if (!(is_null($contacto->user_borro))) {
             return redirect()->route('contactos.show', ['contacto' => $contacto]);
         }
 
         $data['user_borro'] = Auth::user()->id;
+        $contacto->update($data);
         //$data['borrado_at'] = Carbon::now();
         //$data['borrado_at'] = new Carbon();
 
+        $datos = 'id:'.$contacto->id.', cedula:'.$contacto->cedula.', nombre:'.$contacto->name;
+
         $contacto->delete();
+
+        Bitacora::create([
+            'user_id' => Auth::user()->id,
+            'tx_modelo' => 'Contacto',
+            'tx_data' => $datos,
+            'tx_tipo' => 'B',
+        ]);
 
         return redirect()->route('contactos.index');
     }

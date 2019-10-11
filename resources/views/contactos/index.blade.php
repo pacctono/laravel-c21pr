@@ -60,7 +60,13 @@
         </thead>
         <tbody>
         @foreach ($contactos as $contacto)
-        <tr>
+        <tr class="
+        @if (0 == ($loop->iteration % 2))
+            table-primary
+        @else
+            table-info
+        @endif
+        ">
             {{--<td scope="row">{{ $contacto->id }}</td>--}}
             <td>
                 @if ($movil)
@@ -90,11 +96,11 @@
             @endif
             <td class="d-flex align-items-end">
                 <a href="{{ route('contactos.show', $contacto) }}" class="btn btn-link" 
-                        title="Mostrar los datos de este contacto inicial.">
+                        title="Mostrar los datos de este contacto inicial ({{ $contacto->name }}).">
                     <span class="oi oi-eye"></span>
                 </a>
                 <a href="{{ route('contactos.edit', $contacto) }}" class="btn btn-link"
-                        title="Editar los datos de este contacto inicial.">
+                        title="Editar los datos de este contacto inicial ({{ $contacto->name }}).">
                     <span class="oi oi-pencil"></span>
                 </a>
 
@@ -105,7 +111,7 @@
                     {{ csrf_field() }}
                     {{ method_field('DELETE') }}
                     <button class="btn btn-link" title="Borrar (lógico) contacto inicial.">
-                        <span class="oi oi-trash" title="Borrar">
+                        <span class="oi oi-trash" title="Borrar {{ $contacto->name }}">
                         </span>
                     </button>
                 </form>

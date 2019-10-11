@@ -2,67 +2,85 @@
 
 @section('content')
 <div class="card">
-    <h4 class="card-header">Contacto inicial: {{ $cliente->name }}</h4>
+    <h4 class="card-header">Cliente: {{ $cliente->name }}</h4>
     <div class="card-body">
-        <p>Este nombre ha contactado: <span class="alert-info">{{ $cliente->veces_name }}
-        @if (1 >= $cliente->veces_name)
-                vez.
-            @else
-                veces.
-            @endif
-        </span></p>
-        <p>Telefono de contacto: <span class="alert-info">
-            0{{ substr($cliente->telefono, 0, 3) }}-{{ substr($cliente->telefono, 3) }}
-        </span></p>
-        <p>Este telefono ha contactado: <span class="alert-info">{{ $cliente->veces_telefono }}
-        @if (1 >= $cliente->veces_telefono)
-                vez.
-            @else
-                veces.
-            @endif
-        </span></p>
-        <p>Correo de contacto: <span class="alert-info">{{ $cliente->email }}
-        </span></p>
-        <p>Este correo ha contactado: <span class="alert-info">{{ $cliente->veces_email }}
-            @if (1 >= $cliente->veces_email)
-                vez.
-            @else
-                veces.
-            @endif
-        </span></p>
-        <p>Atendido por: <span class="alert-info">[{{ $cliente->user_id }}] {{ $cliente->user->name }}
-        </span></p>
-        <p>Dirección: <span class="alert-info">{{ $cliente->direccion }}
-        </span></p>
-        <p>Desea: <span class="alert-info">{{ $cliente->deseo->descripcion }}
-        </span></p>
-        <p>Tipo: <span class="alert-info">{{ $cliente->tipo->descripcion }}
-        </span></p>
-        <p>Zona: <span class="alert-info">{{ $cliente->zona->descripcion }}
-        </span></p>
-        <p>Precio: <span class="alert-info">{{ $cliente->precio->descripcion }}
-        </span></p>
-        <p>Origen: <span class="alert-info">{{ $cliente->origen->descripcion }}
-        </span></p>
-        <p>Resultado: <span class="alert-info">{{ $cliente->resultado->descripcion }}
-        </span></p>
-        <p>Observaciones: <span class="alert-info">{{ $cliente->observaciones }}
-        </span></p>
-        @if ($cliente->user_borro != null)
-            <p>Este cliente fue borrado por {{ $cliente->userBorro->name }}
-                el {{ $diaSemana[$cliente->created_at->format('w')] }}, {{ $cliente->deleted_at->format('d/m/Y') }}.
-            </p>
-        @endif
-        @if ($cliente->user_actualizo != null)
-            <p>Este cliente fue actualizado por {{ $cliente->userActualizo->name }}
-                el {{ $diaSemana[$cliente->created_at->format('w')] }}, {{ $cliente->updated_at->format('d/m/Y') }}.
-            </p>
-        @endif
+        <div class="row my-1 py-1">
+            <div class="mx-1 px-2">
+                C&eacute;dula:<span class="alert-info">
+                    {{ $cliente->cedula_f }}
+                </span>
+            </div>
+        </div>
+        <div class="row my-1 py-1 bg-suave">
+            <div class="mx-1 px-2">
+                Rif:<span class="alert-info">
+                    {{ $cliente->rif_f }}
+                </span>
+            </div>
+        </div>
+        <div class="row my-1 py-1">
+            <div class="mx-1 px-2">
+                Telefono:<span class="alert-info">
+                    {{ $cliente->telefono_f }}
+                </span>
+            </div>
+        </div>
+        <div class="row my-1 py-1 bg-suave">
+            <div class="mx-1 px-2">
+                Correo:<span class="alert-info">
+                    {{ $cliente->email }}
+                </span>
+            </div>
+        </div>
+        <div class="row my-1 py-1">
+            <div class="mx-1 px-2">
+                Fecha de nacimiento:<span class="alert-info">
+                    {{ $cliente->fecha_nacimiento_en }}
+                </span>
+            </div>
+        </div>
+        <div class="row my-1 py-1 bg-suave">
+            <div class="mx-1 px-2">
+                Dirección:<span class="alert-info">
+                    {{ $cliente->direccion }}
+                </span>
+            </div>
+        </div>
+        <div class="row my-1 py-1">
+            <div class="mx-1 px-2">
+                Observaciones:<span class="alert-info">
+                    {{ $cliente->observaciones }}
+                </span>
+            </div>
+        </div>
 
-        <p>
-            <!-- a href="{{ action('ClienteController@index') }}">Regresar al listado de usuarios</a -->
-            <a href="{{ route('clientes.index') }}" class="btn btn-link">Regresar al listado de clientes</a>
-        </p>
+    @if (!(is_null($cliente->user_borro)))
+        <div class="row my-1 py-1 bg-suave">
+            <div class="mx-1 px-2">
+                Este cliente fue borrado por {{ $cliente->userBorro->name }}
+                el {{ $diaSemana[$cliente->deleted_at->format('w')] }},
+                {{ $cliente->deleted_at->format('d/m/Y') }}.
+            </div>
+        </div>
+    @endif
+    @if (!(is_null($cliente->user_actualizo)))
+        <div class="row my-1 py-1">
+            <div class="mx-1 px-2">
+                Este cliente fue actualizado por {{ $cliente->userActualizo->name }}
+                el {{ $diaSemana[$cliente->updated_at->format('w')] }},
+                {{ $cliente->updated_at->format('d/m/Y') }}.
+            </div>
+        </div>
+    @endif
+
+        <div class="row my-1 py-1">
+            <div class="mx-1 px-2">
+                <!-- a href="{{ action('ClienteController@index') }}">Regresar al listado de usuarios</a -->
+                <a href="{{ route('clientes.orden', $orden).$nroPagina }}" class="btn btn-link">
+                    Regresar al listado de clientes
+                </a>
+            </div>
+        </div>
     </div>
 </div>
 @endsection

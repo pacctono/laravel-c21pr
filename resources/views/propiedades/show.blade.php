@@ -12,13 +12,13 @@
         @endif
     </h4>
     <div class="card-body">
-    	<div class="row my=0 py=0">
+    	<div class="row my-0 py-0">
             <div class="mx-1 px-2">
                 Estatus del Inmueble:<span class="alert-info">{{ $propiedad->estatus_alfa }}</span>
             </div>
         </div>
 
-    	<div class="row my=0 py=0 bg-suave">
+    	<div class="row my-0 py-0 bg-suave">
             <div class="mx-1 px-2">
                 Fecha de Reserva:<span class="alert-info">{{ $propiedad->reserva_en }}</span>
             </div>
@@ -27,7 +27,7 @@
             </div>
         </div>
 
-    	<div class="row my=0 py=0">
+    	<div class="row my-0 py-0">
             <div class="mx-1 px-2">
                 Comisi&oacute;n:<span class="alert-info">{{ $propiedad->comision_p }}</span>
             </div>
@@ -40,7 +40,7 @@
             </div>
         </div>
 
-    	<div class="row my=0 py=0 bg-suave">
+    	<div class="row my-0 py-0 bg-suave">
             <div class="mx-1 px-2">
                 Lados:<span class="alert-info">{{ $propiedad->lados }}</span>
             </div>
@@ -125,6 +125,16 @@
             <div class="mx-1 px-2">
                 Cliente</label>
                 <span class="alert-info">{{ $propiedad->cliente->name }}</span>
+            </div>
+            <div class="mx-1 px-2">
+                Telefono del cliente:<span class="alert-info">
+                    {{ $propiedad->cliente->telefono_f }}
+                </span>
+            </div>
+            <div class="mx-1 px-2">
+                Correo del cliente:<span class="alert-info">
+                    {{ $propiedad->cliente->email }}
+                </span>
             </div>
         </div>
         <!--/fieldset-->
@@ -297,10 +307,11 @@
 
     <p>
         <!-- a href="{{ action('PropiedadController@index') }}">Regresar al listado de propiedad</a -->
-    @if ('' == $col_id)
-        <a href="{{ route($rutRetorno).$restoRuta }}" class="btn btn-link">
+    @if ((isset($col_id)) and ('' != $col_id))
+        <a href="{{ route($rutRetorno, [$propiedad[$col_id], $orden]).$nroPagina }}"
+            class="btn btn-link">
     @else
-        <a href="{{ route($rutRetorno, [$propiedad[$col_id], 'id']).$restoRuta }}" class="btn btn-link">
+        <a href="{{ route($rutRetorno, $orden).$nroPagina }}" class="btn btn-link">
     @endif
             <button class="btn btn-primary" title="Ir a la lista de propiedades">
                 Ir a la lista de propiedades

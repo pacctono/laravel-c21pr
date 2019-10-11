@@ -7,7 +7,14 @@
           onSubmit="return alertaFechaRequerida()">
       {!! csrf_field() !!}
 
-    @if (!$movil)
+    @includeWhen(!$movil, 'include.intervalo')
+
+      <div class="form-row my-0 py-0 mx-1 px-1">
+    @include('include.fechas')
+    @includeWhen(Auth::user()->is_admin, 'include.asesor', ['berater' => 'asesor'])   {{-- Obligatorio pasar la variable 'berater' --}}
+    @include('include.botonMostrar')
+      </div>
+    {{--@if (!$movil)
       <div class="row form-group">
         <div class="col-lg-12">
         @foreach (['hoy', 'ayer', 'manana', 'esta_semana', 'semana_pasada', 'proxima_semana',
@@ -20,6 +27,8 @@
           <label>
           @if ('manana' == $intervalo)
           Mañana
+          @elseif ('intervalo' == $intervalo)
+          Otro
           @else
           {{ str_replace('_', ' ', ucfirst($intervalo)) }}
           @endif
@@ -58,7 +67,7 @@
         <div class="col-lg-2">
           <button type="submit" class="btn btn-success">Mostrar</button>
         </div>
-      </div>
+      </div>--}}
     </form>
 </div>
 
@@ -114,7 +123,13 @@
   </thead>
   <tbody>
   @foreach ($turnos as $turno)
-    <tr>
+    <tr class="
+    @if (0 == ($loop->iteration % 2))
+        table-primary
+    @else
+        table-info
+    @endif
+    ">
       <td>
         {{ $diaSemana[$turno->turno->dayOfWeek] }}
         {{ $turno->turno_fecha }}

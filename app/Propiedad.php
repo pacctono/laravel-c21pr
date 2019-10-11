@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Storage;     // PC
 use App\MisClases\Fecha;
+use App\MisClases\Constantes;               // PC
 
 class Propiedad extends Model
 {
@@ -33,7 +34,6 @@ class Propiedad extends Model
         'fecha_reserva', 'fecha_firma',
         'deleted_at', 'created_at', 'updated_at'
     ];
-    public static $lineasXPagina = 10;      // Puede definirse como constante: const LINEASXPAGINA = 10;
     protected $META_2019 = 400000;
     protected $COMISION = 5.00;
     protected $IVA = 16.00;
@@ -600,6 +600,56 @@ class Propiedad extends Model
         return $this->agregarComaMoneda($this->getPvrCerradorPrbrAttribute());
     }
 
+    public function getPuntosAttribute()
+    {
+        $puntos = $this->getOficinaBrutoRealAttribute();
+        return round($puntos, 2);
+    }
+
+    public function getPuntosVenAttribute()
+    {
+        return $this->numeroVen($this->getPuntosAttribute(), 2);
+    }
+
+    public function getPuntosCaptadorAttribute()
+    {
+        if ((1 < $this->asesor_captador_id) and (!$this->captador->socio))
+            $puntosCaptador = 0.40 * $this->getOficinaBrutoRealAttribute();    // 40% puntos captador
+        else $puntosCaptador = 0.00;
+
+        return round($puntosCaptador, 2);
+    }
+
+    public function getPuntosCaptadorVenAttribute()
+    {
+        return $this->numeroVen($this->getPuntosCaptadorAttribute(), 2);
+    }
+
+    public function getPuntosCerradorAttribute()
+    {
+        if ((1 < $this->asesor_cerrador_id) and (!$this->cerrador->socio))
+            $puntosCerrador = 0.40 * $this->getOficinaBrutoRealAttribute();    // 40% puntos cerrador
+        else $puntosCerrador = 0.00;
+
+        return round($puntosCerrador, 2);
+    }
+
+    public function getPuntosCerradorVenAttribute()
+    {
+        return $this->numeroVen($this->getPuntosCerradorAttribute(), 2);
+    }
+
+    public function getPuntosAsesorAttribute()
+    {
+        $puntosAsesor = $this->getPuntosCaptadorAttribute() + $this->getPuntosCerradorAttribute();
+        return round($puntosAsesor, 2);
+    }
+
+    public function getPuntosAsesorVenAttribute()
+    {
+        return $this->numeroVen($this->getPuntosAsesorAttribute(), 2);
+    }
+
     public function getReporteCasaNacionalVenAttribute()
     {
         if (is_numeric($this->reporte_casa_nacional))
@@ -626,40 +676,42 @@ class Propiedad extends Model
                      ->get()->sum($tipoAsesor . '_prbr');
     }
 
-    public static function ladosXMes($fecha='fecha_firma', $fecha_desde=null, $fecha_hasta=null, $user=0)
+    public static function ladosXMes($fecha='fecha_firma',
+                                    $fecha_desde=null, $fecha_hasta=null, $asesor=0)
     {
         if(null == $fecha_desde)
             $fecha_desde = (new Carbon(Propiedad::min($fecha, Fecha::$ZONA)))->startOfDay();
         if(null == $fecha_hasta)
             $fecha_hasta = (new Carbon(Propiedad::max($fecha, Fecha::$ZONA)))->endOfDay();
-        If (0 == $user) {
+        If (0 == $asesor) {
             $signo = '>';
-            $user = 1;
+            $asesor = 1;
         }
         else $signo = '=';
  
         $sql = self::select(DB::raw('sum(lados) as lados'),
-                                    DB::raw('YEAR(fecha_firma) agno,
-                                    MONTH(fecha_firma) mes'))
+                                    DB::raw("YEAR($fecha) agno,
+                                    MONTH($fecha) mes"))
                         ->whereIn('estatus', ['P', 'C'])
                         ->whereBetween($fecha, [$fecha_desde, $fecha_hasta])
-                        ->where(function ($query) use ($user, $signo) {
-                                $query->where('asesor_captador_id', $signo, $user)
-                                        ->orWhere('asesor_cerrador_id', $signo, $user);
+                        ->where(function ($query) use ($asesor, $signo) {
+                                $query->where('asesor_captador_id', $signo, $asesor)
+                                        ->orWhere('asesor_cerrador_id', $signo, $asesor);
                         })
                         ->groupBy('agno', 'mes');
         return $sql;
     }
 
-    public static function negociacionesXMes($fecha='fecha_firma', $fecha_desde=null, $fecha_hasta=null, $user=0)
+    public static function negociacionesXMes($fecha='fecha_firma',
+                            $fecha_desde=null,$fecha_hasta=null, $asesor=0)
     {
         if(null == $fecha_desde)
             $fecha_desde = (new Carbon(Propiedad::min($fecha, Fecha::$ZONA)))->startOfDay();
         if(null == $fecha_hasta)
          $fecha_hasta = (new Carbon(Propiedad::max($fecha, Fecha::$ZONA)))->endOfDay();
-        If (0 == $user) {
+        If (0 == $asesor) {
             $signo = '>';
-            $user = 1;
+            $asesor = 1;
         }
         else $signo = '=';
  
@@ -668,15 +720,16 @@ class Propiedad extends Model
                                     MONTH(fecha_firma) mes'))
                         ->whereIn('estatus', ['P', 'C'])
                         ->whereBetween($fecha, [$fecha_desde, $fecha_hasta])
-                        ->where(function ($query) use ($user, $signo) {
-                                $query->where('asesor_captador_id', $signo, $user)
-                                        ->orWhere('asesor_cerrador_id', $signo, $user);
+                        ->where(function ($query) use ($asesor, $signo) {
+                                $query->where('asesor_captador_id', $signo, $asesor)
+                                        ->orWhere('asesor_cerrador_id', $signo, $asesor);
                         })
                         ->groupBy('agno', 'mes');
         return $sql;
     }
 
-    public static function comisionXMes($fecha='fecha_firma', $fecha_desde=null, $fecha_hasta=null, $user=0)
+    public static function comisionXMes($fecha='fecha_firma',
+                            $fecha_desde=null, $fecha_hasta=null, $asesor=0)
     {
         if(null == $fecha_desde) {
             $fecha_desde = (new Carbon(Propiedad::min($fecha, Fecha::$ZONA)))->startOfDay();
@@ -686,9 +739,9 @@ class Propiedad extends Model
             $fecha_hasta = (new Carbon(Propiedad::max($fecha, Fecha::$ZONA)))->endOfDay();
             $nulo = True;
         } else $nulo = False;
-        If (0 == $user) {
+        If (0 == $asesor) {
             $signo = '>';
-            $user = 1;
+            $asesor = 1;
         }
         else $signo = '=';
         $agnoInicial = date('Y', strtotime($fecha_desde));
@@ -698,11 +751,11 @@ class Propiedad extends Model
  
         $arrRetorno   = [];
         if ($nulo) {
-            $captado = self::where('asesor_captador_id', $signo, $user)
+            $captado = self::where('asesor_captador_id', $signo, $asesor)
                             ->whereIn('estatus', ['P', 'C'])
                             ->whereNull($fecha)
                             ->get()->sum('captadorPrbr');
-            $cerrado = self::where('asesor_cerrador_id', $signo, $user)
+            $cerrado = self::where('asesor_cerrador_id', $signo, $asesor)
                             ->whereIn('estatus', ['P', 'C'])
                             ->whereNull($fecha)
                             ->get()->sum('cerradorPrbr');
@@ -717,12 +770,12 @@ class Propiedad extends Model
         for ($agno = $agnoInicial; $agno <= $agnoFinal; $agno++) {
             for ($mes = $mesInicial; $mes <= 12; $mes++) {
                 if (($agnoFinal == $agno) and ($mes > $mesFinal)) break;
-                $captado = self::where('asesor_captador_id', $signo, $user)
+                $captado = self::where('asesor_captador_id', $signo, $asesor)
                                 ->whereIn('estatus', ['P', 'C'])
                                 ->whereYear($fecha, $agno)
                                 ->whereMonth($fecha, $mes)
                                 ->get()->sum('captadorPrbr');
-                $cerrado = self::where('asesor_cerrador_id', $signo, $user)
+                $cerrado = self::where('asesor_cerrador_id', $signo, $asesor)
                                 ->whereIn('estatus', ['P', 'C'])
                                 ->whereYear($fecha, $agno)
                                 ->whereMonth($fecha, $mes)
@@ -798,15 +851,16 @@ class Propiedad extends Model
         $arrRetorno[] = round($propiedades->get()->sum('base_para_honorarios'), 2);
         $props = clone $propiedades;
         $arrRetorno[] = round($props->where('asesor_captador_id', '>', 1)
-                                          ->get()->sum('captador_prbr'), 2);            // Indice = 12
+                                          ->get()->sum('captador_prbr'), 2);        // Indice = 12
         $arrRetorno[] = round($propiedades->get()->sum('gerente'), 2);
         $props = clone $propiedades;
         $arrRetorno[] = round($props->where('asesor_cerrador_id', '>', 1)
-                                          ->get()->sum('cerrador_prbr'), 2);            // Indice = 14
+                                          ->get()->sum('cerrador_prbr'), 2);        // Indice = 14
         $arrRetorno[] = round($propiedades->get()->sum('bonificaciones'), 2);
-        $arrRetorno[] = round($propiedades->sum('comision_bancaria'), 2);               // 'AB'.
+        $arrRetorno[] = round($propiedades->sum('comision_bancaria'), 2);           // 'AB'.
         $arrRetorno[] = round($propiedades->get()->sum('ingreso_neto_oficina'), 2);
-        $arrRetorno[] = round($propiedades->get()->sum('precio_venta_real'), 2);        // Indice = 18
+        $arrRetorno[] = round($propiedades->get()->sum('precio_venta_real'), 2);    // Indice = 18
+        $arrRetorno[] = round($propiedades->get()->sum('puntos'), 2);               // Indice = 19
 /*        $proCap = clone $propiedades;
         $proCer = clone $propiedades;
         $arrRetorno[] = round($proCap->where('asesor_captador_id', '>', 1)
@@ -821,10 +875,13 @@ class Propiedad extends Model
                                             ->get()->sum('captador_prbr'), 2);   // la linea anterior. Por si acaso.
             $tPvrCaptadorPrbrSel = round($props->where('asesor_captador_id', $cap)
                                             ->get()->sum('pvr_captador_prbr'), 2);
+            $tPuntosCaptadorSel = round($props->where('asesor_captador_id', $cap)
+                                            ->get()->sum('puntos_captador'), 2);
         } else {
             $tLadosCap = $props->where('asesor_captador_id', '>', 1)->count();
             $tCaptadorPrbrSel = 0.00;
             $tPvrCaptadorPrbrSel = 0.00;
+            $tPuntosCaptadorSel = 0.00;
         }
         $props = clone $propiedades;                     // Los query modifican el arreglo propiedades.
         if (0 < $cer) {
@@ -833,17 +890,21 @@ class Propiedad extends Model
                                             ->get()->sum('cerrador_prbr'), 2);   // la linea anterior. Por si acaso.
             $tPvrCerradorPrbrSel = round($props->where('asesor_cerrador_id', $cer)
                                             ->get()->sum('pvr_cerrador_prbr'), 2);
+            $tPuntosCerradorSel = round($props->where('asesor_cerrador_id', $cap)
+                                            ->get()->sum('puntos_cerrador'), 2);
         } else {
             $tLadosCer = $props->where('asesor_cerrador_id', '>', 1)->count();
             $tCerradorPrbrSel = 0.00;
             $tPvrCerradorPrbrSel = 0.00;
+            $tPuntosCerradorSel = 0.00;
         }
         /*dd($arrRetorno[12], $arrRetorno[14], $arrRetorno[18], $tCaptadorPrbrSel,
                 $tCerradorPrbrSel, $tLadosCap, $tLadosCer,
                 $tCaptadorPrbrSel, $tCerradorPrbrSel,
                 $tPvrCaptadorPrbrSel + $tPvrCerradorPrbrSel);*/
         array_push($arrRetorno, $tCaptadorPrbrSel, $tCerradorPrbrSel,
-            $tLadosCap, $tLadosCer, $tPvrCaptadorPrbrSel, $tPvrCerradorPrbrSel);
+                    $tLadosCap, $tLadosCer, $tPvrCaptadorPrbrSel,
+                    $tPvrCerradorPrbrSel, $tPuntosCaptadorSel, $tPuntosCerradorSel);
         //dd($arrRetorno);
         return $arrRetorno;
     }   // totales
@@ -1008,11 +1069,13 @@ class Propiedad extends Model
                         $p->oficina_bruto_real, $p->base_honorarios_socios,
                         $p->base_para_honorarios, $p->asesor_captador_id,
                         $p->asesor_captador, $p->porc_captador_prbr, $p->captador_prbr,
+                        $p->puntos_captador,
                         $p->porc_gerente, $p->gerente, $p->asesor_cerrador_id,
                         $p->asesor_cerrador, $p->porc_cerrador_prbr, $p->cerrador_prbr,
+                        $p->puntos_cerrador,
                         $p->porc_bonificacion, $p->bonificaciones,
                         nulo($p->comision_bancaria, 0), $p->ingreso_neto_oficina,
-                        $p->precio_venta_real, nulo($p->numero_recibo),
+                        $p->precio_venta_real, $p->puntos, nulo($p->numero_recibo),
                         nulo($p->pago_gerente), nulo($p->factura_gerente),
                         nulo($p->pago_asesores), nulo($p->factura_asesores),
                         nulo($p->pago_otra_oficina), nulo($p->pagado_casa_nacional),

@@ -23,7 +23,7 @@
         </ul>
     </div>
     @endif
-    <form method="POST" class="form align-items-end-horizontal"
+    <form method="POST" class="form align-items-end-horizontal" id="formulario"
         action="{{ url('propiedades') }}" onSubmit="return fnSometerForma()">
         {!! csrf_field() !!}
 
@@ -268,7 +268,7 @@
             <div class="form-group form-inline mx-1 px-2">
                 <label class="control-label" for="cliente_id">Cliente</label>
                 <select class="form-control form-control-sm" name="cliente_id" id="cliente_id">
-                    <option value="">Qué cliente?</option>
+                    <option value="X">Nuevo...</option>
                 @foreach ($clientes as $cliente)
                 @if (old('cliente_id', $cols['cliente_id']['xdef']) == $cliente->id)
                     <option value="{{ $cliente->id }}" selected>{{ $cliente->name }}</option>
@@ -277,6 +277,72 @@
                 @endif
                 @endforeach
                 </select>
+            </div>
+            <div class="form-group form-inline mx-1 px-1 nuevo">
+                <label class="control-label" for="cedula">C&eacute;dula Id.</label>
+                <input type="text" class="form-control form-control-sm" size="8" maxlength="8" minlength="7" 
+                        name="cedula" id="cedula" placeholder="# cedula"
+                        value="{{ old('cedula') }}">
+            </div>
+            <div class="form-group form-inline mx-1 px-1 nuevo">
+                <label class="control-label" for="rif">Rif</label>
+                <input type="text" class="form-control form-control-sm" size="10" minlength="10" 
+                        name="rif" id="rif" placeholder="# rif"
+                        value="{{ old('rif') }}">
+            </div>
+            <div class="form-group form-inline mx-1 px-1 nuevo">
+                <label class="control-label" for="name">Nombre</label>
+                <input type="text" class="form-control form-control-sm" size="30" maxlength="150" 
+                        name="name" id="name" placeholder="Nombre del cliente"
+                        value="{{ old('name') }}">
+            </div>
+            <div class="form-group form-inline mx-1 px-1 nuevo">
+                <label class="control-label" for="telefono">Tel&eacute;fono</label>
+                0<select class="form-control form-control-sm" name="ddn" id="ddn">
+                  <option value="">ddn</option>
+                @foreach ($ddns as $ddn)
+                @if (old('ddn', '414') == $ddn->ddn)
+                  <option value="{{ $ddn->ddn }}" selected>{{ $ddn->ddn }}</option>
+                @else
+                  <option value="{{ $ddn->ddn }}">{{ $ddn->ddn }}</option>
+                @endif
+                @endforeach
+                </select>
+                <input type="text" class="form-control form-control-sm" size="7" minlength="7" 
+                        name="telefono" id="telefono" placeholder="telefono sin area" 
+                        value="{{ old('telefono') }}">
+            </div>
+        </div>
+
+        <div class="form-row my-0 py-0 nuevo">
+            <div class="form-group form-inline mx-1 px-1 nuevo">
+                <label class="control-label" for="email">Correo electr&oacute;nico</label>
+                <input type="email" class="form-control form-control-sm" size="100" maxlength="160"
+                        name="email" id="email" placeholder="correo electronico" value="{{ old('email') }}">
+            </div>
+            <div class="form-group form-inline mx-1 px-1 nuevo">
+                <label class="control-label" for="fecha_nacimiento">Fec. nacimiento</label>
+                <input type="date" class="form-control form-control-sm" name="fecha_nacimiento" 
+                        id="fecha_nacimiento" max="{{ now()->format('Y-m-d') }}"
+                        value="{{ old('fecha_nacimiento') }}">
+            </div>
+        </div>
+
+        <div class="form-row my-0 py-0 nuevo">
+            <div class="form-group col-lg-12 d-flex mx-1 px-2 nuevo">
+                <label class="control-label" for="dirCliente" id="etiqDirCliente">
+                    Direcci&oacute;n del cliente</label>
+                <textarea class="form-control form-control-sm" rows="2" name="dirCliente" id="dirCliente"
+                placeholder="Calle, Casa, Apto, Edificio, Barrio, etc.">{{ old('dirCliente') }}</textarea>
+            </div>
+        </div>
+
+        <div class="form-row my-0 py-0 nuevo">
+            <div class="form-group col-lg-12 d-flex mx-1 px-2 nuevo">
+                <label class="control-label" for="observaciones" id="etiqObservaciones">
+                    Observaciones sobre este cliente</label>
+                <textarea class="form-control form-control-sm" rows="2" name="observaciones" id="observaciones"
+                placeholder="Observaciones que se puedan tener sobre este cliente, etc.">{{ old('observaciones') }}</textarea>
             </div>
         </div>
         </fieldset>
@@ -544,13 +610,38 @@
 <script>
     $(document).ready(function(){
         $("fieldset.datosPropiedad").children("div").hide();  // Clase "datosPropiedad"
-        $("#datosPropiedad").click(function(event){           // Id "datosPropiedad"
+        if ('X' != $("#cliente_id").val()) {
+            $("div.nuevo").hide();          // Clase "nuevo"
+            $("#etiqDirCliente, #dirCliente, #etiqObservaciones, #observaciones").hide();     // Id's
+        }
+
+        $("#datosPropiedad").click(function(ev){         // Id "datosPropiedad"
             $("fieldset.datosPropiedad").children("div").toggle(1000);  // Clase "datosPropiedad"
-            event.preventDefault();
+            ev.preventDefault();
         })
-        $("#datosOficina").click(function(event){           // Id "datosOficina"
+        $("#cliente_id").change(function(ev){            // Id "cliente_id"
+            if ('X' == $("#cliente_id").val()) {
+                $("div.nuevo, #etiqDirCliente, #dirCliente, #etiqObservaciones, #observaciones").show();
+            } else {
+                $("div.nuevo, #etiqDirCliente, #dirCliente, #etiqObservaciones, #observaciones").hide();
+            }
+        })
+        $("#datosOficina").click(function(ev){           // Id "datosOficina"
             $("fieldset.datosOficina").children("div").toggle(1000);  // Clase "datosOficina"
-            event.preventDefault();
+            ev.preventDefault();
+        })
+        $("#formulario").submit(function(ev){
+            //alert('$("#cliente_id option:selected").text():'+$("#cliente_id option:selected").text()+'|$("#name").val():'+$("#name").val()+'|');
+            if ('X' == $("#cliente_id").val()) {
+                if ('' === $("#name").val()) {
+                    ev.preventDefault();
+                    alert("Usted seleccciono un 'Nuevo...' cliente; pero, no suministro su nombre!");
+                    $("#name").focus();
+                }
+            } else {
+                var name = $("#cliente_id option:selected").text();
+                $("#name").val(name);
+            }
         })
     })
 </script>

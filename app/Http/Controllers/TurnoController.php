@@ -9,12 +9,14 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
-use App\MisClases\Fecha;
 use Jenssegers\Agent\Agent;                 // PC
+use App\MisClases\Fecha;
+use App\MisClases\General;               // PC
 
 class TurnoController extends Controller
 {
     protected $tipo = 'Turnos';
+    protected $lineasXPagina = General::LINEASXPAGINA;
 
     public function index($orden = null)
     {
@@ -73,7 +75,7 @@ class TurnoController extends Controller
             $orden = '';
             $alertar = 1;
         }
-        if ('' == $orden or null == $orden) {
+        if ('' == $orden or is_null($orden)) {
             $orden = 'turno';
         }
         if (Auth::user()->is_admin) {
@@ -100,7 +102,7 @@ class TurnoController extends Controller
             $turnos = $turnos->orderBy('turno');   // ordenar por turno en cada usuario.
         }
         if ($movil) $turnos = $turnos->get();
-        else $turnos = $turnos->paginate(10);               // Pagina la impresión de 10 en 10
+        else $turnos = $turnos->paginate($this->lineasXPagina);               // Pagina la impresión de 10 en 10
 // Devolver las fechas sin la hora. Los diez primeros caracteres son: yyyy-mm-dd.
         session(['rPeriodo' => $rPeriodo, 'fecha_desde' => $fecha_desde,    // Asignar valores en sesión.
                     'fecha_hasta' => $fecha_hasta, 'asesor' => $asesor]);
@@ -117,7 +119,7 @@ class TurnoController extends Controller
             return redirect('home');
         }
 
-        if ('' == $semana or $semana == null) {
+        if ('' == $semana or is_null($semana)) {
             $semana = 0;
         }
 
@@ -202,7 +204,7 @@ class TurnoController extends Controller
         }
         $semana = $fechas['semana'];
 
-        if ('' == $semana or $semana == null) {
+        if ('' == $semana or is_null($semana)) {
             return redirect()->route('turnos');
         } else {
             return redirect()->route('turnos.crear', $semana);
@@ -218,7 +220,7 @@ class TurnoController extends Controller
             return redirect('home');
         }
 
-        if ('' == $semana or $semana == null) {
+        if ('' == $semana or is_null($semana)) {
             $semana = 0;
         }
 
@@ -311,7 +313,7 @@ class TurnoController extends Controller
         //dd($fechas, $data, $turno);
 
         $semana = $fechas['semana'];
-        if ('' == $semana or $semana == null) {
+        if ('' == $semana or is_null($semana)) {
             return redirect()->route('turnos');
         } else {
             return redirect()->route('turnos.crear', $semana);

@@ -53,7 +53,7 @@
 
             <div class="form-group form-inline row my-0 py-0">
                 <label class="control-label" for="email">Correo electrónico personal</label>
-                <input class="form-control" type="email" size="30" maxlength="30" required
+                <input class="form-control" type="email" size="100" maxlength="160" required
                         name="email" id="email" placeholder="correo electronico"
                         value="{{ old('email', $user->email) }}">
             </div>
@@ -67,7 +67,7 @@
 
             <div class="form-group form-inline row my-0 py-0">
                 <label class="control-label" for="email_c21">Correo electrónico C21</label>
-                <input class="form-control" type="email" size="30" maxlength="30" name="email_c21" id="email_c21" 
+                <input class="form-control" type="email" size="100" maxlength="160" name="email_c21" id="email_c21" 
                         placeholder="correo electronico de Century 21" value="{{ old('email_c21', $user->email_c21) }}">
             </div>
 

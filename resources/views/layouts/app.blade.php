@@ -41,7 +41,8 @@
         @auth
           <ul class="navbar-nav mr-auto col-md-10">
           @foreach (array('home' => 'Home', 'contactos' => 'Contactos', 'users' => 'Asesores',
-                    'turnos' => 'Turnos', 'agenda' => 'Agenda', 'propiedades' => 'Propiedades')
+                    'turnos' => 'Turnos', 'agenda' => 'Agenda', 'propiedades' => 'Propiedades',
+                    'clientes' => 'Clientes')
                     as $hMenu => $muestraMenu)
             @if ($hMenu == substr($view_name, 0, 
                 ((strpos($view_name, '-'))?(strpos($view_name, '-')):4)))
@@ -106,6 +107,10 @@
               <ul class="dropdown-menu">
                 <li><a class="dropdown-item" href="#{{-- route('reportes', 'Cumpleanos') --}}">
                   Conciliaci&oacute;n
+                </a></li>
+                <!--li><a class="dropdown-item" href="/clientes"-->
+                <li><a class="dropdown-item" href="{{ route('clientes.index') }}">
+                  Clientes
                 </a></li>
               </ul>
             </li>

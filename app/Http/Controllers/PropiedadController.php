@@ -10,17 +10,21 @@ use App\Caracteristica;
 use App\Municipio;
 use App\Estado;
 use App\Cliente;
+use App\Venezueladdn;
+use App\Bitacora;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;        // PC
 use Illuminate\Support\Facades\DB;          // PC
 use Carbon\Carbon;                          // PC
-use App\MisClases\Fecha;                    // PC
 use Jenssegers\Agent\Agent;                 // PC
+use App\MisClases\Fecha;                    // PC
+use App\MisClases\General;               // PC
 
 class PropiedadController extends Controller
 {
     protected $tipo = 'Propiedad';
     protected $tipoPlural = 'Propiedades';
+    protected $lineasXPagina = General::LINEASXPAGINA;
     /**
      * Display a listing of the resource.
      *
@@ -76,7 +80,7 @@ class PropiedadController extends Controller
                                                                 $fecha_max);*/
         }
 //        dd($dato, $fecha_desde, $fecha_hasta);
-        if ('' == $orden or null == $orden) {
+        if ('' == $orden or is_null($orden)) {
             $orden = 'id';
         }
         if (Auth::user()->is_admin) {
@@ -194,23 +198,25 @@ class PropiedadController extends Controller
                 $tFranquiciaConIva, $tFranquiciaPagarR, $tRegalia, $tSanaf5PorCiento,
                 $tOficinaBrutoReal, $tBaseHonorariosSo, $tBaseParaHonorari,
                 $tCaptadorPrbr, $tGerente, $tCerradorPrbr, $tBonificaciones,
-                $tComisionBancaria, $tIngresoNetoOfici, $tPrecioVentaReal,
+                $tComisionBancaria, $tIngresoNetoOfici, $tPrecioVentaReal, $tPuntos,
                 $tCaptadorPrbrSel, $tCerradorPrbrSel, $tLadosCap, $tLadosCer,
-                $tPvrCaptadorPrbrSel, $tPvrCerradorPrbrSel) =
+                $tPvrCaptadorPrbrSel, $tPvrCerradorPrbrSel,
+                $tPuntosCaptador, $tPuntosCerrador) =
                 Propiedad::totales($propiedades, True, (($captador)?$captador:(($asesor)?$asesor:0)),
                                 (($cerrador)?$cerrador:(($asesor)?$asesor:0)));
         $agente = new Agent();
         $movil  = $agente->isMobile() and true;             // Fuerzo booleana. No funciona al usar el metodo directamente.
         $paginar = ($paginar)?!$movil:$paginar;
-        if ($paginar) $propiedades = $propiedades->paginate(Propiedad::$lineasXPagina);      // Pagina la impresión de 10 en 10
+        if ($paginar) $propiedades = $propiedades->paginate($this->lineasXPagina);      // Pagina la impresión de 10 en 10
         else $propiedades = $propiedades->get();                      // Mostrar todos los registros.
 // Devolver las fechas sin la hora. Los diez primeros caracteres son: yyyy-mm-dd.
         $cols = Propiedad::columnas();
         $arrEstatus = $cols['estatus']['opcion'];
         unset($cols);
-        session(['fecha_desde' => $fecha_desde,    // Asignar valores en sesión.
-                    'fecha_hasta' => $fecha_hasta, 'estatus' => $estatus,
-                    'captador' => $captador, 'cerrador' => $cerrador]);
+        session(['fecha_desde' => $fecha_desde, 'fecha_hasta' => $fecha_hasta,    // Asignar valores en sesión.
+                    'estatus' => $estatus, 'captador' => $captador, 'cerrador' => $cerrador,
+                    'orden' => $orden
+                ]);
         /*dd($tCaptadorPrbr, $tCerradorPrbr, $tPrecioVentaReal, $tCaptadorPrbrSel,
                 $tCerradorPrbrSel, $tLadosCap, $tLadosCer,
                 $tPvrCaptadorPrbrSel + $tPvrCerradorPrbrSel);*/
@@ -245,6 +251,10 @@ class PropiedadController extends Controller
         return redirect()->back();
     }
 
+    function compararXNombre($cliente1, $cliente2) {
+        return strcmp($cliente1->name, $cliente2->name);
+    }
+
     /**
      * Show the form for creating a new resource.
      *
@@ -272,11 +282,16 @@ class PropiedadController extends Controller
         $caracteristicas = Caracteristica::all();
         $municipios = Municipio::all();
         $estados = Estado::all();
-        $clientes = Cliente::all();
+        $clientes = Cliente::all()->all();
+        //dd(self::compararXNombre($clientes[0], $clientes[1]));
+        $otroCliente = array_shift($clientes);
+        usort($clientes, "self::compararXNombre");
+        $ddns = Venezueladdn::distinct()->get(['ddn'])->all();
+        array_unshift($clientes, $otroCliente);
 //        return view((($movil)?'celular.createPropiedades':'propiedades.create'),
         return view('propiedades.create',
                     compact('title', 'users', 'tipos', 'ciudades', 'caracteristicas',
-                    'municipios', 'estados', 'clientes', 'cols', 'exito'));
+                    'municipios', 'estados', 'clientes', 'ddns', 'cols', 'exito'));
     }
 
     /**
@@ -287,7 +302,7 @@ class PropiedadController extends Controller
      */
     public function store(Request $request)
     {
-        //dd($request);
+        //dd($request->path(), $request->fullUrl(), $request->url(), $request->root());   //"propiedades", "http://c21pr.vb/propiedades", "http://c21pr.vb/propiedades", "http://c21pr.vb"
         $data = request()->validate([   // Si ocurre error, laravel nos envia al url anterior.
             'codigo' => ['required', 'digits_between:6,8'],
             'fecha_reserva' => ['sometimes', 'nullable', 'date'],
@@ -339,6 +354,15 @@ class PropiedadController extends Controller
             'reporte_casa_nacional' => '',
             'factura_AyS' => '',
             'comentarios' => '',
+            'cedula' => '',
+            'rif' => '',
+            'name' => 'required',
+            'ddn' => '',
+            'telefono' => '',
+            'email' => '',
+            'fecha_nacimiento' => '',
+            'dirCliente' => '',
+            'observaciones' => '',
         ], [
             'codigo.required' => 'Debe siministrarse el <codigo> de la propiedad.',
             'codigo.digits_between' => 'El <codigo> debe contener entre 6 y 8 caracteres.',
@@ -361,11 +385,35 @@ class PropiedadController extends Controller
             'porc_bonificacion.required' => 'El campo <Porcentaje bonificacion> es obligatorio',
             'asesor_captador_id.required' => 'El campo <Asesor captador> es obligatorio',
             'asesor_cerrador_id.required' => 'El campo <Asesor cerrador> es obligatorio',
+            'name.required' => 'El campo <nombre> DEL CLIENTE (Nuevo) es obligatorio',
         ]);
 
-        $cols = Propiedad::columnas();
         //dd($data);
-        propiedad::create([
+        if ('X' == $data['cliente_id']) {
+            if (!(is_null($data['ddn'])) and ('' != $data['ddn']) and
+                !(is_null($data['telefono'])) and ('' != $data['telefono'])) {
+                $data['telefono'] = $data['ddn'] . $data['telefono'];
+            } else {
+                $data['telefono'] = null;
+            }
+            unset($data['ddn']);
+
+            $cliente = Cliente::create([
+                'cedula' => (isset($data['cedula'])?$data['cedula']:null),
+                'rif' => (isset($data['rif'])?$data['rif']:null),
+                'name' => $data['name'],
+                'telefono' => (isset($data['telefono'])?$data['telefono']:null),
+                'user_id' => Auth::user()->id,
+                'email' => (isset($data['email'])?$data['email']:null),
+                'fecha_nacimiento' => (isset($data['fecha_nacimiento'])?$data['fecha_nacimiento']:null),
+                'dirCliente' => (isset($data['dirCliente'])?$data['dirCliente']:null),
+                'observaciones' => (isset($data['observaciones'])?$data['observaciones']:null)
+            ]);
+            $data['cliente_id'] = $cliente->id;
+        }
+
+        $cols = Propiedad::columnas();
+        Propiedad::create([
             'codigo' => $data['codigo'],
             'fecha_reserva' => $data['fecha_reserva'],
             'fecha_firma' => $data['fecha_firma'],
@@ -433,33 +481,42 @@ class PropiedadController extends Controller
      * @param  \App\Propiedad  $propiedad
      * @return \Illuminate\Http\Response
      */
-    public function show(Propiedad $propiedad, $rutRetorno='propiedades.index')
+    public function show(Propiedad $propiedad, $rutRetorno='propiedades.orden')
     {
+        //dd(redirect()->getUrlGenerator());    // arreglo , un poco complejo.
         if (!(Auth::check())) {
             return redirect('login');
         }
 
         $col_id = '';
-        $restoRuta = '';
+        $orden = '';
+        $nroPagina = '';
         if ((0 == stripos($rutRetorno, 'propiedades')) or (0 == stripos($rutRetorno, 'reporte'))) {
-            if (17 < strlen($rutRetorno)) {     // 17 = len(propiedades.index)
-                $col_id = strtolower(substr($rutRetorno, 19)) . '_id';  // 19 = len(reporte.propiedades)
-// $col_id sera 'caracteristica', 'ciudad', 'municipio', 'estado', 'tipo', etc.
-            }
-// Las proximas tres lineas consiguen si fue llamada desde una pagina especifica; pero, no funciona si se llamo desde una pagina con orden diferente a #id.
             $rutaPrevia = redirect()->getUrlGenerator()->previous();
+            if (17 < strlen($rutRetorno)) {     // 17 = len(propiedades/orden)
+                $col_id = strtolower(substr($rutRetorno, 19)) . '_id';  // 19 = len(reporte.propiedades)
+// $col_id sera 'caracteristica_id', 'ciudad_id', 'municipio_id', 'estado_id', 'tipo_id', etc.
+                $long = (strrpos($rutaPrevia, '?')?strrpos($rutaPrevia, '?'):strlen($rutaPrevia)) - 1;
+                $long -= strrpos($rutaPrevia, '/');
+                $orden = substr($rutaPrevia, strrpos($rutaPrevia, '/')+1, $long);
+            } else {
+                $orden = session('orden', 'id');
+            }
+// Las proximas dos lineas consiguen si fue llamada desde una pagina especifica.
             if (0 < stripos($rutaPrevia, '?page'))
-                $restoRuta = substr($rutaPrevia, stripos($rutaPrevia, '?page'));
+// $rutaPrevia: 'propiedades' o 'propiedades/orden/nombre' o 'propiedades/orden/nombre?page=5' o
+//          'reportes/propiedadesCaracteristica/1/id' o 'reportes/propiedadesCaracteristica/1/codigo?page=3' o etc.
+                $nroPagina = substr($rutaPrevia, stripos($rutaPrevia, '?page'));
 /* Esto no funcionaria en un sitio en produccion porque las filas seran borradas y el # id no necesariamente identificaria a la pagina.
             $id = $propiedad->id;   // Desde aqui se busca la pagina a la que se volvera.
             $lineas = Propiedad::$lineasXPagina;
             $pagina = round((($id/$lineas)+0.5), 0, PHP_ROUND_HALF_DOWN);
 //            if (0 < ($id%$lineas)) $pagina++;
-            if (1 < $pagina) $restoRuta = '?page=' . $pagina;*/
+            if (1 < $pagina) $nroPagina = '?page=' . $pagina;*/
         }
         
         //dd($propiedad);
-        //dd($rutRetorno, $col_id, $restoRuta);
+        //dd($rutaPrevia);
         //dd(redirect()->getUrlGenerator());    // No consegui nada que pueda ayudar.
         $agente = new Agent();
         $movil  = $agente->isMobile() and true;             // Fuerzo booleana. No funciona al usar el metodo directamente.
@@ -469,22 +526,15 @@ class PropiedadController extends Controller
         $municipios = Municipio::all();
         $estados = Estado::all();
         $clientes = Cliente::all();
-        if (Auth::user()->is_admin) {
-//            return view((($movil)?'celular.showPropiedad':'propiedades.show'),
-            return view('propiedades.show',
-                        compact('propiedad', 'rutRetorno', 'restoRuta', 'col_id', 'movil', 'tipos',
-                        'ciudades', 'caracteristicas', 'municipios', 'estados', 'clientes'));
-        }
-        if ($propiedad->user_borro != null) {
-            return redirect()->back();
-        }
-        if (($propiedad->user_id == Auth::user()->id) or
+        if ((Auth::user()->is_admin) or
+            (is_null($propiedad->user_borro) and (($propiedad->user_id == Auth::user()->id) or
             ($propiedad->asesor_captador_id == Auth::user()->id) or
-            ($propiedad->asesor_cerrador_id == Auth::user()->id)) {
+            ($propiedad->asesor_cerrador_id == Auth::user()->id)))) {
 //            return view((($movil)?'celular.showPropiedad':'propiedades.show'),
             return view('propiedades.show',
-                        compact('propiedad', 'rutRetorno', 'col_id', 'tipos',
-                        'ciudades', 'caracteristicas', 'municipios', 'estados', 'clientes'));
+                        compact('propiedad', 'rutRetorno', 'nroPagina', 'col_id', 'movil',
+                                'orden', 'tipos', 'ciudades', 'caracteristicas', 'municipios',
+                                'estados', 'clientes'));
         } else {
             return redirect()->back();
         }
@@ -501,9 +551,16 @@ class PropiedadController extends Controller
         if (!(Auth::check())) {
             return redirect('login');
         }
-        if ($propiedad->user_borro != null) {
+        if (!(is_null($propiedad->user_borro))) {
             return redirect('/propiedades');
         }
+
+        $rutaPrevia = redirect()->getUrlGenerator()->previous();
+// Las proximas dos lineas consiguen si fue llamada desde una pagina especifica.
+        if (0 < stripos($rutaPrevia, '?page'))
+            $nroPagina = substr($rutaPrevia, stripos($rutaPrevia, '?page'));
+        else $nroPagina = '';
+        $orden = session('orden', 'id');
 
         $cols = Propiedad::columnas();
         $title = 'Editar ' . $this->tipo;
@@ -525,7 +582,7 @@ class PropiedadController extends Controller
             return view('propiedades.edit',
 //                        ['propiedad' => $propiedad, 'users' => $users, 'cols' => $cols, 'title' => $title]);
                     compact('propiedad', 'title', 'users', 'tipos', 'ciudades', 'caracteristicas',
-                            'municipios', 'estados', 'clientes', 'cols'));
+                            'municipios', 'estados', 'clientes', 'cols', 'orden', 'nroPagina'));
         }
         return redirect('/propiedades');
     }
@@ -624,6 +681,13 @@ class PropiedadController extends Controller
         //dd($data);
         $propiedad->update($data);
 
+        Bitacora::create([
+            'user_id' => Auth::user()->id,
+            'tx_modelo' => 'Propiedad',
+            'tx_data' => $data,
+            'tx_tipo' => 'A',
+        ]);
+
         return redirect()->route('propiedades.show', ['propiedad' => $propiedad]);
     }
 
@@ -642,7 +706,7 @@ class PropiedadController extends Controller
         if (!(Auth::user()->is_admin)) {
             return redirect('/propiedades');
         }
-        if ($propiedad->user_borro != null) {
+        if (!(is_null($propiedad->user_borro))) {
             return redirect()->route('propiedades.show', ['propiedad' => $propiedad]);
         }
 
@@ -651,7 +715,15 @@ class PropiedadController extends Controller
         //$data['borrado_at'] = new Carbon();
 
         //dd($data);
+        $datos = 'id:'.$propiedad->id.', codigo:'.$propiedad->codigo.', nombre:'.$propiedad->nombre;
         $propiedad->delete();
+
+        Bitacora::create([
+            'user_id' => Auth::user()->id,
+            'tx_modelo' => 'Propiedad',
+            'tx_data' => $datos,
+            'tx_tipo' => 'B',
+        ]);
 
         return redirect()->route('propiedades.index');
     }

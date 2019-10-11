@@ -35,6 +35,7 @@
             <th scope="col">Correo</th>
         @if (Auth::user()->is_admin)
             <th scope="col">Comision</th>
+            <th scope="col">Puntos</th>
         @endif
             <th scope="col">Acciones</th>
         @endif
@@ -45,6 +46,10 @@
         <tr
         @if (!$user->activo)
             class="table-danger" title="Asesor no est&aacute; activo"
+        @elseif (0 == ($loop->iteration % 2))
+            class="table-primary"
+        @else
+            class="table-info"
         @endif
         >
         @if (!$movil)
@@ -72,14 +77,27 @@
                 {{ $user->email }}
             </td>
         @if (Auth::user()->is_admin)
-            <td class="float-right"
+            <td
             @if (1 == $user->id)
-                title="Este monto representa la 'comision' producida para 'Otra oficina'"
-            @endif
+                title="Este monto representa la 'comision' producida para 'Otra oficina'">
+                <span class="float-right">0,00</span>
+            @else
             >
-                {{ Prop::numeroVen($user->comision, 2) }}{{-- 'Prop' es un alias definido en config/app.php --}}
+                <span class="float-right">{{ Prop::numeroVen($user->comision, 2) }}{{-- 'Prop' es un alias definido en config/app.php --}}
+                </span>
+            @endif (1 == $user->id)
             </td>
-        @endif
+            <td
+            @if (1 == $user->id)
+                title="Estos puntos representan los producidos por 'Otra oficina'">
+                <span class="float-right">0,00</span>
+            @else
+            >
+                <span class="float-right">{{ Prop::numeroVen($user->puntos, 2) }}{{-- 'Prop' es un alias definido en config/app.php --}}
+                </span>
+            @endif (1 == $user->id)
+            </td>
+        @endif (Auth::user()->is_admin)
             <td>
                 <form action="{{ route('users.destroy', $user) }}" method="POST"
                         id="forma.{{ $user->id }}" name="forma.{{ $user->id }}"
@@ -114,7 +132,7 @@
                     @endif
                 </form>
             </td>
-        @endif
+        @endif (!$movil)
         </tr>
         @endForeach
         </tbody>

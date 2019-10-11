@@ -10,41 +10,55 @@
           onSubmit="return alertaFechaRequerida()">
       {!! csrf_field() !!}
 
-    @if (!$movil)
-      <div class="row form-group">
-        <div class="col-lg-12">
+    @includeWhen(!$movil, 'include.intervalo')
+
+      <div class="form-row my-0 py-0 mx-1 px-1">
+    @include('include.fechas')
+    @includeWhen(Auth::user()->is_admin, 'include.asesor', ['berater' => 'asesor']) {{-- Obligatorio berater (asesor en aleman) --}}
+    @include('include.botonMostrar')
+      </div>
+    {{--@if (!$movil)
+      <div class="form-row my-0 py-0 mx-1 px-1">
         @foreach (['hoy', 'ayer', 'manana', 'esta_semana', 'semana_pasada', 'proxima_semana',
                   'este_mes', 'mes_pasado', 'proximo_mes', 'todo', 'intervalo'] as $intervalo)
-          <input type="radio" required name="periodo" id="_{{ $intervalo }}" value="{{ $intervalo }}"
+        <div class="form-check form-check-inline my-1 py-0 mx-1 px-0">
+          <input class="form-check-input form-check-input-sm" type="radio" required name="periodo"
+                  id="_{{ $intervalo }}" value="{{ $intervalo }}"
           @if ($rPeriodo == $intervalo)
             checked
           @endif
           >
-          <label>
+          <label class="form-check-label form-check-label-sm" for="_{{ $intervalo }}">
           @if ('manana' == $intervalo)
           Mañana
+          @elseif ('intervalo' == $intervalo)
+          Otro
           @else
           {{ str_replace('_', ' ', ucfirst($intervalo)) }}
           @endif
           </label>
-        @endforeach
         </div>
+        @endforeach
       </div>
     @endif
-      <div class="row form-group">
-        <div class="col-lg-3">
-          <label>Desde:</label>
-          <input type="date" name="fecha_desde" id="fecha_desde" min="{{ now() }}" max="{{ now() }}"
-                          value="{{ old('fecha_desde', $fecha_desde) }}">
+      <div class="form-row my-0 py-0 mx-1 px-1">
+        <div class="form-group form-inline my-1 py-0 mx-0 px-0">
+          <label class="control-label" for="fecha_desde">
+            Desde:</label>
+          <input class="form-control form-control-sm" type="date" name="fecha_desde"
+                  id="fecha_desde" min="{{ now() }}" max="{{ now() }}"
+                  value="{{ old('fecha_desde', $fecha_desde) }}">
         </div>
-        <div class="col-lg-3">
-          <label>Hasta:</label>
-          <input type="date" name="fecha_hasta" id="fecha_hasta" min="{{ now() }}" max="{{ now() }}"
-                          value="{{ old('fecha_hasta', $fecha_hasta) }}">
+        <div class="form-group form-inline my-1 py-0 mx-0 px-0">
+          <label class="control-label" for="fecha_hasta">
+            Hasta</label>
+          <input class="form-control form-control-sm" type="date" name="fecha_hasta"
+                  id="fecha_hasta" min="{{ now() }}" max="{{ now() }}"
+                  value="{{ old('fecha_hasta', $fecha_hasta) }}">
         </div>
       @if (Auth::user()->is_admin)
-        <div class="col-lg-2">
-          <select name="asesor" id="asesor">
+        <div class="form-group form-inline my-1 py-0 mx-0 px-0">
+          <select class="form-control form-control-sm" name="asesor" id="asesor">
             <option value="0">Asesor</option>
             @foreach ($users as $user)
               <option value="{{ $user->id }}"
@@ -61,7 +75,7 @@
         <div class="col-lg-2">
           <button type="submit" class="btn btn-success">Mostrar</button>
         </div>
-      </div>
+      </div>--}}
     </form>
 </div>
 
@@ -109,7 +123,13 @@
   </thead>
   <tbody>
   @foreach ($agendas as $agenda)
-    <tr>
+    <tr class="
+    @if (0 == ($loop->iteration % 2))
+        table-primary
+    @else
+        table-info
+    @endif
+    ">
       <td>
       @if (($movil) && (NULL != $agenda->contacto_id))
         <a href="{{ route('agenda.show', $agenda->contacto) }}" class="btn btn-link">

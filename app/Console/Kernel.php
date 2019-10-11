@@ -13,7 +13,7 @@ class Kernel extends ConsoleKernel
      * @var array
      */
     protected $commands = [
-        //
+        'App\Console\Commands\GrabarArchivo',
     ];
 
     /**
@@ -26,6 +26,14 @@ class Kernel extends ConsoleKernel
     {
         // $schedule->command('inspire')
         //          ->hourly();
+        $schedule->command('grabar:archivo')
+                    ->weekdays()->everyThirtyMinutes()
+                    ->between('9:00', '23:00')
+                    ->sendOutputTo('/home/pablo/salidas/cronLaravelGrabarArchivo.txt');
+        $schedule->command('grabar:archivo')
+                    ->saturdays()->everyThirtyMinutes()
+                    ->between('9:00', '13:00')
+                    ->sendOutputTo('/home/pablo/salidas/cronLaravelGrabarArchivo.txt');
     }
 
     /**

@@ -3,16 +3,23 @@
 
 @section('content')
 
-<div class="d-flex justify-content-between align-items-end mb-1">
+<div><!--div class="d-flex justify-content-between align-items-end mb-1"-->
   <form method="POST" class="form-horizontal" action="{{ url('/reportes') }}"
         onSubmit="return alertaFechaRequerida()">
     {!! csrf_field() !!}
 
+    <div class="form-row my-0 py-0 mx-1 px-1">
       <input type="hidden" name="periodo" value="intervalo">
-      <label>Desde:</label>
+  @include('include.fechas')
+  @includeWhen(((Auth::user()->is_admin) and
+               (('Fecha' == $muestra) or ('Negociaciones' == $muestra) or
+                ('LadMes' == $muestra) or ('ComMes' == $muestra))),
+               'include.asesor', ['berater' => 'asesor']) {{-- Obligatorio berater (asesor en aleman) --}}
+  @include('include.botonMostrar')
+    </div>
+      {{--<label>Desde:</label>
       <input type="date" name="fecha_desde" id="fecha_desde" min="{{ now() }}" max="{{ now() }}"
                       value="{{ old('fecha_desde', substr($fecha_desde, 0, 10)) }}">
-      {{-- $fecha_desde --}}
       <label>Hasta:</label>
       <input type="date" name="fecha_hasta" id="fecha_hasta" min="{{ now() }}" max="{{ now() }}"
                       value="{{ old('fecha_hasta', substr($fecha_hasta, 0, 10)) }}">
@@ -31,7 +38,7 @@
       </select>
       @endif
       <button type="submit" class="btn btn-success">Mostrar</button>
-    </div>
+    </div>--}}
   </form>
 </div>
 
@@ -102,7 +109,13 @@
   <tbody>
   @foreach ($elemsRep as $elemento)
     {{-- @continue (0 >= $elemento->atendidos) --}}
-    <tr>
+    <tr class="
+    @if (0 == ($loop->iteration % 2))
+        table-primary
+    @else
+        table-info
+    @endif
+    ">
       <td>
     @if ('Fecha' == $muestra)
       {{ $elemento->fecha }}
@@ -157,17 +170,13 @@
 function alertaFechaRequerida() {
   var fecha_desde = document.getElementById('fecha_desde').value;
   var fecha_hasta = document.getElementById('fecha_hasta').value;
+  var asesor = document.getElementById('asesor').value;
 
-  if ('' == fecha_desde) {
-    alert("Usted tiene que suministrar la fecha 'Desde'");
-    return false;
-  }
-  if ('' == fecha_desde) {
-    alert("Usted tiene que suministrar la fecha 'Hasta'");
+  if (('' == fecha_desde) && ('0' == asesor)) {
+    alert("Usted tiene que suministrar, como minimo, la fecha 'Desde' y/o el 'asesor'");
     return false;
   }
   return true;
-//  submit();
 }
 </script>
 

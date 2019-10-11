@@ -17,16 +17,16 @@
             </span>
     </div>
     <div class="card-body">
-        <div class="row">
-            <div class="col-lg-4">
+        <div class="row my-1 py-1">
+            <div class="mx-1 px-2">
                 C&eacute;dula de Identidad:
                 <span class="alert-info">
                     {{ $contacto->cedula_f }}
                 </span>
             </div>
         </div>
-        <div class="row bg-suave">
-            <div class="col-lg-4">
+        <div class="row bg-suave my-1 py-1">
+            <div class="mx-1 px-2">
                 Telefono de contacto:
                 <span class="alert-info">
                     {{ $contacto->telefono_f }}
@@ -43,8 +43,8 @@
                 </span>
             </div>
         </div>
-        <div class="row">
-            <div class="col-lg-4">
+        <div class="row my-1 py-1">
+            <div class="mx-1 px-2">
                 Correo de contacto:
                 <span class="alert-info">
                     {{ $contacto->email }}
@@ -62,24 +62,24 @@
                 </span>
             </div>
         </div>
-        <div class="row bg-suave">
-            <div class="col-lg-4">
+        <div class="row bg-suave my-1 py-1">
+            <div class="mx-1 px-2">
                 Atendido por:
                 <span class="alert-info">
                     [{{ $contacto->user_id }}] {{ $contacto->user->name }}
                 </span>
             </div>
         </div>
-        <div class="row">
-            <div class="col-lg-8">
+        <div class="row my-1 py-1">
+            <div class="mx-1 px-2">
                 Dirección:
                 <span class="alert-info">
                     {{ $contacto->direccion }}
                 </span>
             </div>
         </div>
-        <div class="row bg-suave">
-            <div class="col-lg-4">
+        <div class="row bg-suave my-1 py-1">
+            <div class="mx-1 px-2">
                 Desea:
                 <span class="alert-info">
                     {{ $contacto->deseo->descripcion }}
@@ -92,8 +92,8 @@
                 </span>
             </div>
         </div>
-        <div class="row">
-            <div class="col-lg-4">
+        <div class="row my-1 py-1">
+            <div class="mx-1 px-2">
                 Zona:
                 <span class="alert-info">
                     {{ $contacto->zona->descripcion }}
@@ -106,16 +106,16 @@
                 </span>
             </div>
         </div>
-        <div class="row bg-suave">
-            <div class="col-lg-4">
+        <div class="row bg-suave my-1 py-1">
+            <div class="mx-1 px-2">
                 Origen:
                 <span class="alert-info">
                     {{ $contacto->origen->descripcion }}
                 </span>
             </div>
         </div>
-        <div class="row">
-            <div class="col-lg-4">
+        <div class="row my-1 py-1">
+            <div class="mx-1 px-2">
                 Resultado:
                 <span class="alert-info">
                     {{ $contacto->resultado->descripcion }}
@@ -138,16 +138,16 @@
             </div>
             @endif
         </div>
-        <div class="row bg-suave">
-            <div class="col-lg-8">
+        <div class="row bg-suave my-1 py-1">
+            <div class="mx-1 px-2">
                 Observaciones:
                 <span class="alert-info">
                     {{ $contacto->observaciones }}
                 </span>
             </div>
         </div>
-        <div class="row">
-            <div class="col-lg-8">
+        <div class="row my-1 py-1">
+            <div class="mx-1 px-2">
                 Esta persona fue contactada hace:
                 <span class="alert-info">
                     {{ $contacto->tiempo_creado }}
@@ -155,8 +155,8 @@
             </div>
         </div>
     @if ($contacto->user_borro != null)
-        <div class="row bg-suave">
-            <div class="col-lg-8">
+        <div class="row bg-suave my-1 py-1">
+            <div class="mx-1 px-2">
                 Este contacto inicial fue borrado por {{ $contacto->userBorro->name }} el
                 {{ $contacto->borrado_dia_semana }}
                 {{ $contacto->borrado_con_hora }}.
@@ -164,8 +164,8 @@
         </div>
     @endif
     @if ($contacto->user_actualizo != null)
-        <div class="row">
-            <div class="col-lg-8">
+        <div class="row my-1 py-1">
+            <div class="mx-1 px-2">
                 Este contacto inicial fue actualizado por {{ $contacto->userActualizo->name }}
                 el
                 {{ $contacto->actualizado_dia_semana }}
@@ -174,8 +174,8 @@
         </div>
     @endif
 
-        <div class="row">
-            <div class="col-lg-4">
+        <div class="row my-1 py-1">
+            <div class="mx-1 px-2">
             <!-- a href="{{ action('ContactoController@index') }}">Regresar al listado de contactos iniciales</a -->
             @if ('' == $col_id)
         	    <a href="{{ route($rutRetorno) }}" class="btn btn-link">

@@ -25,7 +25,13 @@
         </thead>
         <tbody>
         @foreach ($arreglo as $arrInd)
-        <tr>
+        <tr class="
+        @if (0 == ($loop->iteration % 2))
+            table-primary
+        @else
+            table-info
+        @endif
+        ">
         @if (!$movil)
             <th scope="row">{{ $loop->iteration }}</th>
             <td>{{ $arrInd->id }}</td>

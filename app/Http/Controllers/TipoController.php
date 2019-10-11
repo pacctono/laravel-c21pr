@@ -43,7 +43,7 @@ class TipoController extends Controller
         $agente = new Agent();
         $movil  = $agente->isMobile() and true;             // Fuerzo booleana. No funciona al usar el metodo directamente.
 
-        if ('' == $orden or $orden == null) {
+        if ('' == $orden or is_null($orden)) {
             $orden = 'id';
         }
         $arreglo = Tipo::orderBy($orden)->paginate(10);

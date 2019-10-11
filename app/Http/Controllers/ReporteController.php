@@ -24,8 +24,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
-use App\MisClases\Fecha;
 use Jenssegers\Agent\Agent;                 // PC
+use App\MisClases\Fecha;
+use App\MisClases\General;               // PC
 
 class ReporteController extends Controller
 {
@@ -33,43 +34,54 @@ class ReporteController extends Controller
     protected $subTitulo1 = 'Contactos atendidos por ';
     protected $titulo = 'Listado de contactos iniciales ';
     protected $titProp = 'Listado de propiedades ';
+    protected $lineasXPagina = General::LINEASXPAGINA;
 
     protected function prepararFechas($fecha, $asesor=0, $muestra=null)
     {
         $ZONA = Fecha::$ZONA;
 
+        //dd(request()->method(), $muestra, $fecha, $asesor);
         if ('POST' == request()->method()) {
             $fechas = request()->all();
             $muestra = session('muestra', 'Asesor');
             if (array_key_exists('asesor', $fechas)) $asesor = $fechas['asesor'];
             list ($fecha_desde, $fecha_hasta) = Fecha::periodo($fechas);
+            //dd('0', $muestra, $fecha, $fecha_desde, $fecha_hasta, $asesor);
         } elseif (is_null($muestra)) {
-            if ('' != session('fecha_desde', '') and '' != session('fecha_hasta', ''))  {
-                $fecha_desde = session('fecha_desde');
-                $fecha_hasta = session('fecha_hasta');
+            if ('' != session('fecha_desde', '') and '' != session('fecha_hasta', ''))  {   // chart
+                $fecha_desde = new Carbon(session('fecha_desde'));
+                $fecha_hasta = new Carbon(session('fecha_hasta'));
+                $asesor = session('asesor');
                 $muestra = session('muestra', 'Asesor');
-            } else {
+            } else {          // Esto nunca deberia suceder.
                 $muestra = 'Lados';
                 $fecha_desde = null;
                 $fecha_hasta = null;
             }
+            //dd('1', $muestra, $fecha, $fecha_desde, $fecha_hasta, $asesor);
         } elseif ('Conexion' == $muestra) {
             $fecha_desde = (new Carbon(Bitacora::min('created_at', $ZONA)))->startOfDay();
             $fecha_hasta = (new Carbon(Bitacora::max('created_at', $ZONA)))->endOfDay();
         } elseif ('Cumpleanos' == $muestra) {
             $fecha_desde = Fecha::hoy();
             $fecha_hasta = Fecha::hoy()->addDays(30)->endOfDay();
+            //dd('2', $muestra, $fecha, $fecha_desde, $fecha_hasta, $asesor);
         } elseif (('Negociaciones' == $muestra) or
                   ('Lados' == $muestra) or ('Comision' == $muestra) or
-                  ('LadMes' == $muestra) or ('ComMes' == $muestra)) {
-            $fecha_desde = null;
-            $fecha_hasta = null;
-        } else {
+                  ('LadMes' == $muestra) or ('ComMes' == $muestra)) {   // Se trabaja con Propiedades
+            $fecha_desde = (new Carbon(Propiedad::min($fecha, $ZONA)))->startOfDay();
+            $fecha_hasta = (new Carbon(Propiedad::max($fecha, $ZONA)))->endOfDay();
+            $asesor = 0;
+            //dd('3', $muestra, $fecha, $fecha_desde, $fecha_hasta, $asesor);
+        } else {                                        // Se trabaja con Contactos
             $fecha_desde = (new Carbon(Contacto::min('created_at', $ZONA)))->startOfDay();
             $fecha_hasta = (new Carbon(Contacto::max('created_at', $ZONA)))->endOfDay();
+            $asesor = 0;
+            //dd('4', $muestra, $fecha, $fecha_desde, $fecha_hasta, $asesor);
         }
+        //dd('5', $muestra, $fecha, $fecha_desde, $fecha_hasta, $asesor);
 
-        return array($muestra, $fecha_desde, $fecha_hasta);
+        return array($muestra, $fecha_desde, $fecha_hasta, $asesor);
     }
     protected function title($muestra, $fecha, $fecha_desde, $fecha_hasta, $asesor=0)
     {
@@ -138,13 +150,13 @@ class ReporteController extends Controller
                 $elemsRep = User::where('id', '>', 1);
                 break;
             case 'Negociaciones':
-                $elemsRep = Propiedad::negociacionesXMes($fecha, $fecha_desde, $fecha_hasta);
+                $elemsRep = Propiedad::negociacionesXMes($fecha, $fecha_desde, $fecha_hasta, $asesor);
                 break;
             case 'LadMes':
-                $elemsRep = Propiedad::ladosXMes($fecha, $fecha_desde, $fecha_hasta);
+                $elemsRep = Propiedad::ladosXMes($fecha, $fecha_desde, $fecha_hasta, $asesor);
                 break;
             case 'ComMes':
-                $elemsRep = Propiedad::comisionXMes($fecha, $fecha_desde, $fecha_hasta);
+                $elemsRep = Propiedad::comisionXMes($fecha, $fecha_desde, $fecha_hasta, $asesor);
                 break;
             default:        // 'Fecha'
                 dd(request()->method(), session('muestra', 'muestra sin asignar'), session('asesor', 'asesor sin asignar'));
@@ -162,8 +174,9 @@ class ReporteController extends Controller
         if (!(Auth::user()->is_admin) and (('Asesor' == $muestra) or ('Conexion' == $muestra))) {
             return redirect()->back();
         }
+        $dato = request()->all();
         $ZONA = Fecha::$ZONA;
-        
+        //dd(request()->method(), count($dato), $dato);
         if (Auth::user()->is_admin) {
             $asesor = session('asesor', 0);
             $users  = User::all()->where('id', '>', 1); // Todos los usuarios, excepto id=1.
@@ -171,20 +184,24 @@ class ReporteController extends Controller
             $asesor = Auth::user()->id;
         }
 
-        $fecha = 'fecha_reserva';
-        list($muestra, $fecha_desde, $fecha_hasta) = $this->prepararFechas($fecha,
-                                                                        $asesor, $muestra);
+        $fecha = 'fecha_firma';
+        list($muestra, $fecha_desde, $fecha_hasta, $asesor) =
+                    $this->prepararFechas($fecha, $asesor, $muestra);   // $muestra es obligatoria.
+        //dd($muestra, $fecha, $fecha_desde, $fecha_hasta, $asesor);
         $title = $this->title($muestra, $fecha, $fecha_desde, $fecha_hasta, $asesor);
-
+        //dd($muestra, $fecha, $fecha_desde, $fecha_hasta, $asesor);
         $hoy = Fecha::hoy()->format('d-m');
         $elemsRep = $this->elemsReporte($muestra, $fecha, $fecha_desde, $fecha_hasta, $asesor);
 
         if (is_null($fecha_desde))
             $fecha_desde = (new Carbon(Propiedad::min($fecha, $ZONA)))->startOfDay();
-//        else $fecha_desde = $fecha_desde->format('d/m/Y');
         if (is_null($fecha_hasta))
             $fecha_hasta = (new Carbon(Propiedad::max($fecha, $ZONA)))->endOfDay();
-//        else $fecha_hasta = $fecha_hasta->format('d/m/Y');
+        //dd($muestra, $fecha, $fecha_desde, $fecha_hasta, $asesor);
+
+        $fecha_desde = $fecha_desde->format('Y-m-d');
+        $fecha_hasta = $fecha_hasta->format('Y-m-d');
+
         session(['fecha_desde' => $fecha_desde, 'fecha_hasta' => $fecha_hasta,
                     'muestra' => $muestra, 'asesor' => $asesor]);
         return view('reportes.index', compact('title', 'users', 'elemsRep', 'chart', 'muestra',
@@ -211,8 +228,8 @@ class ReporteController extends Controller
             $asesor = Auth::user()->id;
         }
 
-        $fecha = 'fecha_reserva';
-        list($muestra, $fecha_desde, $fecha_hasta) =
+        $fecha = 'fecha_firma';
+        list($muestra, $fecha_desde, $fecha_hasta, $asesor) =
                                         $this->prepararFechas($fecha, $asesor);
         if (!isset($muestra)) $muestra = 'Asesor';
 
@@ -226,7 +243,7 @@ class ReporteController extends Controller
         $title = $this->title($muestra, $fecha, $fecha_desde, $fecha_hasta, $asesor);
         $legenda = $title;
 
-        if ('' == $tipo or $tipo == null) {
+        if ('' == $tipo or is_null($tipo)) {
             $tipo = 'line';
         }
 
@@ -308,7 +325,7 @@ class ReporteController extends Controller
         if (!(Auth::user()->is_admin)) {
             return redirect()->back();
         }
-        if ((0 == $id) or (null == $id)) {
+        if ((0 == $id) or (is_null($id))) {
             return redirect()->back();
         }
 
@@ -316,15 +333,17 @@ class ReporteController extends Controller
         $tipo = strtolower(substr($ruta, 18, strpos($ruta, '/', 18)-18));
         $title = $this->titulo . 'del ' . 'asesor' . ': ' . User::find($id)->name;
 
-        if ('' == $orden or $orden == null) {
+        if ('' == $orden or is_null($orden)) {
             $orden = 'id';
         }
         $tipoId   = $tipo . '_id';
-        $contactos = Contacto::where($tipoId, $id)->orderBy($orden)->paginate(10);
+        $contactos = Contacto::where($tipoId, $id)->orderBy($orden)->paginate($this->lineasXPagina);
 
 	    $rutRetorno = 'reporte.contactos' . ucfirst($tipo);
 	    $tipo .= 's';						// route 'users'
-        return view('reportes.contactos', compact('title', 'contactos', 'tipo', 'rutRetorno', 'id'));
+        $agente = new Agent();
+        $movil  = $agente->isMobile() and true;             // Fuerzo booleana. No funciona al usar el metodo directamente.
+        return view('reportes.contactos', compact('title', 'contactos', 'tipo', 'rutRetorno', 'id', 'movil'));
     }
 /*
     public function contactosXDeseo($id = 0, $orden = 'id')
@@ -335,7 +354,7 @@ class ReporteController extends Controller
         if (!(Auth::user()->is_admin)) {
             return redirect()->back();
         }
-        if ((0 == $id) or (null == $id)) {
+        if ((0 == $id) or (is_null($id))) {
             return redirect()->back();
         }
 
@@ -343,7 +362,7 @@ class ReporteController extends Controller
         $tipo = strtolower(substr($ruta, 18, strpos($ruta, '/', 18)-18));
         $title = $this->titulo . 'con el ' . $tipo . ': ' . Deseo::find($id)->descripcion;
 
-        if ('' == $orden or $orden == null) {
+        if ('' == $orden or is_null($orden)) {
             $orden = 'id';
         }
         $tipoId   = $tipo . '_id';
@@ -361,7 +380,7 @@ class ReporteController extends Controller
         if (!(Auth::user()->is_admin)) {
             return redirect()->back();
         }
-        if ((0 == $id) or (null == $id)) {
+        if ((0 == $id) or is_null($id)) {
             return redirect()->back();
         }
 
@@ -369,7 +388,7 @@ class ReporteController extends Controller
         $tipo = strtolower(substr($ruta, 18, strpos($ruta, '/', 18)-18));
         $title = $this->titulo . 'con la ' . $tipo . ': ' . Tipo::find($id)->descripcion;
 
-        if ('' == $orden or $orden == null) {
+        if ('' == $orden or is_null($orden)) {
             $orden = 'id';
         }
 	    $tipoId = $tipo . '_id';
@@ -387,7 +406,7 @@ class ReporteController extends Controller
         if (!(Auth::user()->is_admin)) {
             return redirect()->back();
         }
-        if ((0 == $id) or (null == $id)) {
+        if ((0 == $id) or is_null($id)) {
             return redirect()->back();
         }
 
@@ -395,7 +414,7 @@ class ReporteController extends Controller
         $tipo = strtolower(substr($ruta, 18, strpos($ruta, '/', 18)-18));
         $title = $this->titulo . 'en la ' . $tipo . ': ' . Zona::find($id)->descripcion;
 
-        if ('' == $orden or $orden == null) {
+        if ('' == $orden or is_null($orden)) {
             $orden = 'id';
         }
 	    $tipoId = $tipo . '_id';
@@ -413,7 +432,7 @@ class ReporteController extends Controller
         if (!(Auth::user()->is_admin)) {
             return redirect()->back();
         }
-        if ((0 == $id) or (null == $id)) {
+        if ((0 == $id) or is_null($id)) {
             return redirect()->back();
         }
 
@@ -421,7 +440,7 @@ class ReporteController extends Controller
         $tipo = strtolower(substr($ruta, 18, strpos($ruta, '/', 18)-18));
         $title = $this->titulo . 'con el ' . $tipo . ': ' . Precio::find($id)->descripcion;
 
-        if ('' == $orden or $orden == null) {
+        if ('' == $orden or is_null($orden)) {
             $orden = 'id';
         }
 	    $tipoId = $tipo . '_id';
@@ -439,7 +458,7 @@ class ReporteController extends Controller
         if (!(Auth::user()->is_admin)) {
             return redirect()->back();
         }
-        if ((0 == $id) or (null == $id)) {
+        if ((0 == $id) or is_null($id)) {
             return redirect()->back();
         }
 
@@ -447,7 +466,7 @@ class ReporteController extends Controller
         $tipo = strtolower(substr($ruta, 18, strpos($ruta, '/', 18)-18));
         $title = $this->titulo . 'con ' . $tipo . ': ' . Origen::find($id)->descripcion;
 
-        if ('' == $orden or $orden == null) {
+        if ('' == $orden or is_null($orden)) {
             $orden = 'id';
         }
 	    $tipoId = $tipo . '_id';
@@ -465,7 +484,7 @@ class ReporteController extends Controller
         if (!(Auth::user()->is_admin)) {
             return redirect()->back();
         }
-        if ((0 == $id) or (null == $id)) {
+        if ((0 == $id) or is_null($id)) {
             return redirect()->back();
         }
 
@@ -473,7 +492,7 @@ class ReporteController extends Controller
         $tipo = strtolower(substr($ruta, 18, strpos($ruta, '/', 18)-18));
         $title = $this->titulo . 'con el ' . $tipo . ': ' . Resultado::find($id)->descripcion;
 
-        if ('' == $orden or $orden == null) {
+        if ('' == $orden or is_null($orden)) {
             $orden = 'id';
         }
 	    $tipoId = $tipo . '_id';
@@ -491,7 +510,7 @@ class ReporteController extends Controller
         if (!(Auth::user()->is_admin)) {
             return redirect()->back();
         }
-        if ((0 == $id) or (null == $id)) {
+        if ((0 == $id) or is_null($id)) {
             return redirect()->back();
         }
 
@@ -500,11 +519,11 @@ class ReporteController extends Controller
 	$modelo = 'App\\' . ucfirst($tipo);
         $title = $this->titulo . 'con el ' . $tipo . ': ' . $modelo::find($id)->descripcion;
 
-        if ('' == $orden or $orden == null) {
+        if (('' == $orden) or is_null($orden)) {
             $orden = 'id';
         }
 	    $tipoId = $tipo . '_id';
-        $contactos = Contacto::where($tipoId, $id)->orderBy($orden)->paginate(10);
+        $contactos = Contacto::where($tipoId, $id)->orderBy($orden)->paginate($this->lineasXPagina);
 
 	    $rutRetorno = 'reporte.contactos' . substr($modelo, 4);
         $agente = new Agent();
@@ -520,24 +539,42 @@ class ReporteController extends Controller
         if (!(Auth::user()->is_admin)) {
             return redirect()->back();
         }
-        if ((0 == $id) or (null == $id)) {
+        if ((0 == $id) or is_null($id)) {
             return redirect()->back();
         }
 
         $ruta = request()->path();
         $tipo = strtolower(substr($ruta, 20, strpos($ruta, '/', 20)-20));
-	$modelo = 'App\\' . ucfirst($tipo);
+	    $modelo = 'App\\' . ucfirst($tipo);
         $title = $this->titProp . 'con ' . $tipo . ': ' . $modelo::find($id)->descripcion;
 
-        if ('' == $orden or $orden == null) {
+        if ('' == $orden or is_null($orden)) {
             $orden = 'id';
         }
 	    $tipoId = $tipo . '_id';
-        $propiedades = Propiedad::where($tipoId, $id)->orderBy($orden)->paginate(10);
+        $propiedades = Propiedad::where($tipoId, $id)->orderBy($orden);
 
 	    $rutRetorno = 'reporte.propiedades' . substr($modelo, 4);
         $agente = new Agent();
         $movil  = $agente->isMobile() and true;             // Fuerzo booleana. No funciona al usar el metodo directamente.
-        return view('reportes.propiedades', compact('title', 'propiedades', 'tipo', 'rutRetorno', 'id', 'movil'));
+        list ($filas, $tPrecio, $tLados, $tCompartidoConIva, $tFranquiciaSinIva,
+                $tFranquiciaConIva, $tFranquiciaPagarR, $tRegalia, $tSanaf5PorCiento,
+                $tOficinaBrutoReal, $tBaseHonorariosSo, $tBaseParaHonorari,
+                $tCaptadorPrbr, $tGerente, $tCerradorPrbr, $tBonificaciones,
+                $tComisionBancaria, $tIngresoNetoOfici, $tPrecioVentaReal,
+                $tCaptadorPrbrSel, $tCerradorPrbrSel, $tLadosCap, $tLadosCer,
+                $tPvrCaptadorPrbrSel, $tPvrCerradorPrbrSel) = Propiedad::totales($propiedades);
+        $propiedades = $propiedades->paginate($this->lineasXPagina);
+        //session(['orden' => $orden]);
+        return view('reportes.propiedades', compact('title', 'propiedades',
+                                'filas', 'tPrecio', 'tCompartidoConIva', 'tLados',
+                                'tFranquiciaSinIva', 'tFranquiciaConIva', 'tFranquiciaPagarR',
+                                'tRegalia', 'tSanaf5PorCiento', 'tOficinaBrutoReal',
+                                'tBaseHonorariosSo', 'tBaseParaHonorari', 'tIngresoNetoOfici',
+                                'tCaptadorPrbr', 'tGerente', 'tCerradorPrbr', 'tBonificaciones',
+                                'tComisionBancaria', 'tPrecioVentaReal', 'tCaptadorPrbrSel',
+                                'tCerradorPrbrSel', 'tLadosCap', 'tLadosCer',
+                                'tPvrCaptadorPrbrSel', 'tPvrCerradorPrbrSel',
+                                'tipo', 'rutRetorno', 'id', 'movil'));
     }
 }

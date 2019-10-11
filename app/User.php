@@ -45,6 +45,7 @@ class User extends Authenticatable
         'genero', 'edocivil',
         'comision_captador', 'comision_cerrador', 'comision',
         'pvr_captador', 'pvr_cerrador', 'precio_venta_real',
+        'puntos_captador', 'puntos_cerrador', 'puntos',
     ];
 
     public function contactos()    // user_id
@@ -173,7 +174,7 @@ class User extends Authenticatable
     public function getComisionCaptadorAttribute()
     {
         return round($this->captadorPropiedades()
-                    ->where('estatus', '!=', 'S')
+                    ->whereIn('estatus', ['P', 'C'])
                     ->get()
                     ->sum('captador_prbr'), 2);
     }
@@ -181,7 +182,7 @@ class User extends Authenticatable
     public function getComisionCerradorAttribute()
     {
         return round($this->cerradorPropiedades()
-                    ->where('estatus', '!=', 'S')
+                    ->whereIn('estatus', ['P', 'C'])
                     ->get()
                     ->sum('cerrador_prbr'), 2);
     }
@@ -192,10 +193,32 @@ class User extends Authenticatable
                     $this->getComisionCerradorAttribute(), 2);
     }
 
+    public function getPuntosCaptadorAttribute()
+    {
+        return round($this->captadorPropiedades()
+                    ->whereIn('estatus', ['P', 'C'])
+                    ->get()
+                    ->sum('puntos_captador'), 2);
+    }
+
+    public function getPuntosCerradorAttribute()
+    {
+        return round($this->cerradorPropiedades()
+                    ->whereIn('estatus', ['P', 'C'])
+                    ->get()
+                    ->sum('puntos_cerrador'), 2);
+    }
+
+    public function getPuntosAttribute()
+    {
+        return round($this->getPuntosCaptadorAttribute() +
+                    $this->getPuntosCerradorAttribute(), 2);
+    }
+
     public function getPvrCaptadorAttribute()
     {
         return round($this->captadorPropiedades()
-                    ->where('estatus', '!=', 'S')
+                    ->whereIn('estatus', ['P', 'C'])
                     ->get()
                     ->sum('pvr_captador_prbr'), 2);
     }
@@ -203,7 +226,7 @@ class User extends Authenticatable
     public function getPvrCerradorAttribute()
     {
         return round($this->cerradorPropiedades()
-                    ->where('estatus', '!=', 'S')
+                    ->whereIn('estatus', ['P', 'C'])
                     ->get()
                     ->sum('pvr_cerrador_prbr'), 2);
     }
@@ -224,7 +247,7 @@ class User extends Authenticatable
                     ->withCount(['captadorPropiedades as captadas',
                                 'cerradorPropiedades as cerradas' => function ($query)
                                         use ($fecha, $fecha_desde, $fecha_hasta) {  // 'use' permite heredar variables del scope del padre, donde el closure es definido.
-                            $query->where('estatus', '!=', 'S')
+                            $query->whereIn('estatus', ['P', 'C'])
                                   ->whereBetween($fecha, [$fecha_desde, $fecha_hasta]);
                     }]);
     }

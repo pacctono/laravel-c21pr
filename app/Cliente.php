@@ -5,6 +5,7 @@ namespace App;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\MisClases\Fecha;
+use App\MisClases\General;
 
 class Cliente extends Model
 {
@@ -12,11 +13,11 @@ class Cliente extends Model
 
     protected $fillable = [
         'cedula', 'rif', 'name', 'telefono',
-        'user_id', 'email', 'direccion', 'observaciones',
+        'user_id', 'email', 'fecha_nacimiento', 'direccion', 'observaciones',
         'user_actualizo', 'user_borro'
     ];
     protected $dates = [
-        'created_at', 'updated_at', 'deleted_at'
+        'fecha_nacimiento', 'created_at', 'updated_at', 'deleted_at'
     ];
 
     public function user()    // user_id
@@ -27,6 +28,31 @@ class Cliente extends Model
     public function propiedades()    // cliente_id
     {
         return $this->hasMany(Propiedad::class); // Si llave foranea, diferente a esperada, usamos 2do parametro.
+    }
+
+    public function getCedulaFAttribute()     // Cedula formateado.
+    {
+        return General::enteroEn($this->cedula);
+    }
+
+    public function getRifFAttribute()     // Cedula formateado.
+    {
+        return General::rifF($this->rif);
+    }
+
+    public function getTelefonoFAttribute()
+    {
+        return General::telefonoF($this->telefono);
+    }
+
+    public function getFechaNacimientoEnAttribute()
+    {
+        return General::fechaEn($this->fecha_nacimiento);
+    }
+
+    public function getFechaNacimientoBdAttribute()
+    {
+        return General::fechaBd($this->fecha_nacimiento);
     }
 
     public static function propiedadesBorradas($id)

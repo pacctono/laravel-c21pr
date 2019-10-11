@@ -3,22 +3,21 @@
 namespace App\Http\Controllers;
 
 use App\Cliente;
-use App\Deseo;
-use App\Origen;
-use App\Precio;
-use App\Tipo;
-use App\Resultado;
-use App\Zona;
 use App\Venezueladdn;
 use App\User;
+use App\Bitacora;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;        // PC
 use Carbon\Carbon;                          // PC
-use App\MisClases\Fecha;
+use Jenssegers\Agent\Agent;                 // PC
+use App\MisClases\Fecha;                    // PC
+use App\MisClases\General;                  // PC
 
 class ClienteController extends Controller
 {
-    protected $tipo = 'Contactos Iniciales';
+    protected $tipo = 'Cliente';
+    protected $tipoPlural = 'Clientes';
+    protected $lineasXPagina = General::LINEASXPAGINA;
     /**
      * Display a listing of the resource.
      *
@@ -29,24 +28,35 @@ class ClienteController extends Controller
         if (!(Auth::check())) {
             return redirect('login');
         }
-
-        $title = 'Listado de ' . $this->tipo;
-        $ruta = request()->path();
         $diaSemana = Fecha::$diaSemana;
 
-        if ('' == $orden or $orden == null) {
+        $title = 'Listado de ' . $this->tipoPlural;
+        $ruta = request()->path();
+
+// En caso de volver luego de haber enviado un correo, ver el metodo 'emailcita', en AgendaController.
+        $alertar = 0;
+        if ('alert' == $orden) {
+            $orden = '';
+            $alertar = 1;
+        }        
+        if ('' == $orden or is_null($orden)) {
             $orden = 'id';
         }
-        if (1 == Auth::user()->is_admin) {
-            $clientes = Cliente::orderBy($orden)->paginate(10);
-        } else {
-            $clientes = User::find(Auth::user()->id)->clientes()->whereNull('user_borro')->orderBy($orden)->paginate(10);
-            //return redirect('/clientes/create');
-        }
-    
-        //dd(Auth::user()->id);
 
-        return view('clientes.index', compact('title', 'clientes', 'ruta', 'diaSemana'));
+        $agente = new Agent();
+        $movil  = $agente->isMobile() and true;             // Fuerzo booleana. No funciona al usar el metodo directamente.
+
+        if (Auth::user()->is_admin) {
+            $clientes = Cliente::orderBy($orden);
+        } else {
+            $clientes = Cliente::whereNull('user_borro')->orderBy($orden);
+        }
+        if ($movil) $clientes = $clientes->get();
+        else $clientes = $clientes->paginate($this->lineasXPagina);
+
+        session(['orden' => $orden]);
+        return view('clientes.index',
+                    compact('title', 'clientes', 'ruta', 'diaSemana', 'alertar', 'movil'));
     }
 
     public function filtro($filtro)
@@ -58,7 +68,7 @@ class ClienteController extends Controller
         $title = 'Listado de ' . $this->tipo;
         $ruta = request()->path();
 
-        if ('' == $filtro or $filtro == null) {
+        if ('' == $filtro or is_null($filtro)) {
             $filtro = 'created_at';
         }
         if (1 == Auth::user()->is_admin) {
@@ -84,18 +94,17 @@ class ClienteController extends Controller
             return redirect('login');
         }
 
+        $rutaPrevia = redirect()->getUrlGenerator()->previous();
         $title = 'Crear ' . $this->tipo;
-        $deseos = Deseo::all();
-        $origenes = Origen::all();
-        $precios = Precio::all();
-        $tipos = Tipo::all();
-        $resultados = Resultado::all();
-        $zonas = Zona::all();
+        $orden = session('orden', 'id');
+        if (0 < stripos($rutaPrevia, '?page'))
+            $nroPagina = substr($rutaPrevia, stripos($rutaPrevia, '?page'));
+        else $nroPagina ='';
         $ddns = Venezueladdn::distinct()->get(['ddn'])->all();
 
-        return view('clientes.create', compact(
-            'title', 'deseos', 'origenes', 'precios',
-            'tipos', 'resultados', 'zonas', 'ddns'));
+        $exito = session('exito', '');
+        session(['exito' => '']);
+        return view('clientes.create', compact('title', 'ddns', 'exito', 'orden', 'nroPagina'));
     }
 
     /**
@@ -108,62 +117,43 @@ class ClienteController extends Controller
     {
         //dd($request);
         $data = request()->validate([   // Si ocurre error, laravel nos envia al url anterior.
+            'cedula' => '',
+            'rif' => '',
             'name' => 'required',
             'ddn' => '',
             'telefono' => '',
             'email' => ['sometimes', 'nullable', 'email'],
+            'fecha_nacimiento' => '',
             'direccion' => '',
-            'deseo_id' => 'required',
-            'tipo_id' => 'required',
-            'zona_id' => 'required',
-            'precio_id' => 'required',
-            'origen_id' => 'required',
-            'resultado_id' => 'required',
             'observaciones' => '',
         ], [
             'name.required' => 'El campo nombre es obligatorio.',
             'email.email' => 'Debe suministrar un correo elctrónico válido.',
-            'deseo_id.required' => 'El deseo del cliente es obligatorio suministrarlo.',
-            'tipo_id.required' => 'El tipo de tipo es obligatorio suministrarlo.',
-            'zona_id.required' => 'La zona de la tipo es obligatorio suministrarla.',
-            'precio_id.required' => 'El precio de la tipo es obligatorio suministrarlo.',
-            'origen_id.required' => 'El origen de como conocio de nuestra oficina es obligatorio suministrarlo.',
-            'resultado_id.required' => 'El resultado de la conversación con el cliente es obligatorio suministrarlo.',
         ]);
 
-        //$data['user_id'] = Auth::user()->id;
-        //$data['user_id'] = intval($data['user_id']);
         //dd($data);
-
         if ('' != $data['ddn'] and '' != $data['telefono']) {
             $data['telefono'] = $data['ddn'] . $data['telefono'];
         } else {
             $data['telefono'] = '';
         }
         unset($data['ddn']);
-        $data['veces_name'] = Cliente::ofVeces($data['name'], 'name') + 1;
-        $data['veces_telefono'] = Cliente::ofVeces($data['telefono'], 'telefono') + 1;
-        $data['veces_email'] = Cliente::ofVeces($data['email'], 'email') + 1;
 
         Cliente::create([
+            'cedula' => $data['cedula'],
+            'rif' => $data['rif'],
             'name' => $data['name'],
-            'veces_name' => $data['veces_name'],
             'telefono' => $data['telefono'],
-            'veces_telefono' => $data['veces_telefono'],
             'user_id' => Auth::user()->id,
             'email' => $data['email'],
-            'veces_email' => $data['veces_email'],
+            'fecha_nacimiento' => $data['fecha_nacimiento'],
             'direccion' => $data['direccion'],
-            'deseo_id' => $data['deseo_id'],
-            'tipo_id' => $data['tipo_id'],
-            'zona_id' => $data['zona_id'],
-            'precio_id' => $data['precio_id'],
-            'origen_id' => $data['origen_id'],
-            'resultado_id' => $data['resultado_id'],
             'observaciones' => $data['observaciones']
         ]);
 
         //return redirect('usuarios');
+        session(['exito' => "El cliente '" . $data['name'] .
+                            "' fue agregado con exito."]);
         return redirect()->route('clientes.create');
     }
 
@@ -179,17 +169,17 @@ class ClienteController extends Controller
             return redirect('login');
         }
         $diaSemana = Fecha::$diaSemana;
+        $orden = session('orden', 'id');
+        $rutaPrevia = redirect()->getUrlGenerator()->previous();
+        if (0 < stripos($rutaPrevia, '?page'))
+            $nroPagina = substr($rutaPrevia, stripos($rutaPrevia, '?page'));
+        else $nroPagina ='';
 
-        if (1 == Auth::user()->is_admin) {
-            return view('clientes.show', compact('cliente', 'diaSemana'));
-        }
-        if ($cliente->user_borro != null) {
-            return redirect('/clientes');
-        }
-        if ($cliente->user->id == Auth::user()->id) {
-            return view('clientes.show', compact('cliente', 'diaSemana'));
+        if ((Auth::user()->is_admin) or
+            (is_null($cliente->user_borro) and ($cliente->user->id == Auth::user()->id))) {
+            return view('clientes.show', compact('cliente', 'diaSemana', 'orden', 'nroPagina'));
         } else {
-            return redirect('/clientes');
+            return redirect()->back();
         }
     }
 
@@ -204,15 +194,23 @@ class ClienteController extends Controller
         if (!(Auth::check())) {
             return redirect('login');
         }
-        if ($cliente->user_borro != null) {
+        if (!(is_null($cliente->user_borro))) {     // Los registros borrados no se editan.
             return redirect('/clientes');
         }
 
         $title = 'Editar ' . $this->tipo;
+        $orden = session('orden', 'id');
+        $rutaPrevia = redirect()->getUrlGenerator()->previous();
+        if (0 < stripos($rutaPrevia, '?page'))
+            $nroPagina = substr($rutaPrevia, stripos($rutaPrevia, '?page'));
+        else $nroPagina ='';
+
         $ddns = Venezueladdn::distinct()->get(['ddn'])->all();
 
-        if ((1 == Auth::user()->is_admin) or ($cliente->user->id == Auth::user()->id)) {
-            return view('clientes.edit', ['cliente' => $cliente, 'title' => $title, 'ddns' => $ddns]);
+        //dd($cliente);
+        if ((Auth::user()->is_admin) or ($cliente->user->id == Auth::user()->id)) { // Ver arriba para filas borradas.
+            return view('clientes.edit', ['cliente' => $cliente, 'title' => $title,
+                        'ddns' => $ddns, 'orden' => $orden,'nroPagina' => $nroPagina]);
         }
         return redirect('/clientes');
     }
@@ -227,10 +225,13 @@ class ClienteController extends Controller
     public function update(Request $request, Cliente $cliente)
     {
         $data = request()->validate([   // Si ocurre error, laravel nos envia al url anterior.
+            'cedula' => '',
+            'rif' => '',
             'name' => 'required',
             'ddn' => '',
             'telefono' => '',
             'email' => ['sometimes', 'nullable', 'email'],
+            'fecha_nacimiento' => '',
             'direccion' => '',
             'observaciones' => '',
         ], [
@@ -239,7 +240,6 @@ class ClienteController extends Controller
         ]);
 
         //dd($data);
-
         if ('' != $data['ddn'] and '' != $data['telefono']) {
             $data['telefono'] = $data['ddn'] . $data['telefono'];
         } else {
@@ -247,28 +247,23 @@ class ClienteController extends Controller
         }
         unset($data['ddn']);
 
-        foreach (['telefono', 'email', 'direccion', 'observaciones'] as $col) {
-            if ('' == $data[$col] or $data[$col] == null) {
+        foreach (['cedula', 'rif', 'telefono', 'email', 'fecha_nacimiento', 'direccion',
+                    'observaciones'] as $col) {
+            if ('' == $data[$col] or is_null($data[$col])) {
                 unset($data[$col]);
             }
         }
-/*        if ('' == $data['telefono'] or $data['telefono'] == null) {
-            unset($data['telefono']);
-        }
-        if ('' == $data['email'] or $data['email'] == null) {
-            unset($data['email']);
-        }
-        if ('' == $data['direccion'] or $data['direccion'] == null) {
-            unset($data['direccion']);
-        }
-        if ('' == $data['observaciones'] or $data['observaciones'] == null) {
-            unset($data['observaciones']);
-        }*/
         $data['user_actualizo'] = Auth::user()->id;
 
         //dd($data);
-
         $cliente->update($data);
+
+        Bitacora::create([
+            'user_id' => Auth::user()->id,
+            'tx_modelo' => 'Cliente',
+            'tx_data' => implode(';', $data),
+            'tx_tipo' => 'A',
+        ]);
 
         return redirect()->route('clientes.show', ['cliente' => $cliente]);
     }
@@ -285,19 +280,30 @@ class ClienteController extends Controller
             return redirect('login');
         }
 
-        if (1 != Auth::user()->is_admin) {
+        if (!Auth::user()->is_admin) {
             return redirect('/clientes');
         }
-        if ($cliente->user_borro != null) {
+        if (!(is_null($cliente->user_borro))) {
             return redirect()->route('clientes.show', ['cliente' => $cliente]);
         }
 
         $data['user_borro'] = Auth::user()->id;
+        $cliente->update($data);
         //$data['borrado_at'] = Carbon::now();
         //$data['borrado_at'] = new Carbon();
 
+        $datos = 'id:'.$cliente->id.', cedula:'.$cliente->cedula.', nombre:'.$cliente->name;
+
         $cliente->delete();
 
-        return redirect()->route('clientes.index');
+        Bitacora::create([
+            'user_id' => Auth::user()->id,
+            'tx_modelo' => 'Cliente',
+            'tx_data' => $datos,
+            'tx_tipo' => 'B',
+        ]);
+
+        //return redirect()->route('clientes.index');
+        return redirect()->back();
     }
 }

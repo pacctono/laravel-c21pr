@@ -25,7 +25,10 @@ class CaracteristicaSeeder extends Seeder
             'descripcion' => 'Amoblado',
         ]);
         Caracteristica::create([
-            'descripcion' => 'Completo',
+            'descripcion' => 'Equipado',
+        ]);
+        Caracteristica::create([
+            'descripcion' => 'Amoblado y equipado',
         ]);
     }
 }

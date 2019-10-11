@@ -72,8 +72,7 @@
                     <label class="control-label" for="fecha_firma">Firma</label>
                     <input type="date" class="form-control form-control-sm" name="fecha_firma"
                         id="fecha_firma" max="{{ now()->addWeeks(4)->format('d/m/Y') }}"
-                        value="{{ old('fecha_firma',
-                            ($propiedad->fecha_firma)?$propiedad->fecha_firma_bd:'') }}">
+                        value="{{ old('fecha_firma', $propiedad->fecha_firma_bd) }}">
                 </div>
             </div>
 
@@ -518,7 +517,7 @@
                         Actualizar Propiedad
                     </button>
                     <!-- a href="{{ action('PropiedadController@index') }}">Regresar al listado de usuarios</a -->
-                    <a href="{{ url('/propiedades') }}" class="btn btn-link">
+                    <a href="{{ url('/propiedades/orden/'.$orden).$nroPagina }}" class="btn btn-link">
                         Regresar al listado de propiedades
                     </a>
                 </div>

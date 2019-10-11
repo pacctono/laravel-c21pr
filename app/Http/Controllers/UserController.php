@@ -11,11 +11,13 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use Jenssegers\Agent\Agent;                 // PC
+use App\MisClases\General;               // PC
 
 class UserController extends Controller
 {
 
     protected $tipo = 'Asesor';
+    protected $lineasXPagina = General::LINEASXPAGINA;
 
     public function index($orden = null)
     {
@@ -36,13 +38,13 @@ class UserController extends Controller
             $orden = '';
             $alertar = 1;
         }
-        if ('' == $orden or $orden == null) {
+        if ('' == $orden or is_null($orden)) {
             $orden = 'id';
         }
         $agente = new Agent();
         $movil  = $agente->isMobile() and true;             // Fuerzo booleana. No funciona al usar el metodo directamente.
         if ($movil) $users = User::orderBy($orden)->get();
-        else $users = User::orderBy($orden)->paginate(10);
+        else $users = User::orderBy($orden)->paginate($this->lineasXPagina);
         //dd($users);
 
         return view('users.index', compact('title', 'users', 'alertar', 'movil'));
@@ -184,13 +186,20 @@ class UserController extends Controller
         }
         unset($data['ddn']);
 
-        if ($data['password'] != null) {
+        if (!(is_null($data['password']))) {
             $data['password'] = bcrypt($data['password']);
         } else {
             unset($data['password']);
         }
         //dd($data);
         $user->update($data);
+
+        Bitacora::create([
+            'user_id' => Auth::user()->id,
+            'tx_modelo' => 'User',
+            'tx_data' => $data,
+            'tx_tipo' => 'A',
+        ]);
 
         return redirect()->route('users.show', ['user' => $user]);
     }
@@ -206,12 +215,11 @@ class UserController extends Controller
                 $contacto->delete();
             }
         }
-        $usuario = Auth::user()->id;
         $datos = 'id:'.$user->id.', cedula:'.$user->cedula.', nombre:'.$user->name;
         $user->delete();
 
         Bitacora::create([
-            'user_id' => $usuario,
+            'user_id' => Auth::user()->id,
             'tx_modelo' => 'User',
             'tx_data' => $datos,
             'tx_tipo' => 'B',

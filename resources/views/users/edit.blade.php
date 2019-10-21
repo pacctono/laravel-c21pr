@@ -53,7 +53,7 @@
 
             <div class="form-group form-inline row my-0 py-0">
                 <label class="control-label" for="email">Correo electrónico personal</label>
-                <input class="form-control" type="email" size="100" maxlength="160" required
+                <input class="form-control" type="email" size="80" maxlength="160" required
                         name="email" id="email" placeholder="correo electronico"
                         value="{{ old('email', $user->email) }}">
             </div>
@@ -67,8 +67,9 @@
 
             <div class="form-group form-inline row my-0 py-0">
                 <label class="control-label" for="email_c21">Correo electrónico C21</label>
-                <input class="form-control" type="email" size="100" maxlength="160" name="email_c21" id="email_c21" 
-                        placeholder="correo electronico de Century 21" value="{{ old('email_c21', $user->email_c21) }}">
+                <input class="form-control" type="email" size="80" maxlength="160" name="email_c21"
+                id="email_c21" placeholder="correo electronico de Century 21"
+                value="{{ old('email_c21', $user->email_c21) }}">
             </div>
 
             <div class="form-group form-inline row bg-suave my-0 py-0">
@@ -85,32 +86,39 @@
                         value="{{ old('fecha_ingreso', ($user->fecha_ingreso)?$user->fecha_ingreso_bd:'') }}">
             </div>
 
-            <div class="form-row bg-suave my-0 py-0 d-flex">
+            <div class="form-row bg-suave my-0 py-0">
+                <div class="mx-3 px-2">
+                    <div>
+                        Sexo
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="sexo" id="fem"
+                                value="F" {{ (('F' == old('sexo', $user->sexo))?'checked':'') }}>
+                        <label class="form-check-label" for="fem">Femenino</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="sexo" id="masc"
+                                value="M" {{ (('M' == old('sexo', $user->sexo))?'checked':'') }}>
+                        <label class="form-check-label" for="masc">Masculino</label>
+                    </div>
+                </div>
                 <div class="col-lg-1">
-                    Sexo
+                    &nbsp;
                 </div>
-                <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="radio" name="sexo" id="fem"
-                            value="F" {{ (('F' == old('sexo', $user->sexo))?'checked':'') }}>
-                    <label class="form-check-label" for="fem">Femenino</label>
-                </div>
-                <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="radio" name="sexo" id="masc"
-                            value="M" {{ (('M' == old('sexo', $user->sexo))?'checked':'') }}>
-                    <label class="form-check-label" for="masc">Masculino</label>
-                </div>
-                <div class="col-lg-2">
-                    Estado civil
-                </div>
-                <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="radio" name="estado_civil" id="casado"
-                            value="C" {{ (('C' == old('sexo', $user->estado_civil))?'checked':'') }}>
-                    <label class="form-check-label" for="casado">Casado</label>
-                </div>
-                <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="radio" name="estado_civil" id="soltero"
-                            value="S" {{ (('S' == old('sexo', $user->estado_civil))?'checked':'') }}>
-                    <label class="form-check-label" for="soltero">Soltero</label>
+                <div class="mx-3 px-2">
+                    <div>
+                        Estado civil
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="estado_civil" id="casado"
+                                value="C" {{ (('C' == old('sexo', $user->estado_civil))?'checked':'') }}>
+                        <label class="form-check-label" for="casado">Casado</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="estado_civil" id="soltero"
+                                value="S" {{ (('S' == old('sexo', $user->estado_civil))?'checked':'') }}>
+                        <label class="form-check-label" for="soltero">Soltero</label>
+                    </div>
                 </div>
             </div>
 

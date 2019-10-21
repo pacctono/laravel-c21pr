@@ -14,6 +14,12 @@ class Agenda extends Model
     protected $dates = [
         'fecha_evento'
     ];
+    protected $hidden = [
+        'fecha_evento'
+    ];
+    protected $appends = [
+        'fecEve'
+    ];
     protected $table = 'vista_agenda';
 
     public function user()    // user_id
@@ -36,7 +42,7 @@ class Agenda extends Model
         return $query->where('contacto_id', $contacto);
     }
 
-    public function getEventoEnAttribute()
+    public function getFecEveAttribute()
     {
         if (null == $this->fecha_evento) return '';
         return $this->fecha_evento->format('d/m/Y');

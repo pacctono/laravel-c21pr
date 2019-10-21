@@ -1,5 +1,5 @@
   <div class="row my-0 py-0 mx-1 px-1">
-    TOTS: {{ $filas }} props
+    TOT.$s: {{ $filas }} props
     <span class="alert-success mx-1 px-1" title="Precio">
         {{ Prop::numeroVen($tPrecio, 0) }}</span>{{-- 'Prop' es un alias definido en config/app.php --}}
   @if (Auth::user()->is_admin)
@@ -80,7 +80,14 @@
   </div>
   <div class="row my-0 py-0 mx-1 px-1">
   @endif ((0 != $tCaptadorPrbrSel) || (0 != $tCerradorPrbr))
-    <span class="alert-info ml-1 mr-0 px-1">Tot Comision:</span>
+    <span class="alert-info ml-1 mr-0 px-1">Puntos:</span>
+    <span class="alert-success ml-0 mr-1 px-1" title="Total de puntos: Captado + Cerrado">
+        {{ Prop::numeroVen($tPuntos, 2) }}
+    @if ((0 < $tPuntosCaptador) or (0 < $tPuntosCerrador))
+        ({{ Prop::numeroVen($tPuntosCaptador+$tPuntosCerrador, 2) }})
+    @endif
+    </span>
+    <span class="alert-info ml-1 mr-0 px-1">Comision:</span>
     <span class="alert-success ml-0 mr-1 px-1" title="Total de comisiones: Captado + Cerrado">
         {{ Prop::numeroVen($tCaptadorPrbr+$tCerradorPrbr, 2) }}
     @if ((0 < $tCaptadorPrbrSel) or (0 < $tCerradorPrbrSel))
@@ -94,8 +101,14 @@
         {{ Prop::numeroVen($tPvrCaptadorPrbrSel+$tPvrCerradorPrbrSel, 2) }}
     </span>
   @endif ((0 < $tPvrCaptadorPrbrSel) || (0 < $tPvrCerradorPrbrSel))
+  @if ((0 < $tPuntosCaptador) or (0 < $tPuntosCerrador))
+    <span class="alert-info ml-1 mr-0 px-1">Puntos:</span>
+    <span class="alert-success ml-0 mr-1 px-1" title="Total de comisiones: Captado + Cerrado">
+            {{ Prop::numeroVen($tPuntosCaptador+$tPuntosCerrador, 2) }}
+    </span>
+  @endif ((0 < $tPuntosCaptador) or (0 < $tPuntosCerrador))
   @if ((0 < $tCaptadorPrbrSel) or (0 < $tCerradorPrbrSel))
-    <span class="alert-info ml-1 mr-0 px-1">Tot Comision:</span>
+    <span class="alert-info ml-1 mr-0 px-1">Comision:</span>
     <span class="alert-success ml-0 mr-1 px-1" title="Total de comisiones: Captado + Cerrado">
             {{ Prop::numeroVen($tCaptadorPrbrSel+$tCerradorPrbrSel, 2) }}
     </span>

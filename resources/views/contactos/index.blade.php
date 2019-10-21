@@ -86,7 +86,7 @@
             </td>
             <td>
                 {{ $contacto->creado_dia_semana }}
-                {{ $contacto->creado_en }}
+                {{ $contacto->creado }}
                 @if ('' != $contacto->user_borro and $contacto->user_borro != null)
                     [B]
                 @endif

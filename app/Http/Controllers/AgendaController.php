@@ -85,10 +85,10 @@ class AgendaController extends Controller
                 $agendas = $agendas->where('name', '!=', '');
             }
         } else {                            // El usuario (asesor) no es un administrador.
-            $user_id = Auth::user()->id;    // id de la usuario (asesor) conectado.
-            $asesorConectado = User::find($user_id);    // Consigue la clase App\User de la asesor conectado.
+            $asesor = Auth::user()->id;    // id de la usuario (asesor) conectado.
+            $asesorConectado = User::find($asesor);    // Consigue la clase App\User de la asesor conectado.
             $title  .= 'de ' . $asesorConectado->name;  // Titulo de la página de la Agenda.
-            $agendas = Agenda::where('user_id', $user_id)   // Solo el asesor conectado.
+            $agendas = Agenda::where('user_id', $asesor)   // Solo el asesor conectado.
                     ->select('fecha_evento', 'hora_evento', 'descripcion', 'name', 'telefono',
                                 'contacto_id', 'email', 'direccion');           // Solo estas columnas.
         }

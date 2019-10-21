@@ -16,6 +16,12 @@ class Turno extends Model
     protected $dates = [
         'turno', 'deleted_at', 'updated_at'
     ];
+    protected $hidden = [
+        'turno', 'deleted_at', 'updated_at'
+    ];
+    protected $appends = [
+        'fecTur',
+    ];
 
     public function user()    // user_id
     {
@@ -40,10 +46,10 @@ class Turno extends Model
     public function getTurnoFechaAttribute()
     {
         if (null == $this->turno) return '';    // No tiene sentido, pero.........
-        return $this->turno->timezone('America/Caracas')->format('d/m/Y');
+        return $this->turno->format('d/m/Y');
     }
 
-    public function getTurnoEnAttribute()
+    public function getFecTurAttribute()
     {
         if (null == $this->turno) return '';    // No tiene sentido, pero.........
         return ('08' == $this->turno->format('H'))?'Mañana':'Tarde';
@@ -52,13 +58,12 @@ class Turno extends Model
     public function getTurnoDiaSemanaAttribute()
     {
         if (null == $this->turno) return '';    // No tiene sentido, pero.........
-        return substr(Fecha::$diaSemana[$this->turno->timezone('America/Caracas')
-                        ->dayOfWeek], 0, 3);
+        return substr(Fecha::$diaSemana[$this->turno->dayOfWeek], 0, 3);
     }
 
     public function getTurnoConHoraAttribute()
     {
         if (null == $this->turno) return '';    // No tiene sentido, pero.........
-        return $this->turno->timezone('America/Caracas')->format('d/m/Y H:i a');
+        return $this->turno->format('d/m/Y H:i a');
     }
 }

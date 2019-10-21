@@ -218,7 +218,7 @@
 
     <footer class="footer">
       <div class="container">
-        <span class="text-muted">Piso 1, Centro Comercial Costanera Plaza I, Barcelona, 0281-416.0885.</span>
+        <span class="text-muted">Piso 1, Centro Comercial Costanera Plaza I, Barcelona, 0281-416.0885.&copy; Copyright 2019-</span>
       </div>
     </footer>
     @yield('js')

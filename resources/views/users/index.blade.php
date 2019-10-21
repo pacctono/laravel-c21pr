@@ -34,6 +34,7 @@
         @if (!$movil)
             <th scope="col">Correo</th>
         @if (Auth::user()->is_admin)
+            <th scope="col">Lados</th>
             <th scope="col">Comision</th>
             <th scope="col">Puntos</th>
         @endif
@@ -77,6 +78,16 @@
                 {{ $user->email }}
             </td>
         @if (Auth::user()->is_admin)
+            <td
+            @if (1 == $user->id)
+                title="Estos lados representan los 'lados' producidos por 'Otra oficina'">
+                <span class="float-right">0</span>
+            @else
+            >
+                <span class="float-right">{{ Prop::numeroVen($user->lados, 0) }}{{-- 'Prop' es un alias definido en config/app.php --}}
+                </span>
+            @endif (1 == $user->id)
+            </td>
             <td
             @if (1 == $user->id)
                 title="Este monto representa la 'comision' producida para 'Otra oficina'">

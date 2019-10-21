@@ -19,6 +19,12 @@ class Cliente extends Model
     protected $dates = [
         'fecha_nacimiento', 'created_at', 'updated_at', 'deleted_at'
     ];
+    protected $hidden = [
+        'created_at', 'updated_at', 'deleted_at', 'fecha_nacimiento',
+    ];
+    protected $appends = [
+        'fecNac', 'borrado', 'creado', 'actualizado',
+    ];
 
     public function user()    // user_id
     {
@@ -45,7 +51,7 @@ class Cliente extends Model
         return General::telefonoF($this->telefono);
     }
 
-    public function getFechaNacimientoEnAttribute()
+    public function getFecNacAttribute()
     {
         return General::fechaEn($this->fecha_nacimiento);
     }
@@ -87,4 +93,20 @@ class Cliente extends Model
     {
         return $query->where('user_id', $user);
     }
+
+    public function getCreadoAttribute()
+    {
+        return General::fechaEn($this->created_at, true);
+    }
+
+    public function getActualizadoAttribute()
+    {
+        return General::fechaEn($this->updated_at, true);
+    }
+
+    public function getBorradoAttribute()
+    {
+        return General::fechaEn($this->deleted_at, true);
+    }
+
 }

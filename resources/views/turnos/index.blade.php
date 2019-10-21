@@ -135,7 +135,7 @@
         {{ $turno->turno_fecha }}
       </td>
       <td>
-        {{ $turno->turno_en }}
+        {{ $turno->fec_tur }}
       </td>
     @if (Auth::user()->is_admin)
       <td>{{ $turno->user->name }}</td>

@@ -32,6 +32,7 @@ class User extends Authenticatable
      */
     protected $hidden = [
         'password', 'remember_token',
+        'created_at', 'updated_at', 'deleted_at', 'fecha_nacimiento', 'fecha_ingreso'
     ];
     protected $dates = [
         'created_at', 'updated_at', 'deleted_at', 'fecha_nacimiento', 'fecha_ingreso'
@@ -42,10 +43,12 @@ class User extends Authenticatable
         'activo' => 'boolean',
     ];
     protected $appends = [
-        'genero', 'edocivil',
-        'comision_captador', 'comision_cerrador', 'comision',
-        'pvr_captador', 'pvr_cerrador', 'precio_venta_real',
-        'puntos_captador', 'puntos_cerrador', 'puntos',
+        'fecNac', 'fecIng', 'genero', 'edoCivil',
+        'ladosCaptador', 'ladosCerrador', 'lados',
+        'comisionCaptador', 'comisionCerrador', 'comision',
+        'pvrCaptador', 'pvrCerrador', 'precioVentaReal',
+        'puntosCaptador', 'puntosCerrador', 'puntos',
+        'borrado', 'creado', 'actualizado',
     ];
 
     public function contactos()    // user_id
@@ -149,7 +152,7 @@ class User extends Authenticatable
                     }]);
     }
 
-    public function getFechaNacimientoEnAttribute()
+    public function getFecNacAttribute()
     {
         if (null == $this->fecha_nacimiento) return '';
         return $this->fecha_nacimiento->format('d/m/Y');
@@ -169,6 +172,28 @@ class User extends Authenticatable
         $fecha = (new Carbon($this->fecha_nacimiento, Fecha::$ZONA))->addYears($anos);
         if (now(Fecha::$ZONA) < $fecha) return $fecha;
         else return $fecha->addYears(1);
+    }
+
+    public function getLadosCaptadorAttribute()
+    {
+        return round($this->captadorPropiedades()
+                    ->whereIn('estatus', ['P', 'C'])
+                    ->get()
+                    ->count(), 2);
+    }
+
+    public function getLadosCerradorAttribute()
+    {
+        return round($this->cerradorPropiedades()
+                    ->whereIn('estatus', ['P', 'C'])
+                    ->get()
+                    ->count(), 2);
+    }
+
+    public function getLadosAttribute()
+    {
+        return round($this->getLadosCaptadorAttribute() +
+                    $this->getLadosCerradorAttribute(), 2);
     }
 
     public function getComisionCaptadorAttribute()
@@ -266,7 +291,7 @@ class User extends Authenticatable
 //                            ->get();
     }
 
-    public function getFechaIngresoEnAttribute()
+    public function getFecIngAttribute()
     {
         if (null == $this->fecha_ingreso) return '';
         return $this->fecha_ingreso->format('d/m/Y');
@@ -294,7 +319,7 @@ class User extends Authenticatable
         return $this[$fecha]->timezone(Fecha::$ZONA)->format('d/m/Y h:i a');
     }
 
-    public function getCreadoEnAttribute()
+    public function getCreadoAttribute()
     {
         return $this->created_at->timezone(Fecha::$ZONA)->format('d/m/Y');
     }
@@ -308,6 +333,18 @@ class User extends Authenticatable
     public function getCreadoConHoraAttribute()
     {
         return $this->created_at->timezone(Fecha::$ZONA)->format('d/m/Y H:i a');
+    }
+
+    public function getActualizadoAttribute()
+    {
+        if (null == $this->updated_at) return '';
+        return $this->updated_at->timezone(Fecha::$ZONA)->format('d/m/Y');
+    }
+
+    public function getBorradoAttribute()
+    {
+        if (null == $this->deleted_at) return '';
+        return $this->deleted_at->timezone(Fecha::$ZONA)->format('d/m/Y');
     }
 
     public function getEdadAttribute()
@@ -331,7 +368,7 @@ class User extends Authenticatable
         else return 'Ninguno';
     }
 
-    public function getEdocivilAttribute()
+    public function getEdoCivilAttribute()
     {
         if ('F' == $this->sexo) $ultLetra = 'a';
         elseif ('M' == $this->sexo) $ultLetra = 'o';

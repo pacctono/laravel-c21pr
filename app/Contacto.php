@@ -19,10 +19,13 @@ class Contacto extends Model
         'fecha_evento', 'observaciones', 'user_actualizo', 'user_borro'
     ];
     protected $dates = [        // Mutan a una instancia de Carbon.
-        'created_at',
-        'updated_at',
-        'deleted_at',
-        'fecha_evento'
+        'created_at', 'updated_at', 'deleted_at', 'fecha_evento'
+    ];
+    protected $hidden = [
+        'created_at', 'updated_at', 'deleted_at', 'fecha_evento'
+    ];
+    protected $appends = [
+        'fecEve', 'borrado', 'creado', 'actualizado',
     ];
 
     public function user()    // user_id
@@ -153,7 +156,7 @@ class Contacto extends Model
         return $this[$fecha]->timezone(Fecha::$ZONA)->format('d/m/Y h:i a');
     }
 
-    public function getCreadoEnAttribute()
+    public function getCreadoAttribute()
     {
         return $this->created_at->timezone(Fecha::$ZONA)->format('d/m/Y');
     }
@@ -177,7 +180,7 @@ class Contacto extends Model
                         ->format('%y años, %m meses y %d dias');
     }
 
-    public function getActualizadoEnAttribute()
+    public function getActualizadoAttribute()
     {
         return $this->updated_at->timezone(Fecha::$ZONA)->format('d/m/Y');
     }
@@ -193,7 +196,7 @@ class Contacto extends Model
         return $this->updated_at->timezone(Fecha::$ZONA)->format('d/m/Y h:i a');
     }
 
-    public function getBorradoEnAttribute()
+    public function getBorradoAttribute()
     {
         if (null == $this->deleted_at) return '';
         return $this->deleted_at->timezone(Fecha::$ZONA)->format('d/m/Y');
@@ -212,7 +215,7 @@ class Contacto extends Model
         return $this->deleted_at->timezone(Fecha::$ZONA)->format('d/m/Y h:i a');
     }
 
-    public function getEventoEnAttribute()
+    public function getFecEveAttribute()
     {
         if (null == $this->fecha_evento) return '';
         return $this->fecha_evento->format('d/m/Y');

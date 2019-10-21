@@ -210,7 +210,7 @@ class PropiedadController extends Controller
         if ($paginar) $propiedades = $propiedades->paginate($this->lineasXPagina);      // Pagina la impresión de 10 en 10
         else $propiedades = $propiedades->get();                      // Mostrar todos los registros.
 // Devolver las fechas sin la hora. Los diez primeros caracteres son: yyyy-mm-dd.
-        $cols = Propiedad::columnas();
+        $cols = General::columnas('propiedads');
         $arrEstatus = $cols['estatus']['opcion'];
         unset($cols);
         session(['fecha_desde' => $fecha_desde, 'fecha_hasta' => $fecha_hasta,    // Asignar valores en sesión.
@@ -228,10 +228,11 @@ class PropiedadController extends Controller
                 'tRegalia', 'tSanaf5PorCiento', 'tOficinaBrutoReal',
                 'tBaseHonorariosSo', 'tBaseParaHonorari', 'tIngresoNetoOfici',
                 'tCaptadorPrbr', 'tGerente', 'tCerradorPrbr', 'tBonificaciones',
-                'tComisionBancaria', 'tPrecioVentaReal', 'tCaptadorPrbrSel',
-                'tCerradorPrbrSel', 'tLadosCap', 'tLadosCer',
-                'tPvrCaptadorPrbrSel', 'tPvrCerradorPrbrSel', 'ruta',
-                'fecha_desde', 'fecha_hasta', 'arrEstatus', 'captador', 'cerrador',
+                'tComisionBancaria', 'tPrecioVentaReal', 'tPuntos',
+                'tCaptadorPrbrSel', 'tCerradorPrbrSel', 'tLadosCap', 'tLadosCer',
+                'tPvrCaptadorPrbrSel', 'tPvrCerradorPrbrSel',
+                'ruta', 'fecha_desde', 'fecha_hasta', 'arrEstatus',
+                'captador', 'cerrador', 'tPuntosCaptador', 'tPuntosCerrador',
                 'estatus', 'paginar'));
     }       // Final del metodo index.
 
@@ -245,7 +246,7 @@ class PropiedadController extends Controller
             return redirect()->back();
         }
 
-        Propiedad::grabarArchivo();
+        General::grabarArchivo();
 
         //return redirect('/propiedades');
         return redirect()->back();
@@ -270,7 +271,7 @@ class PropiedadController extends Controller
 //        dd($users[0]['name']);
         $users[0]['name'] = 'Asesor otra oficina';
 
-        $cols = Propiedad::columnas();
+        $cols = General::columnas('propiedads');
         $title = 'Crear ' . $this->tipo;
         $exito = session('exito', '');
         session(['exito' => '']);
@@ -412,7 +413,7 @@ class PropiedadController extends Controller
             $data['cliente_id'] = $cliente->id;
         }
 
-        $cols = Propiedad::columnas();
+        $cols = General::columnas('propiedads');
         Propiedad::create([
             'codigo' => $data['codigo'],
             'fecha_reserva' => $data['fecha_reserva'],
@@ -562,7 +563,7 @@ class PropiedadController extends Controller
         else $nroPagina = '';
         $orden = session('orden', 'id');
 
-        $cols = Propiedad::columnas();
+        $cols = General::columnas('propiedads');
         $title = 'Editar ' . $this->tipo;
         $users = User::get(['id', 'name']);     // Todos los usuarios (asesores).
         $users[0]['name'] = 'Asesor otra oficina';

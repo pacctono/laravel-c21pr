@@ -116,7 +116,7 @@ Estatus en sistema C21: {{ $propiedad->estatus_c21_alfa.(($propiedad->pagado_cas
         @else ($movil)
             <td>
                 <span title="Fecha de reserva">
-                    {{ $propiedad->reserva_en }}</span>
+                    {{ $propiedad->fec_res }}</span>
         @if (Auth::user()->is_admin)
                 <br>
         @else
@@ -124,7 +124,7 @@ Estatus en sistema C21: {{ $propiedad->estatus_c21_alfa.(($propiedad->pagado_cas
             <td>
         @endif (Auth::user()->is_admin)
                 <span title="Fecha de la firma">
-                    {{ $propiedad->firma_en }}</span>
+                    {{ $propiedad->fec_fir }}</span>
             </td>
 
             <td title="{{ $propiedad->negociacion_alfa }}">

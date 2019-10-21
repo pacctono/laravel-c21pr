@@ -28,12 +28,14 @@ class Kernel extends ConsoleKernel
         //          ->hourly();
         $schedule->command('grabar:archivo')
                     ->weekdays()->everyThirtyMinutes()
-                    ->between('9:00', '23:00')
-                    ->sendOutputTo('/home/pablo/salidas/cronLaravelGrabarArchivo.txt');
+                    ->between('9:00', '23:00');
+/*                    ->between('9:00', '23:00')
+                    ->sendOutputTo('/home/pablo/salidas/cronLaravelGrabarArchivo.txt');*/
         $schedule->command('grabar:archivo')
                     ->saturdays()->everyThirtyMinutes()
-                    ->between('9:00', '13:00')
-                    ->sendOutputTo('/home/pablo/salidas/cronLaravelGrabarArchivo.txt');
+                    ->between('9:00', '13:00');
+/*                    ->between('9:00', '13:00')
+                    ->sendOutputTo('/home/pablo/salidas/cronLaravelGrabarArchivo.txt');*/
     }
 
     /**

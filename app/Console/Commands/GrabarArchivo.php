@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 
-use App\Propiedad;
+use App\MisClases\General;
 use Illuminate\Console\Command;
 
 class GrabarArchivo extends Command
@@ -38,6 +38,6 @@ class GrabarArchivo extends Command
      */
     public function handle()
     {
-        Propiedad::grabarArchivo();
+        General::grabarArchivo();
     }
 }

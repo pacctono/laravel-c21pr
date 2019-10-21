@@ -35,7 +35,7 @@
         <div class="row my-1 py-1">
             <div class="mx-1 px-2">
                 Fecha de nacimiento:<span class="alert-info">
-                    {{ $cliente->fecha_nacimiento_en }}
+                    {{ $cliente->fec_nac }}
                 </span>
             </div>
         </div>

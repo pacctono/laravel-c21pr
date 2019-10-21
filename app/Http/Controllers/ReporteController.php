@@ -34,11 +34,12 @@ class ReporteController extends Controller
     protected $subTitulo1 = 'Contactos atendidos por ';
     protected $titulo = 'Listado de contactos iniciales ';
     protected $titProp = 'Listado de propiedades ';
-    protected $lineasXPagina = General::LINEASXPAGINA;
+    protected $lineasXPagina = General::LINEASXPAGINA;      // Constante en App\MisClases\General
 
     protected function prepararFechas($fecha, $asesor=0, $muestra=null)
     {
         $ZONA = Fecha::$ZONA;
+        $estadisticaPropiedad = General::estadisticaPropiedad;  // Constante en App\MisClases\General
 
         //dd(request()->method(), $muestra, $fecha, $asesor);
         if ('POST' == request()->method()) {
@@ -66,9 +67,7 @@ class ReporteController extends Controller
             $fecha_desde = Fecha::hoy();
             $fecha_hasta = Fecha::hoy()->addDays(30)->endOfDay();
             //dd('2', $muestra, $fecha, $fecha_desde, $fecha_hasta, $asesor);
-        } elseif (('Negociaciones' == $muestra) or
-                  ('Lados' == $muestra) or ('Comision' == $muestra) or
-                  ('LadMes' == $muestra) or ('ComMes' == $muestra)) {   // Se trabaja con Propiedades
+        } elseif (array_key_exists($muestra , $estadisticaPropiedad)) {
             $fecha_desde = (new Carbon(Propiedad::min($fecha, $ZONA)))->startOfDay();
             $fecha_hasta = (new Carbon(Propiedad::max($fecha, $ZONA)))->endOfDay();
             $asesor = 0;
@@ -83,7 +82,8 @@ class ReporteController extends Controller
 
         return array($muestra, $fecha_desde, $fecha_hasta, $asesor);
     }
-    protected function title($muestra, $fecha, $fecha_desde, $fecha_hasta, $asesor=0)
+    protected function title($muestra, $fecha, $fecha_desde, $fecha_hasta,
+                                $asesor=0, $modelo='App\\Propiedad')
     {
         $ZONA = Fecha::$ZONA;
 
@@ -117,11 +117,11 @@ class ReporteController extends Controller
 
         return $subTitulo1 . $subTitulo2 . ' desde ' .
                  ((is_null($fecha_desde))?
-                    (new Carbon(Propiedad::min($fecha, $ZONA)))->startOfDay()->format('d/m/Y'):
+                    (new Carbon($modelo::min($fecha, $ZONA)))->startOfDay()->format('d/m/Y'):
                     $fecha_desde->format('d/m/Y'))
                    . ' hasta ' .
                  ((is_null($fecha_hasta))?
-                    (new Carbon(Propiedad::max($fecha, $ZONA)))->endOfDay()->format('d/m/Y'):
+                    (new Carbon($modelo::max($fecha, $ZONA)))->endOfDay()->format('d/m/Y'):
                     $fecha_hasta->format('d/m/Y'));
 
     }
@@ -171,7 +171,7 @@ class ReporteController extends Controller
         if (!(Auth::check())) {
             return redirect('login');
         }
-        if (!(Auth::user()->is_admin) and (('Asesor' == $muestra) or ('Conexion' == $muestra))) {
+        if (!(Auth::user()->is_admin) and (('Fecha' != $muestra))) {
             return redirect()->back();
         }
         $dato = request()->all();
@@ -188,7 +188,12 @@ class ReporteController extends Controller
         list($muestra, $fecha_desde, $fecha_hasta, $asesor) =
                     $this->prepararFechas($fecha, $asesor, $muestra);   // $muestra es obligatoria.
         //dd($muestra, $fecha, $fecha_desde, $fecha_hasta, $asesor);
-        $title = $this->title($muestra, $fecha, $fecha_desde, $fecha_hasta, $asesor);
+        $estadisticaPropiedad = General::estadisticaPropiedad;  // Constante en App\MisClases\General
+        if (array_key_exists($muestra , $estadisticaPropiedad))         // Se trabaja con Propiedades
+            $modelo = 'App\\Propiedad';
+//        elseif (array_key_exists($muestra , $estadisticaContacto))    // Se trabaja con Contactos
+        else $modelo = 'App\\Contacto';
+        $title = $this->title($muestra, $fecha, $fecha_desde, $fecha_hasta, $asesor, $modelo);
         //dd($muestra, $fecha, $fecha_desde, $fecha_hasta, $asesor);
         $hoy = Fecha::hoy()->format('d-m');
         $elemsRep = $this->elemsReporte($muestra, $fecha, $fecha_desde, $fecha_hasta, $asesor);
@@ -233,14 +238,16 @@ class ReporteController extends Controller
                                         $this->prepararFechas($fecha, $asesor);
         if (!isset($muestra)) $muestra = 'Asesor';
 
-        if (!(Auth::user()->is_admin) and (('Asesor' == $muestra) or ('Conexion' == $muestra) or
-                                        ('Negociaciones' == $muestra) or ('Lados' == $muestra) or
-                                        ('Comision' == $muestra) or ('LadMes' == $muestra) or
-                                        ('ComMes' == $muestra))) {
+        if (!(Auth::user()->is_admin) and (('Fecha' != $muestra))) {
             return redirect()->back();
         }
 
-        $title = $this->title($muestra, $fecha, $fecha_desde, $fecha_hasta, $asesor);
+        $estadisticaPropiedad = General::estadisticaPropiedad;  // Constante en App\MisClases\General
+        if (array_key_exists($muestra , $estadisticaPropiedad))         // Se trabaja con Propiedades
+            $modelo = 'App\\Propiedad';
+//        elseif (array_key_exists($muestra , $estadisticaContacto))    // Se trabaja con Contactos
+        else $modelo = 'App\\Contacto';
+        $title = $this->title($muestra, $fecha, $fecha_desde, $fecha_hasta, $asesor, $modelo);
         $legenda = $title;
 
         if ('' == $tipo or is_null($tipo)) {
@@ -516,7 +523,7 @@ class ReporteController extends Controller
 
         $ruta = request()->path();
         $tipo = strtolower(substr($ruta, 18, strpos($ruta, '/', 18)-18));
-	$modelo = 'App\\' . ucfirst($tipo);
+	    $modelo = 'App\\' . ucfirst($tipo);
         $title = $this->titulo . 'con el ' . $tipo . ': ' . $modelo::find($id)->descripcion;
 
         if (('' == $orden) or is_null($orden)) {
@@ -561,9 +568,11 @@ class ReporteController extends Controller
                 $tFranquiciaConIva, $tFranquiciaPagarR, $tRegalia, $tSanaf5PorCiento,
                 $tOficinaBrutoReal, $tBaseHonorariosSo, $tBaseParaHonorari,
                 $tCaptadorPrbr, $tGerente, $tCerradorPrbr, $tBonificaciones,
-                $tComisionBancaria, $tIngresoNetoOfici, $tPrecioVentaReal,
+                $tComisionBancaria, $tIngresoNetoOfici, $tPrecioVentaReal, $tPuntos,
                 $tCaptadorPrbrSel, $tCerradorPrbrSel, $tLadosCap, $tLadosCer,
-                $tPvrCaptadorPrbrSel, $tPvrCerradorPrbrSel) = Propiedad::totales($propiedades);
+                $tPvrCaptadorPrbrSel, $tPvrCerradorPrbrSel,
+                $tPuntosCaptador, $tPuntosCerrador) =
+                Propiedad::totales($propiedades);
         $propiedades = $propiedades->paginate($this->lineasXPagina);
         //session(['orden' => $orden]);
         return view('reportes.propiedades', compact('title', 'propiedades',
@@ -572,9 +581,10 @@ class ReporteController extends Controller
                                 'tRegalia', 'tSanaf5PorCiento', 'tOficinaBrutoReal',
                                 'tBaseHonorariosSo', 'tBaseParaHonorari', 'tIngresoNetoOfici',
                                 'tCaptadorPrbr', 'tGerente', 'tCerradorPrbr', 'tBonificaciones',
-                                'tComisionBancaria', 'tPrecioVentaReal', 'tCaptadorPrbrSel',
-                                'tCerradorPrbrSel', 'tLadosCap', 'tLadosCer',
+                                'tComisionBancaria', 'tPrecioVentaReal', 'tPuntos',
+                                'tCaptadorPrbrSel', 'tCerradorPrbrSel', 'tLadosCap', 'tLadosCer',
                                 'tPvrCaptadorPrbrSel', 'tPvrCerradorPrbrSel',
+                                'tPuntosCaptador', 'tPuntosCerrador',
                                 'tipo', 'rutRetorno', 'id', 'movil'));
     }
 }

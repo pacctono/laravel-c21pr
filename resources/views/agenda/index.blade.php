@@ -1,4 +1,3 @@
-
 @extends('layouts.app')
 
 @section('content')
@@ -139,9 +138,9 @@
         {{ $agenda->evento_dia_semana }}
       @endif
       @if ($movil)
-        {{ substr($agenda->evento_en, 0, 5) }}
+        {{ substr($agenda->fec_eve, 0, 5) }}
       @else
-        {{ $agenda->evento_en }}
+        {{ $agenda->fec_eve }}
       @endif
       </td>
       <td>

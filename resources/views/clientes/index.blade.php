@@ -80,7 +80,7 @@
             </td>
             <td>{{ $cliente->email }}</td>
             <td>
-                {{ $cliente->fecha_nacimiento_en }}
+                {{ $cliente->fec_nac }}
             </td>
             @if (Auth::user()->is_admin)
             <td>{{ $cliente->user->name }}</td>
@@ -91,16 +91,25 @@
                     <span class="oi oi-eye"></span>
                 </a>
                 <a href="{{ route('clientes.edit', $cliente) }}" class="btn btn-link"
-                        title="Mostrar los datos de este cliente ({{ $cliente->name }}).">
+                    title="Editar los datos del cliente ({{ $cliente->name }})."
+                    onclick="return seguroEditar({{ $cliente->id }}, '{{ $cliente->name }}')">
                     <span class="oi oi-pencil"></span>
                 </a>
 
                 @if (Auth::user()->is_admin)
                 <form action="{{ route('clientes.destroy', $cliente) }}" method="POST"
-                        class="form-inline mt-0 mt-md-0"
-                        onSubmit="return confirm('Realmente, desea borrar (borrado lógico) los datos de este cliente de la base de datos?')">
+                        class="form-inline mt-0 mt-md-0" id="forma.{{ $cliente->id }}"
+                        name="forma.{{ $cliente->id }}"
+                        onSubmit="return seguroBorrar({{ $cliente->id }}, '{{ $cliente->name }}')">
                     {{ csrf_field() }}
                     {{ method_field('DELETE' )}}
+
+                    <input type="hidden" name="propiedades" id="propiedades.{{ $cliente->id }}"
+                            value="{{ $cliente->propiedades->count()-$cliente->propiedadesBorradas($cliente->id)->count() }}">
+                    <input type="hidden" name="propiedadesBorradas"
+                            id="propiedadesBorradas.{{ $cliente->id }}"
+                            value="{{ $cliente->propiedadesBorradas($cliente->id)->count() }}">
+
                     <button class="btn btn-link" title="Borrar (lógico) cliente.">
                         <span class="oi oi-trash" title="Borrar {{ $cliente->name }}"></span>
                     </button>
@@ -116,4 +125,36 @@
         <p>No hay clientes registrados.</p>
     @endif
 
+@endsection
+
+@section('js')
+<script>
+function seguroBorrar(id, nombre) {
+    var nroPropiedades         = document.getElementById('propiedades.'+id).value;
+    var nroPropiedadesBorradas = document.getElementById('propiedadesBorradas.'+id).value;
+
+    if (0 < nroPropiedades) {
+        alert("Este cliente: '" + nombre + "', ha sido asignado a <" + nroPropiedades +
+                            '> propiedades, por lo tanto, no puede borrar sus datos.');
+        return false;
+    }
+    if (0 < nroPropiedadesBorradas) {
+        return confirm("Este cliente: '" + nombre + "',  está en " + nroPropiedadesBorradas +
+                            " 'Propiedades borradas', esta seguro de querer borrar sus datos " + 
+                            '(incluyendo, los propiedades borradas) de la base de datos?');
+    }
+    return confirm("Realmente, desea borrar (borrado logico) los datos del cliente: '" + nombre +
+                     "', de la base de datos?");
+}
+function seguroEditar(id, nombre) {
+    var nroPropiedades         = document.getElementById('propiedades.'+id).value;
+    var nroPropiedadesBorradas = document.getElementById('propiedadesBorradas.'+id).value;
+
+    if ((0 < nroPropiedades) || (0 < nroPropiedadesBorradas)) {
+        return confirm("Realmente, desea cambiar los datos del cliente: '" + nombre +
+                     "', en la base de datos?");
+    }
+    return true;
+}
+</script>
 @endsection

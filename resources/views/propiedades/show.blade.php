@@ -20,10 +20,10 @@
 
     	<div class="row my-0 py-0 bg-suave">
             <div class="mx-1 px-2">
-                Fecha de Reserva:<span class="alert-info">{{ $propiedad->reserva_en }}</span>
+                Fecha de Reserva:<span class="alert-info">{{ $propiedad->fec_res }}</span>
             </div>
             <div class="mx-1 px-2">
-                Fecha de la firma:<span class="alert-info">{{ $propiedad->firma_en }}</span>
+                Fecha de la firma:<span class="alert-info">{{ $propiedad->fec_fir }}</span>
             </div>
         </div>
 

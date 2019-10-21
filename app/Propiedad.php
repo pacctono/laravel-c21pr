@@ -6,9 +6,9 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Support\Facades\Storage;     // PC
+//use Illuminate\Support\Facades\Storage;     // PC
 use App\MisClases\Fecha;
-use App\MisClases\Constantes;               // PC
+use App\MisClases\General;                  // PC
 
 class Propiedad extends Model
 {
@@ -34,6 +34,51 @@ class Propiedad extends Model
         'fecha_reserva', 'fecha_firma',
         'deleted_at', 'created_at', 'updated_at'
     ];
+    protected $hidden = [
+        'fecha_reserva', 'fecha_firma',
+        'negociacion', 'habitaciones', 'descripcion', 'direccion',
+        'codigo_postal', 'porc_franquicia', 'reportado_casa_nacional',
+        'porc_regalia', 'porc_compartido', 'porc_captador_prbr',
+        'porc_gerente', 'porc_cerrador_prbr', 'porc_bonificacion',
+        'comision_bancaria', 'numero_recibo',
+        'asesor_captador_id', 'asesor_captador', 'asesor_cerrador_id',
+        'asesor_cerrador', 'pago_gerente', 'factura_gerente', 'pago_asesores',
+        'factura_asesores', 'pago_otra_oficina', 'pagado_casa_nacional',
+        'estatus_sistema_c21', 'reporte_casa_nacional', 'comentarios', 'factura_AyS',
+        'deleted_at', 'created_at', 'updated_at',
+        'captador', 'cerrador'
+    ];
+    protected $appends = [
+        'fecRes', 'fecFir',
+        'negoc', 'habits', 'descr', 'direc',
+        'codPos', 'pcFrq', 'pcReCaNa',
+        'pcRega', 'pcCom', 'pcCap',
+        'pcGer', 'pcCer', 'pcBonif',
+        'comBanc', 'nroRec',
+        'asCapId', 'asCap', 'asCerId',
+        'asCer', 'pagGer', 'factGer', 'pagAses',
+        'factAse', 'pagOtOf', 'PagCaNa',
+        'estaC21', 'repCaNa', 'comens', 'factAyS',
+        'resSIva', 'resCIva', 'comCIva', 'comSIva',
+        'frqSIva', 'frqCIva', 'frqPaRe',
+        'regalia', 'sanaf5pc',
+        'ofBrRe', 'baHoSoc', 'baPaHon', 'bonific',
+        'capPrbr', 'cerPrbr', 'gerente', 'ingNeOf',
+        'pvrCap', 'pvrCer', 'prVeRe',
+        'ptsCap', 'ptsCer', 'puntos',
+/*        'reserva_sin_iva', 'reserva_con_iva',
+        'compartido_con_iva', 'compartido_sin_iva',
+        'franquicia_reservado_sin_iva', 'franquicia_reservado_con_iva',
+        'franquicia_pagar_reportada', 'regalia', 'sanaf5_por_ciento',
+        'oficina_bruto_real',
+        'base_honorarios_socios', 'base_para_honorarios',
+        'bonificaciones', 'captador_prbr', 'cerrador_prbr',
+        'gerente', 'ingreso_neto_oficina',
+        'pvr_captador_prbr', 'pvr_cerrador_prbr', 'precio_venta_real',
+        'puntos_captador', 'puntos_cerrador', 'puntos',*/
+        'borrado', 'creado', 'actualizado',
+    ];
+
     protected $META_2019 = 400000;
     protected $COMISION = 5.00;
     protected $IVA = 16.00;
@@ -177,7 +222,7 @@ class Propiedad extends Model
         return $this->fecha_reserva->format('Y-m-d');
     }
 
-    public function getReservaEnAttribute()
+    public function getFecResAttribute()
     {
         if (null == $this->fecha_reserva) return '';
         return $this->fecha_reserva->format('d/m/Y');
@@ -202,7 +247,7 @@ class Propiedad extends Model
         return $this->fecha_firma->format('Y-m-d');
     }
 
-    public function getFirmaEnAttribute()
+    public function getFecFirAttribute()
     {
         if (null == $this->fecha_firma) return '';
         return $this->fecha_firma->format('d/m/Y');
@@ -792,45 +837,6 @@ class Propiedad extends Model
         return collect($arrRetorno);
     }
 
-    public static function columnas()
-    {
-        $valores = DB::select("SELECT COLUMN_NAME, COLUMN_DEFAULT, IS_NULLABLE,
-                                        DATA_TYPE, COLUMN_TYPE, COLUMN_COMMENT
-                               FROM   INFORMATION_SCHEMA.COLUMNS
-                               WHERE  TABLE_NAME = 'propiedads'");
-        $cols = Array();
-        foreach($valores as $fila) {
-            if ('enum' == $fila->DATA_TYPE) {
-                $tipos = explode(',',           // Crea arreglo de los valores 'enum' separados por ,
-                    str_replace('"', '',                        // Elimina "s
-                        str_replace("'", "",                    // Elimina 's
-                            substr($fila->COLUMN_TYPE, 5, -1)   // Elimina enum( y )
-                        )
-                    )
-                );
-                if ((1 < strlen($fila->COLUMN_COMMENT)) and
-                    strpos($fila->COLUMN_COMMENT, ',', 1)) {
-                    $come = explode(',', $fila->COLUMN_COMMENT);
-                } else $come = $tipos;        // Esto solo debe ocurrir si la col es enum.
-                $tipo = Array();
-                for ($j=0; $j<count($tipos); $j++) {
-                    if ($j < count($come)) $tipo[$tipos[$j]] = $come[$j];
-                    else $tipo[$tipos[$j]] = 'S/DESC';
-                }
-            } else {
-                $tipo = $fila->COLUMN_TYPE;
-                $come = $fila->COLUMN_COMMENT;
-            }
-            $cols[$fila->COLUMN_NAME] = array(
-                'tipo' => $fila->DATA_TYPE,
-                'xdef' => $fila->COLUMN_DEFAULT,
-                'opcion' => $tipo,
-                'come' => $come,
-            );
-        }
-        return $cols;
-    }       // Final del metodo columnas.
-
     public static function totales($propiedads, $valido=True, $cap=0, $cer=0)
     {
         $propiedades = clone $propiedads;               // Los query modifican el arreglo propiedades.
@@ -909,202 +915,7 @@ class Propiedad extends Model
         return $arrRetorno;
     }   // totales
 
-    public static function grabarArchivo()
-    {
-        function nulo($valor, $def='') {
-            if (is_null($valor)) {
-                $valor = $def;
-            }
-            return $valor;
-        }
-        $users   = User::get();                     // Todos los usuarios (asesores).
-        $users[0]['name'] = 'Asesor otra oficina';
-        $propiedades = Propiedad::where('id', '>', 0);   // condición dummy, solo para continuar armando la consulta.
-
-        $totales = '';
-/*
- * Calculo de totales por 'asesor' (user).
- */
-        foreach ($users as $user) {
-            $props = clone $propiedades;               // Los query modifican el arreglo propiedades.
-            $props = $props->where('asesor_captador_id', $user->id)
-                        ->orWhere('asesor_cerrador_id', $user->id);
-            $arreglo = self::totales($props, True, $user->id, $user->id);
-            array_unshift($arreglo, 'A', $user->id);
-            $totales .= json_encode($arreglo) . "\n";
-        }
-/*
- * Calculo de totales por mes.
- */
-        $fecha = DB::select("SELECT DATE_FORMAT(fecha_firma, '%Y') AS Agno,
-                                    DATE_FORMAT(fecha_firma, '%m') AS Mes
-                             FROM   propiedads
-                            GROUP BY 1, 2");
-        $anoMes = Array();
-        foreach($fecha as $fila) {
-            if (array_key_exists($fila->Agno, $anoMes))
-                $anoMes[$fila->Agno][] = $fila->Mes;
-            else $anoMes[$fila->Agno][] = $fila->Mes;
-        }
-        foreach($anoMes as $agno=>$meses) {
-            foreach ($meses as $mes) {
-                $props = clone $propiedades;               // Los query modifican el arreglo propiedades.
-                if (is_null($agno) or is_null($mes)) {
-                    $props = $props->whereNull('fecha_firma');
-                } else {
-                    $props = $props->whereYear('fecha_firma', $agno)
-                                    ->whereMonth('fecha_firma', $mes);
-                }
-                $arreglo = self::totales($props);
-                if (is_null($agno) or is_null($mes)) {
-                    array_unshift($arreglo, 'M', FECHA::hoy()->format('Y') . '-' . '00');
-                } else {
-                    array_unshift($arreglo, 'M', $agno . '-' . $mes);
-                }
-                $totales .= json_encode($arreglo) . "\n";
-            }
-        }
-        //dd($totales);
-/*
- * Calculo de totales por 'estatus'. cols es usado, al final, para grabar las tablas.
- */
-        $cols = self::columnas();
-        $estatus = $cols['estatus']['opcion'];
-        foreach ($estatus as $op=>$desc) {
-            $props = clone $propiedades;               // Los query modifican el arreglo propiedades.
-            $props = $props->where('estatus', $op);
-            $arreglo = self::totales($props, False);
-            array_unshift($arreglo, 'E', $op);
-            $totales .= json_encode($arreglo) . "\n";
-        }
-        //dd($totales);
-/*
- * Calculo de totales por 'asesor' (user) y mes.
- */
-        foreach ($users as $user) {
-            foreach($anoMes as $agno=>$meses) {
-                foreach ($meses as $mes) {
-                    $props = clone $propiedades;               // Los query modifican el arreglo propiedades.
-                    if (is_null($agno) or is_null($mes)) {
-                        $props = $props->where(function ($Q) use ($user) {
-                                            $Q->where('asesor_captador_id', $user->id)
-                                                ->orWhere('asesor_cerrador_id', $user->id);
-                                        })
-                                        ->whereNull('fecha_firma');
-                    } else {
-                        $props = $props->where(function ($Q) use ($user) {
-                                            $Q->where('asesor_captador_id', $user->id)
-                                                ->orWhere('asesor_cerrador_id', $user->id);
-                                        })
-                                        ->whereYear('fecha_firma', $agno)
-                                        ->whereMonth('fecha_firma', $mes);
-                    }
-                    $arreglo = self::totales($props, True, $user->id, $user->id);
-                    if (is_null($agno) or is_null($mes)) {
-                        array_unshift($arreglo, 'AM', $user->id,
-                                            FECHA::hoy()->format('Y') . '-' . '00');
-                    } else {
-                        array_unshift($arreglo, 'AM', $user->id, $agno . '-' . $mes);
-                    }
-                    $totales .= json_encode($arreglo) . "\n";
-                }
-            }
-        }
-        //dd($totales);
-/*
- * Calculo de totales por mes y asesor (user).
- */
-        foreach($anoMes as $agno=>$meses) {
-            foreach ($meses as $mes) {
-                foreach ($users as $user) {
-                    $props = clone $propiedades;               // Los query modifican el arreglo propiedades.
-                    if (is_null($agno) or is_null($mes)) {
-                        $props = $props->where(function ($Q) use ($user) {
-                                            $Q->where('asesor_captador_id', $user->id)
-                                                ->orWhere('asesor_cerrador_id', $user->id);
-                                        })
-                                        ->whereNull('fecha_firma');
-                    } else {
-                        $props = $props->where(function ($Q) use ($user) {
-                                            $Q->where('asesor_captador_id', $user->id)
-                                                ->orWhere('asesor_cerrador_id', $user->id);
-                                        })
-                                        ->whereYear('fecha_firma', $agno)
-                                        ->whereMonth('fecha_firma', $mes);
-                    }
-                    $arreglo = self::totales($props, True, $user->id, $user->id);
-                    if (is_null($agno) or is_null($mes)) {
-                        array_unshift($arreglo, 'MA',
-                                            FECHA::hoy()->format('Y') . '-' . '00', $user->id);
-                    } else {
-                        array_unshift($arreglo, 'MA', $agno . '-' . $mes, $user->id);
-                    }
-                    $totales .= json_encode($arreglo) . "\n";
-                }
-            }
-        }
-        //dd($totales);
-/*
- * Calculo de totales generales.
- */
-        $arreglo = self::totales($propiedades);
-        array_unshift($arreglo, 'T', 'T');
-        $totales .= json_encode($arreglo) . "\n";
-        $propiedades = $propiedades->get();
-        $props       = '';
-        foreach ($propiedades as $p) {
-            $props .= json_encode(array ($p->id, $p->codigo, $p->reserva_en,
-                        $p->firma_en, $p->negociacion, $p->nombre,
-                        $p->tipo_id, $p->metraje, $p->habitaciones, $p->banos,
-                        $p->niveles, $p->puestos, $p->anoc, $p->caracteristica_id,
-                        $p->descripcion, $p->direccion, $p->ciudad_id, $p->codigo_postal,
-                        $p->municipio_id, $p->estado_id, $p->cliente_id,
-                        $p->estatus, $p->moneda, $p->precio, $p->comision,
-                        $p->reserva_sin_iva, $p->iva, $p->reserva_con_iva,
-                        $p->compartido_con_iva, $p->compartido_sin_iva,
-                        $p->lados, $p->franquicia_reservado_sin_iva,
-                        $p->franquicia_reservado_con_iva, $p->porc_franquicia,
-                        $p->franquicia_pagar_reportada, $p->reportado_casa_nacional,
-                        $p->porc_regalia, $p->porc_compartido, $p->regalia, $p->sanaf5_por_ciento,
-                        $p->oficina_bruto_real, $p->base_honorarios_socios,
-                        $p->base_para_honorarios, $p->asesor_captador_id,
-                        $p->asesor_captador, $p->porc_captador_prbr, $p->captador_prbr,
-                        $p->puntos_captador,
-                        $p->porc_gerente, $p->gerente, $p->asesor_cerrador_id,
-                        $p->asesor_cerrador, $p->porc_cerrador_prbr, $p->cerrador_prbr,
-                        $p->puntos_cerrador,
-                        $p->porc_bonificacion, $p->bonificaciones,
-                        nulo($p->comision_bancaria, 0), $p->ingreso_neto_oficina,
-                        $p->precio_venta_real, $p->puntos, nulo($p->numero_recibo),
-                        nulo($p->pago_gerente), nulo($p->factura_gerente),
-                        nulo($p->pago_asesores), nulo($p->factura_asesores),
-                        nulo($p->pago_otra_oficina), nulo($p->pagado_casa_nacional),
-                        nulo($p->estatus_sistema_c21),
-                        (($p->reporte_casa_nacional)?
-                                number_format($p->reporte_casa_nacional, 0, ',', '.'):''),
-                        nulo($p->factura_AyS), nulo($p->comentarios))) . "\n";
-        }
-        //dd($totales);
-        //dd($users);
-        $users = json_encode($users);
-/*
- * Estos archivos grabados con Storage seran guardados en 'storage/app/public'
- * Usando: composer artisan storage:link, se crea un enlace que permite acceder
- * los archivos desde public/storage
- */
-        $control = FECHA::hoy()->format('d-m-Y');
-        Storage::put('public/control.txt', $control);
-        Storage::put('public/asesores.txt', $users);
-        Storage::put('public/propiedades.txt', $props);
-        Storage::put('public/totales.txt', $totales);
-        foreach($cols as $nombCol => $arr) {
-            if ('enum' == $arr['tipo']) {
-                Storage::put('public/' . $nombCol . '.txt', json_encode($arr['opcion']));
-            }
-        }
-    }       // Final del metodo grabarArchivo.
-
-    public function getCreadoEnAttribute()
+    public function getCreadoAttribute()
     {
         return $this->created_at->timezone(Fecha::$ZONA)->format('d/m/Y');
     }
@@ -1128,8 +939,9 @@ class Propiedad extends Model
                         ->format('%y años, %m meses y %d dias');
     }
 
-    public function getActualizadoEnAttribute()
+    public function getActualizadoAttribute()
     {
+        if (null == $this->updated_at) return '';
         return $this->updated_at->timezone(Fecha::$ZONA)->format('d/m/Y');
     }
 
@@ -1144,7 +956,7 @@ class Propiedad extends Model
         return $this->updated_at->timezone(Fecha::$ZONA)->format('d/m/Y h:i a');
     }
 
-    public function getBorradoEnAttribute()
+    public function getBorradoAttribute()
     {
         if (null == $this->deleted_at) return '';
         return $this->deleted_at->timezone(Fecha::$ZONA)->format('d/m/Y');
@@ -1162,5 +974,152 @@ class Propiedad extends Model
         if (null == $this->deleted_at) return '';
         return $this->deleted_at->timezone(Fecha::$ZONA)->format('d/m/Y h:i a');
     }
-
+// Las proximas funciones seran utilizadas para la conversion en json y toArray.
+    public function getNegocAttribute() {
+        return $this->negociacion;
+    }
+    public function getHabitsAttribute() {
+        return $this->habitaciones;
+    }
+    public function getDescrAttribute() {
+        return $this->descripcion;
+    }
+    public function getDirecAttribute() {
+        return $this->direccion;
+    }
+    public function getCodPosAttribute() {
+        return $this->codigo_postal;
+    }
+    public function getPcFrqAttribute() {
+        return $this->porc_franquicia;
+    }
+    public function getPcReCaNaAttribute() {
+        return $this->reportado_casa_nacional;
+    }
+    public function getPcRegaAttribute() {
+        return $this->porc_regalia;
+    }
+    public function getPcComAttribute() {
+        return $this->porc_compartido;
+    }
+    public function getPcCapAttribute() {
+        return $this->porc_captador_prbr;
+    }
+    public function getPcGerAttribute() {
+        return $this->porc_gerente;
+    }
+    public function getPcCerAttribute() {
+        return $this->porc_cerrador_prbr;
+    }
+    public function getPcBonifAttribute() {
+        return $this->porc_bonificacion;
+    }
+    public function getComBancAttribute() {
+        return $this->comision_bancaria;
+    }
+    public function getNroRecAttribute() {
+        return $this->numero_recibo;
+    }
+    public function getAsCapIdAttribute() {
+        return $this->asesor_captador_id;
+    }
+    public function getAsCapAttribute() {
+        return $this->asesor_captador;
+    }
+    public function getAsCerIdAttribute() {
+        return $this->asesor_cerrador_id;
+    }
+    public function getAsCerAttribute() {
+        return $this->asesor_cerrador;
+    }
+    public function getPagGerAttribute() {
+        return $this->pago_gerente;
+    }
+    public function getFactGerAttribute() {
+        return $this->factura_gerente;
+    }
+    public function getPagAsesAttribute() {
+        return $this->pago_asesores;
+    }
+    public function getFactAseAttribute() {
+        return $this->factura_asesores;
+    }
+    public function getPagOtOfAttribute() {
+        return $this->pago_otra_oficina;
+    }
+    public function getPagCaNaAttribute() {
+        return $this->pagado_casa_nacional;
+    }
+    public function getEstaC21Attribute() {
+        return $this->estatus_sistema_c21;
+    }
+    public function getRepCaNaAttribute() {
+        return $this->reporte_casa_nacional;
+    }
+    public function getcomensAttribute() {
+        return $this->comentarios;
+    }
+    public function getfactAySAttribute() {
+        return $this->factura_AyS;
+    }
+    public function getResSIvaAttribute() {
+        return $this->getReservaSinIvaAttribute();
+    }
+    public function getResCIvaAttribute() {
+        return $this->getReservaConIvaAttribute();
+    }
+    public function getComCIvaAttribute() {
+        return $this->getCompartidoConIvaAttribute();
+    }
+    public function getComSIvaAttribute() {
+        return $this->getCompartidoSinIvaAttribute();
+    }
+    public function getFrqSIvaAttribute() {
+        return $this->getFranquiciaReservadoSinIvaAttribute();
+    }
+    public function getFrqCIvaAttribute() {
+        return $this->getFranquiciaReservadoConIvaAttribute();
+    }
+    public function getFrqPaReAttribute() {
+        return $this->getFranquiciaPagarReportadaAttribute();
+    }
+    public function getSanaf5pcAttribute() {
+        return $this->getSanaf5PorCientoAttribute();
+    }
+    public function getOfBrReAttribute() {
+        return $this->getOficinaBrutoRealAttribute();
+    }
+    public function getBaHoSocAttribute() {
+        return $this->getBaseHonorariosSociosAttribute();
+    }
+    public function getBaPaHonAttribute() {
+        return $this->getBaseParaHonorariosAttribute();
+    }
+    public function getBonificAttribute() {
+        return $this->getBonificacionesAttribute();
+    }
+    public function getCapPrbrAttribute() {
+        return $this->getCaptadorPrbrAttribute();
+    }
+    public function getCerPrbrAttribute() {
+        return $this->getCerradorPrbrAttribute();
+    }
+    public function getIngNeOfAttribute() {
+        return $this->getIngresoNetoOficinaAttribute();
+    }
+    public function getPvrCapAttribute() {
+        return $this->getPvrCaptadorPrbrAttribute();
+    }
+    public function getPvrCerAttribute() {
+        return $this->getPvrCerradorPrbrAttribute();
+    }
+    public function getPrVeReAttribute() {
+        return $this->getPrecioVentaRealAttribute();
+    }
+    public function getPtsCapAttribute() {
+        return $this->getPuntosCaptadorAttribute();
+    }
+    public function getPtsCerAttribute() {
+        return $this->getPuntosCerradorAttribute();
+    }
 }

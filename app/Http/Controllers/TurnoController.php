@@ -82,7 +82,8 @@ class TurnoController extends Controller
             $users   = User::all();         // Todos los usuarios. Incluye '1' porque en turnos hay feriado.
             $turnos = Turno::where('id', '>', 0);   // condición dummy, solo para continuar armando la consulta.
         } else {
-            $user   = User::find(Auth::user()->id);
+            $asesor = Auth::user()->id;
+            $user   = User::find($asesor);
             $title .= ' de ' . $user->name;
             $turnos = $user->turnos();
         }

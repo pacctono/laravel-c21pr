@@ -43,7 +43,7 @@
                 &nbsp;
             @else
             <span class={{ $clase }}>
-                {{ $user->fecha_nacimiento_en }}
+                {{ $user->fec_nac }}
                 ({{ $user->edad }} años)
             </span>
             @endif
@@ -68,7 +68,7 @@
                 &nbsp;
             @else
             <span class={{ $clase }}>
-                {{ $user->fecha_ingreso_en }}
+                {{ $user->fec_ing }}
                 ({{ $user->Tiempo_servicio }})
             </span>
             @endif
@@ -82,19 +82,36 @@
                 <span class={{ $clase }}>{{ $user->edocivil }}</span>
             </div>
         </div>
+        @if ($user->profesion)
     	<div class="row my-1 py-1">
             <div class="mx-1 px-2">
-                            
-        @if ($user->profesion)
                 Profesión:
                 <span class={{ $clase }}>{{ $user->profesion }}</span>
-        @endif
             </div>
         </div>
+        @endif
     	<div class="row my-1 py-1">
             <div class="mx-1 px-2">
                 Dirección:
                 <span class={{ $clase }}>{{ $user->direccion }}</span>
+            </div>
+        </div>
+    	<div class="row my-1 py-1">
+            <div class="mx-1 px-2">
+                Lados:
+                <span class={{ $clase }}>{{ $user->lados }}</span>
+            </div>
+        </div>
+    	<div class="row my-1 py-1">
+            <div class="mx-1 px-2">
+                comisi&oacute;n:
+                <span class={{ $clase }}>{{ $user->comision }}</span>
+            </div>
+        </div>
+    	<div class="row my-1 py-1">
+            <div class="mx-1 px-2">
+                Puntos:
+                <span class={{ $clase }}>{{ $user->puntos }}</span>
             </div>
         </div>
         @if (null != $fechaUltLogin)

@@ -8,11 +8,19 @@
         onSubmit="return alertaFechaRequerida()">
     {!! csrf_field() !!}
 
-    <input type="hidden" name="periodo" value="intervalo">
+    <div class="form-row my-0 py-0 mx-1 px-1">
+      <input type="hidden" name="periodo" value="intervalo">
+  @include('include.fechas')
+  @includeWhen(((Auth::user()->is_admin) and
+               (('Fecha' == $muestra) or ('Negociaciones' == $muestra) or
+                ('LadMes' == $muestra) or ('ComMes' == $muestra))),
+               'include.asesor', ['berater' => 'asesor']) {{-- Obligatorio berater (asesor en aleman) --}}
+  @include('include.botonMostrar')
+    </div>
+    {{--<input type="hidden" name="periodo" value="intervalo">
     <label>Desde:</label>
     <input type="date" name="fecha_desde" id="fecha_desde" min="{{ now() }}" max="{{ now() }}"
                     value="{{ old('fecha_desde', substr($fecha_desde, 0, 10)) }}">
-    {{-- $fecha_desde --}}
     <label>Hasta:</label>
     <input type="date" name="fecha_hasta" id="fecha_hasta" min="{{ now() }}" max="{{ now() }}"
                     value="{{ old('fecha_hasta', substr($fecha_hasta, 0, 10)) }}">
@@ -30,7 +38,7 @@
       @endforeach
     </select>
     @endif
-    <button type="submit" class="btn btn-success">Mostrar</button>
+    <button type="submit" class="btn btn-success">Mostrar</button>--}}
   </form>
   </div>
 
@@ -117,10 +125,18 @@
     </tr>
   </thead>
   <tbody>
+  {!! $impar = true; !!}
   @foreach ($elemsRep as $elemento)
     {{-- $loop->index, comienza desde 0, $loop-iteration, desde 1 --}}
     @if (0 == ($loop->index % 2))
-    <tr>
+    <tr class="
+    @if ($impar)
+        table-primary
+    @else
+        table-info
+    @endif
+    ">
+  {!! $impar = !$impar; !!}
     @endif
       <td>
     @if ('Fecha' == $muestra)

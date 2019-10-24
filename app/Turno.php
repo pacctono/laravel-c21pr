@@ -14,13 +14,13 @@ class Turno extends Model
         'turno', 'user_id', 'user_creo', 'user_actualizo', 'user_borro'
     ];
     protected $dates = [
-        'turno', 'deleted_at', 'updated_at'
+        'turno', 'deleted_at', 'updated_at', 'created_at'
     ];
     protected $hidden = [
-        'turno', 'deleted_at', 'updated_at'
+        'turno', 'deleted_at', 'updated_at', 'created_at'
     ];
     protected $appends = [
-        'fecTur',
+        'fecha', 'turnoFecha', 'creado'
     ];
 
     public function user()    // user_id
@@ -61,9 +61,23 @@ class Turno extends Model
         return substr(Fecha::$diaSemana[$this->turno->dayOfWeek], 0, 3);
     }
 
+    public function getFechaAttribute()
+    {
+        if (null == $this->turno) return '';
+        return $this->getTurnoDiaSemanaAttribute() . ', ' .
+                $this->getTurnoFechaAttribute() . ' ' .
+                $this->getFecTurAttribute();
+    }
+
     public function getTurnoConHoraAttribute()
     {
         if (null == $this->turno) return '';    // No tiene sentido, pero.........
         return $this->turno->format('d/m/Y H:i a');
     }
+
+    public function getCreadoAttribute()
+    {
+        return $this->created_at->timezone(Fecha::$ZONA)->format('d/m/Y');
+    }
+
 }

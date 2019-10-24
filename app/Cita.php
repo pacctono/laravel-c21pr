@@ -7,6 +7,10 @@ use App\MisClases\Fecha;
 
 class Cita extends Model
 {
+/*
+  Esta clase se usa para almacenar la información de las citas realizadas
+  con el contacto respectivo. O sea aqui se graba como termino la cita.
+ */
     protected $fillable = [
         'contacto_id', 'fecha_cita', 'comentarios'
     ];

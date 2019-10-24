@@ -25,7 +25,7 @@ class Contacto extends Model
         'created_at', 'updated_at', 'deleted_at', 'fecha_evento'
     ];
     protected $appends = [
-        'fecEve', 'borrado', 'creado', 'actualizado',
+        'fecha', 'fecEve', 'borrado', 'creado', 'actualizado',
     ];
 
     public function user()    // user_id
@@ -245,4 +245,12 @@ class Contacto extends Model
         if (null == $this->fecha_evento) return '';
         return $this->fecha_evento->format('H:i');
     }
+
+    public function getFechaAttribute()
+    {
+        if (null == $this->fecha_evento) return '';
+        return $this->getEventoDiaSemanaAttribute() . ', ' .
+                $this->getEventoConHoraAttribute();
+    }
+
 }

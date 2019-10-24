@@ -15,10 +15,10 @@ class Agenda extends Model
         'fecha_evento'
     ];
     protected $hidden = [
-        'fecha_evento'
+        'fecha_evento', 'hora_evento'
     ];
     protected $appends = [
-        'fecEve'
+        'fecEve', 'fecha'
     ];
     protected $table = 'vista_agenda';
 
@@ -46,6 +46,14 @@ class Agenda extends Model
     {
         if (null == $this->fecha_evento) return '';
         return $this->fecha_evento->format('d/m/Y');
+    }
+
+    public function getFechaAttribute()
+    {
+        if (null == $this->fecha_evento) return '';
+        return $this->getEventoDiaSemanaAttribute() . ', ' .
+                $this->getFecEveAttribute() .
+                (is_null($this->hora_evento)?'':' '.$this->hora_evento);
     }
 
     public function getEventoDiaSemanaAttribute()

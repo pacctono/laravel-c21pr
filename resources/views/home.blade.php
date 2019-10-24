@@ -39,7 +39,7 @@
         </ol>
         <div class="carousel-inner">
           <div class="carousel-item active">
-            <img class="first-slide" src="{{ (asset('img/fachadaConAsesores_201804.jpg')) }}"
+            <img class="first-slide" src="{{ (asset('img/imagen0.jpg')) }}"
                     alt="Primera slide" style="width:100%;height:600px;">
             <div class="container">
               <div class="carousel-caption text-left">
@@ -50,7 +50,7 @@
             </div>
           </div>
           <div class="carousel-item">
-            <img class="second-slide" src="{{ (asset('img/asesores.jpg')) }}"
+            <img class="second-slide" src="{{ (asset('img/imagen1.jpg')) }}"
                     alt="Segunda slide" style="width:100%;height:600px;">
             <div class="container">
               <div class="carousel-caption">
@@ -60,7 +60,7 @@
             </div>
           </div>
           <div class="carousel-item">
-            <img class="third-slide" src="{{ (asset('img/inauguracion1.jpg')) }}"
+            <img class="third-slide" src="{{ (asset('img/imagen2.jpg')) }}"
                     alt="Tercera slide" style="width:100%;height:600px;">
             <div class="container">
               <div class="carousel-caption text-right">
@@ -70,7 +70,7 @@
             </div>
           </div>
           <div class="carousel-item">
-            <img class="fourth-slide" src="{{ (asset('img/asesores_1roMayo-0.jpg')) }}"
+            <img class="fourth-slide" src="{{ (asset('img/imagen3.jpg')) }}"
                     alt="Cuarta slide" style="width:100%;height:600px;">
             <!-- div class="container">
               <div class="carousel-caption text-right">
@@ -80,7 +80,7 @@
             </div -->
           </div>
           <div class="carousel-item">
-            <img class="fith-slide" src="{{ (asset('img/asesores_1roMayo-1.jpg')) }}"
+            <img class="fith-slide" src="{{ (asset('img/imagen4.jpg')) }}"
                     alt="Quinta slide" style="width:100%;height:600px;">
             <!-- div class="container">
               <div class="carousel-caption text-right">

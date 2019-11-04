@@ -289,8 +289,8 @@ class PropiedadController extends Controller
         usort($clientes, "self::compararXNombre");
         $ddns = Venezueladdn::distinct()->get(['ddn'])->all();
         array_unshift($clientes, $otroCliente);
-//        return view((($movil)?'celular.createPropiedades':'propiedades.create'),
-        return view('propiedades.create',
+//        return view((($movil)?'celular.createPropiedades':'propiedades.crear'),
+        return view('propiedades.crear',
                     compact('title', 'users', 'tipos', 'ciudades', 'caracteristicas',
                     'municipios', 'estados', 'clientes', 'ddns', 'cols', 'exito'));
     }
@@ -310,6 +310,7 @@ class PropiedadController extends Controller
             'fecha_firma' => ['sometimes', 'nullable', 'date'],
             'negociacion' => 'required',
             'nombre' => 'required',
+            'exclusividad' => '',
             'tipo_id' => '',
             'metraje' => '',
             'habitaciones' => '',
@@ -420,6 +421,8 @@ class PropiedadController extends Controller
             'fecha_firma' => $data['fecha_firma'],
             'negociacion' => $data['negociacion'],
             'nombre' => $data['nombre'],
+            'exclusividad' => (isset($data['exclusividad']) and
+                                        ('on' == $data['exclusividad'])),
             'tipo_id' => (isset($data['tipo_id'])?$data['tipo_id']:$cols['tipo_id']['xdef']),
             'metraje' => (isset($data['metraje'])?$data['metraje']:null),
             'habitaciones' => (isset($data['habitaciones'])?$data['habitaciones']:null),
@@ -579,8 +582,8 @@ class PropiedadController extends Controller
             ($propiedad->asesor_cerrador_id == Auth::user()->id)) {
             $agente = new Agent();
             $movil  = $agente->isMobile() and true;             // Fuerzo booleana. No funciona al usar el metodo directamente.
-//            return view((($movil)?'celular.editPropiedades':'propiedades.edit'),
-            return view('propiedades.edit',
+//            return view((($movil)?'celular.editPropiedades':'propiedades.editar'),
+            return view('propiedades.editar',
 //                        ['propiedad' => $propiedad, 'users' => $users, 'cols' => $cols, 'title' => $title]);
                     compact('propiedad', 'title', 'users', 'tipos', 'ciudades', 'caracteristicas',
                             'municipios', 'estados', 'clientes', 'cols', 'orden', 'nroPagina'));
@@ -603,6 +606,7 @@ class PropiedadController extends Controller
             'fecha_firma' => ['sometimes', 'nullable', 'date'],
             'negociacion' => 'required',
             'nombre' => 'required',
+            'exclusividad' => '',
             'tipo_id' => '',
             'metraje' => '',
             'habitaciones' => '',
@@ -673,6 +677,10 @@ class PropiedadController extends Controller
 
         //print_r($data);
         if (!array_key_exists('estatus', $data)) $data['estatus'] = 'A';
+        if (!array_key_exists('exclusividad', $data))
+            $data['exclusividad'] = false;
+        elseif ('on' == $data['exclusividad'])
+            $data['exclusividad'] = true;
         if (!array_key_exists('pagado_casa_nacional', $data))
             $data['pagado_casa_nacional'] = false;
         elseif ('on' == $data['pagado_casa_nacional'])
@@ -685,7 +693,7 @@ class PropiedadController extends Controller
         Bitacora::create([
             'user_id' => Auth::user()->id,
             'tx_modelo' => 'Propiedad',
-            'tx_data' => $data,
+            'tx_data' => implode(';', $data),
             'tx_tipo' => 'A',
         ]);
 

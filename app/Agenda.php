@@ -9,7 +9,7 @@ class Agenda extends Model
 {
     protected $fillable = [
         'user_id', 'contacto_id', 'fecha_evento', 'hora_evento', 'descripcion',
-        'name', 'telefono', 'email', 'direccion'
+        'tipo', 'name', 'telefono', 'email', 'direccion'
     ];
     protected $dates = [
         'fecha_evento'

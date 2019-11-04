@@ -4,23 +4,15 @@
     <div class="card col-10">
         <h4 class="card-header">{{ $title }}</h4>
         <div class="card-body">
-        @if ($errors->any())
-        <div class="alert alert-danger">
-            <h5>Por favor corrige los errores debajo:</h5>
-            <ul>
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
-        @endif
+        @include('include.exitoCrear')
+        @include('include.errorData')
 
         <form method="POST" class="form-horizontal" action="{{ url($url) }}">
             {!! csrf_field() !!}
 
             <div class="form-group d-flex">
                 <label class="control-label col-sm-4" for="descripcion">Descripcion:</label>
-                <input type="text" class="form-control col-sm-5" size="30" maxlength="30"
+                <input type="text" class="form-control col-sm-5" size="60" maxlength="90"
                         name="descripcion" id="descripcion"
                         placeholder="descripcion del item" value="{{ old('descripcion') }}">
             </div>

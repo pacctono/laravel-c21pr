@@ -125,22 +125,24 @@
                             title="Motrar los datos personales de {{ $user->name }}">
                         <span class="oi oi-eye"></span>
                     </a>
-                    @if (1 < $user->id)
+                    @if ((1 == Auth::user()->id) or (1 < $user->id))
                     <a href="{{ route('users.edit', $user) }}" class="btn btn-link"
                             title="Editar los datos personales de {{ $user->name }}">
                         <span class="oi oi-pencil"></span>
                     </a>
+                    @if (Auth::user()->id != $user->id)
                     <button class="btn btn-link" title="Borrar este asesor. Mucho cuidado!!!">
                         <span class="oi oi-trash">
                         </span>
                     </button>
+                    @endif (Auth::user()->id != $user->id)
                     @if (0 < $user->contactos->count())
                     <a href="{{ route('agenda.emailcitas', $user) }}" class="btn btn-link"
                             title="Enviar correo a '{{ $user->name }}' con sus citas.">
                         <span class="oi oi-envelope-closed"></span>
                     </a>
-                    @endif
-                    @endif
+                    @endif (0 < $user->contactos->count())
+                    @endif ((1 == Auth::user()->id) or (1 < $user->id))
                 </form>
             </td>
         @endif (!$movil)

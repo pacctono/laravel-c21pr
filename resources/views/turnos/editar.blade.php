@@ -4,16 +4,7 @@
 <div class="card col-8">
     <h4 class="card-header">{{ $title }}</h4>
     <div class="card-body">
-    @if ($errors->any())
-    <div class="alert alert-danger">
-        <h5>Por favor corrige los errores debajo:</h5>
-        <ul>
-            @foreach ($errors->all() as $error)
-                <li>{{ $error }}</li>
-            @endforeach
-        </ul>
-    </div>
-    @endif
+    @include('include.errorData')
 
     <form method="POST" action="{{ url("/turnos/{$turno->id}") }}" id="forma-editar-turnos">
         {{ method_field('PUT') }}

@@ -140,7 +140,8 @@ class TurnoController extends Controller
             $dia[$d] = $fecha->addDays($d)->format('Y-m-d');    // Fecha de cada dia.
         }
 
-        $users = User::get(['id', 'name']);     // Todos los usuarios (asesores).
+        $users = User::where('activo', True)->where('socio', False)
+                        ->get(['id', 'name']);     // Todos los usuarios (asesores) activos.
 
         for ($d = 0; $d < 11; $d++) {
             $semanaInicial = Fecha::primerLunesDePrimeraSemana();
@@ -241,7 +242,8 @@ class TurnoController extends Controller
             $dia[$d] = $fecha->addDays($d)->format('Y-m-d');    // Fecha de cada dia.
         }
 
-        $users = User::get(['id', 'name']);     // Todos los usuarios (asesores).
+        $users = User::where('activo', True)->where('socio', False)
+                        ->get(['id', 'name']);     // Todos los usuarios (asesores) activos.
 
         for ($d = 0; $d < 11; $d++) {
             $semanaInicial = Fecha::primerLunesDePrimeraSemana();

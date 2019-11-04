@@ -20,7 +20,7 @@ class CiudadController extends Controller
     protected $enlace = 'propiedades';
     protected $vistaCrear  = 'tabla.crear';
     protected $vistaIndice = 'tabla.index';
-    protected $vistaEditar = 'tabla.edit';
+    protected $vistaEditar = 'tabla.editar';
 
     public function index($orden = null)
     {

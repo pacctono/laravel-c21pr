@@ -15,6 +15,7 @@ class User extends Authenticatable
     use Notifiable;
     use SoftDeletes;
 
+    public const CORREO_COPIAR = 'aliriomendozacarrero@gmail.com';
     /**
      * The attributes that are mass assignable.
      *
@@ -174,6 +175,16 @@ class User extends Authenticatable
         else return $fecha->addYears(1);
     }
 
+    public static function cumpleanosHoy()
+    {
+        return self::where('activo', True)
+                    ->where(DB::raw("MONTH(fecha_nacimiento)"),
+                            DB::raw("MONTH(CURRENT_DATE)"))
+                    ->where(DB::raw("DAYOFMONTH(fecha_nacimiento)"),
+                            DB::raw("DAYOFMONTH(CURRENT_DATE)"))
+                    ;
+    }
+
     public function getLadosCaptadorAttribute()
     {
         return round($this->captadorPropiedades()
@@ -262,12 +273,13 @@ class User extends Authenticatable
                     $this->getPvrCerradorAttribute(), 2);
     }
 
-    public static function ladosXAsesor($fecha='fecha_reserva', $fecha_desde=null, $fecha_hasta=null, $cond='>', $user=1)
+    public static function ladosXAsesor($fecha='fecha_reserva', $fecha_desde=null,
+                                       $fecha_hasta=null, $cond='>', $user=1)
     {
         if(null == $fecha_desde)
-            $fecha_desde = (new Carbon(Propiedad::min($fecha, Fecha::$ZONA)))->startOfDay();
+            $fecha_desde = (new Carbon(Propiedad::min($fecha)))->startOfDay();
         if(null == $fecha_hasta)
-            $fecha_hasta = (new Carbon(Propiedad::max($fecha, Fecha::$ZONA)))->endOfDay();
+            $fecha_hasta = (new Carbon(Propiedad::max($fecha)))->endOfDay();
         return self::where('id', $cond, $user)
                     ->withCount(['captadorPropiedades as captadas',
                                 'cerradorPropiedades as cerradas' => function ($query)

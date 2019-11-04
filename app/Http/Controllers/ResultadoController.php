@@ -20,7 +20,7 @@ class ResultadoController extends Controller
     protected $enlace = 'contactos';
     protected $vistaCrear  = 'tabla.crear';
     protected $vistaIndice = 'tabla.index';
-    protected $vistaEditar = 'tabla.edit';
+    protected $vistaEditar = 'tabla.editar';
 
     public function index($orden = null)
     {

@@ -116,7 +116,7 @@ class ContactoController extends Controller
         $exito = session('exito', '');
         session(['exito' => '']);
 
-        return view('contactos.create', compact(
+        return view('contactos.crear', compact(
             'title', 'deseos', 'origenes', 'precios',
             'tipos', 'resultados', 'zonas', 'ddns', 'exito'));
     }
@@ -256,7 +256,7 @@ class ContactoController extends Controller
         $ddns = Venezueladdn::distinct()->get(['ddn'])->all();
 
         if ((Auth::user()->is_admin) or ($contacto->user->id == Auth::user()->id)) {
-            return view('contactos.edit', ['contacto' => $contacto, 'title' => $title,
+            return view('contactos.editar', ['contacto' => $contacto, 'title' => $title,
                         'ddns' => $ddns]);
         }
         return redirect('/contactos');
@@ -285,7 +285,6 @@ class ContactoController extends Controller
             'telefono.digits:7' => 'La parte del telefono, sin ddn, debe contener 7 dígitos',
             'email.email' => 'Debe suministrar un correo elctrónico válido.',
         ]);
-
         //dd($data);
 
         if (!(is_null($data['ddn'])) and '' != $data['ddn'] and !(is_null($data['telefono'])) and
@@ -322,7 +321,7 @@ class ContactoController extends Controller
         Bitacora::create([
             'user_id' => Auth::user()->id,
             'tx_modelo' => 'Contacto',
-            'tx_data' => $data,
+            'tx_data' => implode(';', $data),
             'tx_tipo' => 'A',
         ]);
 

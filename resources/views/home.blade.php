@@ -44,8 +44,12 @@
             <div class="container">
               <div class="carousel-caption text-left">
                 <h1>Hola, {{ Auth::user()->name }}!</h1>
-                <p>Cras justo odio, dapibus ac facilisis in, egestas eget quam. Donec id elit non mi porta gravida at eget metus. Nullam id dolor id nibh ultricies vehicula ut id elit.</p>
-                <p><a class="btn btn-lg btn-primary" href="#" role="button">Registrese hoy</a></p>
+                <p>
+                  {{ $texto1->descripcion??'' }}
+                </p>
+                <p><a class="btn btn-lg btn-primary" href="{{ $texto1->enlace??'' }}" role="button">
+                  {{ $texto1->textoEnlace??'' }}
+                </a></p>
               </div>
             </div>
           </div>
@@ -54,8 +58,12 @@
                     alt="Segunda slide" style="width:100%;height:600px;">
             <div class="container">
               <div class="carousel-caption">
-                <h1>Ejemplo 2</h1>
-                <p><a class="btn btn-lg btn-primary" href="#" role="button">Aprende</a></p>
+                <h1>
+                  {{ $texto2->descripcion??'' }}
+                </h1>
+                <p><a class="btn btn-lg btn-primary" href="{{ $texto2->enlace??'' }}" role="button">
+                  {{ $texto2->textoEnlace??'' }}
+                </a></p>
               </div>
             </div>
           </div>
@@ -64,30 +72,42 @@
                     alt="Tercera slide" style="width:100%;height:600px;">
             <div class="container">
               <div class="carousel-caption text-right">
-                <h1>Ejemplo 3</h1>
-                <p><a class="btn btn-lg btn-primary" href="#" role="button">Explora</a></p>
+                <h1>
+                  {{ $texto3->descripcion??'' }}
+                </h1>
+                <p><a class="btn btn-lg btn-primary" href="{{ $texto3->enlace??'' }}" role="button">
+                  {{ $texto3->textoEnlace??'' }}
+                </a></p>
               </div>
             </div>
           </div>
           <div class="carousel-item">
             <img class="fourth-slide" src="{{ (asset('img/imagen3.jpg')) }}"
                     alt="Cuarta slide" style="width:100%;height:600px;">
-            <!-- div class="container">
+            <div class="container">
               <div class="carousel-caption text-right">
-                <h1>Ejemplo 3</h1>
-                <p><a class="btn btn-lg btn-primary" href="#" role="button">Explora</a></p>
+                <h1>
+                  {{ $texto4->descripcion??'' }}
+                </h1>
+                <p><a class="btn btn-lg btn-primary" href="{{ $texto4->enlace??'' }}" role="button">
+                  {{ $texto4->textoEnlace??'' }}
+                </a></p>
               </div>
-            </div -->
+            </div>
           </div>
           <div class="carousel-item">
             <img class="fith-slide" src="{{ (asset('img/imagen4.jpg')) }}"
                     alt="Quinta slide" style="width:100%;height:600px;">
-            <!-- div class="container">
+            <div class="container">
               <div class="carousel-caption text-right">
-                <h1>Ejemplo 3</h1>
-                <p><a class="btn btn-lg btn-primary" href="#" role="button">Explora</a></p>
+                <h1>
+                  {{ $texto5->descripcion??'' }}
+                </h1>
+                <p><a class="btn btn-lg btn-primary" href="{{ $texto5->enlace??'' }}" role="button">
+                  {{ $texto5->textoEnlace??'' }}
+                </a></p>
               </div>
-            </div -->
+            </div>
           </div>
         </div>
         <a class="carousel-control-prev" href="#myCarousel" role="button" data-slide="prev">

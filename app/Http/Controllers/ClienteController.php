@@ -104,7 +104,7 @@ class ClienteController extends Controller
 
         $exito = session('exito', '');
         session(['exito' => '']);
-        return view('clientes.create', compact('title', 'ddns', 'exito', 'orden', 'nroPagina'));
+        return view('clientes.crear', compact('title', 'ddns', 'exito', 'orden', 'nroPagina'));
     }
 
     /**
@@ -209,7 +209,7 @@ class ClienteController extends Controller
 
         //dd($cliente);
         if ((Auth::user()->is_admin) or ($cliente->user->id == Auth::user()->id)) { // Ver arriba para filas borradas.
-            return view('clientes.edit', ['cliente' => $cliente, 'title' => $title,
+            return view('clientes.editar', ['cliente' => $cliente, 'title' => $title,
                         'ddns' => $ddns, 'orden' => $orden,'nroPagina' => $nroPagina]);
         }
         return redirect('/clientes');

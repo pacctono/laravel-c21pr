@@ -65,15 +65,18 @@ class General {
     }
 
     public static function fechaDiaSemana($fecha) {
+        if (null == $fecha) return '';
         return substr(Fecha::$diaSemana[$fecha->timezone(Fecha::$ZONA)
                         ->dayOfWeek], 0, 3);
     }
 
     public static function fechaConHora($fecha) {
+        if (null == $fecha) return '';
         return $fecha->timezone(Fecha::$ZONA)->format('d/m/Y h:i a');
     }
 
     public static function tiempoCreado($fecha) {
+        if (null == $fecha) return '';
         return Carbon::parse($fecha)->timezone(Fecha::$ZONA)
                         ->diff(Carbon::now(Fecha::$ZONA))
                         ->format('%y años, %m meses y %d dias');

@@ -16,26 +16,30 @@ class Propiedad extends Model
 
     protected $fillable = [
         'codigo', 'fecha_reserva', 'fecha_firma', 'negociacion', 'nombre',
-        'tipo_id', 'metraje', 'habitaciones', 'banos', 'niveles', 'puestos',
-        'anoc', 'caracteristica_id', 'descripcion', 'direccion', 'ciudad_id',
-        'codigo_postal', 'municipio_id', 'estado_id', 'cliente_id',
-        'estatus', 'user_id', 'moneda', 'precio', 'comision', 'iva',
-        'lados', 'porc_franquicia', 'porc_comision', 'reportado_casa_nacional',
-        'porc_regalia', 'porc_captador_prbr', 'captador_prbr', 'porc_gerente',
-        'porc_cerrador_pbr', 'cerrador_pbr', 'porc_bonificacion',
-        'comision_bancaria', 'numero_recibo', 'asesor_captador_id',
-        'asesor_captador', 'asesor_cerrador_id', 'asesor_cerrador',
-        'pago_gerente', 'factura_gerente', 'pago_asesores', 'factura_asesores',
-        'pagado_casa_nacional', 'estatus_sistema_c21', 'reporte_casa_nacional',
-        'comentarios', 'factura_AyS',
+        'exclusividad', 'tipo_id', 'metraje', 'habitaciones', 'banos',
+        'niveles', 'puestos', 'anoc', 'caracteristica_id', 'descripcion',
+        'direccion', 'ciudad_id', 'codigo_postal', 'municipio_id', 'estado_id',
+        'cliente_id', 'estatus', 'user_id', 'moneda', 'precio', 'comision',
+        'iva', 'lados', 'porc_franquicia', 'porc_comision',
+        'reportado_casa_nacional', 'porc_regalia', 'porc_captador_prbr',
+        'captador_prbr', 'porc_gerente', 'porc_cerrador_pbr', 'cerrador_pbr',
+        'porc_bonificacion', 'comision_bancaria', 'numero_recibo',
+        'asesor_captador_id', 'asesor_captador', 'asesor_cerrador_id',
+        'asesor_cerrador', 'pago_gerente', 'factura_gerente', 'pago_asesores',
+        'factura_asesores', 'pagado_casa_nacional', 'estatus_sistema_c21',
+        'reporte_casa_nacional', 'comentarios', 'factura_AyS',
         'user_actualizo', 'user_borro'
     ];
     protected $dates = [        // Mutan a una instancia de Carbon.
         'fecha_reserva', 'fecha_firma',
         'deleted_at', 'created_at', 'updated_at'
     ];
+    protected $casts = [
+        'exclusividad' => 'boolean',
+        'pagado_casa_nacional' => 'boolean',
+    ];
     protected $hidden = [
-        'fecha_reserva', 'fecha_firma',
+        'fecha_reserva', 'fecha_firma', 'exclusividad',
         'negociacion', 'habitaciones', 'descripcion', 'direccion',
         'codigo_postal', 'porc_franquicia', 'reportado_casa_nacional',
         'porc_regalia', 'porc_compartido', 'porc_captador_prbr',
@@ -50,7 +54,7 @@ class Propiedad extends Model
     ];
     protected $appends = [
         'fecRes', 'fecFir',
-        'negoc', 'habits', 'descr', 'direc',
+        'negoc', 'exclu', 'habits', 'descr', 'direc',
         'codPos', 'pcFrq', 'pcReCaNa',
         'pcRega', 'pcCom', 'pcCap',
         'pcGer', 'pcCer', 'pcBonif',
@@ -82,6 +86,7 @@ class Propiedad extends Model
     protected $META_2019 = 400000;
     protected $COMISION = 5.00;
     protected $IVA = 16.00;
+    protected $PORC_ASESORES = 40.00;   // Porcentaje a repartir a asesores.
     public $mMoZero = true;
     public $espMonB = true;
     public $monedaB = true;
@@ -632,7 +637,8 @@ class Propiedad extends Model
 
     public function getPrecioVentaRealAttribute()
     {
-        return $this->getPvrCaptadorPrbrAttribute() + $this->getPvrCerradorPrbrAttribute();
+        return $this->getPvrCaptadorPrbrAttribute() +
+                $this->getPvrCerradorPrbrAttribute();
     }
 
     public function getPrecioVentaRealVenAttribute()
@@ -659,7 +665,8 @@ class Propiedad extends Model
     public function getPuntosCaptadorAttribute()
     {
         if ((1 < $this->asesor_captador_id) and (!$this->captador->socio))
-            $puntosCaptador = 0.40 * $this->getOficinaBrutoRealAttribute();    // 40% puntos captador
+            $puntosCaptador = (($this->PORC_ASESORES/100.0)/$this->lados) *
+                                $this->getOficinaBrutoRealAttribute();
         else $puntosCaptador = 0.00;
 
         return round($puntosCaptador, 2);
@@ -673,7 +680,7 @@ class Propiedad extends Model
     public function getPuntosCerradorAttribute()
     {
         if ((1 < $this->asesor_cerrador_id) and (!$this->cerrador->socio))
-            $puntosCerrador = 0.40 * $this->getOficinaBrutoRealAttribute();    // 40% puntos cerrador
+            $puntosCerrador = (($this->PORC_ASESORES/100.0)/$this->lados) * $this->getOficinaBrutoRealAttribute();    // 40% puntos cerrador
         else $puntosCerrador = 0.00;
 
         return round($puntosCerrador, 2);
@@ -977,6 +984,9 @@ class Propiedad extends Model
 // Las proximas funciones seran utilizadas para la conversion en json y toArray.
     public function getNegocAttribute() {
         return $this->negociacion;
+    }
+    public function getExcluAttribute() {
+        return $this->exclusividad;
     }
     public function getHabitsAttribute() {
         return $this->habitaciones;

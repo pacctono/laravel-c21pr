@@ -19,7 +19,7 @@ class CreateBitacorasTable extends Migration
             $table->foreign('user_id')->references('id')->on('users');
             $table->string('tx_modelo', 30)->nullable();    // Nulo, si es solo login.
             $table->string('tx_tipo', 1);       // tipo=L:login,I:inserto,M:modifico,B:borro.
-            $table->string('tx_data', 160)->nullable();     // Pendiente, posible mas de 160 car's
+            $table->string('tx_data', 5000)->nullable();     // Pendiente, posible mas de 160 car's
             $table->string('tx_host', 15)->nullable();
             $table->timestamps();
         });

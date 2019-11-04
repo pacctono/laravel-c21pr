@@ -36,7 +36,9 @@
         </span></p>
         @endif
         <p>
-            <a href="{{ route('agenda') }}" class="btn btn-link">Regresar a la agenda</a>
+            <a href="{{ $rutaPrevia??route('agenda') }}" class="btn btn-link">
+                Regresar a la agenda
+            </a>
         </p>
     </div>
 </div>

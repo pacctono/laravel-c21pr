@@ -4,22 +4,28 @@
     <div class="d-flex justify-content-between align-items-end mb-3">
         <h1 class="pb-1">{{ $title }}</h1>
 
+    @if ('texto' != $elemento)
         <p>
             <a href="{{ route($rutCrear) }}" class="btn btn-primary">
                 Crear {{ ucfirst($elemento) }}
             </a>
         </p>
+    @endif ('texto' != $elemento)
     </div>
 
     @if ($arreglo->isNotEmpty())
     <table class="table table-striped table-hover table-bordered">
         <thead class="thead-dark">
         <tr>
-        @if (!$movil)
+        @if ((!$movil) and ('texto' != $elemento))
             <th scope="col">#</th>
             <th scope="col">id</th>
-        @endif (!$movil)
+        @endif ((!$movil) and ('texto' != $elemento))
             <th scope="col">Descripcion</th>
+        @if ('texto' == $elemento)
+            <th scope="col">Enlace</th>
+            <th scope="col">Texto del enlace</th>
+        @endif ('texto' != $elemento)
             <th scope="col">Acciones</th>
         </tr>
         </thead>
@@ -32,16 +38,30 @@
             table-info
         @endif
         ">
-        @if (!$movil)
+        @if ((!$movil) and ('texto' != $elemento))
             <th scope="row">{{ $loop->iteration }}</th>
             <td>{{ $arrInd->id }}</td>
-        @endif (!$movil)
+        @endif ((!$movil) and ('texto' != $elemento))
             <td>
-                <a href="{{ route('reporte.'.$enlace.ucfirst($elemento), [$arrInd->id, 'id']) }}" class="btn btn-link">
+            @if ($enlace)
+                <a href="{{ route('reporte.'.$enlace.ucfirst($elemento), [$arrInd->id, 'id']) }}"
+                    class="btn btn-link">
                     {{ $arrInd->descripcion }}
                 </a>
+            @else ($enlace)
+                {{ $arrInd->descripcion }}
+            @endif ($enlace)
+            </td>
+        @if ('texto' == $elemento)
+            <td>
+                {{ $arrInd->enlace??'' }}
             </td>
             <td>
+                {{ $arrInd->textoEnlace??'' }}
+            </td>
+        @endif ('texto' != $elemento)
+            <td>
+            @if ($enlace)
                 <form action="{{ route($rutBorrar, $arrInd) }}" method="POST"
                         id="forma.{{ $arrInd->id }}" name="forma.{{ $arrInd->id }}"
                         onSubmit="return seguroBorrar({{ $arrInd->id }}, '{{ $elemento }}', '{{ $arrInd->descripcion }}')">
@@ -59,6 +79,11 @@
                     </a>
                     <button class="btn btn-link"><span class="oi oi-trash"></span></button>
                 </form>
+            @else ($enlace)
+                <a href="{{ route($rutEditar, $arrInd) }}" class="btn btn-link">
+                    <span class="oi oi-pencil"></span>
+                </a>
+            @endif ($enlace)
             </td>
         </tr>
         @endForeach

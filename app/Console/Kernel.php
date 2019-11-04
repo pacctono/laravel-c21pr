@@ -14,6 +14,7 @@ class Kernel extends ConsoleKernel
      */
     protected $commands = [
         'App\Console\Commands\GrabarArchivo',
+        'App\Console\Commands\CorreoCumpleano',
     ];
 
     /**
@@ -28,14 +29,19 @@ class Kernel extends ConsoleKernel
         //          ->hourly();
         $schedule->command('grabar:archivo')
                     ->weekdays()->everyThirtyMinutes()
-                    ->between('9:00', '23:00');
-/*                    ->between('9:00', '23:00')
-                    ->sendOutputTo('/home/pablo/salidas/cronLaravelGrabarArchivo.txt');*/
+                    ->between('9:00', '23:00')
+//                    ->sendOutputTo('/home/pablo/salidas/cronLaravelGrabarArchivo.txt')
+                    ;
         $schedule->command('grabar:archivo')
                     ->saturdays()->everyThirtyMinutes()
                     ->between('9:00', '13:00');
-/*                    ->between('9:00', '13:00')
-                    ->sendOutputTo('/home/pablo/salidas/cronLaravelGrabarArchivo.txt');*/
+//                    ->sendOutputTo('/home/pablo/salidas/cronLaravelGrabarArchivo.txt');
+
+        $schedule->command('correo:cumpleano')
+//                    ->twiceDaily(6, 9)
+                    ->twiceDaily(21, 23)
+                    ->sendOutputTo('/home/pablo/salidas/cronLaravelCorreoCumpleano.txt')
+                    ;
     }
 
     /**

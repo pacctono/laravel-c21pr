@@ -5,10 +5,12 @@ namespace App\Http\Controllers;
 use App\User;
 use App\Venezueladdn;
 use App\Bitacora;
+use \App\Mail\Cumpleano;
 use Illuminate\Validation\Rule;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 use Carbon\Carbon;
 use Jenssegers\Agent\Agent;                 // PC
 use App\MisClases\General;               // PC
@@ -68,7 +70,7 @@ class UserController extends Controller
 
         $ddns = Venezueladdn::distinct()->get(['ddn'])->all();
 
-        return view('users.create', compact('title', 'ddns'));
+        return view('users.crear', compact('title', 'ddns'));
     }
 
     public function store()
@@ -129,8 +131,11 @@ class UserController extends Controller
             'password' => bcrypt($data['password'])
         ]);
 
+        session(['exito' => "El asesor '" . $data['name'] .
+                            "' fue agregado con exito."]);
+        return redirect()->route('users.crear');
         //return redirect('usuarios');
-        return redirect()->route('users');
+        //return redirect()->route('users');
     }
 
     public function edit(User $user)
@@ -138,7 +143,7 @@ class UserController extends Controller
         $title = 'Editar ' . $this->tipo;
         $ddns = Venezueladdn::distinct()->get(['ddn'])->all();
 
-        return view('users.edit', ['user' => $user, 'title' => $title, 'ddns' => $ddns]);
+        return view('users.editar', ['user' => $user, 'title' => $title, 'ddns' => $ddns]);
     }
 
     public function update(User $user)
@@ -197,7 +202,7 @@ class UserController extends Controller
         Bitacora::create([
             'user_id' => Auth::user()->id,
             'tx_modelo' => 'User',
-            'tx_data' => $data,
+            'tx_data' => implode($data),
             'tx_tipo' => 'A',
         ]);
 
@@ -227,4 +232,21 @@ class UserController extends Controller
 
         return redirect()->route('users');
     }
+
+    public static function correoCumpleano()
+    {
+        $users = \App\User::cumpleanosHoy()->get();   // Todos los asesores cumpleaneros.
+        if (0 >= $users->count()) return;
+        $correoCopiar = \App\User::CORREO_COPIAR;
+
+        foreach ($users as $user) {
+            //return new Cumpleano($user);  // Vista preliminar del correo, en el navegador.
+            Mail::to($user->email, $user->name)
+//                    ->cc()
+                    ->bcc($correoCopiar)
+                    ->send(new Cumpleano($user));
+        }   // Final del foreach.
+        return;
+    }   // Final del metodo correoCumpleano.
+
 }

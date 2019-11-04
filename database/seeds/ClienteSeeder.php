@@ -22,6 +22,6 @@ class ClienteSeeder extends Seeder
             'email' => 'otro@correo.com',
             'fecha_nacimiento' => '2000-01-01'
         ]);
-        factory(Cliente::class, 20)->create();
+        //factory(Cliente::class, 20)->create();
     }
 }

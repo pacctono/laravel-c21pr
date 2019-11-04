@@ -13,7 +13,8 @@
     <!-- Bootstrap core CSS -->
     <!--link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous"-->
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/open-iconic/1.1.1/font/css/open-iconic-bootstrap.css" integrity="sha256-CNwnGWPO03a1kOlAsGaH5g8P3dFaqFqqGFV/1nkX5OU=" crossorigin="anonymous" />
+    <!--link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/open-iconic/1.1.1/font/css/open-iconic-bootstrap.css" integrity="sha256-CNwnGWPO03a1kOlAsGaH5g8P3dFaqFqqGFV/1nkX5OU=" crossorigin="anonymous" /-->
+    <link rel="stylesheet" href="{{ asset('open-iconic-master/font/css/open-iconic-bootstrap.css') }}">
     <!-- Custom styles for this template -->
     <link href="{{ asset('css/style.css') }}" rel="stylesheet">
     <link href="{{ asset('css/c21pr.css') }}" rel="stylesheet">
@@ -164,6 +165,9 @@
                 <li><a class="dropdown-item" href="{{ route('zona') }}">
                   Zona
                 </a></li>
+                <li><a class="dropdown-item" href="{{ route('texto') }}">
+                  Texto
+                </a></li>
               </ul>
             </li>
             @endif
@@ -218,7 +222,9 @@
 
     <footer class="footer">
       <div class="container">
-        <span class="text-muted">Piso 1, Centro Comercial Costanera Plaza I, Barcelona, 0281-416.0885.&copy; Copyright 2019-</span>
+        <span class="text-muted">
+          Piso 1, Centro Comercial Costanera Plaza I, Barcelona, 0281-416.0885.&copy; Copyright 2019-{{ date('Y') }}
+        </span>
       </div>
     </footer>
     @yield('js')

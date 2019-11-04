@@ -76,6 +76,24 @@
         </div>
       </div>--}}
     </form>
+    <div class="d-flex justify-content-between align-items-end mb-1">
+        @if ($movil)
+        <h4 class="pb-1">Agenda</h4>
+        @else
+        <h1 class="pb-1">Agenda</h1>
+        @endif
+
+        <p>
+            <a href="{{ route('agendaPersonal.crear') }}" class="btn btn-primary">
+            @if ($movil)
+                Crear
+            @else
+                Crear Cita Personal
+            @endif
+            </a>
+        </p>
+    </div>
+
 </div>
 
 @if ($alertar)
@@ -101,7 +119,7 @@
             title="Al ordenar por nombre de contacto, no mostrará los turnos"
           @endif
             href="{{ route('agenda.orden', 'name') }}" class="btn btn-link">
-          Nombre Contacto
+          Nombre de la cita
         </a>
       @endif
       </th>
@@ -134,14 +152,14 @@
         <a href="{{ route('agenda.show', $agenda->contacto) }}" class="btn btn-link">
           {{ $agenda->evento_dia_semana }}
         </a>
-      @else
+      @else (($movil) && (NULL != $agenda->contacto_id))
         {{ $agenda->evento_dia_semana }}
-      @endif
+      @endif (($movil) && (NULL != $agenda->contacto_id))
       @if ($movil)
         {{ substr($agenda->fec_eve, 0, 5) }}
-      @else
+      @else ($movil)
         {{ $agenda->fec_eve }}
-      @endif
+      @endif ($movil)
       </td>
       <td>
         {{ $agenda->hora_evento }}
@@ -149,49 +167,71 @@
       <td>
         {{ $agenda->descripcion }}
       </td>
-      <td title="DIRECCIÓN: {{ $agenda->direccion }}">
+      <td title="DIRECCIÓN: {{ $agenda->direccion??'No fue suministrada' }}">
         {{ $agenda->name }}
       </td>
     @if (!$movil)
     @if (Auth::user()->is_admin)
-      <td title="CORREO: {{ $agenda->email }}">
-    @else
+      <td title="CORREO: {{ $agenda->email??'No fue suministrado' }}">
+    @else (Auth::user()->is_admin)
       <td>
-    @endif
+    @endif (Auth::user()->is_admin)
       @if ('' != $agenda->telefono)
         {{ $agenda->telefono_f }}
       @elseif (Auth::user()->is_admin)
         {{ $agenda->user->telefono_f }}
-      @endif
+      @endif (Auth::user()->is_admin)
       </td>
       <td>
       @if (Auth::user()->is_admin)
         {{ $users->find($agenda->user_id)->name }}
-      @else
+      @else (Auth::user()->is_admin)
         {{ $agenda->email }}
-      @endif
+      @endif (Auth::user()->is_admin)
       </td>
       <td class="d-flex align-items-end">
-      @if (NULL == $agenda->contacto_id)
+      @if (('T' == $agenda->tipo) or (NULL == $agenda->contacto_id))
         &nbsp;
+      @else (('T' == $agenda->tipo) or (NULL == $agenda->contacto_id))
+        <a href="
+      @if ('C' == $agenda->tipo)  {{-- Esta cita es con un contacto incial --}}
+        {{ route('agenda.show', $agenda->contacto) }}
+      @elseif ('A' == $agenda->tipo)  {{-- Esta cita es personal, contacto_id => id --}}
+        {{ route('agendaPersonal.show', $agenda->contacto_id) }}  {{-- contacto_id es id de la cita personal --}}
       @else
-        <a href="{{ route('agenda.show', $agenda->contacto) }}" class="btn btn-link"
-            title="Motrar datos de esta cita.">
+        #
+      @endif ('C' == $agenda->tipo)  {{-- Esta cita es con un contacto incial --}}
+            " class="btn btn-link" title="Motrar datos de esta cita.">
           <span class="oi oi-eye"></span>
         </a>
-        <a href="{{ route('agenda.crear', $agenda->contacto) }}" class="btn btn-link"
-            title="Editar datos de esta cita.">
+        <a href="
+      @if ('C' == $agenda->tipo)  {{-- Esta cita es con un contacto incial --}}
+          {{ route('agenda.crear', $agenda->contacto) }}
+      @elseif ('A' == $agenda->tipo)  {{-- Esta cita es personal, contacto_id => id --}}
+          {{ route('agendaPersonal.edit', $agenda->contacto_id) }}  {{-- contacto_id es id de la cita personal --}}
+      @else
+        #
+      @endif ('C' == $agenda->tipo)  {{-- Esta cita es con un contacto incial --}}
+            " class="btn btn-link" title="Editar datos de esta cita.">
           <span class="oi oi-pencil"></span>
         </a>
-        @if (Auth::user()->is_admin)
-        <a href="{{ route('agenda.emailcita', $agenda->contacto) }}" class="btn btn-link"
+      @if (Auth::user()->is_admin)
+        <a href="
+      @if ('C' == $agenda->tipo)  {{-- Esta cita es con un contacto incial --}}
+          {{ route('agenda.emailcita', $agenda->contacto) }}
+      @elseif ('A' == $agenda->tipo)  {{-- Esta cita es personal, contacto_id => id --}}
+          #{{-- route('agendaPersonal.emailcita', $agenda->contacto_id) --}}
+      @else
+        #
+      @endif ('C' == $agenda->tipo)  {{-- Esta cita es con un contacto incial --}}
+            " class="btn btn-link"
             title="Enviar correo a '{{ $users->find($agenda->user_id)->name }}' sobre esta cita">
           <span class="oi oi-envelope-closed"></span>
         </a>
-        @endif
-      @endif
+      @endif (Auth::user()->is_admin)
+      @endif (('T' == $agenda->tipo) or (NULL == $agenda->contacto_id))
       </td>
-    @endif
+    @endif (!$movil)
     </tr>
   @endForeach
   </tbody>

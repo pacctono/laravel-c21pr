@@ -113,6 +113,23 @@ Route::get('/agenda/{contacto}/editar', 'AgendaController@edit')
 Route::put('/agenda/{cita}', 'AgendaController@update')
     ->name('agenda.update');
 
+Route::get('/agendaPersonal/{agenda}', 'AgendaPersonalController@show')
+    ->where('agenda', '[0-9]+')
+    ->name('agendaPersonal.show');
+
+Route::get('/agendaPersonal/crear', 'AgendaPersonalController@create')
+    ->name('agendaPersonal.crear');
+
+Route::post('/agendaPersonal', 'AgendaPersonalController@store')
+    ->name('agendaPersonal.store');
+
+Route::get('/agendaPersonal/{agenda}/editar', 'AgendaPersonalController@edit')
+    ->name('agendaPersonal.edit');
+
+Route::put('/agendaPersonal/{agenda}', 'AgendaPersonalController@update')
+    ->where('agenda', '[0-9]+')
+    ->name('agendaPersonal.update');
+
 Route::get('/propiedades/orden/{orden}', 'PropiedadController@index')
     ->name('propiedades.orden');
 
@@ -262,6 +279,28 @@ Route::put('/zonas/{zona}', 'ZonaController@update');
 
 Route::delete('/zonas/{zona}', 'ZonaController@destroy')
     ->name('zona.destroy')
+    ->middleware('admin');
+
+Route::get('/textos', 'TextoController@index')
+    ->name('texto');
+
+Route::get('/textos/{texto}', 'TextoController@show')
+    ->where('texto', '[0-9]+')
+    ->name('texto.show');
+
+Route::get('/textos/nuevo', 'TextoController@create')
+    ->name('texto.crear')
+    ->middleware('admin');
+
+Route::post('/textos', 'TextoController@store');
+
+Route::get('/textos/{texto}/editar', 'TextoController@edit')
+    ->name('texto.edit');
+
+Route::put('/textos/{texto}', 'TextoController@update');
+
+Route::delete('/textos/{texto}', 'TextoController@destroy')
+    ->name('texto.destroy')
     ->middleware('admin');
 
 Route::get('/precios', 'PrecioController@index')

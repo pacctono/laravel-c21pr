@@ -11,6 +11,9 @@
         con {{ $contacto->name }}
     </h4>
     <div class="card-body">
+    @include('include.exitoCrear')
+    @include('include.errorData')
+
         <p>Telefono de contacto: <span class="alert-info">
             0{{ $contacto->telefono }}
         </span>.

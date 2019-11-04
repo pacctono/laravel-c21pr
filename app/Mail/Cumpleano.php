@@ -32,6 +32,6 @@ class Cumpleano extends Mailable
     {
         return $this->markdown('emails.asesor.cumpleano')
                 ->subject('Feliz cumpleaño')
-                ->from('puentereal@centurt21.com.ve', 'Century21 Puente Real');
+                ->from('puentereal@centurt21.com.ve', env('APP_NAME'));
     }
 }

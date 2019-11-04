@@ -7,6 +7,7 @@ use App\Cita;
 use App\Turno;
 use App\Contacto;
 use App\User;
+use App\Bitacora;
 use \App\Mail\CitaAsesor;
 use \App\Mail\CitasAsesor;
 use \App\Mail\TurnosAsesor;
@@ -80,7 +81,7 @@ class AgendaController extends Controller
             $users   = User::all();         // Todos los usuarios. Incluye '1' porque en turnos hay feriado.
             $agendas = Agenda::select('fecha_evento', 'hora_evento', 'descripcion', 'name',
                                         'telefono', 'user_id', 'contacto_id', 'email',
-                                        'direccion');   // Solo estas columnas.
+                                        'tipo', 'direccion');   // Solo estas columnas.
             if ('name' == $orden) {         // Si se ordena por nombre, no muestra turnos (name == '').
                 $agendas = $agendas->where('name', '!=', '');
             }
@@ -90,7 +91,7 @@ class AgendaController extends Controller
             $title  .= 'de ' . $asesorConectado->name;  // Titulo de la página de la Agenda.
             $agendas = Agenda::where('user_id', $asesor)   // Solo el asesor conectado.
                     ->select('fecha_evento', 'hora_evento', 'descripcion', 'name', 'telefono',
-                                'contacto_id', 'email', 'direccion');           // Solo estas columnas.
+                                'tipo', 'contacto_id', 'email', 'direccion');           // Solo estas columnas.
         }
 
         if (0 < $asesor) {      // Se selecciono un asesor o el conectado no es administrador.
@@ -125,6 +126,14 @@ class AgendaController extends Controller
             return redirect('/agenda');
         }
 
+        $rutaPrevia = url()->previous();        // "http://c21pr.vb/agenda/90/editar"
+        if (((False === strpos($rutaPrevia, 'agenda/')) and
+            (False === strpos($rutaPrevia, 'agenda?page')) and
+            (False === strpos($rutaPrevia, 'agenda/orden'))) or
+            (1 === preg_match('@agenda/([0-9]+)/@', $rutaPrevia)))
+            $rutaPrevia = null;
+
+        //dd($rutaPrevia);
         $cita = Cita::where('contacto_id', $contacto->id)->get();
         if (0 >= $cita->count()) {
             $cita->contacto = $contacto;
@@ -134,7 +143,7 @@ class AgendaController extends Controller
             $cita=$cita->all()[0];      // Primera fila devuelta de 'Cita' del $contacto->id.
         }
         //dd($cita);
-        return view('agenda.show', compact('cita'));
+        return view('agenda.show', compact('cita', 'rutaPrevia'));
     }
 
     /**
@@ -205,19 +214,28 @@ class AgendaController extends Controller
             return redirect('login');
         }
 
-        $cita = Cita::where('contacto_id', $contacto->id)->get();
+        $cita = Cita::where('contacto_id', $contacto->id)->get();   // Devuelve un arreglo de 1 item.
         if (0 >= $cita->count()) {
             return redirect()->route('agenda.crear', ['contacto' => $contacto]);
         } else {
-            $id  = $cita->all()[0]->id;
-            $fecha_cita  = $cita->all()[0]->fecha_cita;
-            $comentarios = $cita->all()[0]->comentarios;
+//            $id  = $cita->all()[0]->id;
+// Solo accedemos al primer item del arreglo '$cita', ver arriba.
+            $id  = $cita[0]->id;
+            $fecha_cita  = $cita[0]->fecha_cita;
+            $comentarios = $cita[0]->comentarios;
         }
 
         $title = 'Editar ' . $this->tipo;
 
+        $rutaPrevia = url()->previous();
+        if (((False === strpos($rutaPrevia, 'agenda/')) and
+            (False === strpos($rutaPrevia, 'agenda?page')) and
+            (False === strpos($rutaPrevia, 'agenda/orden'))) or
+            (1 === preg_match('@agenda/([0-9]+)/@', $rutaPrevia)))
+            $rutaPrevia = null;
+
         return view('agenda.editar', compact('title', 'contacto',
-                'id', 'fecha_cita', 'comentarios'));
+                'id', 'fecha_cita', 'comentarios', 'rutaPrevia'));
     }
 
     /**
@@ -235,13 +253,20 @@ class AgendaController extends Controller
             'comentarios' => '',
         ], [
             'fecha_cita.date' => 'La fecha de la cita debe ser una fecha valida.',
-            'hora_cita.date' => 'La hora de la cita debe ser una hora valida.',
+            'hora_cita.date_format' => 'La hora de la cita debe ser una hora valida.',
         ]);
-        //dd($data);
+        //dd($cita, $data);
 
         $data['fecha_cita'] = Carbon::createFromFormat('Y-m-d H:i', $data['fecha_cita']
                                                     . ' ' . $data['hora_cita']);
         $cita->update($data);
+
+        Bitacora::create([
+            'user_id' => Auth::user()->id,
+            'tx_modelo' => 'Cita',
+            'tx_data' => implode(';', $data),
+            'tx_tipo' => 'A',
+        ]);
 
         $contacto = $cita->contacto;
         return redirect()->route('agenda.show', ['contacto' => $contacto]);

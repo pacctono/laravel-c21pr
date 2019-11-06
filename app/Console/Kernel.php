@@ -38,9 +38,12 @@ class Kernel extends ConsoleKernel
 //                    ->sendOutputTo('/home/pablo/salidas/cronLaravelGrabarArchivo.txt');
 
         $schedule->command('correo:cumpleano')
-//                    ->twiceDaily(6, 9)
-                    ->twiceDaily(21, 23)
-                    ->sendOutputTo('/home/pablo/salidas/cronLaravelCorreoCumpleano.txt')
+                    ->twiceDaily(7, 9)
+//                    ->twiceDaily(21, 23)
+//                    ->sendOutputTo('/home/pablo/salidas/cronLaravelCorreoCumpleano.txt')
+                    ;
+        $schedule->command('correo:cumpleano')
+                    ->dailyAt('8:00')
                     ;
     }
 

@@ -15,7 +15,7 @@ class Agenda extends Model
         'fecha_evento'
     ];
     protected $hidden = [
-        'fecha_evento', 'hora_evento'
+//        'fecha_evento', 'hora_evento'
     ];
     protected $appends = [
         'fecEve', 'fecha'

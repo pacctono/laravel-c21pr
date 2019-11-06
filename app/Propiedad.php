@@ -39,7 +39,8 @@ class Propiedad extends Model
         'pagado_casa_nacional' => 'boolean',
     ];
     protected $hidden = [
-        'fecha_reserva', 'fecha_firma', 'exclusividad',
+//        'fecha_reserva', 'fecha_firma', 'exclusividad',
+        'exclusividad',
         'negociacion', 'habitaciones', 'descripcion', 'direccion',
         'codigo_postal', 'porc_franquicia', 'reportado_casa_nacional',
         'porc_regalia', 'porc_compartido', 'porc_captador_prbr',

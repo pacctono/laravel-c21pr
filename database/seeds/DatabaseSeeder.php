@@ -39,7 +39,7 @@ class DatabaseSeeder extends Seeder
         $this->call(MunicipioSeeder::class);
         $this->call(EstadoSeeder::class);
         $this->call(CiudadSeeder::class);
-        $this->call(ClienteSeeder::class);
+        //this->call(ClienteSeeder::class);
 
         DB::statement('INSERT INTO venezueladdns (estado_zona, ciudad_sector, ddn)
                         SELECT estado_zona, ciudad_sector, ddn FROM pablo.venezueladdns;');

@@ -55,7 +55,7 @@ class General {
 
     public static function fechaEn($fecha, $zona=false) {
         if (null == $fecha) return '';
-	if ($zona) $fecha = $fecha->timezone(Fecha::$ZONA);
+	    if ($zona) $fecha = $fecha->timezone(Fecha::$ZONA);
         return $fecha->format('d/m/Y');
     }
 
@@ -64,15 +64,16 @@ class General {
         return $fecha->format('Y-m-d');
     }
 
-    public static function fechaDiaSemana($fecha) {
+    public static function fechaDiaSemana($fecha, $zona=false) {
         if (null == $fecha) return '';
-        return substr(Fecha::$diaSemana[$fecha->timezone(Fecha::$ZONA)
-                        ->dayOfWeek], 0, 3);
+	    if ($zona) $fecha = $fecha->timezone(Fecha::$ZONA);
+        return substr(Fecha::$diaSemana[$fecha->dayOfWeek], 0, 3);
     }
 
-    public static function fechaConHora($fecha) {
+    public static function fechaConHora($fecha, $zona=false) {
         if (null == $fecha) return '';
-        return $fecha->timezone(Fecha::$ZONA)->format('d/m/Y h:i a');
+	    if ($zona) $fecha = $fecha->timezone(Fecha::$ZONA);
+        return $fecha->format('d/m/Y h:i a');
     }
 
     public static function tiempoCreado($fecha) {
@@ -310,7 +311,8 @@ class General {
  * Usando: composer artisan storage:link, se crea un enlace que permite acceder
  * los archivos desde public/storage
  */
-        $control = Fecha::hoy()->format('d-m-Y') . "\n";
+        $control = self::fechaDiaSemana(Carbon::now(Fecha::$ZONA)) . ', ' .
+                    Carbon::now(Fecha::$ZONA)->format('d-m-Y h:i a') . "\n";
         Storage::put('public/asesores.txt', $asesores);
         $control .= "asesores.txt\n";
         Storage::put('public/propiedades.txt', $props);

@@ -22,7 +22,7 @@ class Contacto extends Model
         'created_at', 'updated_at', 'deleted_at', 'fecha_evento'
     ];
     protected $hidden = [
-        'created_at', 'updated_at', 'deleted_at', 'fecha_evento'
+        'created_at', 'updated_at', 'deleted_at'
     ];
     protected $appends = [
         'fecha', 'fecEve', 'borrado', 'creado', 'actualizado',

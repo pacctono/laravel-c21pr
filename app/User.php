@@ -33,7 +33,7 @@ class User extends Authenticatable
      */
     protected $hidden = [
         'password', 'remember_token',
-        'created_at', 'updated_at', 'deleted_at', 'fecha_nacimiento', 'fecha_ingreso'
+        'created_at', 'updated_at', 'deleted_at'
     ];
     protected $dates = [
         'created_at', 'updated_at', 'deleted_at', 'fecha_nacimiento', 'fecha_ingreso'

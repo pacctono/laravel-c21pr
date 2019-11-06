@@ -20,7 +20,7 @@ class Cliente extends Model
         'fecha_nacimiento', 'created_at', 'updated_at', 'deleted_at'
     ];
     protected $hidden = [
-        'created_at', 'updated_at', 'deleted_at', 'fecha_nacimiento',
+        'created_at', 'updated_at', 'deleted_at'
     ];
     protected $appends = [
         'fecNac', 'borrado', 'creado', 'actualizado',

@@ -2,6 +2,7 @@
 @extends('layouts.app')
 
 @section('content')
+@if ((!$movil) and (!isset($accion) or ('html' == $accion)))
 <div>
     <form method="POST" class="form-horizontal" action="{{ route('turnos.post') }}"
           onSubmit="return alertaFechaRequerida()">
@@ -70,14 +71,20 @@
       </div>--}}
     </form>
 </div>
+@endif ((!$movil) and (!isset($accion) or ('html' == $accion)))
 
 <div class="d-flex justify-content-between align-items-end my-0">
+  @if (!isset($accion) or ('html' == $accion))
   @if ($movil)
     <h4 class="pb-0">{{ substr($title, 11) }}</h4>
   @else
     <h1 class="pb-0">{{ $title }}</h1>
   @endif
+  @else ((!$movil) and (!isset($accion) or ('html' == $accion)))
+    <h1 align="center">{{ $title }}</h1>
+  @endif ((!$movil) and (!isset($accion) or ('html' == $accion)))
 
+  @if ((!$movil) and (!isset($accion) or ('html' == $accion)))
     @if (Auth::user()->is_admin)
     <p>
         <!-- a href="{{ route('turnos.crear', '0') }}" class="btn btn-primary">Preparar turno</a -->
@@ -94,15 +101,28 @@
         </select>
     </p>
     @endif
+  @endif ((!$movil) and (!isset($accion) or ('html' == $accion)))
 </div>
 
 @if ($alertar)
   <script>alert('El correo con los turnos fue enviado a cada asesor');</script>
 @endif
 @if ($turnos->isNotEmpty())
-<table class="table table-striped table-hover table-bordered">
+<table
+@if (!isset($accion) or ('html' == $accion))
+  class="table table-striped table-hover table-bordered"
+@else (!isset($accion) or ('html' == $accion))
+  align="center"
+@endif (!isset($accion) or ('html' == $accion))
+>
   <thead class="thead-dark my-0 py-0">
-    <tr class="my-0 py-0">
+    <tr
+    @if (isset($accion) and ('html' != $accion))
+      class="encabezado"
+    @else (isset($accion) and ('html' != $accion))
+      class="my-0 py-0"
+    @endif (isset($accion) and ('html' != $accion))
+    >
       <th scope="col">
         <a href="{{ route('turnos.orden', 'turno') }}" class="btn btn-link">
           Fecha
@@ -158,12 +178,22 @@
   </tfoot>
   @endif
 </table>
-@if (!$movil)
-{{ $turnos->links() }}
-@endif
-@else
-<p>No hay turnos registrados.</p>
-@endif
+@if ((!$movil) and (!isset($accion) or ('html' == $accion)))
+    {{ $turnos->links() }}
+@endif ((!$movil) and (!isset($accion) or ('html' == $accion)))
+
+@else ($turnos->isNotEmpty())
+  <p>No hay turnos registrados.</p>
+@endif ($turnos->isNotEmpty())
+
+@if (!isset($accion) or ('html' == $accion))
+    <a target="_blank" href="{{ route('turnos.orden', 'ver') }}">
+        <button>Ver PDF</button>
+    </a>
+    <a target="_blank" href="{{ route('turnos.orden', 'descargar') }}">
+        <button>Descargar PDF</button>
+    </a>
+@endif (!isset($accion) or ('html' == $accion))
 
 @endsection
 

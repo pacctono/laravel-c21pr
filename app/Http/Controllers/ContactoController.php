@@ -16,6 +16,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;        // PC
 use Carbon\Carbon;                          // PC
 use Jenssegers\Agent\Agent;                 // PC
+use Mpdf\Mpdf;
 use App\MisClases\General;                  // PC
 
 class ContactoController extends Controller
@@ -37,11 +38,15 @@ class ContactoController extends Controller
         $title = 'Listado de ' . $this->tipoPlural;
         $ruta = request()->path();
 
+        $accion = 'html';
 // En caso de volver luego de haber enviado un correo, ver el metodo 'emailcita', en AgendaController.
         $alertar = 0;
         if ('alert' == $orden) {
             $orden = '';
             $alertar = 1;
+        } elseif (('ver' == $orden) or ('descargar' == $orden)) {
+            $accion = $orden;
+            $orden = '';
         }
         if ('' == $orden or is_null($orden)) {
             $orden = 'id';
@@ -56,12 +61,49 @@ class ContactoController extends Controller
                                 ->contactos()->whereNull('user_borro')->orderBy($orden);
             //return redirect('/contactos/create');
         }
-        if ($movil) $contactos = $contactos->get();
+        if ($movil or ('html' != $accion)) $contactos = $contactos->get();
         else $contactos = $contactos->paginate($this->lineasXPagina);
-    
         //dd(Auth::user()->id);
 
-        return view('contactos.index', compact('title', 'contactos', 'ruta', 'alertar', 'movil'));
+        if ('html' == $accion)
+            return view('contactos.index',
+                    compact('title', 'contactos', 'ruta', 'alertar', 'movil', 'accion'));
+        $html = view('contactos.index',
+                    compact('title', 'contactos', 'ruta', 'alertar', 'movil', 'accion'))
+                ->render();
+        //dd($html);
+        General::generarPdf($html, 'contactosIniciales', $accion);
+/*
+        $namefile = 'contactosIniciales_'.time().'.pdf';
+ 
+        $defaultConfig = (new \Mpdf\Config\ConfigVariables())->getDefaults();
+        $fontDirs = $defaultConfig['fontDir'];
+ 
+        $defaultFontConfig = (new \Mpdf\Config\FontVariables())->getDefaults();
+        $fontData = $defaultFontConfig['fontdata'];
+        $mpdf = new Mpdf([
+            'fontDir' => array_merge($fontDirs, [
+                public_path() . '/fonts',
+            ]),
+            'fontdata' => $fontData + [
+                'arial' => [
+                    'R' => 'arial.ttf',
+                    'B' => 'arialbd.ttf',
+                ],
+            ],
+            'default_font' => 'arial',
+            "format" => "letter",  // Carta. Otras opciones: A4, A3, A2, etc.
+        ]);
+        // $mpdf->SetTopMargin(5);
+        $mpdf->SetDisplayMode('fullpage');
+        $mpdf->WriteHTML($html);
+        // dd($mpdf);
+        if($accion=='ver'){
+            $mpdf->Output($namefile,"I");
+        }elseif($accion=='descargar'){
+            $mpdf->Output($namefile,"D");   // "D": Descargar el archivo. "F": Guardar el archivo.
+        }
+ */
     }
 
     public function filtro($filtro)

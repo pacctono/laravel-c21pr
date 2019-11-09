@@ -5,6 +5,7 @@ namespace App\MisClases;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Mpdf\Mpdf;
 //use MisClases\Fecha;
 
 class General {
@@ -388,4 +389,40 @@ class General {
         Storage::put('public/control.txt', $control);
     }       // Final del metodo grabarArchivo.
 
+    public static function generarPdf($html, $nombre, $accion="ver")
+    {
+        $namefile = $nombre . '_' . time() . '.pdf';
+ 
+        $defaultConfig = (new \Mpdf\Config\ConfigVariables())->getDefaults();
+        $fontDirs = $defaultConfig['fontDir'];
+ 
+        $defaultFontConfig = (new \Mpdf\Config\FontVariables())->getDefaults();
+        $fontData = $defaultFontConfig['fontdata'];
+        $mpdf = new Mpdf([
+            'fontDir' => array_merge($fontDirs, [
+                public_path() . '/fonts',
+            ]),
+            'fontdata' => $fontData + [
+                'arial' => [
+                    'R' => 'arial.ttf',
+                    'B' => 'arialbd.ttf',
+                ],
+            ],
+            'default_font' => 'arial',
+            //"format" => [216.0,279.0],  // Carta en dimensiones milimetricas.
+            "format" => "letter",  // Carta. Otras opciones: A4, A3, A2, etc.
+        ]);
+        // $mpdf->SetTopMargin(5);
+        $mpdf->SetHTMLHeader('<h6 align="center">Puente Real</h6>');
+        $mpdf->SetHTMLFooter('<h6>Piso 1, Centro Comercial Costanera Plaza I, Barcelona, 0281-416.0885.&copy; Copyright 2019-' . 
+                                date('Y') . '</h6>');
+        $mpdf->SetDisplayMode('fullpage');
+        $mpdf->WriteHTML($html);
+        // dd($mpdf);
+        if($accion=='ver'){
+            $mpdf->Output($namefile,"I");
+        }elseif($accion=='descargar'){
+            $mpdf->Output($namefile,"D");   // "D": Descargar el archivo. "F": Guardar el archivo.
+        }
+    }
 }

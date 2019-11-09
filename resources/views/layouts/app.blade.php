@@ -10,6 +10,7 @@
 
     <title>{{ config('app.name', 'Laravel') }}</title>
 
+@if (!isset($accion) or ('html' == $accion))
     <!-- Bootstrap core CSS -->
     <!--link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous"-->
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
@@ -21,11 +22,36 @@
     <script src="{{ asset('js/app.js') }}"></script>
 
     @yield('jshead')
+@else (!isset($accion) or ('html' == $accion))
+    <style type="text/css">
+    body{
+        font-size: 16px;
+        font-family: "Arial";
+    }
+    table{
+        border-collapse: collapse;
+        border: 1px solid #000;
+    }
+    td,th{
+        padding: 6px 5px;
+        font-size: 15px;
+        border: 1px solid #000;
+    }
+    .encabezado{
+        background-color: #dfdfdf;
+        font-weight: bold;
+    }
+    .float-right{
+        text-align:right;
+    }
+    </style>
+@endif (!isset($accion) or ('html' == $accion))
 
   </head>
 
   <body>
 
+@if (!isset($accion) or ('html' == $accion))
     <header>
       <!-- Fixed navbar -->
       <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
@@ -204,6 +230,7 @@
         </div>
       </nav>
     </header>
+@endif (!isset($accion) or ('html' == $accion))
 
     <!-- Begin page content -->
     <main role="main" class="container">
@@ -220,6 +247,7 @@
         </div>
      </main>
 
+@if (!isset($accion) or ('html' == $accion))
     <footer class="footer">
       <div class="container">
         <span class="text-muted">
@@ -228,6 +256,7 @@
       </div>
     </footer>
     @yield('js')
+@endif (!isset($accion) or ('html' == $accion))
     <!-- Bootstrap core JavaScript
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->

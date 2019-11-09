@@ -2,12 +2,17 @@
 
 @section('content')
     <div class="d-flex justify-content-between align-items-end mb-1">
+        @if (!isset($accion) or ('html' == $accion))
         @if ($movil)
         <h4 class="pb-1">{{ substr($title, 11) }}</h4>
         @else
         <h1 class="pb-1">{{ $title }}</h1>
         @endif
+        @else ('html' == $accion)
+        <h1 align="center">{{ $title }}</h1>
+        @endif ('html' == $accion)
 
+        @if ((!$movil) and (!isset($accion) or ('html' == $accion)))
         <p>
             <a href="{{ route('users.create') }}" class="btn btn-primary">
                 @if ($movil)
@@ -17,6 +22,7 @@
                 @endif
             </a>
         </p>
+        @endif ((!$movil) and ('html' == $accion))
     </div>
 
     @if ($alertar)
@@ -25,7 +31,11 @@
 @if ($users->isNotEmpty())
     <table class="table table-striped table-hover table-bordered">
         <thead class="thead-dark">
-        <tr>
+        <tr
+        @if (isset($accion) and ('html' != $accion))
+            class="encabezado"
+        @endif ('html' != $accion)
+        >
         @if (!$movil)
             <th scope="col">#</th>
         @endif
@@ -37,9 +47,11 @@
             <th scope="col">Lados</th>
             <th scope="col">Comision</th>
             <th scope="col">Puntos</th>
-        @endif
+        @endif (Auth::user()->is_admin)
+        @if (!isset($accion) or ('html' == $accion))
             <th scope="col">Acciones</th>
-        @endif
+        @endif ('html' == $accion)
+        @endif (!$movil)
         </tr>
         </thead>
         <tbody>
@@ -57,6 +69,7 @@
             <td scope="row">{{ $user->id }}</td>
         @endif
             <td>
+        @if (!isset($accion) or ('html' == $accion))
             @if ($movil)
                 <a href="{{ route('users.show', $user) }}" class="btn btn-link" style="text-decoration:none;">
                     {{ $user->name }}
@@ -71,6 +84,10 @@
                 </a>
             @endif
             @endif
+        @else ('html' == $accion)
+                {{ $user->name }}
+        @endif ('html' == $accion)
+            </td>
             <td>{{ $user->telefono_f }}
             </td>
         @if (!$movil)
@@ -79,6 +96,7 @@
             </td>
         @if (Auth::user()->is_admin)
             <td
+        @if (!isset($accion) or ('html' == $accion))
             @if (1 == $user->id)
                 title="Estos lados representan los 'lados' producidos por 'Otra oficina'">
                 <span class="float-right">0</span>
@@ -87,8 +105,17 @@
                 <span class="float-right">{{ Prop::numeroVen($user->lados, 0) }}{{-- 'Prop' es un alias definido en config/app.php --}}
                 </span>
             @endif (1 == $user->id)
+        @else ('html' == $accion)
+            align="right">
+            @if (1 == $user->id)
+                0
+            @else
+                {{ Prop::numeroVen($user->lados, 0) }}{{-- 'Prop' es un alias definido en config/app.php --}}
+            @endif (1 == $user->id)
+        @endif ('html' == $accion)
             </td>
             <td
+        @if (!isset($accion) or ('html' == $accion))
             @if (1 == $user->id)
                 title="Este monto representa la 'comision' producida para 'Otra oficina'">
                 <span class="float-right">0,00</span>
@@ -97,8 +124,17 @@
                 <span class="float-right">{{ Prop::numeroVen($user->comision, 2) }}{{-- 'Prop' es un alias definido en config/app.php --}}
                 </span>
             @endif (1 == $user->id)
+        @else ('html' == $accion)
+            align="right">
+            @if (1 == $user->id)
+                0,00
+            @else
+                {{ Prop::numeroVen($user->comision, 2) }}{{-- 'Prop' es un alias definido en config/app.php --}}
+            @endif (1 == $user->id)
+        @endif ('html' == $accion)
             </td>
             <td
+        @if (!isset($accion) or ('html' == $accion))
             @if (1 == $user->id)
                 title="Estos puntos representan los producidos por 'Otra oficina'">
                 <span class="float-right">0,00</span>
@@ -107,8 +143,17 @@
                 <span class="float-right">{{ Prop::numeroVen($user->puntos, 2) }}{{-- 'Prop' es un alias definido en config/app.php --}}
                 </span>
             @endif (1 == $user->id)
+        @else ('html' == $accion)
+            align="right">
+            @if (1 == $user->id)
+                0,00
+            @else
+                {{ Prop::numeroVen($user->puntos, 2) }}{{-- 'Prop' es un alias definido en config/app.php --}}
+            @endif (1 == $user->id)
+        @endif ('html' == $accion)
             </td>
         @endif (Auth::user()->is_admin)
+        @if (!isset($accion) or ('html' == $accion))
             <td>
                 <form action="{{ route('users.destroy', $user) }}" method="POST"
                         id="forma.{{ $user->id }}" name="forma.{{ $user->id }}"
@@ -145,20 +190,32 @@
                     @endif ((1 == Auth::user()->id) or (1 < $user->id))
                 </form>
             </td>
+        @endif ('html' == $accion)
         @endif (!$movil)
         </tr>
         @endForeach
         </tbody>
     </table>
-@if (!$movil)
+@if ((!$movil) and (!isset($accion) or ('html' == $accion)))
     {{ $users->links() }}
 @endif
-@else
+
+@else ($users->isNotEmpty())
     <p>No hay asesores registrados.</p>
-@endif
+@endif ($users->isNotEmpty())
+
+@if (!isset($accion) or ('html' == $accion))
+    <a target="_blank" href="{{ route('users.orden', 'ver') }}">
+        <button>Ver PDF</button>
+    </a>
+    <a target="_blank" href="{{ route('users.orden', 'descargar') }}">
+        <button>Descargar PDF</button>
+    </a>
+@endif ('html' == $accion)
 
 @endsection
 
+@if (!isset($accion) or ('html' == $accion))
 @section('js')
 <script>
 function estaSeguro(id) {
@@ -181,3 +238,4 @@ function estaSeguro(id) {
 </script>
 
 @endsection
+@endif (!isset($accion) or ('html' == $accion))

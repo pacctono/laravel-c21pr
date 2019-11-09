@@ -69,11 +69,15 @@ class TurnoController extends Controller
             list ($fecha_desde, $fecha_hasta) = Fecha::periodo($periodo, $fecha_min, $fecha_max);
         }
 //        dd($periodo, $fecha_desde, $fecha_hasta);
+        $accion = 'html';
 // En caso de volver luego de haber enviado un correo, ver el metodo 'emailcita', en AgendaController.
         $alertar = 0;
         if ('alert' == $orden) {
             $orden = '';
             $alertar = 1;
+        } elseif (('ver' == $orden) or ('descargar' == $orden)) {
+            $accion = $orden;
+            $orden = '';
         }
         if ('' == $orden or is_null($orden)) {
             $orden = 'turno';
@@ -91,24 +95,34 @@ class TurnoController extends Controller
         if (0 < $asesor) {      // Se selecciono un asesor o el conectado no es administrador.
             $turnos = $turnos->where('user_id', $asesor);
         }
+        //dd($fecha_desde, $fecha_hasta, $turnos->get());
         if ('' != $fecha_desde and '' != $fecha_hasta) {    // No se seleccionaron fechas.
             $fecha_desde = substr($fecha_desde, 0, 10);
             $fecha_hasta = substr($fecha_hasta, 0, 10);
-            $turnos = $turnos->whereBetween('turno', [$fecha_desde, $fecha_hasta]);
+            $turnos = $turnos->whereBetween('turno',
+                                [$fecha_desde, $fecha_hasta.' 23:59:59']);  // Cualquier hora antes de medianoche.
         } else {
             $turnos = $turnos->where('turno', '>=', now(Fecha::$ZONA));
         }
+//        dd($periodo, $fecha_desde, $fecha_hasta);
         $turnos = $turnos->orderBy($orden);   // Ordenar los items de los turnos.
         if ('user_id' == $orden) {              // Si se pidió ordenar por id de usuario,
             $turnos = $turnos->orderBy('turno');   // ordenar por turno en cada usuario.
         }
-        if ($movil) $turnos = $turnos->get();
+        if ($movil or ('html' != $accion)) $turnos = $turnos->get();
         else $turnos = $turnos->paginate($this->lineasXPagina);               // Pagina la impresión de 10 en 10
 // Devolver las fechas sin la hora. Los diez primeros caracteres son: yyyy-mm-dd.
         session(['rPeriodo' => $rPeriodo, 'fecha_desde' => $fecha_desde,    // Asignar valores en sesión.
                     'fecha_hasta' => $fecha_hasta, 'asesor' => $asesor]);
-        return view('turnos.index', compact('title', 'users', 'turnos', 'ruta', 'diaSemana',
-                'semanas', 'rPeriodo', 'fecha_desde', 'fecha_hasta', 'asesor', 'alertar', 'movil'));
+        if ('html' == $accion)
+            return view('turnos.index', compact('title', 'users', 'turnos',
+                    'ruta', 'diaSemana', 'semanas', 'rPeriodo', 'fecha_desde',
+                    'fecha_hasta', 'asesor', 'alertar', 'movil', 'accion'));
+        $html = view('turnos.index', compact('title', 'users', 'turnos',
+                    'ruta', 'diaSemana', 'semanas', 'rPeriodo', 'fecha_desde',
+                    'fecha_hasta', 'asesor', 'alertar', 'movil', 'accion'))
+                ->render();
+        General::generarPdf($html, 'turnos', $accion);
     }
 
     public function crear($semana = null)

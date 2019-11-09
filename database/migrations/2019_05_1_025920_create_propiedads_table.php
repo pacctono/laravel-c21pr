@@ -20,7 +20,8 @@ class CreatePropiedadsTable extends Migration
             $table->date('fecha_firma')->nullable();
             $table->enum('negociacion', ['V', 'A'])->comment('[V]enta,[A]luiler');
             $table->string('nombre', 160);
-            $table->boolean('exclusividad')->default(true);
+            $table->boolean('exclusividad')->default(true)
+                    ->comment('Define si la propiedad es dada en exclusiva para la negociacion.');
             $table->unsignedInteger('tipo_id')->default(6)->comment('Tipo de construccion');
             $table->foreign('tipo_id')->references('id')->on('tipos');
             $table->float('metraje', 10, 2)->nullable()->comment('Metraje de construccion');

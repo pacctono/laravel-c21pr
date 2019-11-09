@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use Carbon\Carbon;
 use Jenssegers\Agent\Agent;                 // PC
+use Mpdf\Mpdf;
 use App\MisClases\General;               // PC
 
 class UserController extends Controller
@@ -21,7 +22,7 @@ class UserController extends Controller
     protected $tipo = 'Asesor';
     protected $lineasXPagina = General::LINEASXPAGINA;
 
-    public function index($orden = null)
+    public function index($orden=null)
     {
         if (!(Auth::check())) {
             return redirect('login');
@@ -34,22 +35,65 @@ class UserController extends Controller
         //$users = DB::table('users')->get();
         $title = 'Listado de ' . $this->tipo . 'es';
 
+        $accion = 'html';
 // En caso de volver luego de haber enviado un correo, ver el metodo 'emailcita', en AgendaController.
         $alertar = 0;
         if ('alert' == $orden) {
             $orden = '';
             $alertar = 1;
+        } elseif (('ver' == $orden) or ('descargar' == $orden)) {
+            $accion = $orden;
+            $orden = '';
         }
         if ('' == $orden or is_null($orden)) {
             $orden = 'id';
         }
         $agente = new Agent();
         $movil  = $agente->isMobile() and true;             // Fuerzo booleana. No funciona al usar el metodo directamente.
-        if ($movil) $users = User::orderBy($orden)->get();
+        if ($movil or ('html' != $accion)) $users = User::orderBy($orden)->get();
         else $users = User::orderBy($orden)->paginate($this->lineasXPagina);
-        //dd($users);
 
-        return view('users.index', compact('title', 'users', 'alertar', 'movil'));
+        if ('html' == $accion)
+            return view('users.index', compact('title', 'users', 'alertar', 'movil', 'accion'));
+        $html = view('users.index', compact('title', 'users', 'alertar', 'movil', 'accion'))
+                ->render();
+        //dd($html);
+        General::generarPdf($html, 'asesores', $accion);
+/*
+        $namefile = 'asesores_'.time().'.pdf';
+ 
+        $defaultConfig = (new \Mpdf\Config\ConfigVariables())->getDefaults();
+        $fontDirs = $defaultConfig['fontDir'];
+ 
+        $defaultFontConfig = (new \Mpdf\Config\FontVariables())->getDefaults();
+        $fontData = $defaultFontConfig['fontdata'];
+        $mpdf = new Mpdf([
+            'fontDir' => array_merge($fontDirs, [
+                public_path() . '/fonts',
+            ]),
+            'fontdata' => $fontData + [
+                'arial' => [
+                    'R' => 'arial.ttf',
+                    'B' => 'arialbd.ttf',
+                ],
+            ],
+            'default_font' => 'arial',
+            //"format" => [216.0,279.0],  // Carta en dimensiones milimetricas.
+            "format" => "letter",  // Carta. Otras opciones: A4, A3, A2, etc.
+        ]);
+        // $mpdf->SetTopMargin(5);
+        $mpdf->SetHTMLHeader('<h6 align="center">Puente Real</h6>');
+        $mpdf->SetHTMLFooter('<h6>Piso 1, Centro Comercial Costanera Plaza I, Barcelona, 0281-416.0885.&copy; Copyright 2019-' . 
+                                date('Y') . '</h6>');
+        $mpdf->SetDisplayMode('fullpage');
+        $mpdf->WriteHTML($html);
+        // dd($mpdf);
+        if($accion=='ver'){
+            $mpdf->Output($namefile,"I");
+        }elseif($accion=='descargar'){
+            $mpdf->Output($namefile,"D");   // "D": Descargar el archivo. "F": Guardar el archivo.
+        }
+ */
     }
 
     public function show(User $user)

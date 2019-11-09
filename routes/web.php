@@ -450,6 +450,8 @@ Route::get('/emailtodascitas/{tipo}', 'AgendaController@emailtodascitas')
 Route::get('/cumpleano/{user}', 'AgendaController@cumpleano')
     ->name('agenda.cumpleano');
 
+Route::get('pdf','PdfController@getIndex');
+Route::get('pdf/generar','PdfController@getGenerar');
 //Route::get('/clientes/filtrar/{filtro}', 'ClienteController@filtro')
 //    ->name('clientes.filtro');
 

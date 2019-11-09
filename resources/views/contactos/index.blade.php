@@ -2,12 +2,17 @@
 
 @section('content')
     <div class="d-flex justify-content-between align-items-end mb-1">
+        @if (!isset($accion) or ('html' == $accion))
         @if ($movil)
         <h4 class="pb-1">{{ substr($title, 11) }}</h4>
         @else
         <h1 class="pb-1">{{ $title }}</h1>
         @endif
+        @else ('html' == $accion)
+        <h1 align="center">{{ $title }}</h1>
+        @endif (!isset($accion) or ('html' == $accion))
 
+        @if ((!$movil) and (!isset($accion) or ('html' == $accion)))
         <p>
             <a href="{{ route('contactos.create') }}" class="btn btn-primary">
             @if ($movil)
@@ -17,6 +22,7 @@
             @endif
             </a>
         </p>
+        @endif ((!$movil) and (!isset($accion) or ('html' == $accion)))
     </div>
     @if ($alertar)
         <script>alert('El correo fue enviado al asesor');</script>
@@ -24,7 +30,11 @@
     @if ($contactos->isNotEmpty())
     <table class="table table-striped table-hover table-bordered">
         <thead class="thead-dark">
-        <tr>
+        <tr
+        @if (isset($accion) and ('html' != $accion))
+            class="encabezado"
+        @endif (isset($accion) and ('html' != $accion))
+        >
             <!-- th scope="col">#</th -->
             <th scope="col">
                 <a href="{{ route('contactos.orden', 'name') }}" class="btn btn-link">
@@ -36,7 +46,7 @@
                     Telefono
                 </a>
             </th>
-            @if (!$movil)
+        @if (!$movil)
             <th scope="col">
                 <a href="{{ route('contactos.orden', 'email') }}" class="btn btn-link">
                     Correo
@@ -53,9 +63,11 @@
                     Contactado por
                 </a>
             </th>
-            @endif
+            @endif (1 == Auth::user()->is_admin)
+        @if (!isset($accion) or ('html' == $accion))
             <th scope="col">Acciones</th>
-            @endif
+        @endif (!isset($accion) or ('html' == $accion))
+            @endif (!$movil)
         </tr>
         </thead>
         <tbody>
@@ -94,6 +106,7 @@
             @if (1 == Auth::user()->is_admin)
             <td>{{ $contacto->user->name }}</td>
             @endif
+        @if (!isset($accion) or ('html' == $accion))
             <td class="d-flex align-items-end">
                 <a href="{{ route('contactos.show', $contacto) }}" class="btn btn-link" 
                         title="Mostrar los datos de este contacto inicial ({{ $contacto->name }}).">
@@ -123,16 +136,27 @@
                     @endif
                 @endif
             </td>
-            @endif
+        @endif (!isset($accion) or ('html' == $accion))
+        @endif (!$movil)
         </tr>
         @endforeach
         </tbody>
     </table>
-    @if (!$movil)
+@if ((!$movil) and (!isset($accion) or ('html' == $accion)))
     {{ $contactos->links() }}
-    @endif
-    @else
-        <p>No hay contactos iniciales registrados.</p>
-    @endif
+@endif ((!$movil) and (!isset($accion) or ('html' == $accion)))
+
+@else ($contactos->isNotEmpty())
+    <p>No hay contactos iniciales registrados.</p>
+@endif ($contactos->isNotEmpty())
+
+@if (!isset($accion) or ('html' == $accion))
+    <a target="_blank" href="{{ route('contactos.orden', 'ver') }}">
+        <button>Ver PDF</button>
+    </a>
+    <a target="_blank" href="{{ route('contactos.orden', 'descargar') }}">
+        <button>Descargar PDF</button>
+    </a>
+@endif (!isset($accion) or ('html' == $accion))
 
 @endsection

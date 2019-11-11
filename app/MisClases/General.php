@@ -391,6 +391,7 @@ class General {
 
     public static function generarPdf($html, $nombre, $accion="ver")
     {
+        // Ver: https://mpdf.github.io/ y https://desarrollowebtutorial.com/generar-pdf-en-laravel/
         $namefile = $nombre . '_' . time() . '.pdf';
  
         $defaultConfig = (new \Mpdf\Config\ConfigVariables())->getDefaults();
@@ -409,13 +410,20 @@ class General {
                 ],
             ],
             'default_font' => 'arial',
+            'margin_header' => 10,
+            'margin_top' => 25,
             //"format" => [216.0,279.0],  // Carta en dimensiones milimetricas.
             "format" => "letter",  // Carta. Otras opciones: A4, A3, A2, etc.
         ]);
         // $mpdf->SetTopMargin(5);
-        $mpdf->SetHTMLHeader('<h6 align="center">Puente Real</h6>');
-        $mpdf->SetHTMLFooter('<h6>Piso 1, Centro Comercial Costanera Plaza I, Barcelona, 0281-416.0885.&copy; Copyright 2019-' . 
-                                date('Y') . '</h6>');
+        //$mpdf->SetHTMLHeader('<h6 align="center">Puente Real</h6>');
+        $mpdf->SetHTMLHeader("<div style='text-align:center;'>" .
+                            "<img src='" . public_path() . "/img/c21pr.jpg' " . 
+                            "title='C21 Puente Real' alt='C21 Puente Real' " .
+                            "style='display:block;margin:0 auto;width:50;height:48;'></div>");
+        $mpdf->SetHTMLFooter('<h6>Piso 1, Centro Comercial Costanera Plaza I, Barcelona, ' .
+                                '0281-416.0885.&copy; Copyright 2019-{DATE Y}' .
+                                ' Fecha:{DATE j/m/Y} P&aacute;gina:{PAGENO}/{nb}</h6>');
         $mpdf->SetDisplayMode('fullpage');
         $mpdf->WriteHTML($html);
         // dd($mpdf);

@@ -8,11 +8,11 @@
         @else
         <h1 class="pb-1">{{ $title }}</h1>
         @endif
-        @else ('html' == $accion)
-        <h1 align="center">{{ $title }}</h1>
+        @else (!isset($accion) or ('html' == $accion))
+        <h1 style="text-align:center">{{ $title }}</h1>
         @endif (!isset($accion) or ('html' == $accion))
 
-        @if ((!$movil) and (!isset($accion) or ('html' == $accion)))
+        @if (!isset($accion) or ('html' == $accion))
         <p>
             <a href="{{ route('contactos.create') }}" class="btn btn-primary">
             @if ($movil)
@@ -22,13 +22,19 @@
             @endif
             </a>
         </p>
-        @endif ((!$movil) and (!isset($accion) or ('html' == $accion)))
+        @endif (!isset($accion) or ('html' == $accion))
     </div>
     @if ($alertar)
         <script>alert('El correo fue enviado al asesor');</script>
     @endif
     @if ($contactos->isNotEmpty())
-    <table class="table table-striped table-hover table-bordered">
+    <table
+    @if (!isset($accion) or ('html' == $accion))
+        class="table table-striped table-hover table-bordered"
+    @else (!isset($accion) or ('html' == $accion))
+        class="center"
+    @endif (!isset($accion) or ('html' == $accion))
+    >
         <thead class="thead-dark">
         <tr
         @if (isset($accion) and ('html' != $accion))
@@ -150,13 +156,6 @@
     <p>No hay contactos iniciales registrados.</p>
 @endif ($contactos->isNotEmpty())
 
-@if (!isset($accion) or ('html' == $accion))
-    <a target="_blank" href="{{ route('contactos.orden', 'ver') }}">
-        <button>Ver PDF</button>
-    </a>
-    <a target="_blank" href="{{ route('contactos.orden', 'descargar') }}">
-        <button>Descargar PDF</button>
-    </a>
-@endif (!isset($accion) or ('html' == $accion))
+@include('include.botonesPdf', ['enlace' => 'contactos'])
 
 @endsection

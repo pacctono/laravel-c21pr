@@ -18,7 +18,7 @@ class TurnoController extends Controller
     protected $tipo = 'Turnos';
     protected $lineasXPagina = General::LINEASXPAGINA;
 
-    public function index($orden = null)
+    public function index($orden=null, $accion='html')
     {
         if (!(Auth::check())) {
             return redirect('login');
@@ -69,15 +69,11 @@ class TurnoController extends Controller
             list ($fecha_desde, $fecha_hasta) = Fecha::periodo($periodo, $fecha_min, $fecha_max);
         }
 //        dd($periodo, $fecha_desde, $fecha_hasta);
-        $accion = 'html';
 // En caso de volver luego de haber enviado un correo, ver el metodo 'emailcita', en AgendaController.
         $alertar = 0;
         if ('alert' == $orden) {
             $orden = '';
             $alertar = 1;
-        } elseif (('ver' == $orden) or ('descargar' == $orden)) {
-            $accion = $orden;
-            $orden = '';
         }
         if ('' == $orden or is_null($orden)) {
             $orden = 'turno';
@@ -117,10 +113,10 @@ class TurnoController extends Controller
         if ('html' == $accion)
             return view('turnos.index', compact('title', 'users', 'turnos',
                     'ruta', 'diaSemana', 'semanas', 'rPeriodo', 'fecha_desde',
-                    'fecha_hasta', 'asesor', 'alertar', 'movil', 'accion'));
+                    'fecha_hasta', 'asesor', 'alertar', 'orden', 'movil', 'accion'));
         $html = view('turnos.index', compact('title', 'users', 'turnos',
                     'ruta', 'diaSemana', 'semanas', 'rPeriodo', 'fecha_desde',
-                    'fecha_hasta', 'asesor', 'alertar', 'movil', 'accion'))
+                    'fecha_hasta', 'asesor', 'alertar', 'orden', 'movil', 'accion'))
                 ->render();
         General::generarPdf($html, 'turnos', $accion);
     }

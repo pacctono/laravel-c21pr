@@ -22,7 +22,7 @@ Route::get('/home', 'HomeController@index')->name('home');
 Route::get('/usuarios', 'UserController@index')
     ->name('users');
 
-Route::get('/usuarios/orden/{orden}', 'UserController@index')
+Route::get('/usuarios/orden/{orden}/accion/{accion?}', 'UserController@index')
     ->name('users.orden');
 
 Route::get('/usuarios/{user}', 'UserController@show')
@@ -44,7 +44,7 @@ Route::delete('/usuarios/{user}', 'UserController@destroy')
     ->name('users.destroy')
     ->middleware('admin');
 
-Route::get('/contactos/orden/{orden}', 'ContactoController@index')
+Route::get('/contactos/orden/{orden}/accion/{accion?}', 'ContactoController@index')
     ->name('contactos.orden');
 
 Route::pattern('contactos', '[0-9]+');  // Para no crear conflictos con el resource contacto
@@ -72,14 +72,14 @@ Route::put('/turnos/{turno}', 'TurnoController@update');
 Route::delete('/turnos/{turno}', 'TurnoController@destroy')
     ->name('turnos.destroy');
 
-Route::get('/turnos/orden/{orden}', 'TurnoController@index')
+Route::get('/turnos/orden/{orden}/accion/{accion?}', 'TurnoController@index')
     ->name('turnos.orden');
 
 Route::get('/turnos/filtro', 'TurnoController@index');     // Para paginación con filtro.
 Route::post('/turnos/filtro', 'TurnoController@index')
     ->name('turnos.post');
 
-Route::get('/clientes/orden/{orden}', 'ClienteController@index')
+Route::get('/clientes/orden/{orden}/accion/{accion?}', 'ClienteController@index')
     ->name('clientes.orden');
 
 Route::pattern('clientes', '[0-9]+');               // Para no crear conflictos con el resource cliente
@@ -90,7 +90,7 @@ Route::resource('clientes', 'ClienteController');
 Route::get('/agenda', 'AgendaController@index')
     ->name('agenda');
 
-Route::get('/agenda/orden/{orden}', 'AgendaController@index')
+Route::get('/agenda/orden/{orden}/accion/{accion?}', 'AgendaController@index')
     ->name('agenda.orden');
 
 Route::get('/agenda/filtro', 'AgendaController@index');     // Para paginación con filtro.
@@ -130,7 +130,7 @@ Route::put('/agendaPersonal/{agenda}', 'AgendaPersonalController@update')
     ->where('agenda', '[0-9]+')
     ->name('agendaPersonal.update');
 
-Route::get('/propiedades/orden/{orden}', 'PropiedadController@index')
+Route::get('/propiedades/orden/{orden}/accion/{accion?}', 'PropiedadController@index')
     ->name('propiedades.orden');
 
 Route::get('/propiedades/filtro', 'PropiedadController@index');     // Para paginación con filtro.

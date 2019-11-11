@@ -1,4 +1,5 @@
-  <div class="row my-0 py-0 mx-1 px-1">
+  <div @if('html'==$accion) class="row my-0 py-0 mx-1 px-1"
+      @else style="border:1px solid #000;" @endif>
     TOT.$s: {{ $filas }} props
     <span class="alert-success mx-1 px-1" title="Precio">
         {{ Prop::numeroVen($tPrecio, 0) }}</span>{{-- 'Prop' es un alias definido en config/app.php --}}
@@ -19,7 +20,8 @@
     <span class="alert-success ml-0 mr-1 px-1" title="Sanaf - 5%">
         {{ Prop::numeroVen($tSanaf5PorCiento, 2) }}</span>
   </div>
-  <div class="row my-0 py-0 mx-1 px-1">
+  <div @if('html'==$accion) class="row my-0 py-0 mx-1 px-1"
+      @else style="border:1px solid #000;" @endif>
     <span class="alert-info ml-1 mr-0 px-1">Captador:</span>
     <span class="alert-success ml-0 mr-1 px-1" title="Captador PRBR">
         {{ Prop::numeroVen($tCaptadorPrbr, 2) }}
@@ -78,7 +80,8 @@
   @if ((0 < $tCaptadorPrbrSel) || (0 < $tCerradorPrbrSel))
     {{-- $tCaptadorPrbrSel }}-{{ $tCerradorPrbr --}}
   </div>
-  <div class="row my-0 py-0 mx-1 px-1">
+  <div @if('html'==$accion) class="row my-0 py-0 mx-1 px-1"
+      @else style="border:1px solid #000;" @endif>
   @endif ((0 != $tCaptadorPrbrSel) || (0 != $tCerradorPrbr))
     <span class="alert-info ml-1 mr-0 px-1">Puntos:</span>
     <span class="alert-success ml-0 mr-1 px-1" title="Total de puntos: Captado + Cerrado">

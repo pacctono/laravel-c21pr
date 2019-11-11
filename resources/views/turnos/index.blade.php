@@ -80,9 +80,9 @@
   @else
     <h1 class="pb-0">{{ $title }}</h1>
   @endif
-  @else ((!$movil) and (!isset($accion) or ('html' == $accion)))
-    <h1 align="center">{{ $title }}</h1>
-  @endif ((!$movil) and (!isset($accion) or ('html' == $accion)))
+  @else (!isset($accion) or ('html' == $accion))
+    <h1 style="text-align:center;">{{ $title }}</h1>
+  @endif (!isset($accion) or ('html' == $accion))
 
   @if ((!$movil) and (!isset($accion) or ('html' == $accion)))
     @if (Auth::user()->is_admin)
@@ -112,7 +112,7 @@
 @if (!isset($accion) or ('html' == $accion))
   class="table table-striped table-hover table-bordered"
 @else (!isset($accion) or ('html' == $accion))
-  align="center"
+  class="center"
 @endif (!isset($accion) or ('html' == $accion))
 >
   <thead class="thead-dark my-0 py-0">
@@ -166,6 +166,7 @@
     </tr>
   @endForeach
   </tbody>
+@if (!isset($accion) or ('html' == $accion))
   @if (Auth::user()->is_admin)
   <tfoot>
     <tr>
@@ -177,6 +178,7 @@
     </tr>
   </tfoot>
   @endif
+@endif (!isset($accion) or ('html' == $accion))
 </table>
 @if ((!$movil) and (!isset($accion) or ('html' == $accion)))
     {{ $turnos->links() }}
@@ -186,14 +188,7 @@
   <p>No hay turnos registrados.</p>
 @endif ($turnos->isNotEmpty())
 
-@if (!isset($accion) or ('html' == $accion))
-    <a target="_blank" href="{{ route('turnos.orden', 'ver') }}">
-        <button>Ver PDF</button>
-    </a>
-    <a target="_blank" href="{{ route('turnos.orden', 'descargar') }}">
-        <button>Descargar PDF</button>
-    </a>
-@endif (!isset($accion) or ('html' == $accion))
+@include('include.botonesPdf', ['enlace' => 'turnos'])
 
 @endsection
 

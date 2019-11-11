@@ -22,7 +22,7 @@ class UserController extends Controller
     protected $tipo = 'Asesor';
     protected $lineasXPagina = General::LINEASXPAGINA;
 
-    public function index($orden=null)
+    public function index($orden=null, $accion='html')
     {
         if (!(Auth::check())) {
             return redirect('login');
@@ -35,15 +35,11 @@ class UserController extends Controller
         //$users = DB::table('users')->get();
         $title = 'Listado de ' . $this->tipo . 'es';
 
-        $accion = 'html';
 // En caso de volver luego de haber enviado un correo, ver el metodo 'emailcita', en AgendaController.
         $alertar = 0;
         if ('alert' == $orden) {
             $orden = '';
             $alertar = 1;
-        } elseif (('ver' == $orden) or ('descargar' == $orden)) {
-            $accion = $orden;
-            $orden = '';
         }
         if ('' == $orden or is_null($orden)) {
             $orden = 'id';
@@ -54,8 +50,10 @@ class UserController extends Controller
         else $users = User::orderBy($orden)->paginate($this->lineasXPagina);
 
         if ('html' == $accion)
-            return view('users.index', compact('title', 'users', 'alertar', 'movil', 'accion'));
-        $html = view('users.index', compact('title', 'users', 'alertar', 'movil', 'accion'))
+            return view('users.index',
+                    compact('title', 'users', 'alertar', 'orden', 'movil', 'accion'));
+        $html = view('users.index',
+                    compact('title', 'users', 'alertar', 'orden', 'movil', 'accion'))
                 ->render();
         //dd($html);
         General::generarPdf($html, 'asesores', $accion);

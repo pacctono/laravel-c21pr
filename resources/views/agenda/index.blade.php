@@ -4,6 +4,7 @@
   <!-- div class="card-body">
     <h1>{{ $title }}</h1>
   </div -->
+@if ((!$movil) and (!isset($accion) or ('html' == $accion)))
 <div>
     <form method="POST" class="form-horizontal" action="{{ route('agenda.post') }}"
           onSubmit="return alertaFechaRequerida()">
@@ -76,33 +77,51 @@
         </div>
       </div>--}}
     </form>
-    <div class="d-flex justify-content-between align-items-end mb-1">
+</div>
+@endif ((!$movil) and (!isset($accion) or ('html' == $accion)))
+<div class="d-flex justify-content-between align-items-end mb-1">
+  @if (!isset($accion) or ('html' == $accion))
+    @if ($movil)
+    <h4 class="pb-1">Agenda</h4>
+    @else
+    <h1 class="pb-1">Agenda</h1>
+    @endif
+  @else (!isset($accion) or ('html' == $accion))
+    <h1 style="text-align:center;">Agenda</h1>
+  @endif (!isset($accion) or ('html' == $accion))
+
+  @if (!isset($accion) or ('html' == $accion))
+    <p>
+        <a href="{{ route('agendaPersonal.crear') }}" class="btn btn-primary">
         @if ($movil)
-        <h4 class="pb-1">Agenda</h4>
+            Crear
         @else
-        <h1 class="pb-1">Agenda</h1>
+            Crear Cita Personal
         @endif
-
-        <p>
-            <a href="{{ route('agendaPersonal.crear') }}" class="btn btn-primary">
-            @if ($movil)
-                Crear
-            @else
-                Crear Cita Personal
-            @endif
-            </a>
-        </p>
-    </div>
-
+        </a>
+    </p>
+  @endif (!isset($accion) or ('html' == $accion))
 </div>
 
 @if ($alertar)
     <script>alert('Fue enviado un correo a cada asesor con todas sus citas.');</script>
 @endif
 @if ($agendas->isNotEmpty())
-<table class="table table-striped table-hover table-bordered">
+<table
+@if (!isset($accion) or ('html' == $accion))
+  class="table table-striped table-hover table-bordered"
+@else (!isset($accion) or ('html' == $accion))
+  class="center"
+@endif (!isset($accion) or ('html' == $accion))
+>
   <thead class="thead-dark">
-    <tr>
+    <tr
+    @if (isset($accion) and ('html' != $accion))
+      class="encabezado"
+    @else (isset($accion) and ('html' != $accion))
+      class="my-0 py-0"
+    @endif (isset($accion) and ('html' != $accion))
+    >
       <th scope="col">
         <a href="{{ route('agenda.orden', 'fecha_evento') }}" class="btn btn-link">
           Fecha
@@ -134,8 +153,10 @@
         Correo electrónico
       @endif
       </th>
+    @if (!isset($accion) or ('html' == $accion))
       <th scope="col">Acciones</th>
-    @endif
+    @endif (!isset($accion) or ('html' == $accion))
+    @endif (!$movil)
     </tr>
   </thead>
   <tbody>
@@ -189,10 +210,11 @@
         {{ $agenda->email }}
       @endif (Auth::user()->is_admin)
       </td>
+    @if (!isset($accion) or ('html' == $accion))
       <td class="d-flex align-items-end">
-      @if (('T' == $agenda->tipo) or (NULL == $agenda->contacto_id))
+      @if (('T' == $agenda->tipo) or (NULL == $agenda->contacto_id))  {{-- La cita es un turno --}}
         &nbsp;
-      @else (('T' == $agenda->tipo) or (NULL == $agenda->contacto_id))
+      @else (('T' == $agenda->tipo) or (NULL == $agenda->contacto_id))  {{-- La cita no es un turno --}}
         <a href="
       @if ('C' == $agenda->tipo)  {{-- Esta cita es con un contacto incial --}}
         {{ route('agenda.show', $agenda->contacto) }}
@@ -231,10 +253,12 @@
       @endif (Auth::user()->is_admin)
       @endif (('T' == $agenda->tipo) or (NULL == $agenda->contacto_id))
       </td>
+    @endif (!isset($accion) or ('html' == $accion))
     @endif (!$movil)
     </tr>
   @endForeach
   </tbody>
+@if (!isset($accion) or ('html' == $accion))
   @if (Auth::user()->is_admin)
   <tfoot>
     <tr>
@@ -245,14 +269,18 @@
       </td>
     </tr>
   </tfoot>
-  @endif
+  @endif (Auth::user()->is_admin)
+@endif (!isset($accion) or ('html' == $accion))
 </table>
-@if (!$movil)
-{{ $agendas->links() }}
-@endif
-@else
-<p>No tiene agenda registrada.</p>
-@endif
+@if ((!$movil) and (!isset($accion) or ('html' == $accion)))
+    {{ $agendas->links() }}
+@endif ((!$movil) and (!isset($accion) or ('html' == $accion)))
+
+@else ($agendas->isNotEmpty())
+    <p>No tiene agenda registrada.</p>
+@endif ($agendas->isNotEmpty())
+
+@include('include.botonesPdf', ['enlace' => 'agenda'])
 
 @endsection
 

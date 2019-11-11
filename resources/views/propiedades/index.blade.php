@@ -1,7 +1,9 @@
 @extends('layouts.app')
 
 @section('content')
+
 <div>
+@if ((!$movil) and (!isset($accion) or ('html' == $accion)))
     <form method="POST" class="form-horizontal" action="{{ route('propiedades.post') }}"
             onSubmit="return alertaCampoRequerido()">
         {!! csrf_field() !!}
@@ -75,6 +77,7 @@
         </div>
     </div>--}}
     </form>
+@endif ((!$movil) and (!isset($accion) or ('html' == $accion)))
 
     @includeIf('include.totalesPropiedad')
     {{--<div class="row my-0 py-0 mx-1 px-1">
@@ -184,6 +187,7 @@
 </div>
 
     <div class="row">
+    @if (!isset($accion) or ('html' == $accion))
         <div class="col-sm-8">
         @if ($movil)
             <h5 class="pb-1">{{ substr($title, 11) }}</h5>
@@ -195,53 +199,96 @@
             <a href="{{ route('propiedades.create') }}" class="btn btn-primary float-right">
                 Crear Propiedad</a>
         </div>
+    @else (!isset($accion) or ('html' == $accion))
+        <h1 style="text-align:center;">{{ $title }}</h1>
+    @endif (!isset($accion) or ('html' == $accion))
     </div>
     @if ($propiedades->isNotEmpty())
-    <table class="table table-striped table-hover table-bordered table-sm">
-        <thead class="thead-dark">
-        <tr>
+    <table
+    @if (!isset($accion) or ('html' == $accion))
+        class="table table-striped table-hover table-bordered"
+    @else (!isset($accion) or ('html' == $accion))
+        class="center"
+    @endif (!isset($accion) or ('html' == $accion))
+    >
+        <thead class="thead-dark my-0 py-0">
+        <tr
+        @if ((isset($accion) and ('html' != $accion)))
+            class="encabezado"
+        @else ((isset($accion) and ('html' != $accion)))
+            class="my-0 py-0"
+        @endif ((isset($accion) and ('html' != $accion)))
+        >
             <th scope="col">
+            @if (!isset($accion) or ('html' == $accion))
                 <a href="{{ route('propiedades.orden', 'codigo') }}" class="btn btn-link">
                     C&oacute;digo
                 </a>
+            @else (!isset($accion) or ('html' == $accion))
+                C&oacute;digo
+            @endif (!isset($accion) or ('html' == $accion))
             </th>
         @if (!$movil)
             <th scope="col" title="Fecha de reserva">
+            @if (!isset($accion) or ('html' == $accion))
                 <a href="{{ route('propiedades.orden', 'fecha_reserva') }}" class="btn btn-link">
                     Reserva
                 </a>
-        @if (Auth::user()->is_admin)
+            @else (!isset($accion) or ('html' == $accion))
+                Reserva
+            @endif (!isset($accion) or ('html' == $accion))
+        @if ((Auth::user()->is_admin) and (!isset($accion) or ('html' == $accion)))
                 <br>
-        @else
+        @else ((Auth::user()->is_admin) and (!isset($accion) or ('html' == $accion)))
             </th>
             <th scope="col" title="Fecha de la firma">
-        @endif (Auth::user()->is_admin)
+        @endif ((Auth::user()->is_admin) and (!isset($accion) or ('html' == $accion)))
+            @if (!isset($accion) or ('html' == $accion))
                 <a href="{{ route('propiedades.orden', 'fecha_firma') }}" class="btn btn-link">
                     Firma
                 </a>
+            @else (!isset($accion) or ('html' == $accion))
+                Firma
+            @endif (!isset($accion) or ('html' == $accion))
             </th>
             <th scope="col" title="Tipo de negociaci&oacute;n">
+            @if (!isset($accion) or ('html' == $accion))
                 <a href="{{ route('propiedades.orden', 'negociacion') }}" class="btn btn-link">
                     N
                 </a>
+            @else (!isset($accion) or ('html' == $accion))
+                N
+            @endif (!isset($accion) or ('html' == $accion))
             </th>
         @endif (!$movil)
             <th scope="col">
+            @if (!isset($accion) or ('html' == $accion))
                 <a href="{{ route('propiedades.orden', 'nombre') }}" class="btn btn-link">
                     Nombre
                 </a>
+            @else (!isset($accion) or ('html' == $accion))
+                Nombre
+            @endif (!isset($accion) or ('html' == $accion))
             </th>
             <th scope="col">
+            @if (!isset($accion) or ('html' == $accion))
                 <a href="{{ route('propiedades.orden', 'precio') }}" class="btn btn-link">
                     Precio
                 </a>
+            @else (!isset($accion) or ('html' == $accion))
+                Precio
+            @endif (!isset($accion) or ('html' == $accion))
             </th>
             <th scope="col" title="Lados">
+            @if (!isset($accion) or ('html' == $accion))
                 <a href="{{ route('propiedades.orden', 'lados') }}" class="btn btn-link">
                     L
                 </a>
+            @else (!isset($accion) or ('html' == $accion))
+                L
+            @endif (!isset($accion) or ('html' == $accion))
             </th>
-        @if (!$movil)
+        @if ((!$movil) and (!isset($accion) or ('html' == $accion)))
         @if (Auth::user()->is_admin)
             <th scope="col" title="Franquicia">
                 Franquic
@@ -257,15 +304,15 @@
             <th scope="col" title="Pago asesor captador, gerente y cerrador.">
                 Comis
             </th>
-        @else
+        @else (Auth::user()->is_admin)
             <th scope="col" title="Porcentaje de comision cobrado al inmueble">%Com</th>
             <th scope="col" title="Porcentaje de IVA cobrado al inmueble">%IVA</th>
             <th scope="col" title="Precio de venta real">PrVeRe</th>
             <th scope="col" title="Pago asesor captador y/o cerrador, y bonificaciones.">Comisi&oacute;n</th>
             <th scope="col" title="Puntos por esta propiedad">Puntos</th>
-        @endif
+        @endif (Auth::user()->is_admin)
             <th scope="col">Acciones</th>
-        @endif (!$movil)
+        @endif ((!$movil) and (!isset($accion) or ('html' == $accion)))
         </tr>
         </thead>
         <tbody>
@@ -286,28 +333,37 @@
         ">
         @if ($movil)
             <td>
+            @if (!isset($accion) or ('html' == $accion))
                 <a href="{{ route('propiedades.show', $propiedad) }}" class="btn btn-link">
                     <span class="float-right"> {{ $propiedad->codigo }} </span>
                 </a>
+            @else (!isset($accion) or ('html' == $accion))
+                {{ $propiedad->codigo }}
+            @endif (!isset($accion) or ('html' == $accion))
             </td>
             <td>
         @else ($movil)
+        @if (!isset($accion) or ('html' == $accion))
             <td title="{{ $propiedad->id }}) {{ (($propiedad->user_borro || $propiedad->deleted_at)?'Borrado':$propiedad->estatus_alfa) }}
 Reporte en casa nacional: {{ $propiedad->reporte_casa_nacional_ven }}
 Estatus en sistema C21: {{ $propiedad->estatus_c21_alfa.(($propiedad->pagado_casa_nacional)?' y PAGADO A CASA NACIONAL':'') }}
 {{ (($propiedad->factura_AyS)?'Factura A & S: '.$propiedad->factura_AyS.'.':'') }}">
                 <span class="float-right"> {{ $propiedad->codigo }} </span>
+        @else (!isset($accion) or ('html' == $accion))
+            <td>
+                {{ $propiedad->codigo }}
+        @endif (!isset($accion) or ('html' == $accion))
             </td>
 
             <td>
                 <span title="Fecha de reserva">
                     {{ $propiedad->fec_res }}</span>
-        @if (Auth::user()->is_admin)
+        @if ((Auth::user()->is_admin) and (!isset($accion) or ('html' == $accion)))
                 <br>
         @else (Auth::user()->is_admin)
             </td>
             <td>
-        @endif (Auth::user()->is_admin)
+        @endif ((Auth::user()->is_admin) and (!isset($accion) or ('html' == $accion)))
                 <span title="Fecha de la firma">
                     {{ $propiedad->fec_fir }}</span>
             </td>
@@ -315,11 +371,11 @@ Estatus en sistema C21: {{ $propiedad->estatus_c21_alfa.(($propiedad->pagado_cas
             <td title="{{ $propiedad->negociacion_alfa }}">
                 <span class="float-center">{{ $propiedad->negociacion }}</span></td>
 
-            @if (Auth::user()->is_admin)
+        @if ((Auth::user()->is_admin) and (!isset($accion) or ('html' == $accion)))
             <td title="{{ $propiedad->comentarios }}">
-            @else (Auth::user()->is_admin)
+        @else (Auth::user()->is_admin)
             <td>
-            @endif (Auth::user()->is_admin)
+        @endif ((Auth::user()->is_admin) and (!isset($accion) or ('html' == $accion)))
         @endif ($movil)
             {{ $propiedad->nombre }}</td>
 
@@ -330,19 +386,25 @@ Estatus en sistema C21: {{ $propiedad->estatus_c21_alfa.(($propiedad->pagado_cas
         @if ($movil)
             <td>
         @else ($movil)
-            @if (Auth::user()->is_admin)
+        @if ((Auth::user()->is_admin) and (!isset($accion) or ('html' == $accion)))
             <td title="Comisi&oacute;n: {{ $propiedad->comision_p }}
  Reserva s/IVA(I):{{ $propiedad->reserva_sin_iva_ven }};
                   IVA:{{ $propiedad->iva_p }};
  Reserva c/IVA(K):{{ $propiedad->reserva_con_iva_ven }}">
-            @else (Auth::user()->is_admin)
+        @else (Auth::user()->is_admin)
             <td>
-            @endif (Auth::user()->is_admin)
+        @endif ((Auth::user()->is_admin) and (!isset($accion) or ('html' == $accion)))
         @endif ($movil)
+            @if (!isset($accion) or ('html' == $accion))
                 <span class="float-right" title="Precio del inmueble">
                     {{ $propiedad->precio_ven }}
                 </span>
-            @if (Auth::user()->is_admin)
+            @else (!isset($accion) or ('html' == $accion))
+                <span style="text-align:right;">
+                    {{ $propiedad->precio_ven }}
+                </span>
+            @endif (!isset($accion) or ('html' == $accion))
+            @if ((Auth::user()->is_admin) and (!isset($accion) or ('html' == $accion)))
                 <br>
                 <span title="Comisi&oacute;n((H)">
                     Com:{{ $propiedad->comision_p }}
@@ -353,37 +415,44 @@ Estatus en sistema C21: {{ $propiedad->estatus_c21_alfa.(($propiedad->pagado_cas
                 <span class="float-right" title="Precio de venta real">
                     {{ $propiedad->precio_venta_real_ven }}
                 </span>
-            @endif (Auth::user()->is_admin)
+            @endif ((Auth::user()->is_admin) and (!isset($accion) or ('html' == $accion)))
             </td>
         @if ($movil)
             <td>
+            @if (!isset($accion) or ('html' == $accion))
                 <a href="{{ route('propiedades.edit', $propiedad) }}" class="btn btn-link">
                     <span class="float-right"> {{ $propiedad->lados }}</span>
                 </a>
+            @else (!isset($accion) or ('html' == $accion))
+                {{ $propiedad->lados }}
+            @endif (!isset($accion) or ('html' == $accion))
         @else ($movil)
-            @if (Auth::user()->is_admin)
+            @if ((Auth::user()->is_admin) and (!isset($accion) or ('html' == $accion)))
             <td
                 title="Compartido con otra oficina
                   s/IVA(M):{{ $propiedad->compartido_sin_iva_ven }};
  Reserva s/IVA(I):{{ $propiedad->reserva_sin_iva_ven }}
  Reserva c/IVA(K):{{ $propiedad->reserva_con_iva_ven }}">
-            @else
+            @else ((Auth::user()->is_admin) and (!isset($accion) or ('html' == $accion)))
             <td>
-            @endif
+            @endif ((Auth::user()->is_admin) and (!isset($accion) or ('html' == $accion)))
+            @if (!isset($accion) or ('html' == $accion))
                 <span class="float-right"> {{ $propiedad->lados }}</span>
+            @else (!isset($accion) or ('html' == $accion))
+                {{ $propiedad->lados }}
+            @endif (!isset($accion) or ('html' == $accion))
         @endif ($movil)
             </td>
 
-        @if (!$movil)
+        @if ((!$movil) and (!isset($accion) or ('html' == $accion)))
             @if (!(Auth::user()->is_admin))
                 <td><span class="float-right">{{ $propiedad->comision_p }}</span></td>
                 <td><span class="float-right">{{ $propiedad->iva_p }}</span></td>
                 <td><span class="float-right" title="Precio de venta real">
                     {{ $propiedad->precio_venta_real_ven }}</span>
                 </td>
-            @endif
 
-            @if (Auth::user()->is_admin)
+            @else (Auth::user()->is_admin)
             <td title="Franquicia">
                 <span class="float-right" title="Franquicia de reserva sin IVA(O) ({{ $propiedad->porc_franquicia_p }})">
                     {{ $propiedad->franquicia_reservado_sin_iva_ven }} 
@@ -426,7 +495,7 @@ Estatus en sistema C21: {{ $propiedad->estatus_c21_alfa.(($propiedad->pagado_cas
                     {{ $propiedad->ingreso_neto_oficina_ven }}
                 </span>
             </td>
-            @endif
+            @endif (!(Auth::user()->is_admin))
 
             <td>
             @if (Auth::user()->is_admin)
@@ -465,6 +534,7 @@ Estatus en sistema C21: {{ $propiedad->estatus_c21_alfa.(($propiedad->pagado_cas
             </td>
             @endif
 
+        {{-- @if (!isset($accion) or ('html' == $accion)) --}}
             <td class="d-flex align-items-end">
                 <a href="{{ route('propiedades.show', $propiedad) }}" class="btn btn-link" 
                         title="Mostrar los datos de esta propiedad ({{ $propiedad->nombre }}).">
@@ -490,7 +560,8 @@ Estatus en sistema C21: {{ $propiedad->estatus_c21_alfa.(($propiedad->pagado_cas
                 </form>
                 @endif
             </td>
-        @endif (!$movil)
+        {{-- @endif (!isset($accion) or ('html' == $accion)) --}}
+        @endif ((!$movil) and (!isset($accion) or ('html' == $accion)))
         </tr>
 
         <?php $propiedad->espMonB = true; // Restablecer variable cambiada antes de <precio> ?>
@@ -498,12 +569,15 @@ Estatus en sistema C21: {{ $propiedad->estatus_c21_alfa.(($propiedad->pagado_cas
         @endforeach
         </tbody>
     </table>
-    @if ($paginar)
+@if ($paginar)
     {{ $propiedades->links() }}
-    @endif
-    @else
-        <p>No hay propiedades registradas.</p>
-    @endif
+@endif ($paginar)
+
+@else ($propiedades->isNotEmpty())
+    <p>No hay propiedades registradas.</p>
+@endif ($propiedades->isNotEmpty())
+
+@include('include.botonesPdf', ['enlace' => 'propiedades'])
 
 @endsection
 

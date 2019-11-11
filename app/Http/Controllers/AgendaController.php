@@ -20,12 +20,13 @@ use Illuminate\Support\Facades\Mail;
 use Carbon\Carbon;
 use App\MisClases\Fecha;
 use Jenssegers\Agent\Agent;                 // PC
+use App\MisClases\General;               // PC
 
 class AgendaController extends Controller
 {
     protected $tipo = 'cita ';
 
-    public function index($orden = null) {
+    public function index($orden=null, $accion='html') {
         if (!(Auth::check())) {             // No esta conectado.
             return redirect('login');
         }
@@ -107,13 +108,20 @@ class AgendaController extends Controller
         if ('user_id' == $orden) {              // Si se pidió ordenar por id de usuario,
             $agendas = $agendas->orderBy('fecha_evento');   // ordenar por fecha_evento en cada usuario.
         }
-        if ($movil) $agendas = $agendas->get();
+        if ($movil or ('html' != $accion)) $agendas = $agendas->get();
         else $agendas = $agendas->paginate(10);               // Pagina la impresión de 10 en 10
         session(['rPeriodo' => $rPeriodo, 'fecha_desde' => $fecha_desde,    // Asignar valores en sesión.
                     'fecha_hasta' => $fecha_hasta, 'asesor' => $asesor]);
         //if ('este_mes' == $rPeriodo) dd($agendas, $users, $fecha_desde, $fecha_hasta, $asesor);
-        return view('agenda.index', compact('title', 'users', 'ruta', 'agendas',
-                    'rPeriodo', 'fecha_desde', 'fecha_hasta', 'asesor', 'alertar', 'movil'));
+        if ('html' == $accion)
+            return view('agenda.index', compact('title', 'users', 'ruta', 'agendas',
+                        'rPeriodo', 'fecha_desde', 'fecha_hasta', 'asesor',
+                        'alertar', 'orden', 'movil', 'accion'));
+        $html = view('agenda.index', compact('title', 'users', 'ruta', 'agendas',
+                        'rPeriodo', 'fecha_desde', 'fecha_hasta', 'asesor',
+                        'alertar', 'orden', 'movil', 'accion'))
+                ->render();
+        General::generarPdf($html, 'agendas', $accion);
     }
 
     public function show(Contacto $contacto)

@@ -2,12 +2,17 @@
 
 @section('content')
     <div class="d-flex justify-content-between align-items-end mb-1">
+        @if (!isset($accion) or ('html' == $accion))
         @if ($movil)
         <h4 class="pb-1">{{ substr($title, 11) }}</h4>
         @else
         <h1 class="pb-1">{{ $title }}</h1>
         @endif
+        @else (!isset($accion) or ('html' == $accion))
+        <h1 style="text-align:center">{{ $title }}</h1>
+        @endif (!isset($accion) or ('html' == $accion))
 
+        @if (!isset($accion) or ('html' == $accion))
         <p>
             <a href="{{ route('clientes.create') }}" class="btn btn-primary">
             @if ($movil)
@@ -17,12 +22,23 @@
             @endif
             </a>
         </p>
+        @endif (!isset($accion) or ('html' == $accion))
     </div>
 
     @if ($clientes->isNotEmpty())
-    <table class="table table-striped table-hover table-bordered">
+    <table
+    @if (!isset($accion) or ('html' == $accion))
+        class="table table-striped table-hover table-bordered"
+    @else (!isset($accion) or ('html' == $accion))
+        class="center"
+    @endif (!isset($accion) or ('html' == $accion))
+    >
         <thead class="thead-dark">
-        <tr>
+        <tr
+        @if (isset($accion) and ('html' != $accion))
+            class="encabezado"
+        @endif (isset($accion) and ('html' != $accion))
+        >
             <th scope="col">
                 <a href="{{ route('clientes.orden', 'cedula') }}" class="btn btn-link">
                     Cedula
@@ -38,6 +54,7 @@
                     Nombre
                 </a>
             </th>
+        @if (!$movil)
             <th scope="col">
                 <a href="{{ route('clientes.orden', 'telefono') }}" class="btn btn-link">
                     Telefono
@@ -60,7 +77,10 @@
                 </a>
             </th>
             @endif
+        @if (!isset($accion) or ('html' == $accion))
             <th scope="col">Acciones</th>
+        @endif (!isset($accion) or ('html' == $accion))
+        @endif (!$movil)
         </tr>
         </thead>
         <tbody>
@@ -72,9 +92,19 @@
             table-info
         @endif
         ">
-            <td>{{ $cliente->cedula_f }}</td>
+            <td>
+            @if ($movil)
+                <a href="{{ route('clientes.show', $cliente) }}"
+                   class="btn btn-link" style="text-decoration:none">
+                    {{ $cliente->cedula_f }}
+                </a>
+            @else ($movil)
+                {{ $cliente->cedula_f }}
+            @endif ($movil)
+            </td>
             <td>{{ $cliente->rif_f }}</td>
             <td>{{ $cliente->name }}</td>
+        @if (!$movil)
             <td>
                 {{ $cliente->telefono_f }}
             </td>
@@ -85,6 +115,7 @@
             @if (Auth::user()->is_admin)
             <td>{{ $cliente->user->name }}</td>
             @endif
+        @if (!isset($accion) or ('html' == $accion))
             <td class="d-flex align-items-end">
                 <a href="{{ route('clientes.show', $cliente) }}" class="btn btn-link"
                         title="Mostrar los datos de este cliente ({{ $cliente->name }}).">
@@ -116,14 +147,21 @@
                 </form>
                 @endif
             </td>
+        @endif (!isset($accion) or ('html' == $accion))
+        @endif (!$movil)
         </tr>
         @endForeach
         </tbody>
     </table>
+@if ((!$movil) and (!isset($accion) or ('html' == $accion)))
     {{ $clientes->links() }}
-    @else
-        <p>No hay clientes registrados.</p>
-    @endif
+@endif ((!$movil) and (!isset($accion) or ('html' == $accion)))
+
+@else ($clientes->isNotEmpty())
+    <p>No hay clientes registrados.</p>
+@endif ($clientes->isNotEmpty())
+
+@include('include.botonesPdf', ['enlace' => 'clientes'])
 
 @endsection
 

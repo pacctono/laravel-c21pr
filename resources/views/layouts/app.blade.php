@@ -32,6 +32,15 @@
         border-collapse: collapse;
         border: 1px solid #000;
     }
+    table.center {
+        margin-left:auto; 
+        margin-right:auto;
+    }
+    .imgcenter {
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+    }
     td,th{
         padding: 6px 5px;
         font-size: 15px;

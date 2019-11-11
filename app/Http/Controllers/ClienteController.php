@@ -23,7 +23,7 @@ class ClienteController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index($orden = null)
+    public function index($orden=null, $accion='html')
     {
         if (!(Auth::check())) {
             return redirect('login');
@@ -51,12 +51,19 @@ class ClienteController extends Controller
         } else {
             $clientes = Cliente::whereNull('user_borro')->orderBy($orden);
         }
-        if ($movil) $clientes = $clientes->get();
+        if ($movil or ('html' != $accion)) $clientes = $clientes->get();
         else $clientes = $clientes->paginate($this->lineasXPagina);
 
         session(['orden' => $orden]);
-        return view('clientes.index',
-                    compact('title', 'clientes', 'ruta', 'diaSemana', 'alertar', 'movil'));
+        if ('html' == $accion)
+            return view('clientes.index',
+                        compact('title', 'clientes', 'ruta', 'diaSemana', 'alertar',
+                            'orden','movil', 'accion'));
+        $html = view('clientes.index',
+                    compact('title', 'clientes', 'ruta', 'diaSemana', 'alertar',
+                            'orden','movil', 'accion'))
+                ->render();
+        General::generarPdf($html, 'clientes', $accion);
     }
 
     public function filtro($filtro)

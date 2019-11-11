@@ -29,7 +29,7 @@ class ContactoController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index($orden = null)
+    public function index($orden=null, $accion='html')
     {
         if (!(Auth::check())) {
             return redirect('login');
@@ -38,15 +38,11 @@ class ContactoController extends Controller
         $title = 'Listado de ' . $this->tipoPlural;
         $ruta = request()->path();
 
-        $accion = 'html';
 // En caso de volver luego de haber enviado un correo, ver el metodo 'emailcita', en AgendaController.
         $alertar = 0;
         if ('alert' == $orden) {
             $orden = '';
             $alertar = 1;
-        } elseif (('ver' == $orden) or ('descargar' == $orden)) {
-            $accion = $orden;
-            $orden = '';
         }
         if ('' == $orden or is_null($orden)) {
             $orden = 'id';
@@ -67,9 +63,9 @@ class ContactoController extends Controller
 
         if ('html' == $accion)
             return view('contactos.index',
-                    compact('title', 'contactos', 'ruta', 'alertar', 'movil', 'accion'));
+                    compact('title', 'contactos', 'ruta', 'alertar', 'orden', 'movil', 'accion'));
         $html = view('contactos.index',
-                    compact('title', 'contactos', 'ruta', 'alertar', 'movil', 'accion'))
+                    compact('title', 'contactos', 'ruta', 'alertar', 'orden', 'movil', 'accion'))
                 ->render();
         //dd($html);
         General::generarPdf($html, 'contactosIniciales', $accion);

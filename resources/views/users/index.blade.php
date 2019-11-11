@@ -9,10 +9,10 @@
         <h1 class="pb-1">{{ $title }}</h1>
         @endif
         @else ('html' == $accion)
-        <h1 align="center">{{ $title }}</h1>
+        <h1 style="text-align:center">{{ $title }}</h1>
         @endif ('html' == $accion)
 
-        @if ((!$movil) and (!isset($accion) or ('html' == $accion)))
+        @if (!isset($accion) or ('html' == $accion))
         <p>
             <a href="{{ route('users.create') }}" class="btn btn-primary">
                 @if ($movil)
@@ -22,14 +22,20 @@
                 @endif
             </a>
         </p>
-        @endif ((!$movil) and ('html' == $accion))
+        @endif (!isset($accion) or ('html' == $accion))
     </div>
 
     @if ($alertar)
         <script>alert('El correo fue enviado al asesor');</script>
     @endif
 @if ($users->isNotEmpty())
-    <table class="table table-striped table-hover table-bordered">
+    <table
+    @if (!isset($accion) or ('html' == $accion))
+        class="table table-striped table-hover table-bordered"
+    @else (!isset($accion) or ('html' == $accion))
+        class="center"
+    @endif (!isset($accion) or ('html' == $accion))
+    >
         <thead class="thead-dark">
         <tr
         @if (isset($accion) and ('html' != $accion))
@@ -106,7 +112,7 @@
                 </span>
             @endif (1 == $user->id)
         @else ('html' == $accion)
-            align="right">
+            style="text-align:right;">
             @if (1 == $user->id)
                 0
             @else
@@ -125,7 +131,7 @@
                 </span>
             @endif (1 == $user->id)
         @else ('html' == $accion)
-            align="right">
+            style="text-align:right;">
             @if (1 == $user->id)
                 0,00
             @else
@@ -144,7 +150,7 @@
                 </span>
             @endif (1 == $user->id)
         @else ('html' == $accion)
-            align="right">
+            style="text-align:right;">
             @if (1 == $user->id)
                 0,00
             @else
@@ -204,14 +210,7 @@
     <p>No hay asesores registrados.</p>
 @endif ($users->isNotEmpty())
 
-@if (!isset($accion) or ('html' == $accion))
-    <a target="_blank" href="{{ route('users.orden', 'ver') }}">
-        <button>Ver PDF</button>
-    </a>
-    <a target="_blank" href="{{ route('users.orden', 'descargar') }}">
-        <button>Descargar PDF</button>
-    </a>
-@endif ('html' == $accion)
+@include('include.botonesPdf', ['enlace' => 'users'])
 
 @endsection
 

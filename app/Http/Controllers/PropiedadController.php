@@ -30,7 +30,7 @@ class PropiedadController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index($orden = null)
+    public function index($orden=null, $accion='html')
     {
         if (!(Auth::check())) {
             return redirect('login');
@@ -80,6 +80,8 @@ class PropiedadController extends Controller
                                                                 $fecha_max);*/
         }
 //        dd($dato, $fecha_desde, $fecha_hasta);
+// En caso de volver luego de haber enviado un correo, ver el metodo 'emailcita', en AgendaController.
+        $alertar = 0;
         if ('' == $orden or is_null($orden)) {
             $orden = 'id';
         }
@@ -206,7 +208,7 @@ class PropiedadController extends Controller
                                 (($cerrador)?$cerrador:(($asesor)?$asesor:0)));
         $agente = new Agent();
         $movil  = $agente->isMobile() and true;             // Fuerzo booleana. No funciona al usar el metodo directamente.
-        $paginar = ($paginar)?!$movil:$paginar;
+        $paginar = ($paginar)?!($movil or ('html' != $accion)):$paginar;
         if ($paginar) $propiedades = $propiedades->paginate($this->lineasXPagina);      // Pagina la impresión de 10 en 10
         else $propiedades = $propiedades->get();                      // Mostrar todos los registros.
 // Devolver las fechas sin la hora. Los diez primeros caracteres son: yyyy-mm-dd.
@@ -221,19 +223,35 @@ class PropiedadController extends Controller
                 $tCerradorPrbrSel, $tLadosCap, $tLadosCer,
                 $tPvrCaptadorPrbrSel + $tPvrCerradorPrbrSel);*/
 //        return view((($movil)?'celular.indexPropiedades':'propiedades.index'),
-        return view('propiedades.index',
-                compact('title', 'users', 'propiedades', 'movil',
-                'filas', 'tPrecio', 'tCompartidoConIva', 'tLados',
-                'tFranquiciaSinIva', 'tFranquiciaConIva', 'tFranquiciaPagarR',
-                'tRegalia', 'tSanaf5PorCiento', 'tOficinaBrutoReal',
-                'tBaseHonorariosSo', 'tBaseParaHonorari', 'tIngresoNetoOfici',
-                'tCaptadorPrbr', 'tGerente', 'tCerradorPrbr', 'tBonificaciones',
-                'tComisionBancaria', 'tPrecioVentaReal', 'tPuntos',
-                'tCaptadorPrbrSel', 'tCerradorPrbrSel', 'tLadosCap', 'tLadosCer',
-                'tPvrCaptadorPrbrSel', 'tPvrCerradorPrbrSel',
-                'ruta', 'fecha_desde', 'fecha_hasta', 'arrEstatus',
-                'captador', 'cerrador', 'tPuntosCaptador', 'tPuntosCerrador',
-                'estatus', 'paginar'));
+        if ('html' == $accion)
+            return view('propiedades.index',
+                    compact('title', 'users', 'propiedades', 'movil',
+                    'filas', 'tPrecio', 'tCompartidoConIva', 'tLados',
+                    'tFranquiciaSinIva', 'tFranquiciaConIva', 'tFranquiciaPagarR',
+                    'tRegalia', 'tSanaf5PorCiento', 'tOficinaBrutoReal',
+                    'tBaseHonorariosSo', 'tBaseParaHonorari', 'tIngresoNetoOfici',
+                    'tCaptadorPrbr', 'tGerente', 'tCerradorPrbr', 'tBonificaciones',
+                    'tComisionBancaria', 'tPrecioVentaReal', 'tPuntos',
+                    'tCaptadorPrbrSel', 'tCerradorPrbrSel', 'tLadosCap', 'tLadosCer',
+                    'tPvrCaptadorPrbrSel', 'tPvrCerradorPrbrSel',
+                    'ruta', 'fecha_desde', 'fecha_hasta', 'arrEstatus',
+                    'captador', 'cerrador', 'tPuntosCaptador', 'tPuntosCerrador',
+                    'estatus', 'orden', 'paginar', 'accion'));
+        $html = view('propiedades.index',
+                    compact('title', 'users', 'propiedades', 'movil',
+                    'filas', 'tPrecio', 'tCompartidoConIva', 'tLados',
+                    'tFranquiciaSinIva', 'tFranquiciaConIva', 'tFranquiciaPagarR',
+                    'tRegalia', 'tSanaf5PorCiento', 'tOficinaBrutoReal',
+                    'tBaseHonorariosSo', 'tBaseParaHonorari', 'tIngresoNetoOfici',
+                    'tCaptadorPrbr', 'tGerente', 'tCerradorPrbr', 'tBonificaciones',
+                    'tComisionBancaria', 'tPrecioVentaReal', 'tPuntos',
+                    'tCaptadorPrbrSel', 'tCerradorPrbrSel', 'tLadosCap', 'tLadosCer',
+                    'tPvrCaptadorPrbrSel', 'tPvrCerradorPrbrSel',
+                    'ruta', 'fecha_desde', 'fecha_hasta', 'arrEstatus',
+                    'captador', 'cerrador', 'tPuntosCaptador', 'tPuntosCerrador',
+                    'estatus', 'orden', 'paginar', 'accion'))
+                ->render();
+        General::generarPdf($html, 'propiedades', $accion);
     }       // Final del metodo index.
 
     public function grabarArchivo()

@@ -148,7 +148,7 @@ Route::get('/propiedades/{propiedad}/{rutRetorno}', 'PropiedadController@show')
     ->where('propiedad', '[0-9]+')
     ->name('propiedades.muestra');
 
-Route::get('/reportes/tipo/{tipo}', 'ReporteController@index')
+Route::get('/reportes/tipo/{tipo}/accion/{accion?}', 'ReporteController@index')
     ->name('reportes');
 
 Route::post('/reportes', 'ReporteController@index')

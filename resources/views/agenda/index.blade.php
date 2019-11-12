@@ -123,7 +123,9 @@
     @endif (isset($accion) and ('html' != $accion))
     >
       <th scope="col">
-        <a href="{{ route('agenda.orden', 'fecha_evento') }}" class="btn btn-link">
+        <a class=@if('html'==$accion) "btn btn-link" href=
+            @else "enlaceDesabilitado" name=
+            @endif "{{ route('agenda.orden', 'fecha_evento') }}">
           Fecha
         </a>
       </th>
@@ -137,7 +139,9 @@
           @if (Auth::user()->is_admin)
             title="Al ordenar por nombre de contacto, no mostrará los turnos"
           @endif
-            href="{{ route('agenda.orden', 'name') }}" class="btn btn-link">
+            class=@if('html'==$accion) "btn btn-link" href=
+            @else "enlaceDesabilitado" name=
+            @endif "{{ route('agenda.orden', 'name') }}">
           Nombre de la cita
         </a>
       @endif
@@ -146,7 +150,9 @@
       <th scope="col">Telefono</th>
       <th scope="col">
       @if (Auth::user()->is_admin)
-      <a href="{{ route('agenda.orden', 'user_id') }}" class="btn btn-link">
+      <a class=@if('html'==$accion) "btn btn-link" href=
+         @else "enlaceDesabilitado" name=
+         @endif "{{ route('agenda.orden', 'user_id') }}">
         Nombre Asesor
         </a>
       @else
@@ -276,11 +282,11 @@
     {{ $agendas->links() }}
 @endif ((!$movil) and (!isset($accion) or ('html' == $accion)))
 
+@include('include.botonesPdf', ['enlace' => 'agenda'])
+
 @else ($agendas->isNotEmpty())
     <p>No tiene agenda registrada.</p>
 @endif ($agendas->isNotEmpty())
-
-@include('include.botonesPdf', ['enlace' => 'agenda'])
 
 @endsection
 

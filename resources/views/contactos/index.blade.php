@@ -43,29 +43,39 @@
         >
             <!-- th scope="col">#</th -->
             <th scope="col">
-                <a href="{{ route('contactos.orden', 'name') }}" class="btn btn-link">
+                <a class=@if('html'==$accion) "btn btn-link" href=
+                   @else "enlaceDesabilitado" name=
+                   @endif "{{ route('contactos.orden', 'name') }}">
                     Nombre
                 </a>
             </th>
             <th scope="col">
-                <a href="{{ route('contactos.orden', 'telefono') }}" class="btn btn-link">
+                <a class=@if('html'==$accion) "btn btn-link" href=
+                   @else "enlaceDesabilitado" name=
+                   @endif "{{ route('contactos.orden', 'telefono') }}">
                     Telefono
                 </a>
             </th>
         @if (!$movil)
             <th scope="col">
-                <a href="{{ route('contactos.orden', 'email') }}" class="btn btn-link">
+                <a class=@if('html'==$accion) "btn btn-link" href=
+                   @else "enlaceDesabilitado" name=
+                   @endif "{{ route('contactos.orden', 'email') }}">
                     Correo
                 </a>
             </th>
             <th scope="col">
-                <a href="{{ route('contactos.orden', 'created_at') }}" class="btn btn-link">
+                <a class=@if('html'==$accion) "btn btn-link" href=
+                   @else "enlaceDesabilitado" name=
+                   @endif "{{ route('contactos.orden', 'created_at') }}">
                     Contactado
                 </a>
             </th>
             @if (1 == Auth::user()->is_admin)
             <th scope="col">
-                <a href="{{ route('contactos.orden', 'user_id') }}" class="btn btn-link">
+                <a class=@if('html'==$accion) "btn btn-link" href=
+                   @else "enlaceDesabilitado" name=
+                   @endif "{{ route('contactos.orden', 'user_id') }}">
                     Contactado por
                 </a>
             </th>
@@ -152,10 +162,10 @@
     {{ $contactos->links() }}
 @endif ((!$movil) and (!isset($accion) or ('html' == $accion)))
 
+@include('include.botonesPdf', ['enlace' => 'contactos'])
+
 @else ($contactos->isNotEmpty())
     <p>No hay contactos iniciales registrados.</p>
 @endif ($contactos->isNotEmpty())
-
-@include('include.botonesPdf', ['enlace' => 'contactos'])
 
 @endsection

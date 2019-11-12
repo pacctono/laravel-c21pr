@@ -3,6 +3,7 @@
 
 @section('content')
 
+@if ((!$movil) and (!isset($accion) or ('html' == $accion)))
 <div><!--div class="d-flex justify-content-between align-items-end mb-1"-->
   <form method="POST" class="form-horizontal" action="{{ url('/reportes') }}"
         onSubmit="return alertaFechaRequerida()">
@@ -41,10 +42,18 @@
     </div>--}}
   </form>
 </div>
+@endif ((!$movil) and (!isset($accion) or ('html' == $accion)))
 
 <div class="d-flex justify-content-between align-items-end mb-1 col-sm-12">
-  <div class="col-sm-9"><h4 class="pb-1">{{ $title }}</h4></div>
+  <div class="col-sm-9">
+  @if (!isset($accion) or ('html' == $accion))
+    <h4 class="pb-1">{{ $title }}</h4>
+  @else (!isset($accion) or ('html' == $accion))
+    <h5 style="text-align:center;">{{ $title }}</h5>
+  @endif (!isset($accion) or ('html' == $accion))
+  </div>
 
+  @if (!isset($accion) or ('html' == $accion))
   <div class="col-sm-3">
   @if ('Cumpleanos' != $muestra)
   <p class="text-right">
@@ -61,17 +70,30 @@
         @endforeach
       </select>
   </p>
-  @else
+  @else ('Cumpleanos' != $muestra)
   &nbsp;
-  @endif
+  @endif ('Cumpleanos' != $muestra)
   </div>
+  @endif (!isset($accion) or ('html' == $accion))
 </div>
 
 @if ($elemsRep->isNotEmpty())
 
-<table class="table table-striped table-hover table-bordered">
-  <thead class="thead-dark">
-    <tr>
+<table
+@if (!isset($accion) or ('html' == $accion))
+  class="table table-striped table-hover table-bordered"
+@else (!isset($accion) or ('html' == $accion))
+  class="center"
+@endif (!isset($accion) or ('html' == $accion))
+>
+  <thead class="thead-dark my-0 py-0">
+    <tr
+    @if ((isset($accion) and ('html' != $accion)))
+        class="encabezado"
+    @else ((isset($accion) and ('html' != $accion)))
+        class="my-0 py-0"
+    @endif ((isset($accion) and ('html' != $accion)))
+    >
       <th scope="col">
       @if (('Conexion' == $muestra) ||
            ('Cumpleanos' == $muestra) ||
@@ -160,11 +182,14 @@
   @endForeach
   </tbody>
 </table>
-@else
+
+@include('include.botonesPdf', ['enlace' => 'reportes'])
+
+@else ($elemsRep->isNotEmpty())
 <div class="d-flex justify-content-between align-items-end mb-1 col-sm-12">
   <p>No hay registros.</p>
 </div>
-@endif
+@endif ($elemsRep->isNotEmpty())
 
 <script>
 function alertaFechaRequerida() {

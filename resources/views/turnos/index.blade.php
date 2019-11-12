@@ -124,14 +124,18 @@
     @endif (isset($accion) and ('html' != $accion))
     >
       <th scope="col">
-        <a href="{{ route('turnos.orden', 'turno') }}" class="btn btn-link">
+        <a class=@if('html'==$accion) "btn btn-link" href=
+            @else "enlaceDesabilitado" name=
+            @endif "{{ route('turnos.orden', 'turno') }}">
           Fecha
         </a>
       </th>
       <th scope="col">Turno</th>
     @if (Auth::user()->is_admin)
       <th scope="col">
-        <a href="{{ route('turnos.orden', 'user_id') }}" class="btn btn-link">
+        <a class=@if('html'==$accion) "btn btn-link" href=
+            @else "enlaceDesabilitado" name=
+            @endif "{{ route('turnos.orden', 'user_id') }}">
           Asesor
         </a>
       </th>
@@ -184,11 +188,11 @@
     {{ $turnos->links() }}
 @endif ((!$movil) and (!isset($accion) or ('html' == $accion)))
 
+@include('include.botonesPdf', ['enlace' => 'turnos'])
+
 @else ($turnos->isNotEmpty())
   <p>No hay turnos registrados.</p>
 @endif ($turnos->isNotEmpty())
-
-@include('include.botonesPdf', ['enlace' => 'turnos'])
 
 @endsection
 

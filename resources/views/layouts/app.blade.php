@@ -50,6 +50,12 @@
         background-color: #dfdfdf;
         font-weight: bold;
     }
+    .enlaceDesabilitado{
+        pointer-events:none;
+        cursor:default;
+        text-decoration:none;
+        color:#000"
+    }
     .float-right{
         text-align:right;
     }

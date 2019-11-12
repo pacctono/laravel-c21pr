@@ -166,7 +166,7 @@ class ReporteController extends Controller
 
         return $elemsRep;
     }
-    public function index($muestra = 'Asesor')
+    public function index($muestra='Asesor', $accion='html')
     {
         if (!(Auth::check())) {
             return redirect('login');
@@ -207,10 +207,21 @@ class ReporteController extends Controller
         $fecha_desde = $fecha_desde->format('Y-m-d');
         $fecha_hasta = $fecha_hasta->format('Y-m-d');
 
+        $agente = new Agent();
+        $movil  = $agente->isMobile() and true;             // Fuerzo booleana. No funciona al usar el metodo directamente.
         session(['fecha_desde' => $fecha_desde, 'fecha_hasta' => $fecha_hasta,
                     'muestra' => $muestra, 'asesor' => $asesor]);
-        return view('reportes.index', compact('title', 'users', 'elemsRep', 'chart', 'muestra',
-                                            'fecha_desde', 'fecha_hasta', 'asesor', 'hoy'));
+        if ('html' == $accion)
+            return view('reportes.index',
+                    compact('title', 'users', 'elemsRep', 'chart',
+                            'muestra', 'fecha_desde', 'fecha_hasta',
+                            'asesor', 'hoy', 'movil', 'accion'));
+        $html = view('reportes.index',
+                    compact('title', 'users', 'elemsRep', 'chart',
+                            'muestra', 'fecha_desde', 'fecha_hasta',
+                            'asesor', 'hoy', 'movil', 'accion'))
+                ->render();
+        General::generarPdf($html, $muestra, $accion);
     }
 /**
  *  There are a few methods you can use in all datasets (regardless of the type, or charting library).

@@ -40,39 +40,53 @@
         @endif (isset($accion) and ('html' != $accion))
         >
             <th scope="col">
-                <a href="{{ route('clientes.orden', 'cedula') }}" class="btn btn-link">
+                <a class=@if('html'==$accion) "btn btn-link" href=
+                    @else "enlaceDesabilitado" name=
+                    @endif "{{ route('clientes.orden', 'cedula') }}">
                     Cedula
                 </a>
             </th>
             <th scope="col">
-                <a href="{{ route('clientes.orden', 'rif') }}" class="btn btn-link">
+                <a class=@if('html'==$accion) "btn btn-link" href=
+                    @else "enlaceDesabilitado" name=
+                    @endif "{{ route('clientes.orden', 'rif') }}">
                     Rif
                 </a>
             </th>
             <th scope="col">
-                <a href="{{ route('clientes.orden', 'name') }}" class="btn btn-link">
+                <a class=@if('html'==$accion) "btn btn-link" href=
+                    @else "enlaceDesabilitado" name=
+                    @endif "{{ route('clientes.orden', 'name') }}">
                     Nombre
                 </a>
             </th>
         @if (!$movil)
             <th scope="col">
-                <a href="{{ route('clientes.orden', 'telefono') }}" class="btn btn-link">
+                <a class=@if('html'==$accion) "btn btn-link" href=
+                    @else "enlaceDesabilitado" name=
+                    @endif "{{ route('clientes.orden', 'telefono') }}">
                     Telefono
                 </a>
             </th>
             <th scope="col">
-                <a href="{{ route('clientes.orden', 'email') }}" class="btn btn-link">
+                <a class=@if('html'==$accion) "btn btn-link" href=
+                    @else "enlaceDesabilitado" name=
+                    @endif "{{ route('clientes.orden', 'email') }}">
                     Correo
                 </a>
             </th>
             <th scope="col">
-                <a href="{{ route('clientes.orden', 'created_at') }}" class="btn btn-link">
+                <a class=@if('html'==$accion) "btn btn-link" href=
+                    @else "enlaceDesabilitado" name=
+                    @endif "{{ route('clientes.orden', 'fecha_nacimiento') }}">
                     Fec.Nac.
                 </a>
             </th>
             @if (Auth::user()->is_admin)
             <th scope="col">
-                <a href="{{ route('clientes.orden', 'user_id') }}" class="btn btn-link">
+                <a class=@if('html'==$accion) "btn btn-link" href=
+                    @else "enlaceDesabilitado" name=
+                    @endif "{{ route('clientes.orden', 'user_id') }}">
                     Creado por
                 </a>
             </th>
@@ -157,11 +171,11 @@
     {{ $clientes->links() }}
 @endif ((!$movil) and (!isset($accion) or ('html' == $accion)))
 
+@include('include.botonesPdf', ['enlace' => 'clientes'])
+
 @else ($clientes->isNotEmpty())
     <p>No hay clientes registrados.</p>
 @endif ($clientes->isNotEmpty())
-
-@include('include.botonesPdf', ['enlace' => 'clientes'])
 
 @endsection
 

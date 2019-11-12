@@ -573,11 +573,11 @@ Estatus en sistema C21: {{ $propiedad->estatus_c21_alfa.(($propiedad->pagado_cas
     {{ $propiedades->links() }}
 @endif ($paginar)
 
+@include('include.botonesPdf', ['enlace' => 'propiedades'])
+
 @else ($propiedades->isNotEmpty())
     <p>No hay propiedades registradas.</p>
 @endif ($propiedades->isNotEmpty())
-
-@include('include.botonesPdf', ['enlace' => 'propiedades'])
 
 @endsection
 

@@ -1,0 +1,32 @@
+    body{
+        font-size: 16px;
+        font-family: "Arial";
+    }
+    table{
+        border-collapse: collapse;
+        border: 1px solid #000;
+    }
+    table.center {
+        margin-left:auto; 
+        margin-right:auto;
+    }
+    .imgcenter {
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    td,th{
+        padding: 6px 5px;
+        font-size: 15px;
+        border: 1px solid #000;
+    }
+    .encabezado{
+        background-color: #dfdfdf;
+        font-weight: bold;
+    }
+    .enlaceDesabilitado{
+        pointer-events:none;
+        cursor:default;
+        text-decoration:none;
+        color:#000"
+    }

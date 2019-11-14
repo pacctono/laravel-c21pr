@@ -7,6 +7,7 @@ use App\Bitacora;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Jenssegers\Agent\Agent;                 // PC
+use App\MisClases\General;               // PC
 
 class ZonaController extends Controller
 {
@@ -22,7 +23,7 @@ class ZonaController extends Controller
     protected $vistaIndice = 'tabla.index';
     protected $vistaEditar = 'tabla.editar';
 
-    public function index($orden = null)
+    public function index($orden=null, $accion='html')
     {
         if (!(Auth::check())) {
             return redirect('login');
@@ -46,10 +47,16 @@ class ZonaController extends Controller
         if ('' == $orden or is_null($orden)) {
             $orden = 'id';
         }
-        $arreglo = Zona::orderBy($orden)->paginate(10);
+        if ($movil or ('html' != $accion)) $arreglo = Zona::orderBy($orden)->get();
+	else $arreglo = Zona::orderBy($orden)->paginate(10);
 
-        return view($this->vistaIndice, compact('title', 'arreglo', 'tipo', 'elemento', 'enlace', 'movil',
+        if ('html' == $accion)
+            return view($this->vistaIndice, compact('title', 'arreglo', 'tipo', 'elemento', 'enlace', 'accion', 'movil',
                                         'metBorradas', 'rutCrear', 'rutMostrar', 'rutEditar', 'rutBorrar'));
+        $html = view($this->vistaIndice, compact('title', 'arreglo', 'tipo', 'elemento', 'enlace', 'accion', 'movil',
+                                        'metBorradas', 'rutCrear', 'rutMostrar', 'rutEditar', 'rutBorrar'))
+                ->render();
+        General::generarPdf($html, $elemento, $accion);
     }
 
     /**

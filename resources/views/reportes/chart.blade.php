@@ -2,7 +2,9 @@
 
 @section('content')
 
+@if (!isset($accion) or ('html' == $accion))
 <div class="d-flex justify-content-between align-items-end mb-1 col-sm-12">
+@if (!$movil)
   <div class="col-sm-9">
   <form method="POST" class="form-horizontal" action="{{ url('/reportes/chart/'.$tipo) }}"
         onSubmit="return alertaFechaRequerida()">
@@ -41,6 +43,7 @@
     <button type="submit" class="btn btn-success">Mostrar</button>--}}
   </form>
   </div>
+@endif (!$movil)
 
   <!-- h3 class="pb-1">{{ $title }}</h3 -->
 
@@ -52,20 +55,38 @@
         <option value="">tipo</option>
         @foreach (array('bar' => 'barra', 'pie' => 'torta', 'line' => 'línea')
                   as $graph => $grafico)
-          <option value="{{ route('reportes.chart', $graph) }}">
+          <!--option value="{{ route('reportes.chart', $graph) }}"-->
+          <option value="{{ route('reportes.chart', $graph) }}"
+          @if ($graph == $tipo)
+            selected
+          @endif ($graph == $tipo)
+          >
             {{ $grafico }}
           </option>
         @endforeach
       </select>
   </div>
 </div>
+@endif (!isset($accion) or ('html' == $accion))
 
 <div>{!! $chart->container() !!}</div>
 
 @if ($elemsRep->isNotEmpty())
-<table class="table table-striped table-hover table-bordered">
-  <thead class="thead-dark">
-    <tr>
+<table
+@if (!isset($accion) or ('html' == $accion))
+  class="table table-striped table-hover table-bordered"
+@else (!isset($accion) or ('html' == $accion))
+  class="center"
+@endif (!isset($accion) or ('html' == $accion))
+>
+  <thead class="thead-dark my-0 py-0">
+    <tr
+    @if ((isset($accion) and ('html' != $accion)))
+        class="encabezado"
+    @else ((isset($accion) and ('html' != $accion)))
+        class="my-0 py-0"
+    @endif ((isset($accion) and ('html' != $accion)))
+    >
       <th scope="col">
       @if (('Conexion' == $muestra) ||
            ('Lados' == $muestra) ||
@@ -125,22 +146,20 @@
     </tr>
   </thead>
   <tbody>
-  {!! $impar = true; !!}
   @foreach ($elemsRep as $elemento)
     {{-- $loop->index, comienza desde 0, $loop-iteration, desde 1 --}}
     @if (0 == ($loop->index % 2))
     <tr class="
-    @if ($impar)
+    @if (0 == ($loop->index % 4))
         table-primary
     @else
         table-info
     @endif
     ">
-  {!! $impar = !$impar; !!}
     @endif
       <td>
     @if ('Fecha' == $muestra)
-      {{ $elemento->fecha }}
+      {{ $elemento->fechaContacto }}
     @elseif ('Origen' == $muestra)
       {{ $elemento->descripcion }}
     @elseif (('Negociaciones' == $muestra) ||
@@ -176,16 +195,20 @@
   @endForeach
   </tbody>
 </table>
-@else
+
+@include('include.botonesPdf', ['enlace' => 'reportes.chart'])
+
+@else ($elemsRep->isNotEmpty())
 <p>No hay registros.</p>
-@endif
+@endif ($elemsRep->isNotEmpty())
 
 @endsection
 
 @section('js')
 {{-- http://www.chartjs.org/docs/latest/ libreria usada por el proyecto --}}
 {{-- https://erik.cat/projects/charts este es el proyecto que estoy usando --}}
-    <script src=//cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.1/Chart.min.js charset=utf-8></script>
+    <!--script src=//cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.1/Chart.min.js charset=utf-8></script-->
+    <script src="{{ asset('js/Chart.min.js') }}"></script>
     {!! $chart->script() !!}
 
 @endsection

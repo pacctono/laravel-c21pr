@@ -1,4 +1,3 @@
-
 @extends('layouts.app')
 
 @section('content')
@@ -140,7 +139,7 @@
     ">
       <td>
     @if ('Fecha' == $muestra)
-      {{ $elemento->fecha }}
+      {{ $elemento->fechaContacto }}
     @elseif ('Origen' == $muestra)
       {{ $elemento->descripcion }}
     @elseif (('Negociaciones' == $muestra) ||
@@ -155,7 +154,11 @@
       {{ $elemento->name }}
     @endif
       </td>
-      <td>
+      <td
+    @if ((isset($accion) and ('html' != $accion)))
+        style="text-align:right;"
+    @endif ((isset($accion) and ('html' != $accion)))
+      >
     @if ('Cumpleanos' == $muestra)
       {{ $elemento->fecha_cumpleanos->format('d-m') }}
       @if ($hoy == $elemento->fecha_cumpleanos->format('d-m'))
@@ -186,9 +189,7 @@
 @include('include.botonesPdf', ['enlace' => 'reportes'])
 
 @else ($elemsRep->isNotEmpty())
-<div class="d-flex justify-content-between align-items-end mb-1 col-sm-12">
-  <p>No hay registros.</p>
-</div>
+<p>No hay registros.</p>
 @endif ($elemsRep->isNotEmpty())
 
 <script>

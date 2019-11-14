@@ -10,7 +10,7 @@
 
     <title>{{ config('app.name', 'Laravel') }}</title>
 
-@if (!isset($accion) or ('html' == $accion))
+@if (!isset($accion) or ('html' == $accion){{-- or ('reportes-chart' == $view_name)--}})
     <!-- Bootstrap core CSS -->
     <!--link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous"-->
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
@@ -23,43 +23,16 @@
 
     @yield('jshead')
 @else (!isset($accion) or ('html' == $accion))
-    <style type="text/css">
-    body{
-        font-size: 16px;
-        font-family: "Arial";
-    }
-    table{
-        border-collapse: collapse;
-        border: 1px solid #000;
-    }
-    table.center {
-        margin-left:auto; 
-        margin-right:auto;
-    }
-    .imgcenter {
-        display: block;
-        margin-left: auto;
-        margin-right: auto;
-    }
-    td,th{
-        padding: 6px 5px;
-        font-size: 15px;
-        border: 1px solid #000;
-    }
-    .encabezado{
-        background-color: #dfdfdf;
-        font-weight: bold;
-    }
-    .enlaceDesabilitado{
-        pointer-events:none;
-        cursor:default;
-        text-decoration:none;
-        color:#000"
-    }
-    .float-right{
-        text-align:right;
-    }
-    </style>
+    <link href="{{ asset('css/pdf.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/Chart.min.css') }}" rel="stylesheet">
+    <!--link href="{{ asset('css/style.css') }}" rel="stylesheet">  Probando
+    <link href="{{ asset('css/c21pr.css') }}" rel="stylesheet">Probando
+    <link href="{{ asset('css/Chart.min.css') }}" rel="stylesheet"-->
+    <!--link href="{{ asset('css/app.css') }}" rel="stylesheet">
+    <link rel="stylesheet" href="{{ asset('open-iconic-master/font/css/open-iconic-bootstrap.css') }}">
+    <link href="{{ asset('css/style.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/c21pr.css') }}" rel="stylesheet">
+    <script src="{{ asset('js/app.js') }}"></script-->
 @endif (!isset($accion) or ('html' == $accion))
 
   </head>
@@ -270,8 +243,8 @@
         </span>
       </div>
     </footer>
-    @yield('js')
 @endif (!isset($accion) or ('html' == $accion))
+    @yield('js')
     <!-- Bootstrap core JavaScript
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->

@@ -154,10 +154,10 @@ Route::get('/reportes/tipo/{tipo}/accion/{accion?}', 'ReporteController@index')
 Route::post('/reportes', 'ReporteController@index')
     ->name('reportes.post');
 
-Route::get('/reportes/chart/{chart}', 'ReporteController@chart')
+Route::get('/reportes/chart/{chart}/{accion?}', 'ReporteController@chart')
     ->name('reportes.chart');
 
-Route::post('/reportes/chart/{chart}', 'ReporteController@chart')
+Route::post('/reportes/chart/{chart}/{accion?}', 'ReporteController@chart')
     ->name('reportes.chart.post');
 
 Route::get('/reportes/contactosUser/{id}/{orden}', 'ReporteController@contactosXUser')
@@ -193,7 +193,7 @@ Route::get('/reportes/propiedadesMunicipio/{id}/{orden}', 'ReporteController@pro
 Route::get('/reportes/propiedadesEstado/{id}/{orden}', 'ReporteController@propiedadesX')
     ->name('reporte.propiedadesEstado');
 
-Route::get('/origenes', 'OrigenController@index')
+Route::get('/origenes/{orden?}/{accion?}', 'OrigenController@index')
     ->name('origen');
 
 Route::get('/origenes/{origen}', 'OrigenController@show')
@@ -215,7 +215,7 @@ Route::delete('/origenes/{origen}', 'OrigenController@destroy')
     ->name('origen.destroy')
     ->middleware('admin');
 
-Route::get('/deseos', 'DeseoController@index')
+Route::get('/deseos/{orden?}/{accion?}', 'DeseoController@index')
     ->name('deseo');
 
 Route::get('/deseos/{deseo}', 'DeseoController@show')
@@ -237,7 +237,7 @@ Route::delete('/deseos/{deseo}', 'DeseoController@destroy')
     ->name('deseo.destroy')
     ->middleware('admin');
 
-Route::get('/tipos', 'TipoController@index')
+Route::get('/tipos/{orden?}/{accion?}', 'TipoController@index')
     ->name('tipo');
 
 Route::get('/tipos/{tipo}', 'TipoController@show')
@@ -259,7 +259,7 @@ Route::delete('/tipos/{tipo}', 'TipoController@destroy')
     ->name('tipo.destroy')
     ->middleware('admin');
 
-Route::get('/zonas', 'ZonaController@index')
+Route::get('/zonas/{orden?}/{accion?}', 'ZonaController@index')
     ->name('zona');
 
 Route::get('/zonas/{zona}', 'ZonaController@show')
@@ -281,7 +281,7 @@ Route::delete('/zonas/{zona}', 'ZonaController@destroy')
     ->name('zona.destroy')
     ->middleware('admin');
 
-Route::get('/textos', 'TextoController@index')
+Route::get('/textos/{orden?}/{accion?}', 'TextoController@index')
     ->name('texto');
 
 Route::get('/textos/{texto}', 'TextoController@show')
@@ -303,7 +303,7 @@ Route::delete('/textos/{texto}', 'TextoController@destroy')
     ->name('texto.destroy')
     ->middleware('admin');
 
-Route::get('/precios', 'PrecioController@index')
+Route::get('/precios/{orden?}/{accion?}', 'PrecioController@index')
     ->name('precio');
 
 Route::get('/precios/{precio}', 'PrecioController@show')
@@ -325,7 +325,7 @@ Route::delete('/precios/{precio}', 'PrecioController@destroy')
     ->name('precio.destroy')
     ->middleware('admin');
 
-Route::get('/resultados', 'ResultadoController@index')
+Route::get('/resultados/{orden?}/{accion?}', 'ResultadoController@index')
     ->name('resultado');
 
 Route::get('/resultados/{resultado}', 'ResultadoController@show')
@@ -347,7 +347,7 @@ Route::delete('/resultados/{resultado}', 'ResultadoController@destroy')
     ->name('resultado.destroy')
     ->middleware('admin');
 
-Route::get('/caracteristicas', 'CaracteristicaController@index')
+Route::get('/caracteristicas/{orden?}/{accion?}', 'CaracteristicaController@index')
     ->name('caracteristica');
 
 Route::get('/caracteristicas/{caracteristica}', 'CaracteristicaController@show')
@@ -369,7 +369,7 @@ Route::delete('/caracteristicas/{caracteristica}', 'CaracteristicaController@des
     ->name('caracteristica.destroy')
     ->middleware('admin');
 
-Route::get('/ciudades', 'CiudadController@index')
+Route::get('/ciudades/{orden?}/{accion?}', 'CiudadController@index')
     ->name('ciudad');
 
 Route::get('/ciudades/{ciudad}', 'CiudadController@show')
@@ -391,7 +391,7 @@ Route::delete('/ciudades/{ciudad}', 'CiudadController@destroy')
     ->name('ciudad.destroy')
     ->middleware('admin');
 
-Route::get('/estados', 'EstadoController@index')
+Route::get('/estados/{orden?}/{accion?}', 'EstadoController@index')
     ->name('estado');
 
 Route::get('/estados/{estado}', 'EstadoController@show')
@@ -413,7 +413,7 @@ Route::delete('/estados/{estado}', 'EstadoController@destroy')
     ->name('estado.destroy')
     ->middleware('admin');
 
-Route::get('/municipios', 'MunicipioController@index')
+Route::get('/municipios/{orden?}/{accion?}', 'MunicipioController@index')
     ->name('municipio');
 
 Route::get('/municipios/{municipio}', 'MunicipioController@show')

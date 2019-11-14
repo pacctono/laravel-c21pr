@@ -165,7 +165,7 @@ class ReporteController extends Controller
         if ('ComMes' != $muestra) $elemsRep = $elemsRep->get();
 
         return $elemsRep;
-    }
+    }   // elemsReporte($muestra, $fecha, $fecha_desde, $fecha_hasta, $asesor=0)
     public function index($muestra='Asesor', $accion='html')
     {
         if (!(Auth::check())) {
@@ -211,6 +211,7 @@ class ReporteController extends Controller
         $movil  = $agente->isMobile() and true;             // Fuerzo booleana. No funciona al usar el metodo directamente.
         session(['fecha_desde' => $fecha_desde, 'fecha_hasta' => $fecha_hasta,
                     'muestra' => $muestra, 'asesor' => $asesor]);
+        //dd($muestra, $elemsRep, $fecha_desde, $fecha_hasta, $asesor);
         if ('html' == $accion)
             return view('reportes.index',
                     compact('title', 'users', 'elemsRep', 'chart',
@@ -222,7 +223,7 @@ class ReporteController extends Controller
                             'asesor', 'hoy', 'movil', 'accion'))
                 ->render();
         General::generarPdf($html, $muestra, $accion);
-    }
+    }   // index($muestra='Asesor', $accion='html')
 /**
  *  There are a few methods you can use in all datasets (regardless of the type, or charting library).
  *  These includes:
@@ -231,7 +232,7 @@ class ReporteController extends Controller
  *  values($values) - Set the dataset values.
  *  options($options, bool $overwrite = false) - Set the dataset options.
  */
-    public function chart($tipo = 'line')
+    public function chart($tipo='line', $accion='html')
     {
         if (!(Auth::check())) {
             return redirect('login');
@@ -278,7 +279,7 @@ class ReporteController extends Controller
         $hexColor  = 0x0;
         foreach ($elemsRep as $elemento) {
             if ('Fecha' == $muestra) {
-                $arrEtiq[]  = $elemento->fecha;
+                $arrEtiq[]  = $elemento->fechaContacto;
             } elseif ('Origen' == $muestra) {
                 $arrEtiq[]  = $elemento->descripcion;
             } elseif (('Negociaciones' == $muestra) or
@@ -321,7 +322,8 @@ class ReporteController extends Controller
         $chart->barWidth(1);
         $chart->title($title);
         $chart->height(400);
-        $chart->width(1000);
+        if ('html' == $accion) $chart->width(1000);
+        else $chart->width(0);  // 0/null: auto
         $chart->dataset($legenda, $tipo, $arrData)     // bar, pie, line, ...
             ->backgroundColor($arrColor)
             ->color($lineaColor)
@@ -329,10 +331,18 @@ class ReporteController extends Controller
             ->lineTension(0);                       // 0.5, por defecto.
 //            ->color('#ff0000');                 // dataset configuration presets.
 
+        $agente = new Agent();
+        $movil  = $agente->isMobile() and true;             // Fuerzo booleana. No funciona al usar el metodo directamente.
         session(['fecha_desde' => $fecha_desde, 'fecha_hasta' => $fecha_hasta,
                     'muestra' => $muestra, 'asesor' => $asesor]);
-        return view('reportes.chart', compact('title', 'users', 'elemsRep', 'chart', 'tipo',
-                                            'muestra', 'fecha_desde', 'fecha_hasta', 'asesor'));
+        if ('html' == $accion)
+            return view('reportes.chart',
+                    compact('title', 'users', 'elemsRep', 'chart', 'tipo', 'muestra',
+                            'fecha_desde', 'fecha_hasta', 'asesor', 'movil', 'accion'));
+        $html = view('reportes.chart',
+                    compact('title', 'users', 'elemsRep', 'chart', 'tipo', 'muestra',
+                            'fecha_desde', 'fecha_hasta', 'asesor', 'movil', 'accion'));
+        General::generarPdf($html, $muestra, $accion);
     }
 
     public function contactosXUser($id = 0, $orden = 'id')

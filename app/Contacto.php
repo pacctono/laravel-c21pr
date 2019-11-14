@@ -116,8 +116,8 @@ class Contacto extends Model
     {
         If (0 >= $user) $signo = '>';
         else $signo = '=';
-        $sql = self::select(DB::raw('DATE_FORMAT(created_at, "%Y-%m-%d")'),
-                        DB::raw('DATE_FORMAT(created_at, "%d/%m/%Y") as fecha'),
+        $sql = self::select(DB::raw('DATE_FORMAT(created_at, "%Y-%m-%d") as fechaBD'),
+                        DB::raw('DATE_FORMAT(created_at, "%d/%m/%Y") as fechaContacto'),
                         DB::raw('count(*) as atendidos'))
                     ->whereBetween('created_at', [$fecha_desde, $fecha_hasta])
                     ->where('user_id', $signo, $user)

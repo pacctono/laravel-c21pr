@@ -1,6 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
+    @if (!isset($accion) or ('html' == $accion))
     <div class="d-flex justify-content-between align-items-end mb-3">
         <h1 class="pb-1">{{ $title }}</h1>
 
@@ -12,13 +13,28 @@
         </p>
     @endif ('texto' != $elemento)
     </div>
+    @else (!isset($accion) or ('html' == $accion))
+        <h1 style="text-align:center">{{ $title }}</h1>
+    @endif (!isset($accion) or ('html' == $accion))
 
     @if ($arreglo->isNotEmpty())
-    <table class="table table-striped table-hover table-bordered">
+    <table
+    @if (!isset($accion) or ('html' == $accion))
+        class="table table-striped table-hover table-bordered"
+    @else (!isset($accion) or ('html' == $accion))
+        class="center"
+    @endif (!isset($accion) or ('html' == $accion))
+    >
         <thead class="thead-dark">
-        <tr>
+        <tr
+        @if (isset($accion) and ('html' != $accion))
+            class="encabezado"
+        @endif ('html' != $accion)
+        >
         @if ((!$movil) and ('texto' != $elemento))
+        @if (!isset($accion) or ('html' == $accion))
             <th scope="col">#</th>
+        @endif (!isset($accion) or ('html' == $accion))
             <th scope="col">id</th>
         @endif ((!$movil) and ('texto' != $elemento))
             <th scope="col">Descripcion</th>
@@ -26,7 +42,9 @@
             <th scope="col">Enlace</th>
             <th scope="col">Texto del enlace</th>
         @endif ('texto' != $elemento)
+        @if (!$movil and (!isset($accion) or ('html' == $accion)))
             <th scope="col">Acciones</th>
+        @endif (!$movil and (!isset($accion) or ('html' == $accion)))
         </tr>
         </thead>
         <tbody>
@@ -39,11 +57,13 @@
         @endif
         ">
         @if ((!$movil) and ('texto' != $elemento))
+        @if (!isset($accion) or ('html' == $accion))
             <th scope="row">{{ $loop->iteration }}</th>
+        @endif (!isset($accion) or ('html' == $accion))
             <td>{{ $arrInd->id }}</td>
         @endif ((!$movil) and ('texto' != $elemento))
             <td>
-            @if ($enlace)
+            @if ($enlace and (!isset($accion) or ('html' == $accion)))
                 <a href="{{ route('reporte.'.$enlace.ucfirst($elemento), [$arrInd->id, 'id']) }}"
                     class="btn btn-link">
                     {{ $arrInd->descripcion }}
@@ -60,6 +80,7 @@
                 {{ $arrInd->textoEnlace??'' }}
             </td>
         @endif ('texto' != $elemento)
+        @if (!$movil and (!isset($accion) or ('html' == $accion)))
             <td>
             @if ($enlace)
                 <form action="{{ route($rutBorrar, $arrInd) }}" method="POST"
@@ -85,14 +106,20 @@
                 </a>
             @endif ($enlace)
             </td>
+        @endif (!$movil and (!isset($accion) or ('html' == $accion)))
         </tr>
         @endForeach
         </tbody>
     </table>
+@if ((!$movil) and (!isset($accion) or ('html' == $accion)))
     {{ $arreglo->links() }}
-    @else
-        <p>No hay {{ strtolower($tipo) }} registrados.</p>
-    @endif
+@endif ((!$movil) and (!isset($accion) or ('html' == $accion)))
+
+@include('include.botonesPdf', ['enlace' => $elemento])
+
+@else ($turnos->isNotEmpty())
+    <p>No hay {{ strtolower($tipo) }} registrados.</p>
+@endif ($turnos->isNotEmpty())
 
 @endsection
 

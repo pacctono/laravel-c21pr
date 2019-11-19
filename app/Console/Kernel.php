@@ -18,6 +18,16 @@ class Kernel extends ConsoleKernel
     ];
 
     /**
+     * Get the timezone that should be used by default for scheduled events. version +5.8
+     *
+     * @return \DateTimeZone|string|null
+     */
+    protected function scheduleTimezone()
+    {
+        return 'America/Caracas';
+    }
+
+    /**
      * Define the application's command schedule.
      *
      * @param  \Illuminate\Console\Scheduling\Schedule  $schedule
@@ -28,23 +38,26 @@ class Kernel extends ConsoleKernel
         // $schedule->command('inspire')
         //          ->hourly();
         $schedule->command('grabar:archivo')
+                    ->timezone('America/Caracas')   // Definido en la funcion anterior +5.8.
                     ->weekdays()->everyThirtyMinutes()
                     ->between('9:00', '23:00')
 //                    ->sendOutputTo('/home/pablo/salidas/cronLaravelGrabarArchivo.txt')
                     ;
         $schedule->command('grabar:archivo')
+                    ->timezone('America/Caracas')   // Definido en la funcion anterior +5.8.
                     ->saturdays()->everyThirtyMinutes()
                     ->between('9:00', '13:00');
 //                    ->sendOutputTo('/home/pablo/salidas/cronLaravelGrabarArchivo.txt');
 
         $schedule->command('correo:cumpleano')
-                    ->twiceDaily(7, 9)
+                    ->timezone('America/Caracas')   // Definido en la funcion anterior +5.8.
+                    ->twiceDaily(6, 10)
 //                    ->twiceDaily(21, 23)
 //                    ->sendOutputTo('/home/pablo/salidas/cronLaravelCorreoCumpleano.txt')
                     ;
-        $schedule->command('correo:cumpleano')
-                    ->dailyAt('8:00')
-                    ;
+//        $schedule->command('correo:cumpleano')
+//                    ->dailyAt('8:00')
+//                    ;
     }
 
     /**

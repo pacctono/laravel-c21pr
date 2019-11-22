@@ -64,6 +64,13 @@
             <th scope="col">
                 <a class=@if('html'==$accion) "btn btn-link" href=
                     @else "enlaceDesabilitado" name=
+                    @endif "{{ route('clientes.orden', 'tipo') }}">
+                    Tipo
+                </a>
+            </th>
+            <th scope="col">
+                <a class=@if('html'==$accion) "btn btn-link" href=
+                    @else "enlaceDesabilitado" name=
                     @endif "{{ route('clientes.orden', 'telefono') }}">
                     Telefono
                 </a>
@@ -119,6 +126,9 @@
             <td>{{ $cliente->rif_f }}</td>
             <td>{{ $cliente->name }}</td>
         @if (!$movil)
+            <td>
+                {{ substr($cliente->tipo_alfa, 0, 7) }}
+            </td>
             <td>
                 {{ $cliente->telefono_f }}
             </td>

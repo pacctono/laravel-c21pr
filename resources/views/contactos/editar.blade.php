@@ -72,9 +72,13 @@
             </div>
 
             <div class="form-row my-1 py-0">  {{-- margen(m) arriba y abajo(y) 0.25*$spacer(1) y padding(p) arriba y abajo(y) 0(0) --}}
-                <button type="submit" class="btn btn-primary col-sm-5">Actualizar Contacto Inicial</button>
+                <button type="submit" class="btn btn-primary col-sm-5">
+                    Actualizar Contacto Inicial
+                </button>
                 <!-- a href="{{ action('ContactoController@index') }}">Regresar al listado de usuarios</a -->
-                <a href="{{ url('/contactos') }}" class="btn btn-link">Regresar al listado de contactos iniciales</a>
+                <a href="{{ url('/contactos') }}" class="btn btn-link">
+                    Regresar al listado de contactos iniciales
+                </a>
             </div>
         </form>
     </div>

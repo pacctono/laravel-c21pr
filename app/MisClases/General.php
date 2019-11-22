@@ -421,9 +421,11 @@ class General {
                             "<img src='" . public_path() . "/img/c21pr.jpg' " . 
                             "title='C21 Puente Real' alt='C21 Puente Real' " .
                             "style='display:block;margin:0 auto;width:50;height:48;'></div>");
-        $mpdf->SetHTMLFooter('<h6>Piso 1, Centro Comercial Costanera Plaza I, Barcelona, ' .
-                                '0281-416.0885.&copy; Copyright 2019-{DATE Y}' .
-                                ' Fecha:{DATE j/m/Y} P&aacute;gina:{PAGENO}/{nb}</h6>');
+        $mpdf->SetHTMLFooter('<div style="font-size:60%;display:inline-block"><span>' .
+                                'Piso 1, Centro Comercial Costanera Plaza I, Barcelona, ' .
+                                '0281-416.0885.&copy; Copyright 2019-{DATE Y}</span>' .
+                                ' ..... <span>' .
+                                'Fecha:{DATE j/m/Y} P&aacute;gina:{PAGENO}/{nb}</span></div>');
         $mpdf->SetDisplayMode('fullpage');
         $mpdf->WriteHTML($html);
         // dd($mpdf);

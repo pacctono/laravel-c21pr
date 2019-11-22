@@ -18,6 +18,8 @@ class CreateClientesTable extends Migration
             $table->string('cedula', 8)->nullable();
             $table->string('rif', 10)->nullable();
             $table->string('name', 160);
+            $table->enum('tipo', ['C','V','A','F','O'])
+                ->comment('[C]omprador,[V]endedor,[A]mbos,[F]amiliar,[O]tro');
             $table->string('telefono', 10)->nullable();
             $table->unsignedInteger('user_id');
             $table->foreign('user_id')->references('id')->on('users');
@@ -25,6 +27,9 @@ class CreateClientesTable extends Migration
             $table->date('fecha_nacimiento')->nullable();
             $table->string('direccion', 160)->nullable();
             $table->string('observaciones', 190)->nullable();
+            $table->unsignedInteger('contacto_id')->nullable()
+                ->comment('Si es diferente a nulo, representa el id del contacto del que fueron obtenidos los datos');
+            $table->foreign('contacto_id')->references('id')->on('contactos');
             $table->unsignedInteger('user_actualizo')->nullable();
             $table->unsignedInteger('user_borro')->nullable();
             $table->softDeletes();

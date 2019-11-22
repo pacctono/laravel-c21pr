@@ -175,17 +175,70 @@
     @endif
 
         <div class="row my-1 py-1">
+            @if ('' == $col_id)
+            <form method="POST" class="form-horizontal" action="{{ url('clientes') }}">
+                {!! csrf_field() !!}
+
+            <div class="form-row my-0 py-0">  {{-- margen(m) arriba y abajo(y) 0 y padding(p) arriba y abajo(y) 0(0) --}}
+                <input type="hidden" name="cedula" id="cedula" value="{{ $contacto->cedula }}">
+                <input type="hidden" name="name" id="name" value="{{ $contacto->name }}">
+                <div class="form-group form-inline mx-1 px-2 tipoCliente">
+                    <label class="control-label" for="tipo">*Tipo</label>
+                    <select class="form-control form-control-sm" name="tipo" id="tipo">
+                        <option value="">Tipo de cliente</option>
+                    @foreach ($tipos as $opcion => $muestra)
+                        <option value="{{$opcion}}"
+                        @if (old('tipo') == $opcion)
+                            selected
+                        @endif
+                            >{{$muestra}}</option>
+                    @endforeach
+                    </select>
+                </div>
+                <input type="hidden" name="ddn" id="ddn" value="{{ substr($contacto->telefono, 0, 3) }}">
+                <input type="hidden" name="telefono" id="telefono" value="{{ substr($contacto->telefono, 3) }}">
+                <input type="hidden" name="email" id="email" value="{{ $contacto->email }}">
+                <input type="hidden" name="direccion" id="email" value="{{ $contacto->direccion }}">
+                <input type="hidden" name="observaciones" id="email" value="{{ $contacto->observaciones }}">
+                <input type="hidden" name="contacto_id" id="email" value="{{ $contacto->id }}">
+                <div class="form-group form-inline mx-1 px-2">
+                    <button type="submit" class="btn btn-success" id="convertir">
+                        convertir Contacto Inicial a Cliente
+                    </button>
+                </div>
+            </div>
+            </form>
+            @endif ('' == $col_id)
             <div class="mx-1 px-2">
             <!-- a href="{{ action('ContactoController@index') }}">Regresar al listado de contactos iniciales</a -->
             @if ('' == $col_id)
         	    <a href="{{ route($rutRetorno) }}" class="btn btn-link">
 	        @else
 	            <a href="{{ route($rutRetorno, [$contacto[$col_id], 'id']) }}" class="btn btn-link">
-	        @endif
+            @endif ('' == $col_id)
 		            Regresar
                 </a>
             </div>
         </div>
     </div>
 </div>
+@endsection
+
+@section('js')
+<script>
+    $(document).ready(function(){
+        $("div.tipoCliente").hide();  // Clase "tipoCliente"
+
+        $("#convertir").click(function(ev){         // Id "convertir"
+            $("div.tipoCliente").show();  // Clase "tipoCliente"
+            if ('' == $("#tipo").val()) {
+                ev.preventDefault();
+                alert("Para 'convertir' un 'Contacto inicial' a 'cliente' debe seleccionar el 'tipo de cliente'");
+                $("#tipo").focus();
+            //} else {
+            }
+        })
+    })
+</script>
+
 @endsection

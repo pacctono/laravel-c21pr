@@ -104,6 +104,10 @@
                 <a href="{{ route($rutEditar, $arrInd) }}" class="btn btn-link">
                     <span class="oi oi-pencil"></span>
                 </a>
+                <a href="" class="btn btn-link"
+                    title="Cargar al servidor el archivo de la imagen{{ $arrInd->id-1 }}.jpg">
+                    <span class="oi oi-data-transfer-upload"></span>
+                </a>
             @endif ($enlace)
             </td>
         @endif (!$movil and (!isset($accion) or ('html' == $accion)))

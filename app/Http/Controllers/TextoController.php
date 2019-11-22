@@ -46,10 +46,14 @@ class TextoController extends Controller
 	else $arreglo = Texto::orderBy($orden)->paginate(10);
 
         if ('html' == $accion)
-            return view($this->vistaIndice, compact('title', 'arreglo', 'tipo', 'elemento', 'enlace', 'accion', 'movil',
-                                        'metBorradas', 'rutCrear', 'rutMostrar', 'rutEditar', 'rutBorrar'));
-        $html = view($this->vistaIndice, compact('title', 'arreglo', 'tipo', 'elemento', 'enlace', 'accion', 'movil',
-                                        'metBorradas', 'rutCrear', 'rutMostrar', 'rutEditar', 'rutBorrar'))
+            return view($this->vistaIndice,
+                        compact('title', 'arreglo', 'elemento',     // Quite $elemento (=caracteristica), no entiendo que hace aqui.
+                                'enlace', 'accion', 'movil', 'metBorradas',
+                                'rutCrear', 'rutMostrar', 'rutEditar', 'rutBorrar'));
+        $html = view($this->vistaIndice,
+                        compact('title', 'arreglo', 'elemento',     // Quite $elemento (=caracteristica), no entiendo que hace aqui.
+                                'enlace', 'accion', 'movil', 'metBorradas',
+                                'rutCrear', 'rutMostrar', 'rutEditar', 'rutBorrar'))
                 ->render();
         General::generarPdf($html, $elemento, $accion);
     }

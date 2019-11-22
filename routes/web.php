@@ -36,6 +36,7 @@ Route::get('/usuarios/nuevo', 'UserController@create')
 Route::post('/usuarios', 'UserController@store');
 
 Route::get('/usuarios/{user}/editar', 'UserController@edit')
+    ->where('user', '[0-9]+')
     ->name('users.edit');
 
 Route::put('/usuarios/{user}', 'UserController@update');
@@ -65,6 +66,7 @@ Route::get('/turnos/crear/{semana}', 'TurnoController@crear')
 Route::post('/turnos', 'TurnoController@store');
 
 Route::get('/turnos/{turno}/editar', 'TurnoController@editar')
+    ->where('turno', '[0-9]+')
     ->name('turnos.editar');
 
 Route::put('/turnos/{turno}', 'TurnoController@update');
@@ -108,6 +110,7 @@ Route::post('/agenda', 'AgendaController@store')
     ->name('agenda.store');
 
 Route::get('/agenda/{contacto}/editar', 'AgendaController@edit')
+    ->where('contacto', '[0-9]+')
     ->name('agenda.edit');
 
 Route::put('/agenda/{cita}', 'AgendaController@update')
@@ -124,6 +127,7 @@ Route::post('/agendaPersonal', 'AgendaPersonalController@store')
     ->name('agendaPersonal.store');
 
 Route::get('/agendaPersonal/{agenda}/editar', 'AgendaPersonalController@edit')
+    ->where('agenda', '[0-9]+')
     ->name('agendaPersonal.edit');
 
 Route::put('/agendaPersonal/{agenda}', 'AgendaPersonalController@update')
@@ -163,11 +167,11 @@ Route::post('/reportes/chart/{chart}/{accion?}', 'ReporteController@chart')
 Route::get('/reportes/contactosUser/{id}/{orden}', 'ReporteController@contactosXUser')
     ->name('reporte.contactosUser');
 
+Route::get('/reportes/propiedadesCaracteristica/{id}/{orden}', 'ReporteController@propiedadesX')
+    ->name('reporte.propiedadesCaracteristica');
+
 Route::get('/reportes/contactosDeseo/{id}/{orden}', 'ReporteController@contactosX')
     ->name('reporte.contactosDeseo');
-
-Route::get('/reportes/contactosTipo/{id}/{orden}', 'ReporteController@contactosX')
-    ->name('reporte.contactosTipo');
 
 Route::get('/reportes/contactosOrigen/{id}/{orden}', 'ReporteController@contactosX')
     ->name('reporte.contactosOrigen');
@@ -175,14 +179,11 @@ Route::get('/reportes/contactosOrigen/{id}/{orden}', 'ReporteController@contacto
 Route::get('/reportes/contactosPrecio/{id}/{orden}', 'ReporteController@contactosX')
     ->name('reporte.contactosPrecio');
 
-Route::get('/reportes/contactosZona/{id}/{orden}', 'ReporteController@contactosX')
-    ->name('reporte.contactosZona');
-
 Route::get('/reportes/contactosResultado/{id}/{orden}', 'ReporteController@contactosX')
     ->name('reporte.contactosResultado');
 
-Route::get('/reportes/propiedadesCaracteristica/{id}/{orden}', 'ReporteController@propiedadesX')
-    ->name('reporte.propiedadesCaracteristica');
+Route::get('/reportes/contactosTipo/{id}/{orden}', 'ReporteController@contactosX')
+    ->name('reporte.contactosTipo');
 
 Route::get('/reportes/propiedadesCiudad/{id}/{orden}', 'ReporteController@propiedadesX')
     ->name('reporte.propiedadesCiudad');
@@ -193,174 +194,26 @@ Route::get('/reportes/propiedadesMunicipio/{id}/{orden}', 'ReporteController@pro
 Route::get('/reportes/propiedadesEstado/{id}/{orden}', 'ReporteController@propiedadesX')
     ->name('reporte.propiedadesEstado');
 
-Route::get('/origenes/{orden?}/{accion?}', 'OrigenController@index')
-    ->name('origen');
-
-Route::get('/origenes/{origen}', 'OrigenController@show')
-    ->where('origen', '[0-9]+')
-    ->name('origen.show');
-
-Route::get('/origenes/nuevo', 'OrigenController@create')
-    ->name('origen.crear')
-    ->middleware('admin');
-
-Route::post('/origenes', 'OrigenController@store');
-
-Route::get('/origenes/{origen}/editar', 'OrigenController@edit')
-    ->name('origen.edit');
-
-Route::put('/origenes/{origen}', 'OrigenController@update');
-
-Route::delete('/origenes/{origen}', 'OrigenController@destroy')
-    ->name('origen.destroy')
-    ->middleware('admin');
-
-Route::get('/deseos/{orden?}/{accion?}', 'DeseoController@index')
-    ->name('deseo');
-
-Route::get('/deseos/{deseo}', 'DeseoController@show')
-    ->where('deseo', '[0-9]+')
-    ->name('deseo.show');
-
-Route::get('/deseos/nuevo', 'DeseoController@create')
-    ->name('deseo.crear')
-    ->middleware('admin');
-
-Route::post('/deseos', 'DeseoController@store');
-
-Route::get('/deseos/{deseo}/editar', 'DeseoController@edit')
-    ->name('deseo.edit');
-
-Route::put('/deseos/{deseo}', 'DeseoController@update');
-
-Route::delete('/deseos/{deseo}', 'DeseoController@destroy')
-    ->name('deseo.destroy')
-    ->middleware('admin');
-
-Route::get('/tipos/{orden?}/{accion?}', 'TipoController@index')
-    ->name('tipo');
-
-Route::get('/tipos/{tipo}', 'TipoController@show')
-    ->where('tipo', '[0-9]+')
-    ->name('tipo.show');
-
-Route::get('/tipos/nuevo', 'TipoController@create')
-    ->name('tipo.crear')
-    ->middleware('admin');
-
-Route::post('/tipos', 'TipoController@store');
-
-Route::get('/tipos/{tipo}/editar', 'TipoController@edit')
-    ->name('tipo.edit');
-
-Route::put('/tipos/{tipo}', 'TipoController@update');
-
-Route::delete('/tipos/{tipo}', 'TipoController@destroy')
-    ->name('tipo.destroy')
-    ->middleware('admin');
-
-Route::get('/zonas/{orden?}/{accion?}', 'ZonaController@index')
-    ->name('zona');
-
-Route::get('/zonas/{zona}', 'ZonaController@show')
-    ->where('zona', '[0-9]+')
-    ->name('zona.show');
-
-Route::get('/zonas/nuevo', 'ZonaController@create')
-    ->name('zona.crear')
-    ->middleware('admin');
-
-Route::post('/zonas', 'ZonaController@store');
-
-Route::get('/zonas/{zona}/editar', 'ZonaController@edit')
-    ->name('zona.edit');
-
-Route::put('/zonas/{zona}', 'ZonaController@update');
-
-Route::delete('/zonas/{zona}', 'ZonaController@destroy')
-    ->name('zona.destroy')
-    ->middleware('admin');
-
-Route::get('/textos/{orden?}/{accion?}', 'TextoController@index')
-    ->name('texto');
-
-Route::get('/textos/{texto}', 'TextoController@show')
-    ->where('texto', '[0-9]+')
-    ->name('texto.show');
-
-Route::get('/textos/nuevo', 'TextoController@create')
-    ->name('texto.crear')
-    ->middleware('admin');
-
-Route::post('/textos', 'TextoController@store');
-
-Route::get('/textos/{texto}/editar', 'TextoController@edit')
-    ->name('texto.edit');
-
-Route::put('/textos/{texto}', 'TextoController@update');
-
-Route::delete('/textos/{texto}', 'TextoController@destroy')
-    ->name('texto.destroy')
-    ->middleware('admin');
-
-Route::get('/precios/{orden?}/{accion?}', 'PrecioController@index')
-    ->name('precio');
-
-Route::get('/precios/{precio}', 'PrecioController@show')
-    ->where('precio', '[0-9]+')
-    ->name('precio.show');
-
-Route::get('/precios/nuevo', 'PrecioController@create')
-    ->name('precio.crear')
-    ->middleware('admin');
-
-Route::post('/precios', 'PrecioController@store');
-
-Route::get('/precios/{precio}/editar', 'PrecioController@edit')
-    ->name('precio.edit');
-
-Route::put('/precios/{precio}', 'PrecioController@update');
-
-Route::delete('/precios/{precio}', 'PrecioController@destroy')
-    ->name('precio.destroy')
-    ->middleware('admin');
-
-Route::get('/resultados/{orden?}/{accion?}', 'ResultadoController@index')
-    ->name('resultado');
-
-Route::get('/resultados/{resultado}', 'ResultadoController@show')
-    ->where('resultado', '[0-9]+')
-    ->name('resultado.show');
-
-Route::get('/resultados/nuevo', 'ResultadoController@create')
-    ->name('resultado.crear')
-    ->middleware('admin');
-
-Route::post('/resultados', 'ResultadoController@store');
-
-Route::get('/resultados/{resultado}/editar', 'ResultadoController@edit')
-    ->name('resultado.edit');
-
-Route::put('/resultados/{resultado}', 'ResultadoController@update');
-
-Route::delete('/resultados/{resultado}', 'ResultadoController@destroy')
-    ->name('resultado.destroy')
-    ->middleware('admin');
+Route::get('/reportes/contactosZona/{id}/{orden}', 'ReporteController@contactosX')
+    ->name('reporte.contactosZona');
 
 Route::get('/caracteristicas/{orden?}/{accion?}', 'CaracteristicaController@index')
+// Cualquier nombre que comience con letra, luego letra, numero o '_'; excepto 'nuevo'. Otras palabras, usar '|'.
+    ->where('orden', '[a-zA-Z]+[a-zA-Z0-9_]+(?<!nuevo)')
     ->name('caracteristica');
-
-Route::get('/caracteristicas/{caracteristica}', 'CaracteristicaController@show')
-    ->where('caracteristica', '[0-9]+')
-    ->name('caracteristica.show');
 
 Route::get('/caracteristicas/nuevo', 'CaracteristicaController@create')
     ->name('caracteristica.crear')
     ->middleware('admin');
 
+Route::get('/caracteristicas/{caracteristica}', 'CaracteristicaController@show')
+    ->where('caracteristica', '[0-9]+')
+    ->name('caracteristica.show');
+
 Route::post('/caracteristicas', 'CaracteristicaController@store');
 
 Route::get('/caracteristicas/{caracteristica}/editar', 'CaracteristicaController@edit')
+    ->where('caracteristica', '[0-9]+')
     ->name('caracteristica.edit');
 
 Route::put('/caracteristicas/{caracteristica}', 'CaracteristicaController@update');
@@ -369,20 +222,123 @@ Route::delete('/caracteristicas/{caracteristica}', 'CaracteristicaController@des
     ->name('caracteristica.destroy')
     ->middleware('admin');
 
+Route::get('/deseos/nuevo', 'DeseoController@create')
+    ->name('deseo.crear')
+    ->middleware('admin');
+
+Route::get('/deseos/{orden?}/{accion?}', 'DeseoController@index')
+// Cualquier nombre que comience con letra, luego letra, numero o '_'; excepto 'nuevo'. Otras palabras, usar '|'.
+    ->where('orden', '[a-zA-Z]+[a-zA-Z0-9_]+(?<!nuevo)')
+    ->name('deseo');
+
+Route::get('/deseos/{deseo}', 'DeseoController@show')
+    ->where('deseo', '[0-9]+')
+    ->name('deseo.show');
+
+Route::post('/deseos', 'DeseoController@store');
+
+Route::get('/deseos/{deseo}/editar', 'DeseoController@edit')
+    ->where('deseo', '[0-9]+')
+    ->name('deseo.edit');
+
+Route::put('/deseos/{deseo}', 'DeseoController@update');
+
+Route::delete('/deseos/{deseo}', 'DeseoController@destroy')
+    ->name('deseo.destroy')
+    ->middleware('admin');
+
+Route::get('/origenes/nuevo', 'OrigenController@create')
+    ->name('origen.crear')
+    ->middleware('admin');
+
+Route::get('/origenes/{orden?}/{accion?}', 'OrigenController@index')
+// Cualquier nombre que comience con letra, luego letra, numero o '_'; excepto 'nuevo'. Otras palabras, usar '|'.
+    ->where('orden', '[a-zA-Z]+[a-zA-Z0-9_]+(?<!nuevo)')
+    ->name('origen');
+
+Route::get('/origenes/{origen}', 'OrigenController@show')
+    ->where('origen', '[0-9]+')
+    ->name('origen.show');
+
+Route::post('/origenes', 'OrigenController@store');
+
+Route::get('/origenes/{origen}/editar', 'OrigenController@edit')
+    ->where('origen', '[0-9]+')
+    ->name('origen.edit');
+
+Route::put('/origenes/{origen}', 'OrigenController@update');
+
+Route::delete('/origenes/{origen}', 'OrigenController@destroy')
+    ->name('origen.destroy')
+    ->middleware('admin');
+
+Route::get('/precios/nuevo', 'PrecioController@create')
+    ->name('precio.crear')
+    ->middleware('admin');
+
+Route::get('/precios/{orden?}/{accion?}', 'PrecioController@index')
+// Cualquier nombre que comience con letra, luego letra, numero o '_'; excepto 'nuevo'. Otras palabras, usar '|'.
+    ->where('orden', '[a-zA-Z]+[a-zA-Z0-9_]+(?<!nuevo)')
+    ->name('precio');
+
+Route::get('/precios/{precio}', 'PrecioController@show')
+    ->where('precio', '[0-9]+')
+    ->name('precio.show');
+
+Route::post('/precios', 'PrecioController@store');
+
+Route::get('/precios/{precio}/editar', 'PrecioController@edit')
+    ->where('precio', '[0-9]+')
+    ->name('precio.edit');
+
+Route::put('/precios/{precio}', 'PrecioController@update');
+
+Route::delete('/precios/{precio}', 'PrecioController@destroy')
+    ->name('precio.destroy')
+    ->middleware('admin');
+
+Route::get('/resultados/nuevo', 'ResultadoController@create')
+    ->name('resultado.crear')
+    ->middleware('admin');
+
+Route::get('/resultados/{orden?}/{accion?}', 'ResultadoController@index')
+// Cualquier nombre que comience con letra, luego letra, numero o '_'; excepto 'nuevo'. Otras palabras, usar '|'.
+    ->where('orden', '[a-zA-Z]+[a-zA-Z0-9_]+(?<!nuevo)')
+    ->name('resultado');
+
+Route::get('/resultados/{resultado}', 'ResultadoController@show')
+    ->where('resultado', '[0-9]+')
+    ->name('resultado.show');
+
+Route::post('/resultados', 'ResultadoController@store');
+
+Route::get('/resultados/{resultado}/editar', 'ResultadoController@edit')
+    ->where('resultado', '[0-9]+')
+    ->name('resultado.edit');
+
+Route::put('/resultados/{resultado}', 'ResultadoController@update');
+
+Route::delete('/resultados/{resultado}', 'ResultadoController@destroy')
+    ->name('resultado.destroy')
+    ->middleware('admin');
+
+Route::get('/ciudades/nuevo', 'CiudadController@create')
+    ->name('ciudad.crear')
+    ->middleware('admin');
+
 Route::get('/ciudades/{orden?}/{accion?}', 'CiudadController@index')
+// Cualquier nombre que comience con letra, luego letra, numero o '_'; excepto 'nuevo'. Otras palabras, usar '|'.
+    ->where('orden', '[a-zA-Z]+[a-zA-Z0-9_]+(?<!nuevo)')
     ->name('ciudad');
 
 Route::get('/ciudades/{ciudad}', 'CiudadController@show')
     ->where('ciudad', '[0-9]+')
     ->name('ciudad.show');
 
-Route::get('/ciudades/nuevo', 'CiudadController@create')
-    ->name('ciudad.crear')
-    ->middleware('admin');
-
 Route::post('/ciudades', 'CiudadController@store');
 
 Route::get('/ciudades/{ciudad}/editar', 'CiudadController@edit')
+    ->where('ciudad', '[0-9]+')
     ->name('ciudad.edit');
 
 Route::put('/ciudades/{ciudad}', 'CiudadController@update');
@@ -391,20 +347,23 @@ Route::delete('/ciudades/{ciudad}', 'CiudadController@destroy')
     ->name('ciudad.destroy')
     ->middleware('admin');
 
+Route::get('/estados/nuevo', 'EstadoController@create')
+    ->name('estado.crear')
+    ->middleware('admin');
+
 Route::get('/estados/{orden?}/{accion?}', 'EstadoController@index')
+// Cualquier nombre que comience con letra, luego letra, numero o '_'; excepto 'nuevo'. Otras palabras, usar '|'.
+    ->where('orden', '[a-zA-Z]+[a-zA-Z0-9_]+(?<!nuevo)')
     ->name('estado');
 
 Route::get('/estados/{estado}', 'EstadoController@show')
     ->where('estado', '[0-9]+')
     ->name('estado.show');
 
-Route::get('/estados/nuevo', 'EstadoController@create')
-    ->name('estado.crear')
-    ->middleware('admin');
-
 Route::post('/estados', 'EstadoController@store');
 
 Route::get('/estados/{estado}/editar', 'EstadoController@edit')
+    ->where('estado', '[0-9]+')
     ->name('estado.edit');
 
 Route::put('/estados/{estado}', 'EstadoController@update');
@@ -413,26 +372,104 @@ Route::delete('/estados/{estado}', 'EstadoController@destroy')
     ->name('estado.destroy')
     ->middleware('admin');
 
+Route::get('/municipios/nuevo', 'MunicipioController@create')
+    ->name('municipio.crear')
+    ->middleware('admin');
+
 Route::get('/municipios/{orden?}/{accion?}', 'MunicipioController@index')
+// Cualquier nombre que comience con letra, luego letra, numero o '_'; excepto 'nuevo'. Otras palabras, usar '|'.
+    ->where('orden', '[a-zA-Z]+[a-zA-Z0-9_]+(?<!nuevo)')
     ->name('municipio');
 
 Route::get('/municipios/{municipio}', 'MunicipioController@show')
     ->where('municipio', '[0-9]+')
     ->name('municipio.show');
 
-Route::get('/municipios/nuevo', 'MunicipioController@create')
-    ->name('municipio.crear')
-    ->middleware('admin');
-
 Route::post('/municipios', 'MunicipioController@store');
 
 Route::get('/municipios/{municipio}/editar', 'MunicipioController@edit')
+    ->where('municipio', '[0-9]+')
     ->name('municipio.edit');
 
 Route::put('/municipios/{municipio}', 'MunicipioController@update');
 
 Route::delete('/municipios/{municipio}', 'MunicipioController@destroy')
     ->name('municipio.destroy')
+    ->middleware('admin');
+
+Route::get('/tipos/nuevo', 'TipoController@create')
+    ->name('tipo.crear')
+    ->middleware('admin');
+
+Route::get('/tipos/{orden?}/{accion?}', 'TipoController@index')
+// Cualquier nombre que comience con letra, luego letra, numero o '_'; excepto 'nuevo'. Otras palabras, usar '|'.
+    ->where('orden', '[a-zA-Z]+[a-zA-Z0-9_]+(?<!nuevo)')
+    ->name('tipo');
+
+Route::get('/tipos/{tipo}', 'TipoController@show')
+    ->where('tipo', '[0-9]+')
+    ->name('tipo.show');
+
+Route::post('/tipos', 'TipoController@store');
+
+Route::get('/tipos/{tipo}/editar', 'TipoController@edit')
+    ->where('tipo', '[0-9]+')
+    ->name('tipo.edit');
+
+Route::put('/tipos/{tipo}', 'TipoController@update');
+
+Route::delete('/tipos/{tipo}', 'TipoController@destroy')
+    ->name('tipo.destroy')
+    ->middleware('admin');
+
+Route::get('/zonas/nuevo', 'ZonaController@create')
+    ->name('zona.crear')
+    ->middleware('admin');
+
+Route::get('/zonas/{orden?}/{accion?}', 'ZonaController@index')
+// Cualquier nombre que comience con letra, luego letra, numero o '_'; excepto 'nuevo'. Otras palabras, usar '|'.
+    ->where('orden', '[a-zA-Z]+[a-zA-Z0-9_]+(?<!nuevo)')
+    ->name('zona');
+
+Route::get('/zonas/{zona}', 'ZonaController@show')
+    ->where('zona', '[0-9]+')
+    ->name('zona.show');
+
+Route::post('/zonas', 'ZonaController@store');
+
+Route::get('/zonas/{zona}/editar', 'ZonaController@edit')
+    ->where('zona', '[0-9]+')
+    ->name('zona.edit');
+
+Route::put('/zonas/{zona}', 'ZonaController@update');
+
+Route::delete('/zonas/{zona}', 'ZonaController@destroy')
+    ->name('zona.destroy')
+    ->middleware('admin');
+
+Route::get('/textos/nuevo', 'TextoController@create')
+    ->name('texto.crear')
+    ->middleware('admin');
+
+Route::get('/textos/{orden?}/{accion?}', 'TextoController@index')
+// Cualquier nombre que comience con letra, luego letra, numero o '_'; excepto 'nuevo'. Otras palabras, usar '|'.
+    ->where('orden', '[a-zA-Z]+[a-zA-Z0-9_]+(?<!nuevo)')
+    ->name('texto');
+
+Route::get('/textos/{texto}', 'TextoController@show')
+    ->where('texto', '[0-9]+')
+    ->name('texto.show');
+
+Route::post('/textos', 'TextoController@store');
+
+Route::get('/textos/{texto}/editar', 'TextoController@edit')
+    ->where('texto', '[0-9]+')
+    ->name('texto.edit');
+
+Route::put('/textos/{texto}', 'TextoController@update');
+
+Route::delete('/textos/{texto}', 'TextoController@destroy')
+    ->name('texto.destroy')
     ->middleware('admin');
 
 Route::get('/emailcita/{contacto}', 'AgendaController@emailcita')

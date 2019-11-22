@@ -12,8 +12,8 @@ class Cliente extends Model
     use SoftDeletes;
 
     protected $fillable = [
-        'cedula', 'rif', 'name', 'telefono',
-        'user_id', 'email', 'fecha_nacimiento', 'direccion', 'observaciones',
+        'cedula', 'rif', 'name', 'tipo', 'telefono', 'user_id', 'email',
+        'fecha_nacimiento', 'direccion', 'observaciones', 'contacto_id',
         'user_actualizo', 'user_borro'
     ];
     protected $dates = [
@@ -36,6 +36,11 @@ class Cliente extends Model
         return $this->hasMany(Propiedad::class); // Si llave foranea, diferente a esperada, usamos 2do parametro.
     }
 
+    public function contacto()    // contacto_id
+    {
+        return $this->belongsTo(Contacto::class); // Si llave foranea, diferente a esperada, usamos 2do parametro.
+    }
+
     public function getCedulaFAttribute()     // Cedula formateado.
     {
         return General::enteroEn($this->cedula);
@@ -44,6 +49,14 @@ class Cliente extends Model
     public function getRifFAttribute()     // Cedula formateado.
     {
         return General::rifF($this->rif);
+    }
+
+    public function getTipoAlfaAttribute()
+    {
+        $cols = General::columnas('clientes');
+        if (array_key_exists($this->tipo, $cols['tipo']['opcion']))
+            return str_replace(['[', ']'], '', $cols['tipo']['opcion'][$this->tipo]);
+	    else return 'Nulo';
     }
 
     public function getTelefonoFAttribute()

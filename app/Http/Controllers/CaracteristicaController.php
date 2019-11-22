@@ -52,11 +52,11 @@ class CaracteristicaController extends Controller
 
         if ('html' == $accion)
             return view($this->vistaIndice,
-                        compact('title', 'arreglo', $elemento, 'elemento',
+                        compact('title', 'arreglo', 'elemento',     // Quite $elemento (=caracteristica), no entiendo que hace aqui.
                                 'enlace', 'accion', 'movil', 'metBorradas',
                                 'rutCrear', 'rutMostrar', 'rutEditar', 'rutBorrar'));
         $html = view($this->vistaIndice,
-                        compact('title', 'arreglo', $elemento, 'elemento',
+                        compact('title', 'arreglo', 'elemento',     // Quite $elemento (=caracteristica), no entiendo que hace aqui.
                                 'enlace', 'accion', 'movil', 'metBorradas',
                                 'rutCrear', 'rutMostrar', 'rutEditar', 'rutBorrar'))
                 ->render();
@@ -75,7 +75,7 @@ class CaracteristicaController extends Controller
         $title = 'Crear ' . substr($tipo, 0, -1);
         $url  = '/' . strtolower($tipo);
 
-        return view($this->vistaCrear, compact('title', 'caracteristica', 'elemento', 'url'));
+        return view($this->vistaCrear, compact('title', 'tipo', 'elemento', 'url'));     // Quite $elemento (=caracteristica), no entiendo que hace aqui.
     }
 
     /**
@@ -126,8 +126,8 @@ class CaracteristicaController extends Controller
         $objModelo = $caracteristica;
         $rutActualizar = '/' . strtolower($tipo) . '/' . $caracteristica->id;
 
-        return view($this->vistaEditar, compact('objModelo', 'title', 'ruta', 'rutActualizar',
-                                        'singular', 'plural'));
+        return view($this->vistaEditar, compact('objModelo', 'title', 'ruta',
+                                            'rutActualizar', 'singular', 'plural'));
     }
 
     /**

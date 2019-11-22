@@ -516,7 +516,8 @@
                         Actualizar Propiedad
                     </button>
                     <!-- a href="{{ action('PropiedadController@index') }}">Regresar al listado de usuarios</a -->
-                    <a href="{{ url('/propiedades/orden/'.$orden).$nroPagina }}" class="btn btn-link">
+                    <!--a href="{{ url('/propiedades/orden/'.$orden).$nroPagina }}" class="btn btn-link"-->
+                    <a href="{{ route('propiedades.orden', $orden).$nroPagina }}" class="btn btn-link">
                         Regresar al listado de propiedades
                     </a>
                 </div>

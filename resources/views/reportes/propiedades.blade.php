@@ -272,20 +272,12 @@ Estatus en sistema C21: {{ $propiedad->estatus_c21_alfa.(($propiedad->pagado_cas
         </tr>
         @endforeach
         </tbody>
-        <tfoot>
-            <tr>
-            @if ($movil)
-                <td colspan="4">
-            @else ($movil)
-                <td colspan="6">
-            @endif ($movil)
-                    <a href="{{ route($tipo) }}" class="btn btn-link">
-                        Volver
-                    </a>
-                </td>
-            </tr>
-        </tfoot>
     </table>
+    <p>
+        <a href="{{ route($tipo) }}" class="btn btn-link">
+            Volver
+        </a>
+    </p>
     {{ $propiedades->links() }}
     @else
         <p>No hay propiedades registradas.</p>

@@ -18,7 +18,7 @@ class CreatePropiedadsTable extends Migration
             $table->string('codigo', 8);
             $table->date('fecha_reserva')->nullable();
             $table->date('fecha_firma')->nullable();
-            $table->enum('negociacion', ['V', 'A'])->comment('[V]enta,[A]luiler');
+            $table->enum('negociacion', ['V', 'A'])->comment('[V]enta,[A]lquiler');
             $table->string('nombre', 160);
             $table->boolean('exclusividad')->default(true)
                     ->comment('Define si la propiedad es dada en exclusiva para la negociacion.');

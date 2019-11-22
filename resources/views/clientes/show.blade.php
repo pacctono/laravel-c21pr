@@ -20,33 +20,40 @@
         </div>
         <div class="row my-1 py-1">
             <div class="mx-1 px-2">
+                Tipo de cliente:<span class="alert-info">
+                    {{ $cliente->tipo_alfa }}
+                </span>
+            </div>
+        </div>
+        <div class="row my-1 py-1 bg-suave">
+            <div class="mx-1 px-2">
                 Telefono:<span class="alert-info">
                     {{ $cliente->telefono_f }}
                 </span>
             </div>
         </div>
-        <div class="row my-1 py-1 bg-suave">
+        <div class="row my-1 py-1">
             <div class="mx-1 px-2">
                 Correo:<span class="alert-info">
                     {{ $cliente->email }}
                 </span>
             </div>
         </div>
-        <div class="row my-1 py-1">
+        <div class="row my-1 py-1 bg-suave">
             <div class="mx-1 px-2">
                 Fecha de nacimiento:<span class="alert-info">
                     {{ $cliente->fec_nac }}
                 </span>
             </div>
         </div>
-        <div class="row my-1 py-1 bg-suave">
+        <div class="row my-1 py-1">
             <div class="mx-1 px-2">
                 Dirección:<span class="alert-info">
                     {{ $cliente->direccion }}
                 </span>
             </div>
         </div>
-        <div class="row my-1 py-1">
+        <div class="row my-1 py-1 bg-suave">
             <div class="mx-1 px-2">
                 Observaciones:<span class="alert-info">
                     {{ $cliente->observaciones }}

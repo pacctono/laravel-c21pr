@@ -26,10 +26,22 @@
                 </div>
                 <div class="form-group form-inline mx-1 px-2">
                     <label class="control-label" for="name">*Nombre</label>
-                    <input type="text" class="form-control form-control-sm" size="100"
+                    <input type="text" class="form-control form-control-sm" size="70"
                             maxlength="150" name="name" id="name" required
                             value="{{ old('name', $cliente->name) }}">
                 </div>
+            <div class="form-group form-inline mx-1 px-2">
+                <label class="control-label" for="tipo">*Tipo</label>
+                <select class="form-control form-control-sm" name="tipo" id="tipo">
+                @foreach ($tipos as $opcion => $muestra)
+                  <option value="{{$opcion}}"
+                  @if (old('tipo', $cliente->tipo) == $opcion)
+                    selected
+                  @endif
+                    >{{$muestra}}</option>
+                @endforeach
+                </select>
+            </div>
             </div>
 
             <div class="form-row my-0 py-0 bg-suave">
@@ -84,7 +96,8 @@
                         Actualizar Cliente
                     </button>
                     <!-- a href="{{ action('ClienteController@index') }}">Regresar al listado de usuarios</a -->
-                    <a href="{{ url('/clientes/orden/'.$orden).$nroPagina }}" class="btn btn-link">
+                    <!-- a href="{{ url('/clientes/orden/'.$orden).$nroPagina }}" class="btn btn-link"-->
+                    <a href="{{ route('clientes.orden', $orden).$nroPagina }}" class="btn btn-link">
                         Regresar al listado de clientes
                     </a>
                 </div>

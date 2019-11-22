@@ -289,13 +289,18 @@ class PropiedadController extends Controller
 //        dd($users[0]['name']);
         $users[0]['name'] = 'Asesor otra oficina';
 
-        $cols = General::columnas('propiedads');
         $title = 'Crear ' . $this->tipo;
         $exito = session('exito', '');
         session(['exito' => '']);
-
         $agente = new Agent();
         $movil  = $agente->isMobile() and true;             // Fuerzo booleana. No funciona al usar el metodo directamente.
+
+        $cols = General::columnas('propiedads');
+        $colsC = General::columnas('clientes');
+        $tiposC = $colsC['tipo']['opcion'];
+        $tipoCXDef = $colsC['tipo']['xdef'];
+        unset($colsC);
+        if (!Auth::user()->is_admin) unset($tiposC['F']);
         $tipos = Tipo::all();
         $ciudades = Ciudad::all();
         $caracteristicas = Caracteristica::all();
@@ -303,14 +308,15 @@ class PropiedadController extends Controller
         $estados = Estado::all();
         $clientes = Cliente::all()->all();
         //dd(self::compararXNombre($clientes[0], $clientes[1]));
-        $otroCliente = array_shift($clientes);
-        usort($clientes, "self::compararXNombre");
+        $otroCliente = array_shift($clientes);          // Primer id de cliente 'Otro', es sacado del arreglo.
+        usort($clientes, "self::compararXNombre");      // Ordena clientes sin 'Otro'.
         $ddns = Venezueladdn::distinct()->get(['ddn'])->all();
-        array_unshift($clientes, $otroCliente);
+        array_unshift($clientes, $otroCliente);         // Agrega al inicio el cliente 'Otro'. Sacado del arreglo, anteriormente.
 //        return view((($movil)?'celular.createPropiedades':'propiedades.crear'),
         return view('propiedades.crear',
                     compact('title', 'users', 'tipos', 'ciudades', 'caracteristicas',
-                    'municipios', 'estados', 'clientes', 'ddns', 'cols', 'exito'));
+                    'municipios', 'estados', 'clientes', 'ddns', 'cols', 'tiposC',
+                    'tipoCXDef', 'exito'));
     }
 
     /**
@@ -377,6 +383,7 @@ class PropiedadController extends Controller
             'cedula' => '',
             'rif' => '',
             'name' => 'required',
+            'tipo' => '',
             'ddn' => '',
             'telefono' => '',
             'email' => '',
@@ -418,18 +425,22 @@ class PropiedadController extends Controller
             }
             unset($data['ddn']);
 
+            $cols = General::columnas('clientes');
             $cliente = Cliente::create([
-                'cedula' => (isset($data['cedula'])?$data['cedula']:null),
-                'rif' => (isset($data['rif'])?$data['rif']:null),
+                'cedula' => $data['cedula']??null,
+                'rif' => $data['rif']??null,
                 'name' => $data['name'],
-                'telefono' => (isset($data['telefono'])?$data['telefono']:null),
+                'tipo' => $data['tipo']??$cols['tipo']['xdef'],
+                'telefono' => $data['telefono']??null,
                 'user_id' => Auth::user()->id,
-                'email' => (isset($data['email'])?$data['email']:null),
-                'fecha_nacimiento' => (isset($data['fecha_nacimiento'])?$data['fecha_nacimiento']:null),
-                'dirCliente' => (isset($data['dirCliente'])?$data['dirCliente']:null),
-                'observaciones' => (isset($data['observaciones'])?$data['observaciones']:null)
+                'email' => $data['email']??null,
+                'fecha_nacimiento' => $data['fecha_nacimiento']??null,
+                'dirCliente' => $data['dirCliente']??null,
+                'observaciones' => $data['observaciones']??null,
+                'contacto_id' => $data['contacto_id']??null,
             ]);
             $data['cliente_id'] = $cliente->id;
+            unset($cols);
         }
 
         $cols = General::columnas('propiedads');

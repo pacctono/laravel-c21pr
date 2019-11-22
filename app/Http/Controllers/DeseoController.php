@@ -51,10 +51,14 @@ class DeseoController extends Controller
 	else $arreglo = Deseo::orderBy($orden)->paginate(10);
 //        dd($arreglo);
         if ('html' == $accion)
-            return view($this->vistaIndice, compact('title', 'arreglo', 'tipo', 'elemento', 'enlace', 'accion', 'movil',
-                                        'metBorradas', 'rutCrear', 'rutMostrar', 'rutEditar', 'rutBorrar'));
-        $html = view($this->vistaIndice, compact('title', 'arreglo', 'tipo', 'elemento', 'enlace', 'accion', 'movil',
-                                        'metBorradas', 'rutCrear', 'rutMostrar', 'rutEditar', 'rutBorrar'))
+            return view($this->vistaIndice,
+                        compact('title', 'arreglo', 'elemento',     // Quite $elemento (=caracteristica), no entiendo que hace aqui.
+                                'enlace', 'accion', 'movil', 'metBorradas',
+                                'rutCrear', 'rutMostrar', 'rutEditar', 'rutBorrar'));
+        $html = view($this->vistaIndice,
+                        compact('title', 'arreglo', 'elemento',     // Quite $elemento (=caracteristica), no entiendo que hace aqui.
+                                'enlace', 'accion', 'movil', 'metBorradas',
+                                'rutCrear', 'rutMostrar', 'rutEditar', 'rutBorrar'))
                 ->render();
         General::generarPdf($html, $elemento, $accion);
     }

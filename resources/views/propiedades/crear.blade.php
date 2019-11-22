@@ -181,7 +181,7 @@
             </div>
             <div class="form-group form-inline mx-1 px-2">
                 <label class="control-label" for="caracteristica">Caracteristicas</label>
-                <select class="form-control" name="caracteristica_id" id="tipo_id">
+                <select class="form-control" name="caracteristica_id" id="caracteristica_id">
                     <option value="">Qué caracteristica?</option>
                 @foreach ($caracteristicas as $caracteristica)
                 @if (old('caracteristica_id', $cols['caracteristica_id']['xdef']) == $caracteristica->id)
@@ -292,6 +292,21 @@
                         name="name" id="name" placeholder="Nombre del cliente"
                         value="{{ old('name') }}">
             </div>
+            <div class="form-group form-inline mx-1 px-2 nuevo">
+                <label class="control-label" for="tipo">Tipo</label>
+                <select class="form-control form-control-sm" name="tipo" id="tipo">
+                @foreach ($tiposC as $opcion => $muestra)
+                  <option value="{{$opcion}}"
+                  @if (old('tipo', $tipoCXDef) == $opcion)
+                    selected
+                  @endif
+                    >{{$muestra}}</option>
+                @endforeach
+                </select>
+            </div>
+        </div>
+
+        <div class="form-row my-0 py-0 nuevo">
             <div class="form-group form-inline mx-1 px-1 nuevo">
                 <label class="control-label" for="telefono">Tel&eacute;fono</label>
                 0<select class="form-control form-control-sm" name="ddn" id="ddn">
@@ -308,12 +323,9 @@
                         name="telefono" id="telefono" placeholder="telefono sin area" 
                         value="{{ old('telefono') }}">
             </div>
-        </div>
-
-        <div class="form-row my-0 py-0 nuevo">
             <div class="form-group form-inline mx-1 px-1 nuevo">
                 <label class="control-label" for="email">Correo electr&oacute;nico</label>
-                <input type="email" class="form-control form-control-sm" size="100" maxlength="160"
+                <input type="email" class="form-control form-control-sm" size="60" maxlength="160"
                         name="email" id="email" placeholder="correo electronico" value="{{ old('email') }}">
             </div>
             <div class="form-group form-inline mx-1 px-1 nuevo">

@@ -81,37 +81,27 @@
                 Estadisticas
               <span class="caret"></span></a>
               <ul class="dropdown-menu">
-                @if (Auth::user()->is_admin)
-                <li><a class="dropdown-item" href="{{ route('reportes', 'Asesor') }}">
-                  Contactos X asesor
+              @if (Auth::user()->is_admin)
+              @foreach (array('Asesor' => 'Contactos X asesor', 'Conexion' => 'Conexion X asesor')
+                    as $vMEst => $muestraMEst)
+                <li><a class="dropdown-item" href="{{ route('reportes', $vMEst) }}">
+                  {{ $muestraMEst }}
                 </a></li>
-                <li><a class="dropdown-item" href="{{ route('reportes', 'Conexion') }}">
-                  Conexión X asesor
-                </a></li>
-                @endif
+              @endforeach
+              @endif
                 <li><a class="dropdown-item" href="{{ route('reportes', 'Fecha') }}">
                   Contactos X fecha
                 </a></li>
-                @if (Auth::user()->is_admin)
-                <li><a class="dropdown-item" href="{{ route('reportes', 'Origen') }}">
-                  Contactos X origen
+              @if (Auth::user()->is_admin)
+              @foreach (array('Origen' => 'Contactos X origen', 'Lados' => 'Lados X asesor',
+                              'Comision' => 'Comision X Asesor', 'Negociaciones' => 'Negociaciones X mes',
+                              'LadMes' => 'Lados X mes', 'ComMes' => 'Comision X mes')
+                    as $vMEst => $muestraMEst)
+                <li><a class="dropdown-item" href="{{ route('reportes', $vMEst) }}">
+                  {{ $muestraMEst }}
                 </a></li>
-                <li><a class="dropdown-item" href="{{ route('reportes', 'Lados') }}">
-                  Lados X Asesor
-                </a></li>
-                <li><a class="dropdown-item" href="{{ route('reportes', 'Comision') }}">
-                  Comision X Asesor
-                </a></li>
-                <li><a class="dropdown-item" href="{{ route('reportes', 'Negociaciones') }}">
-                  Negociaciones X mes
-                </a></li>
-                <li><a class="dropdown-item" href="{{ route('reportes', 'LadMes') }}">
-                  Lados X mes
-                </a></li>
-                <li><a class="dropdown-item" href="{{ route('reportes', 'ComMes') }}">
-                  Comision X mes
-                </a></li>
-                @endif
+              @endforeach
+              @endif
               </ul>
             </li>
             @if (Auth::user()->is_admin)
@@ -149,39 +139,18 @@
                 <li><a class="dropdown-item" href="{{ route('propiedades.grabar') }}">
                   Grabar propiedades
                 </a></li>
-                <li><a class="dropdown-item" href="{{ route('caracteristica') }}">
-                  Caracteristica
+              @foreach (array('caracteristica' => 'Caracteristica', 'deseo' => 'Deseo',
+                              'origen' => 'Origen', 'precio' => 'Precio',
+                              'resultado' => 'Resultado', 'tipo' => 'Tipo de propiedad',
+                              'ciudad' => 'Ciudad', 'municipio' => 'Municipio',
+                              'estado' => 'Estado', 'zona' => 'Zona',
+                              'texto' => 'Texto',
+                             )
+                    as $vMTab => $muestraMTab)
+                <li><a class="dropdown-item" href="{{ route($vMTab) }}">
+                  {{ $muestraMTab }}
                 </a></li>
-                <li><a class="dropdown-item" href="{{ route('ciudad') }}">
-                  Ciudad
-                </a></li>
-                <li><a class="dropdown-item" href="{{ route('deseo') }}">
-                  Deseo
-                </a></li>
-                <li><a class="dropdown-item" href="{{ route('estado') }}">
-                  Estado
-                </a></li>
-                <li><a class="dropdown-item" href="{{ route('municipio') }}">
-                  Municipio
-                </a></li>
-                <li><a class="dropdown-item" href="{{ route('origen') }}">
-                  Origen
-                </a></li>
-                <li><a class="dropdown-item" href="{{ route('precio') }}">
-                  Precio
-                </a></li>
-                <li><a class="dropdown-item" href="{{ route('resultado') }}">
-                  Resultado
-                </a></li>
-                <li><a class="dropdown-item" href="{{ route('tipo') }}">
-                  Tipo de propiedad
-                </a></li>
-                <li><a class="dropdown-item" href="{{ route('zona') }}">
-                  Zona
-                </a></li>
-                <li><a class="dropdown-item" href="{{ route('texto') }}">
-                  Texto
-                </a></li>
+              @endforeach
               </ul>
             </li>
             @endif

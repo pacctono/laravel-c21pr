@@ -261,14 +261,18 @@ class ContactoController extends Controller
             $col_id = strtolower(substr($rutRetorno, 17)) . '_id';
         }
         
-        if (1 == Auth::user()->is_admin) {
-            return view('contactos.show', compact('contacto', 'rutRetorno', 'col_id'));
+        $cols = General::columnas('clientes');
+        $tipos = $cols['tipo']['opcion'];
+        unset($cols);
+        if (Auth::user()->is_admin) {
+            return view('contactos.show', compact('contacto', 'tipos', 'rutRetorno', 'col_id'));
         }
         if (!(is_null($contacto->user_borro))) {
             return redirect()->back();
         }
         if ($contacto->user->id == Auth::user()->id) {
-            return view('contactos.show', compact('contacto', 'rutRetorno', 'col_id'));
+            unset($tipos['F']);
+            return view('contactos.show', compact('contacto', 'tipos', 'rutRetorno', 'col_id'));
         } else {
             return redirect()->back();
         }

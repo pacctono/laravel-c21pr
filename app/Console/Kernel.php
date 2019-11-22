@@ -40,7 +40,7 @@ class Kernel extends ConsoleKernel
         $schedule->command('grabar:archivo')
                     ->timezone('America/Caracas')   // Definido en la funcion anterior +5.8.
                     ->weekdays()->everyThirtyMinutes()
-                    ->between('9:00', '23:00')
+                    ->between('9:00', '21:00')
 //                    ->sendOutputTo('/home/pablo/salidas/cronLaravelGrabarArchivo.txt')
                     ;
         $schedule->command('grabar:archivo')

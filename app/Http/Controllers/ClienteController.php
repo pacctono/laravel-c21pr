@@ -49,8 +49,18 @@ class ClienteController extends Controller
         if (Auth::user()->is_admin) {
             $clientes = Cliente::orderBy($orden);
         } else {
-            $clientes = Cliente::whereNull('user_borro')->orderBy($orden);
+            $clientes = User::find(Auth::user()->id)
+                                ->clientes()->whereNull('user_borro')->orderBy($orden);
         }
+/*
+        if (Auth::user()->is_admin) {
+            $contactos = Contacto::orderBy($orden);
+        } else {
+            $contactos = User::find(Auth::user()->id)
+                                ->contactos()->whereNull('user_borro')->orderBy($orden);
+            //return redirect('/contactos/create');
+        }
+ */
         if ($movil or ('html' != $accion)) $clientes = $clientes->get();
         else $clientes = $clientes->paginate($this->lineasXPagina);
 
@@ -111,7 +121,13 @@ class ClienteController extends Controller
 
         $exito = session('exito', '');
         session(['exito' => '']);
-        return view('clientes.crear', compact('title', 'ddns', 'exito', 'orden', 'nroPagina'));
+        $cols = General::columnas('clientes');
+        $tipos = $cols['tipo']['opcion'];
+        $tipoXDef = $cols['tipo']['xdef'];
+        unset($cols);
+        if (!Auth::user()->is_admin) unset($tipos['F']);
+        return view('clientes.crear',
+                compact('title', 'ddns', 'tipos', 'tipoXDef', 'exito', 'orden', 'nroPagina'));
     }
 
     /**
@@ -127,12 +143,14 @@ class ClienteController extends Controller
             'cedula' => '',
             'rif' => '',
             'name' => 'required',
+            'tipo' => '',
             'ddn' => '',
             'telefono' => '',
             'email' => ['sometimes', 'nullable', 'email'],
             'fecha_nacimiento' => '',
             'direccion' => '',
             'observaciones' => '',
+            'contacto_id' => '',
         ], [
             'name.required' => 'El campo nombre es obligatorio.',
             'email.email' => 'Debe suministrar un correo elctrónico válido.',
@@ -146,16 +164,19 @@ class ClienteController extends Controller
         }
         unset($data['ddn']);
 
+        $cols = General::columnas('clientes');
         Cliente::create([
             'cedula' => $data['cedula'],
-            'rif' => $data['rif'],
+            'rif' => $data['rif']??null,
             'name' => $data['name'],
+            'tipo' => $data['tipo']??$cols['tipo']['xdef'],
             'telefono' => $data['telefono'],
             'user_id' => Auth::user()->id,
             'email' => $data['email'],
-            'fecha_nacimiento' => $data['fecha_nacimiento'],
-            'direccion' => $data['direccion'],
-            'observaciones' => $data['observaciones']
+            'fecha_nacimiento' => $data['fecha_nacimiento']??null,
+            'direccion' => $data['direccion']??null,
+            'observaciones' => $data['observaciones']??null,
+            'contacto_id' => $data['contacto_id']??$cols['contacto_id']['xdef'],
         ]);
 
         //return redirect('usuarios');
@@ -213,11 +234,17 @@ class ClienteController extends Controller
         else $nroPagina ='';
 
         $ddns = Venezueladdn::distinct()->get(['ddn'])->all();
+        $cols = General::columnas('clientes');
+        $tipos = $cols['tipo']['opcion'];
+        unset($cols);
+        if (!Auth::user()->is_admin) unset($tipos['F']);
 
         //dd($cliente);
-        if ((Auth::user()->is_admin) or ($cliente->user->id == Auth::user()->id)) { // Ver arriba para filas borradas.
+        if ((Auth::user()->is_admin) or
+            (is_null($cliente->user_borro) and ($cliente->user->id == Auth::user()->id))) { // Ver arriba para filas borradas.
             return view('clientes.editar', ['cliente' => $cliente, 'title' => $title,
-                        'ddns' => $ddns, 'orden' => $orden,'nroPagina' => $nroPagina]);
+                            'ddns' => $ddns, 'tipos' => $tipos, 'orden' => $orden,
+                            'nroPagina' => $nroPagina]);
         }
         return redirect('/clientes');
     }
@@ -235,6 +262,7 @@ class ClienteController extends Controller
             'cedula' => '',
             'rif' => '',
             'name' => 'required',
+            'tipo' => '',
             'ddn' => '',
             'telefono' => '',
             'email' => ['sometimes', 'nullable', 'email'],
@@ -256,7 +284,7 @@ class ClienteController extends Controller
 
         foreach (['cedula', 'rif', 'telefono', 'email', 'fecha_nacimiento', 'direccion',
                     'observaciones'] as $col) {
-            if ('' == $data[$col] or is_null($data[$col])) {
+            if (isset($data[$col]) and ('' == $data[$col] or is_null($data[$col]))) {
                 unset($data[$col]);
             }
         }

@@ -23,6 +23,8 @@ Route::get('/usuarios', 'UserController@index')
     ->name('users');
 
 Route::get('/usuarios/orden/{orden}/accion/{accion?}', 'UserController@index')
+    ->where('orden', '[a-zA-Z]+[a-zA-Z0-9_]+(?<!nuevo|crear)')
+    ->where('accion', 'ver|descargar')
     ->name('users.orden');
 
 Route::get('/usuarios/{user}', 'UserController@show')
@@ -46,6 +48,8 @@ Route::delete('/usuarios/{user}', 'UserController@destroy')
     ->middleware('admin');
 
 Route::get('/contactos/orden/{orden}/accion/{accion?}', 'ContactoController@index')
+    ->where('orden', '[a-zA-Z]+[a-zA-Z0-9_]+(?<!nuevo|crear)')
+    ->where('accion', 'ver|descargar')
     ->name('contactos.orden');
 
 Route::pattern('contactos', '[0-9]+');  // Para no crear conflictos con el resource contacto
@@ -75,6 +79,8 @@ Route::delete('/turnos/{turno}', 'TurnoController@destroy')
     ->name('turnos.destroy');
 
 Route::get('/turnos/orden/{orden}/accion/{accion?}', 'TurnoController@index')
+    ->where('orden', '[a-zA-Z]+[a-zA-Z0-9_]+(?<!nuevo|crear)')
+    ->where('accion', 'ver|descargar')
     ->name('turnos.orden');
 
 Route::get('/turnos/filtro', 'TurnoController@index');     // Para paginación con filtro.
@@ -82,6 +88,8 @@ Route::post('/turnos/filtro', 'TurnoController@index')
     ->name('turnos.post');
 
 Route::get('/clientes/orden/{orden}/accion/{accion?}', 'ClienteController@index')
+    ->where('orden', '[a-zA-Z]+[a-zA-Z0-9_]+(?<!nuevo|crear)')
+    ->where('accion', 'ver|descargar')
     ->name('clientes.orden');
 
 Route::pattern('clientes', '[0-9]+');               // Para no crear conflictos con el resource cliente
@@ -93,6 +101,8 @@ Route::get('/agenda', 'AgendaController@index')
     ->name('agenda');
 
 Route::get('/agenda/orden/{orden}/accion/{accion?}', 'AgendaController@index')
+    ->where('orden', '[a-zA-Z]+[a-zA-Z0-9_]+(?<!nuevo|crear)')
+    ->where('accion', 'ver|descargar')
     ->name('agenda.orden');
 
 Route::get('/agenda/filtro', 'AgendaController@index');     // Para paginación con filtro.
@@ -135,6 +145,8 @@ Route::put('/agendaPersonal/{agenda}', 'AgendaPersonalController@update')
     ->name('agendaPersonal.update');
 
 Route::get('/propiedades/orden/{orden}/accion/{accion?}', 'PropiedadController@index')
+    ->where('orden', '[a-zA-Z]+[a-zA-Z0-9_]+(?<!nuevo|crear)')
+    ->where('accion', 'ver|descargar')
     ->name('propiedades.orden');
 
 Route::get('/propiedades/filtro', 'PropiedadController@index');     // Para paginación con filtro.
@@ -199,7 +211,8 @@ Route::get('/reportes/contactosZona/{id}/{orden}', 'ReporteController@contactosX
 
 Route::get('/caracteristicas/{orden?}/{accion?}', 'CaracteristicaController@index')
 // Cualquier nombre que comience con letra, luego letra, numero o '_'; excepto 'nuevo'. Otras palabras, usar '|'.
-    ->where('orden', '[a-zA-Z]+[a-zA-Z0-9_]+(?<!nuevo)')
+    ->where('orden', '[a-zA-Z]+[a-zA-Z0-9_]+(?<!nuevo|crear)')
+    ->where('accion', 'ver|descargar')
     ->name('caracteristica');
 
 Route::get('/caracteristicas/nuevo', 'CaracteristicaController@create')
@@ -228,7 +241,8 @@ Route::get('/deseos/nuevo', 'DeseoController@create')
 
 Route::get('/deseos/{orden?}/{accion?}', 'DeseoController@index')
 // Cualquier nombre que comience con letra, luego letra, numero o '_'; excepto 'nuevo'. Otras palabras, usar '|'.
-    ->where('orden', '[a-zA-Z]+[a-zA-Z0-9_]+(?<!nuevo)')
+    ->where('orden', '[a-zA-Z]+[a-zA-Z0-9_]+(?<!nuevo|crear)')
+    ->where('accion', 'ver|descargar')
     ->name('deseo');
 
 Route::get('/deseos/{deseo}', 'DeseoController@show')
@@ -253,7 +267,8 @@ Route::get('/origenes/nuevo', 'OrigenController@create')
 
 Route::get('/origenes/{orden?}/{accion?}', 'OrigenController@index')
 // Cualquier nombre que comience con letra, luego letra, numero o '_'; excepto 'nuevo'. Otras palabras, usar '|'.
-    ->where('orden', '[a-zA-Z]+[a-zA-Z0-9_]+(?<!nuevo)')
+    ->where('orden', '[a-zA-Z]+[a-zA-Z0-9_]+(?<!nuevo|crear)')
+    ->where('accion', 'ver|descargar')
     ->name('origen');
 
 Route::get('/origenes/{origen}', 'OrigenController@show')
@@ -278,7 +293,8 @@ Route::get('/precios/nuevo', 'PrecioController@create')
 
 Route::get('/precios/{orden?}/{accion?}', 'PrecioController@index')
 // Cualquier nombre que comience con letra, luego letra, numero o '_'; excepto 'nuevo'. Otras palabras, usar '|'.
-    ->where('orden', '[a-zA-Z]+[a-zA-Z0-9_]+(?<!nuevo)')
+    ->where('orden', '[a-zA-Z]+[a-zA-Z0-9_]+(?<!nuevo|crear)')
+    ->where('accion', 'ver|descargar')
     ->name('precio');
 
 Route::get('/precios/{precio}', 'PrecioController@show')
@@ -303,7 +319,8 @@ Route::get('/resultados/nuevo', 'ResultadoController@create')
 
 Route::get('/resultados/{orden?}/{accion?}', 'ResultadoController@index')
 // Cualquier nombre que comience con letra, luego letra, numero o '_'; excepto 'nuevo'. Otras palabras, usar '|'.
-    ->where('orden', '[a-zA-Z]+[a-zA-Z0-9_]+(?<!nuevo)')
+    ->where('orden', '[a-zA-Z]+[a-zA-Z0-9_]+(?<!nuevo|crear)')
+    ->where('accion', 'ver|descargar')
     ->name('resultado');
 
 Route::get('/resultados/{resultado}', 'ResultadoController@show')
@@ -328,7 +345,8 @@ Route::get('/ciudades/nuevo', 'CiudadController@create')
 
 Route::get('/ciudades/{orden?}/{accion?}', 'CiudadController@index')
 // Cualquier nombre que comience con letra, luego letra, numero o '_'; excepto 'nuevo'. Otras palabras, usar '|'.
-    ->where('orden', '[a-zA-Z]+[a-zA-Z0-9_]+(?<!nuevo)')
+    ->where('orden', '[a-zA-Z]+[a-zA-Z0-9_]+(?<!nuevo|crear)')
+    ->where('accion', 'ver|descargar')
     ->name('ciudad');
 
 Route::get('/ciudades/{ciudad}', 'CiudadController@show')
@@ -353,7 +371,8 @@ Route::get('/estados/nuevo', 'EstadoController@create')
 
 Route::get('/estados/{orden?}/{accion?}', 'EstadoController@index')
 // Cualquier nombre que comience con letra, luego letra, numero o '_'; excepto 'nuevo'. Otras palabras, usar '|'.
-    ->where('orden', '[a-zA-Z]+[a-zA-Z0-9_]+(?<!nuevo)')
+    ->where('orden', '[a-zA-Z]+[a-zA-Z0-9_]+(?<!nuevo|crear)')
+    ->where('accion', 'ver|descargar')
     ->name('estado');
 
 Route::get('/estados/{estado}', 'EstadoController@show')
@@ -378,7 +397,8 @@ Route::get('/municipios/nuevo', 'MunicipioController@create')
 
 Route::get('/municipios/{orden?}/{accion?}', 'MunicipioController@index')
 // Cualquier nombre que comience con letra, luego letra, numero o '_'; excepto 'nuevo'. Otras palabras, usar '|'.
-    ->where('orden', '[a-zA-Z]+[a-zA-Z0-9_]+(?<!nuevo)')
+    ->where('orden', '[a-zA-Z]+[a-zA-Z0-9_]+(?<!nuevo|crear)')
+    ->where('accion', 'ver|descargar')
     ->name('municipio');
 
 Route::get('/municipios/{municipio}', 'MunicipioController@show')
@@ -403,7 +423,8 @@ Route::get('/tipos/nuevo', 'TipoController@create')
 
 Route::get('/tipos/{orden?}/{accion?}', 'TipoController@index')
 // Cualquier nombre que comience con letra, luego letra, numero o '_'; excepto 'nuevo'. Otras palabras, usar '|'.
-    ->where('orden', '[a-zA-Z]+[a-zA-Z0-9_]+(?<!nuevo)')
+    ->where('orden', '[a-zA-Z]+[a-zA-Z0-9_]+(?<!nuevo|crear)')
+    ->where('accion', 'ver|descargar')
     ->name('tipo');
 
 Route::get('/tipos/{tipo}', 'TipoController@show')
@@ -428,7 +449,8 @@ Route::get('/zonas/nuevo', 'ZonaController@create')
 
 Route::get('/zonas/{orden?}/{accion?}', 'ZonaController@index')
 // Cualquier nombre que comience con letra, luego letra, numero o '_'; excepto 'nuevo'. Otras palabras, usar '|'.
-    ->where('orden', '[a-zA-Z]+[a-zA-Z0-9_]+(?<!nuevo)')
+    ->where('orden', '[a-zA-Z]+[a-zA-Z0-9_]+(?<!nuevo|crear)')
+    ->where('accion', 'ver|descargar')
     ->name('zona');
 
 Route::get('/zonas/{zona}', 'ZonaController@show')
@@ -453,7 +475,8 @@ Route::get('/textos/nuevo', 'TextoController@create')
 
 Route::get('/textos/{orden?}/{accion?}', 'TextoController@index')
 // Cualquier nombre que comience con letra, luego letra, numero o '_'; excepto 'nuevo'. Otras palabras, usar '|'.
-    ->where('orden', '[a-zA-Z]+[a-zA-Z0-9_]+(?<!nuevo)')
+    ->where('orden', '[a-zA-Z]+[a-zA-Z0-9_]+(?<!nuevo|crear)')
+    ->where('accion', 'ver|descargar')
     ->name('texto');
 
 Route::get('/textos/{texto}', 'TextoController@show')

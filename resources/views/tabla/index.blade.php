@@ -122,7 +122,7 @@
 @include('include.botonesPdf', ['enlace' => $elemento])
 
 @else ($turnos->isNotEmpty())
-    <p>No hay {{ strtolower($tipo) }} registrados.</p>
+    <p>No hay {{ strtolower($elemento) }} registrados.</p>
 @endif ($turnos->isNotEmpty())
 
 @endsection

@@ -143,9 +143,9 @@ class AgendaPersonalController extends Controller
             return redirect('login');
         }
 
-        if ((!Auth::user()->is_admin) and ($agenda->id != Auth::user()->id)) {
-            return redirect('/agenda');
-        }
+//        if ((!Auth::user()->is_admin) and ($agenda->id != Auth::user()->id)) {
+//            return redirect('/agenda');
+//        }
 
         $title = 'Crear ' . $this->tipo;
         $exito = session('exito', '');

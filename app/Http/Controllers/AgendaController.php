@@ -79,7 +79,9 @@ class AgendaController extends Controller
         }
 
         if (Auth::user()->is_admin) {       // El usuario (asesor) es un administrador.
-            $users   = User::all();         // Todos los usuarios. Incluye '1' porque en turnos hay feriado.
+//            $users   = User::all();         // Todos los usuarios. Incluye '1' porque en turnos hay feriado.
+            $users   = User::where('activo', True)->get();
+            $users[0]['name'] = 'Administrador';
             $agendas = Agenda::select('fecha_evento', 'hora_evento', 'descripcion', 'name',
                                         'telefono', 'user_id', 'contacto_id', 'email',
                                         'tipo', 'direccion');   // Solo estas columnas.
@@ -98,11 +100,14 @@ class AgendaController extends Controller
         if (0 < $asesor) {      // Se selecciono un asesor o el conectado no es administrador.
             $agendas = $agendas->where('user_id', $asesor);
         }
+        $hoy = Fecha::hoy();
 // Devolver las fechas sin la hora. Los diez primeros caracteres son: yyyy-mm-dd.
         if ('' != $fecha_desde and '' != $fecha_hasta) {    // No se seleccionaron fechas.
             $fecha_desde = substr($fecha_desde, 0, 10);
             $fecha_hasta = substr($fecha_hasta, 0, 10);
             $agendas = $agendas->whereBetween('fecha_evento', [$fecha_desde, $fecha_hasta]);
+        } else {
+            $agendas = $agendas->where('fecha_evento', '>=', $hoy);
         }
         $agendas = $agendas->orderBy($orden);   // Ordenar los items de la agenda.
         if ('user_id' == $orden) {              // Si se pidió ordenar por id de usuario,
@@ -116,7 +121,7 @@ class AgendaController extends Controller
         if ('html' == $accion)
             return view('agenda.index', compact('title', 'users', 'ruta', 'agendas',
                         'rPeriodo', 'fecha_desde', 'fecha_hasta', 'asesor',
-                        'alertar', 'orden', 'movil', 'accion'));
+                        'alertar', 'orden', 'movil', 'accion', 'hoy'));
         $html = view('agenda.index', compact('title', 'users', 'ruta', 'agendas',
                         'rPeriodo', 'fecha_desde', 'fecha_hasta', 'asesor',
                         'alertar', 'orden', 'movil', 'accion'))
@@ -274,11 +279,12 @@ class AgendaController extends Controller
             'tx_modelo' => 'Cita',
             'tx_data' => implode(';', $data),
             'tx_tipo' => 'A',
+	    'tx_host' => $_SERVER['REMOTE_ADDR']
         ]);
 
         $contacto = $cita->contacto;
         return redirect()->route('agenda.show', ['contacto' => $contacto]);
-    }
+    } // public function update(Request $request, Cita $cita)
 
     public function emailcita(Contacto $contacto)
     {
@@ -293,7 +299,7 @@ class AgendaController extends Controller
         Mail::to($contacto->user->email, $contacto->user->name)
                 ->send(new CitaAsesor($contacto));
         return redirect()->route('contactos.orden', 'alert');
-    }
+    } // public function emailcita(Contacto $contacto)
 
     public function emailcitas(User $user)
     {
@@ -308,7 +314,7 @@ class AgendaController extends Controller
         Mail::to($user->email, $user->name)
                 ->send(new CitasAsesor($user));
         return redirect()->route('users.orden', 'alert');
-    }
+    } // public function emailcitas(User $user)
 
     public function emailturnos()
     {
@@ -320,18 +326,19 @@ class AgendaController extends Controller
         }
 
         //return new TurnosAsesor(User::find(2));  // Vista preliminar del correo, en el navegador.
-        $turnos = Turno::select(DB::raw("user_id")) // Devuelve arreglo de Turno.
-                            ->where('turno','>','now')
-                            ->where('user_id','>',1)
-                            ->groupBy('user_id')
+        $users = Turno::select("user_id") // Devuelve arreglo de Turno.
+                            ->where('turno', '>', now(Fecha::$ZONA))
                             ->get();
-        foreach ($turnos as $turno) {
-            $user = $turno->user;
+        foreach ($users as $user) {
+            $turnos = Turno::where('user_id', $user)
+                            ->where('turno', '>', now(Fecha::$ZONA))
+                            ->orderBy('turno')
+                            ->get();
             Mail::to($user->email, $user->name)
-                    ->send(new TurnosAsesor($user));
+                    ->send(new TurnosAsesor($user, $turnos));
         }
         return redirect()->route('turnos.orden', 'alert');
-    }
+    } // public function emailturnos()
 
     public function emailtodascitas($tipo='todas')
     {
@@ -353,7 +360,7 @@ class AgendaController extends Controller
                     ->send(new CitasAsesor($user));
         }
         return redirect()->route('agenda.orden', 'alert');
-    }
+    } // public function emailtodascitas($tipo='todas')
 
     public function cumpleano(User $user)
     {
@@ -368,5 +375,5 @@ class AgendaController extends Controller
         Mail::to($user->email, $user->name)
                 ->send(new Cumpleano($user));
         return redirect()->route('reportes', 'Cumpleanos');
-    }
+    } // public function cumpleano(User $user)
 }

@@ -11,9 +11,11 @@ use App\Municipio;
 use App\Estado;
 use App\Cliente;
 use App\Venezueladdn;
+use \App\Mail\ReporteCierre;
 use App\Bitacora;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;        // PC
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\DB;          // PC
 use Carbon\Carbon;                          // PC
 use Jenssegers\Agent\Agent;                 // PC
@@ -40,7 +42,7 @@ class PropiedadController extends Controller
         $ruta = request()->path();
         $dato = request()->all();
         //dd($ruta, $dato);
-        if (1 >= count($dato)) $paginar = True;
+        if (1 >= count($dato)) $paginar = True; // Inicialmente, el arreglo '$dato' esta vacio.
         else $paginar = False;
 // Todo se inicializa, cuando se selecciona 'Propiedades' desde el menu horizontal principal.
         if (('GET' == request()->method()) and ('' == $orden) and (0 == count($dato))) {
@@ -55,7 +57,7 @@ class PropiedadController extends Controller
  * es una ruta 'GET' con o sin $orden.
  * Si $dato tiene más de 1 item. Fue seleccionado una fecha y/o estatus y/o un asesor.
  */
-        if (1 >= count($dato)) {
+        if (1 >= count($dato)) {    // Arriba, paginar es True.
             $fecha_desde = session('fecha_desde', '');
             $fecha_hasta = session('fecha_hasta', '');
             $estatus     = session('estatus', '');
@@ -82,11 +84,21 @@ class PropiedadController extends Controller
 //        dd($dato, $fecha_desde, $fecha_hasta);
 // En caso de volver luego de haber enviado un correo, ver el metodo 'emailcita', en AgendaController.
         $alertar = 0;
+        if ('EFE' == $orden) {
+            $orden = '';
+            $alertar = 1;
+        } elseif ('ENFE' == $orden) {
+            $orden = '';
+            $alertar = -1;
+        }
+        $sentido = 'asc';
         if ('' == $orden or is_null($orden)) {
             $orden = 'id';
+            $sentido = 'desc';
         }
         if (Auth::user()->is_admin) {
-            $users   = User::get(['id', 'name']);     // Todos los usuarios (asesores).
+//            $users   = User::get(['id', 'name']);     // Todos los usuarios (asesores).
+            $users   = User::where('activo', True)->get(['id', 'name']);     // Todos los usuarios (asesores), excepto los no activos.
             $users[0]['name'] = 'Asesor otra oficina';
             $propiedades = Propiedad::where('id', '>', 0);   // condición dummy, solo para continuar armando la consulta.
             $asesor = 0;
@@ -133,68 +145,10 @@ class PropiedadController extends Controller
                                     ->orWhereNull('fecha_firma');
                             });
         }
-//  Esto es un fastidio o muy pobre; pero, hay varias fecha de la firma nulas. Para mayor informacion, leer comentarios.
-/*        if (Auth::user()->is_admin) {
-            if ((0 == $captador) and (0 == $cerrador)) {    // El usuario es administrador y no se ha seleccionado captador o cerrador.
-                if ('' == $estatus)         // Tampoco se ha seleccionado estatus. Incluir todas las fechas de la firma nulas.
-                    $propiedades = $propiedades->orWhereNull('fecha_firma');
-                else    // Incluir las fechas de la firma nulas con estatus: "or (estatus and fecha_firma nula)".
-                    $propiedades = $propiedades->orWhere(
-                                        function ($query) use ($estatus) {
-                                            $query->where('estatus', $estatus)
-                                                ->whereNull('fecha_firma');
-                                    });
-            } else {    // El usuario es administrador y se ha seleccionado un captador o un cerrador.
-                if ('' == $estatus)     // Incluir fecha nulas y (captador o cerrador): "or (captador and fecha nula) or (cerrador and fecha nula)
-                    $propiedades = $propiedades->orWhere(
-                                        function ($query) use ($captador) {
-                                            $query->where('asesor_captador_id', $captador)
-                                                ->whereNull('fecha_firma');
-                                    })->orWhere(
-                                        function ($query) use ($cerrador) {
-                                            $query->where('asesor_cerrador_id', $cerrador)
-                                                ->whereNull('fecha_firma');
-                                    });
-                else     // Incluir fecha nulas y estatus y (captador o cerrador): "or (estatus and captador and fecha nula) or (estatus and cerrador and fecha nula)
-                    $propiedades = $propiedades->orWhere(
-                                        function ($query) use ($captador, $estatus) {
-                                            $query->where('estatus', $estatus)
-                                                ->where('asesor_captador_id', $captador)
-                                                ->whereNull('fecha_firma');
-                                    })->orWhere(
-                                        function ($query) use ($cerrador, $estatus) {
-                                            $query->where('estatus', $estatus)
-                                                ->where('asesor_cerrador_id', $cerrador)
-                                                ->whereNull('fecha_firma');
-                                    });
-            }
-        } else {    // El usuario no es administrador. El usuario es el captador y cerrador ($asesor).
-            if ('' == $estatus)     // Incluir fecha nulas y captador/cerrador = $asesor.
-                $propiedades = $propiedades->orWhere(
-                                    function ($query) use ($asesor) {
-                                        $query->where('asesor_captador_id', $asesor)
-                                            ->whereNull('fecha_firma');
-                                })->orWhere(
-                                    function ($query) use ($asesor) {
-                                        $query->where('asesor_cerrador_id', $asesor)
-                                            ->whereNull('fecha_firma');
-                                });
-            else     // Incluir fecha nulas y estatus y captador/cerrador = $asesor.
-                $propiedades = $propiedades->orWhere(
-                                    function ($query) use ($asesor, $estatus) {
-                                        $query->where('estatus', $estatus)
-                                            ->where('asesor_captador_id', $asesor)
-                                            ->whereNull('fecha_firma');
-                                })->orWhere(
-                                    function ($query) use ($asesor, $estatus) {
-                                        $query->where('estatus', $estatus)
-                                            ->where('asesor_cerrador_id', $asesor)
-                                            ->whereNull('fecha_firma');
-                                });
-        }*/
-        $propiedades = $propiedades->orderBy($orden);   // Ordenar los items de los propiedades.
+        if (0 === strpos($orden, 'fecha')) $sentido = 'desc';
+        $propiedades = $propiedades->orderBy($orden, $sentido);   // Ordenar los items de las propiedades.
         if ('user_id' == $orden) {              // Si se pidió ordenar por id de usuario. NUNCA SUCEDERA.
-            $propiedades = $propiedades->orderBy('fecha_firma');   // ordenar por fecha_firma en cada usuario.
+            $propiedades = $propiedades->orderBy('fecha_firma', 'desc');   // ordenar por fecha_firma en cada usuario.
         }
         list ($filas, $tPrecio, $tLados, $tCompartidoConIva, $tFranquiciaSinIva,
                 $tFranquiciaConIva, $tFranquiciaPagarR, $tRegalia, $tSanaf5PorCiento,
@@ -236,7 +190,7 @@ class PropiedadController extends Controller
                     'tPvrCaptadorPrbrSel', 'tPvrCerradorPrbrSel',
                     'ruta', 'fecha_desde', 'fecha_hasta', 'arrEstatus',
                     'captador', 'cerrador', 'tPuntosCaptador', 'tPuntosCerrador',
-                    'estatus', 'orden', 'paginar', 'accion'));
+                    'estatus', 'orden', 'paginar', 'alertar', 'accion'));
         $html = view('propiedades.index',
                     compact('title', 'users', 'propiedades', 'movil',
                     'filas', 'tPrecio', 'tCompartidoConIva', 'tLados',
@@ -249,7 +203,7 @@ class PropiedadController extends Controller
                     'tPvrCaptadorPrbrSel', 'tPvrCerradorPrbrSel',
                     'ruta', 'fecha_desde', 'fecha_hasta', 'arrEstatus',
                     'captador', 'cerrador', 'tPuntosCaptador', 'tPuntosCerrador',
-                    'estatus', 'orden', 'paginar', 'accion'))
+                    'estatus', 'orden', 'paginar', 'alertar', 'accion'))
                 ->render();
         General::generarPdf($html, 'propiedades', $accion);
     }       // Final del metodo index.
@@ -606,9 +560,11 @@ class PropiedadController extends Controller
         $estados = Estado::all();
         $clientes = Cliente::all();
 //        dd($propiedad);
-        if ((Auth::user()->is_admin) or ($propiedad->user_id == Auth::user()->id) or
-            ($propiedad->asesor_captador_id == Auth::user()->id) or
-            ($propiedad->asesor_cerrador_id == Auth::user()->id)) {
+        if ((Auth::user()->is_admin) or
+            (('P' != $propiedad->estatus) and ('C' != $propiedad->estatus) and
+             (($propiedad->user_id == Auth::user()->id) or
+              ($propiedad->asesor_captador_id == Auth::user()->id) or
+              ($propiedad->asesor_cerrador_id == Auth::user()->id)))) {
             $agente = new Agent();
             $movil  = $agente->isMobile() and true;             // Fuerzo booleana. No funciona al usar el metodo directamente.
 //            return view((($movil)?'celular.editPropiedades':'propiedades.editar'),
@@ -633,6 +589,7 @@ class PropiedadController extends Controller
         $data = request()->validate([   // Si ocurre error, laravel nos envia al url anterior.
             'fecha_reserva' => ['sometimes', 'nullable', 'date'],
             'fecha_firma' => ['sometimes', 'nullable', 'date'],
+            'fecha_firma_ant' => '',
             'negociacion' => 'required',
             'nombre' => 'required',
             'exclusividad' => '',
@@ -724,9 +681,14 @@ class PropiedadController extends Controller
             'tx_modelo' => 'Propiedad',
             'tx_data' => implode(';', $data),
             'tx_tipo' => 'A',
+	        'tx_host' => $_SERVER['REMOTE_ADDR']
         ]);
 
-        return redirect()->route('propiedades.show', ['propiedad' => $propiedad]);
+        if (is_null($data['fecha_firma_ant']) and isset($data['fecha_firma'])) {
+            $resp = self::correoReporteCierre($propiedad->id, 0);
+        }
+        return redirect()->route('propiedades.show',
+                                ['propiedad' => $propiedad, 'resp' => $resp]);
     }
 
     /**
@@ -761,8 +723,32 @@ class PropiedadController extends Controller
             'tx_modelo' => 'Propiedad',
             'tx_data' => $datos,
             'tx_tipo' => 'B',
+	    'tx_host' => $_SERVER['REMOTE_ADDR']
         ]);
 
         return redirect()->route('propiedades.index');
     }
+
+    public static function correoReporteCierre($id, $ruta)
+    {
+/*
+ * ENFE: Email No Fue Enviada.
+ * EFE:  Email Fue Enviada.
+ */
+        $host = env('MAIL_HOST');
+        if (!($ip=gethostbyname($host))) { // No hay conexon a Internet.
+            if (1 == $ruta) return redirect()->route('propiedades.orden', 'ENFE');
+            else return 'ENFE';
+        }
+
+        $propiedad = Propiedad::find($id);
+        $correoSocios = \App\User::CORREO_SOCIOS;
+
+        $user = User::find(Auth::user()->id);
+        Mail::to($user->email, $user->name)
+                ->cc($correoSocios)
+                ->send(new ReporteCierre($propiedad, $user));
+        if (1 == $ruta) return redirect()->route('propiedades.orden', 'EFE');
+        else return 'EFE';
+    }   // Final del metodo correoCumpleano.
 }

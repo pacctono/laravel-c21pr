@@ -46,8 +46,12 @@ class UserController extends Controller
         }
         $agente = new Agent();
         $movil  = $agente->isMobile() and true;             // Fuerzo booleana. No funciona al usar el metodo directamente.
+/*
+ * De acuerdo a la reunion del lunes 25/11/2019, se elimino la paginacion de asesores.
         if ($movil or ('html' != $accion)) $users = User::orderBy($orden)->get();
         else $users = User::orderBy($orden)->paginate($this->lineasXPagina);
+ */
+        $users = User::orderBy($orden)->get();
 
         if ('html' == $accion)
             return view('users.index',
@@ -132,6 +136,7 @@ class UserController extends Controller
             'estado_civil' => ['sometimes', 'nullable'],
             'profesion' => ['sometimes', 'nullable'],
             'direccion' => ['sometimes', 'nullable'],
+            'activo' => '',
             'password' => ['required']
         ], [
             'cedula.digits_between' => 'La cedula de ideintidad debe ser entre 6 y 8 digitos',
@@ -170,6 +175,7 @@ class UserController extends Controller
             'sexo' => $data['sexo'],
             'estado_civil' => $data['estado_civil'],
             'direccion' => $data['direccion'],
+            'activo' => (isset($data['activo']) and ('on' == $data['activo'])),
             'password' => bcrypt($data['password'])
         ]);
 
@@ -206,6 +212,7 @@ class UserController extends Controller
             'estado_civil' => ['sometimes', 'nullable'],
             'profesion' => ['sometimes', 'nullable'],
             'direccion' => ['sometimes', 'nullable'],
+            'activo' => '',
             'password' => 'nullable|min:7'
         ], [
             'cedula.digits_between' => 'La cedula de ideintidad debe contener 7 u 8 digitos',
@@ -222,7 +229,8 @@ class UserController extends Controller
             'password.min' => 'La contraseña debe contener más de 6 caracteres'
         ]);
         //dd($data);
-	if (0 < User::where('id', '!=', $user->id)->where('licencia_mls', $data['licencia_mls'])->count()) {
+        // Si se trata de cambiar la licencia_mls y otro usuario ya tiene esa; volver.
+	    if (0 < User::where('id', '!=', $user->id)->where('licencia_mls', $data['licencia_mls'])->count()) {
             redirect()->back();
         }
         if (null != $data['ddn'] and '' != $data['ddn'] and null != $data['telefono'] and
@@ -232,6 +240,13 @@ class UserController extends Controller
             $data['telefono'] = '';
         }
         unset($data['ddn']);
+
+        if (!array_key_exists('activo', $data)) {
+            $data['activo'] = false;
+            $data['password'] = bcrypt('Century21_Puente*Real');
+        }
+        elseif ('on' == $data['activo'])
+            $data['activo'] = true;
 
         if (!(is_null($data['password']))) {
             $data['password'] = bcrypt($data['password']);
@@ -246,9 +261,27 @@ class UserController extends Controller
             'tx_modelo' => 'User',
             'tx_data' => implode($data),
             'tx_tipo' => 'A',
+	    'tx_host' => $_SERVER['REMOTE_ADDR']
         ]);
 
         return redirect()->route('users.show', ['user' => $user]);
+    }
+
+    public function updateActivo(User $user)
+    {
+        $data['activo'] = !($user->activo);
+        if (!$data['activo']) $data['password'] = bcrypt('Century21_Puente*Real');
+        $user->update($data);
+
+        Bitacora::create([
+            'user_id' => Auth::user()->id,
+            'tx_modelo' => 'User',
+            'tx_data' => $user->activo,
+            'tx_tipo' => 'A',
+	    'tx_host' => $_SERVER['REMOTE_ADDR']
+        ]);
+
+        return redirect()->route('users');
     }
 
     public function destroy(User $user)
@@ -270,10 +303,11 @@ class UserController extends Controller
             'tx_modelo' => 'User',
             'tx_data' => $datos,
             'tx_tipo' => 'B',
+	    'tx_host' => $_SERVER['REMOTE_ADDR']
         ]);
 
         return redirect()->route('users');
-    }
+    } // Final del metodo destroy(User $user)
 
     public static function correoCumpleano()
     {
@@ -290,5 +324,4 @@ class UserController extends Controller
         }   // Final del foreach.
         return;
     }   // Final del metodo correoCumpleano.
-
 }

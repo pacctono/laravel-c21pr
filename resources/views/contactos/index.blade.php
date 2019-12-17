@@ -107,6 +107,9 @@
             </td>
             <td>
                 {{ $contacto->telefono_f }}
+                @if ($contacto->otro_telefono)
+                    <br>{{ $contacto->otro_telefono }}
+                @endif ($contacto->otro_telefono)
             </td>
             @if (!$movil)
             <td>
@@ -144,7 +147,8 @@
                         </span>
                     </button>
                 </form>
-                    @if ((4 <= $contacto->resultado_id) and (7 >= $contacto->resultado_id))
+                    @if ((4 <= $contacto->resultado_id) and (7 >= $contacto->resultado_id) and
+                         (!is_null($contacto->fecha_evento)) and ($contacto->fecha_evento > now()))
                     <a href="{{ route('agenda.emailcita', $contacto) }}" class="btn btn-link"
                             title="Enviar correo a '{{ $contacto->user->name }}', sobre cita con este contacto inicial">
                         <span class="oi oi-envelope-closed"></span>

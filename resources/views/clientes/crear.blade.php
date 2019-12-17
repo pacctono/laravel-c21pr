@@ -81,6 +81,14 @@
                         value="{{ old('fecha_nacimiento') }}">
             </div>
         </div>
+        <div class="form-row bg-suave my-0 py-0">
+          <div class="form-group col-lg-8 d-flex">
+            <label class="control-label" for="otro_telefono">Otro telefono</label>
+            <input type="text" class="form-control col-lg-6" size="20" maxlength="20"
+                    name="otro_telefono" id="otro_telefono"
+                    placeholder="Quizas internacional" value="{{ old('otro_telefono') }}">
+          </div>
+        </div>
 
         <div class="form-group d-flex align-items-end mx-1 px-2">
             <label class="control-label" for="dirCliente" id="etiqDirCliente">

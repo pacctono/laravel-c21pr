@@ -1,6 +1,11 @@
 @extends('layouts.app')
 
 @section('content')
+@if ('EFE' == $resp)
+    <script>alert('Le fue enviado el correo con el Reporte de Cierre de la propiedad.');</script>
+@elseif ('ENFE' == $resp)
+    <script>alert('No fue enviado el correo con el Reporte de Cierre de la propiedad.');</script>
+@endif
 <div class="card">
     <h4 class="card-header">Propiedad:
         [{{ $propiedad->id}}]{{ $propiedad->codigo }} 
@@ -53,6 +58,25 @@
                 {{ $propiedad->compartido_con_iva_ven }}</span>
             </div>
         </div>
+
+        @if (!Auth::user()->is_admin)
+        <div class="row my-0 py-0 bg-suave">
+            <div class="mx-1 px-2">
+                Asesor captador: <span class="alert-info">
+                    {{ ('1' == $propiedad->asesor_captador_id)?
+                                ($propiedad->asesor_captador??'?'):
+                                $propiedad->captador->name }}</span>
+                <span class="alert-info">{{ ($propiedad->captador_prbr_ven) }}</span>
+            </div>
+            <div class="mx-1 px-2">
+                Asesor cerrador: <span class="alert-info">
+                    {{ ('1' == $propiedad->asesor_cerrador_id)?
+                                ($propiedad->asesor_cerrador??'?'):
+                                $propiedad->cerrador->name }}</span>
+                <span class="alert-info">{{ ($propiedad->cerrador_prbr_ven) }}</span>
+            </div>
+        </div>
+        @endif (!Auth::user()->is_admin)
 
         <!--fieldset class="datosPropiedad" style="border:solid 2px #000000">
             <legend>
@@ -189,7 +213,7 @@
             <div class="mx-1 px-2">
                 Asesor captador: <span class="alert-info">
                     {{ ('1' == $propiedad->asesor_captador_id)?
-                                $propiedad->asesor_captador:
+                                ($propiedad->asesor_captador??'?'):
                                 $propiedad->captador->name }}</span>
                     [{{ $propiedad->porc_captador_prbr_p }}]
                 <span class="alert-info">{{ ($propiedad->captador_prbr_ven) }}</span>
@@ -197,7 +221,7 @@
             <div class="mx-1 px-2">
                 Asesor cerrador: <span class="alert-info">
                     {{ ('1' == $propiedad->asesor_cerrador_id)?
-                                $propiedad->asesor_cerrador:
+                                ($propiedad->asesor_cerrador??'?'):
                                 $propiedad->cerrador->name }}</span>
                     [{{ $propiedad->porc_cerrador_prbr_p }}]
                 <span class="alert-info">{{ ($propiedad->cerrador_prbr_ven) }}</span>

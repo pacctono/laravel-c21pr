@@ -73,7 +73,9 @@ class AgendaPersonalController extends Controller
         }
 
         if (Auth::user()->is_admin) {       // El usuario (asesor) es un administrador.
-            $users   = User::all();         // Todos los usuarios. Incluye '1' porque en turnos hay feriado.
+//            $users   = User::all();         // Todos los usuarios. Incluye '1' porque en turnos hay feriado.
+            $users   = User::where('activo', True)->get();
+            $users[0]['name'] = 'Administrador';
             $agendas = AgendaPersonal::select('fecha_cita', 'hora_cita', 'descripcion', 'name',
                                         'telefono', 'user_id', 'email', 'direccion');   // Solo estas columnas.
             if ('name' == $orden) {         // Si se ordena por nombre, no muestra turnos (name == '').
@@ -190,7 +192,7 @@ class AgendaPersonalController extends Controller
         }
         unset($data['ddn']);
 
-        $id = AgendaPersonal::create([
+        $cita = AgendaPersonal::create([        // Devuelve el modelo.
             'user_id'     => Auth::user()->id,
             'fecha_cita'  => $data['fecha_cita'],
             'hora_cita'   => $data['hora_cita'],
@@ -289,6 +291,7 @@ class AgendaPersonalController extends Controller
             'tx_modelo' => 'AgendaPersonal',
             'tx_data' => implode(';', $data),
             'tx_tipo' => 'A',
+	    'tx_host' => $_SERVER['REMOTE_ADDR']
         ]);
         //dd('despues de create bitacora', $data, $cita);
 

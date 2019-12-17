@@ -39,18 +39,20 @@ class ClienteController extends Controller
             $orden = '';
             $alertar = 1;
         }        
+        $sentido = 'asc';
         if ('' == $orden or is_null($orden)) {
             $orden = 'id';
+            $sentido = 'desc';
         }
 
         $agente = new Agent();
         $movil  = $agente->isMobile() and true;             // Fuerzo booleana. No funciona al usar el metodo directamente.
 
         if (Auth::user()->is_admin) {
-            $clientes = Cliente::orderBy($orden);
+            $clientes = Cliente::orderBy($orden, $sentido);
         } else {
             $clientes = User::find(Auth::user()->id)
-                                ->clientes()->whereNull('user_borro')->orderBy($orden);
+                        ->clientes()->whereNull('user_borro')->orderBy($orden, $sentido);
         }
 /*
         if (Auth::user()->is_admin) {
@@ -146,6 +148,7 @@ class ClienteController extends Controller
             'tipo' => '',
             'ddn' => '',
             'telefono' => '',
+            'otro_telefono' => '',
             'email' => ['sometimes', 'nullable', 'email'],
             'fecha_nacimiento' => '',
             'direccion' => '',
@@ -171,6 +174,7 @@ class ClienteController extends Controller
             'name' => $data['name'],
             'tipo' => $data['tipo']??$cols['tipo']['xdef'],
             'telefono' => $data['telefono'],
+            'otro_telefono' => $data['otro_telefono']??null,
             'user_id' => Auth::user()->id,
             'email' => $data['email'],
             'fecha_nacimiento' => $data['fecha_nacimiento']??null,
@@ -265,6 +269,7 @@ class ClienteController extends Controller
             'tipo' => '',
             'ddn' => '',
             'telefono' => '',
+            'otro_telefono' => '',
             'email' => ['sometimes', 'nullable', 'email'],
             'fecha_nacimiento' => '',
             'direccion' => '',
@@ -298,6 +303,7 @@ class ClienteController extends Controller
             'tx_modelo' => 'Cliente',
             'tx_data' => implode(';', $data),
             'tx_tipo' => 'A',
+	    'tx_host' => $_SERVER['REMOTE_ADDR']
         ]);
 
         return redirect()->route('clientes.show', ['cliente' => $cliente]);
@@ -336,6 +342,7 @@ class ClienteController extends Controller
             'tx_modelo' => 'Cliente',
             'tx_data' => $datos,
             'tx_tipo' => 'B',
+	    'tx_host' => $_SERVER['REMOTE_ADDR']
         ]);
 
         //return redirect()->route('clientes.index');

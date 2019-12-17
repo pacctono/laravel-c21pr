@@ -16,6 +16,7 @@ class DatabaseSeeder extends Seeder
             'deseos',
             'origens',
             'precios',
+            'prices',
             'tipos',
             'resultados',
             'zonas',
@@ -32,6 +33,7 @@ class DatabaseSeeder extends Seeder
         $this->call(DeseoSeeder::class);
         //$this->call(OrigenSeeder::class);
         $this->call(PrecioSeeder::class);
+        $this->call(PriceSeeder::class);
         $this->call(TipoSeeder::class);
         $this->call(ResultadoSeeder::class);
         $this->call(ZonaSeeder::class);

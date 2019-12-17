@@ -4,10 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Turno;
 use App\User;
+use App\Bitacora;
+use App\Aviso;
+use \App\Mail\TurnosErradosSemanaPasada;
 use Illuminate\Validation\Rule;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 use Carbon\Carbon;
 use Jenssegers\Agent\Agent;                 // PC
 use App\MisClases\Fecha;
@@ -16,7 +20,7 @@ use App\MisClases\General;               // PC
 class TurnoController extends Controller
 {
     protected $tipo = 'Turnos';
-    protected $lineasXPagina = General::LINEASXPAGINA;
+    protected $lineasXPagina = 15;  //General::LINEASXPAGINA;
 
     public function index($orden=null, $accion='html')
     {
@@ -79,7 +83,8 @@ class TurnoController extends Controller
             $orden = 'turno';
         }
         if (Auth::user()->is_admin) {
-            $users   = User::all();         // Todos los usuarios. Incluye '1' porque en turnos hay feriado.
+//            $users   = User::all();         // Todos los usuarios. Incluye '1' porque en turnos hay feriado.
+            $users  = User::where('activo', True)->where('socio', False)->get();
             $turnos = Turno::where('id', '>', 0);   // condición dummy, solo para continuar armando la consulta.
         } else {
             $asesor = Auth::user()->id;
@@ -228,7 +233,7 @@ class TurnoController extends Controller
         if (!(Auth::check())) {
             return redirect('login');
         }
-        if (1 != Auth::user()->is_admin) {
+        if (!Auth::user()->is_admin) {
             return redirect('home');
         }
 
@@ -333,7 +338,61 @@ class TurnoController extends Controller
         }
     }
 
+    public function editarTurno(Turno $turno, $id)
+    {
+        $user_ant = $turno->user_id . ' => ' . $turno->user->name;
+        $data['user_id'] = $id;
+        //dd($turno, $data, $id);
+        $turno->update($data);
+        //dd($turno);
+        $nombre = Turno::find($turno->id)->user->name;  // Recupera el turno desde la bd.
+
+        Bitacora::create([
+            'user_id' => Auth::user()->id,
+            'tx_modelo' => 'Turno',
+            'tx_data' => $turno->id . ' ==>>> ' . $user_ant . ' | ' . $turno->user_id .
+                        ' => ' . $nombre,
+            'tx_tipo' => 'A',
+	    'tx_host' => $_SERVER['REMOTE_ADDR']
+        ]);
+
+        return redirect()->route('turnos');
+    }
+
     public function destroy(User $turno)
     {
+    }
+
+    public static function emailTurnosSemanaPasada()
+    {
+        $periodo['periodo'] = 'semana_pasada';
+        list($fecha_desde, $fecha_hasta) = Fecha::periodo($periodo);
+        $turnos = Turno::whereBetween('turno', [$fecha_desde, $fecha_hasta])->get();
+        $turnos = $turnos->where('tarde', '!=', '');
+        $correoGerente = User::CORREO_GERENTE;
+        Mail::to($correoGerente)
+                ->send(new TurnosErradosSemanaPasada($turnos));
+        return;
+    }
+
+    public static function actualizarAviso()
+    {
+        $hoy = Fecha::hoy();
+        $manana = Fecha::manana();
+        $turnos = Turno::whereBetween('turno', [$hoy, $manana])
+                        ->whereNull('llegada')
+    ->whereNotIn('id', [DB::raw("SELECT turno_id FROM avisos WHERE turno_id IS NOT NULL")])
+                        ->get();
+        foreach ($turnos as $turno) {
+            Aviso::create([
+                'user_id' => $turno->user_id,
+                'turno_id' => $turno->id,
+                'tipo' => 'C',
+                'fecha' => $turno->turno,
+                'descripcion' => 'No se conecto en su turno de la ' . $turno->fec_tur,
+                'user_creo' => $turno->user_creo
+            ]);
+        }
+        return;
     }
 }

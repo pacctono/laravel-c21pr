@@ -31,6 +31,13 @@
                     {{ $cliente->telefono_f }}
                 </span>
             </div>
+        @if ($cliente->otro_telefono)
+            <div class="mx-1 px-2">
+                Otro telefono:<span class="alert-info">
+                    {{ $cliente->otro_telefono }}
+                </span>
+            </div>
+        @endif ($contacto->otro_telefono)
         </div>
         <div class="row my-1 py-1">
             <div class="mx-1 px-2">

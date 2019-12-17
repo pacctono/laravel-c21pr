@@ -2,7 +2,8 @@
 
 @section('content')
 <div class="card">
-    <div class="card-header ft-grande">
+    <div class="row card-header ft-grande">
+        <div class="col-lg-10">
             Contacto inicial:
             {{ $contacto->name }} el
             {{ $contacto->creado_dia_semana }}
@@ -15,6 +16,13 @@
                 veces.
         @endif
             </span>
+        </div>
+        <div class="col-lg-2">
+            <a href="{{ route('contactos.create') }}" class="btn btn-primary"
+                title="Dejar esta p&aacute;gina e ir a crear un nuevo Contacto Inicial">
+                Crear Contacto Inicial
+            </a>
+        </div>
     </div>
     <div class="card-body">
         <div class="row my-1 py-1">
@@ -32,7 +40,7 @@
                     {{ $contacto->telefono_f }}
                 </span>.
             </div>
-            <div class="col-lg">
+            <div class="mx-1 px-2">
                 Este telefono ha contactado:
                 <span class="alert-info">{{ $contacto->veces_telefono }}
                 @if (1 == $contacto->veces_telefono)
@@ -42,6 +50,13 @@
                 @endif
                 </span>
             </div>
+        @if ($contacto->otro_telefono)
+            <div class="mx-1 px-2">
+                Otro telefono:<span class="alert-info">
+                    {{ $contacto->otro_telefono }}
+                </span>
+            </div>
+        @endif ($contacto->otro_telefono)
         </div>
         <div class="row my-1 py-1">
             <div class="mx-1 px-2">
@@ -197,6 +212,7 @@
                 </div>
                 <input type="hidden" name="ddn" id="ddn" value="{{ substr($contacto->telefono, 0, 3) }}">
                 <input type="hidden" name="telefono" id="telefono" value="{{ substr($contacto->telefono, 3) }}">
+                <input type="hidden" name="otro_telefono" id="otro_telefono" value="{{ $contacto->otro_telefono }}">
                 <input type="hidden" name="email" id="email" value="{{ $contacto->email }}">
                 <input type="hidden" name="direccion" id="email" value="{{ $contacto->direccion }}">
                 <input type="hidden" name="observaciones" id="email" value="{{ $contacto->observaciones }}">

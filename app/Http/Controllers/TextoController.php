@@ -149,6 +149,7 @@ class TextoController extends Controller
             'tx_modelo' => 'Texto',
             'tx_data' => implode(';', $data),
             'tx_tipo' => 'A',
+	    'tx_host' => $_SERVER['REMOTE_ADDR']
         ]);
 
         return redirect()->route($this->ruta);
@@ -171,6 +172,7 @@ class TextoController extends Controller
             'tx_modelo' => 'Texto',
             'tx_data' => $datos,
             'tx_tipo' => 'B',
+	    'tx_host' => $_SERVER['REMOTE_ADDR']
         ]);
 
         return redirect()->route($this->ruta);

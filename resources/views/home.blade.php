@@ -1,7 +1,10 @@
 @extends('layouts.app')
 
 @section('content')
-@if ($cumpleaneros->isNotEmpty())
+@if ('' != $alertar)
+    <script>alert("{{ $alertar }}");</script>
+@endif
+@if ((Auth::user()->is_admin) && ($cumpleaneros->isNotEmpty()))
 
 <div class="mb-0 col-lg-8">
   <div class="row">
@@ -43,8 +46,14 @@
                     alt="Primera slide" style="width:100%;height:600px;">
             <div class="container">
               <div class="carousel-caption text-left">
-                <h1>Hola, {{ Auth::user()->name }}!</h1>
-                <p>
+                <h1 class="col-lg-6" style="background-color:lightgrey">Hola,
+                @if (1 < Auth::user()->id)
+                  {{ Auth::user()->name }}
+                @else
+                  Administrador
+                @endif (1 < Auth::user()->id)
+                </h1>
+                <p style="background-color:lightgrey">
                   {{ $texto1->descripcion??'' }}
                 </p>
                 <p><a class="btn btn-lg btn-primary" href="{{ $texto1->enlace??'' }}" role="button">
@@ -58,7 +67,7 @@
                     alt="Segunda slide" style="width:100%;height:600px;">
             <div class="container">
               <div class="carousel-caption">
-                <h1>
+                <h1 style="background-color:lightgrey">
                   {{ $texto2->descripcion??'' }}
                 </h1>
                 <p><a class="btn btn-lg btn-primary" href="{{ $texto2->enlace??'' }}" role="button">
@@ -72,7 +81,7 @@
                     alt="Tercera slide" style="width:100%;height:600px;">
             <div class="container">
               <div class="carousel-caption text-right">
-                <h1>
+                <h1 style="background-color:lightgrey">
                   {{ $texto3->descripcion??'' }}
                 </h1>
                 <p><a class="btn btn-lg btn-primary" href="{{ $texto3->enlace??'' }}" role="button">
@@ -86,7 +95,7 @@
                     alt="Cuarta slide" style="width:100%;height:600px;">
             <div class="container">
               <div class="carousel-caption text-right">
-                <h1>
+                <h1 style="background-color:lightgrey">
                   {{ $texto4->descripcion??'' }}
                 </h1>
                 <p><a class="btn btn-lg btn-primary" href="{{ $texto4->enlace??'' }}" role="button">
@@ -100,7 +109,7 @@
                     alt="Quinta slide" style="width:100%;height:600px;">
             <div class="container">
               <div class="carousel-caption text-right">
-                <h1>
+                <h1 style="background-color:lightgrey">
                   {{ $texto5->descripcion??'' }}
                 </h1>
                 <p><a class="btn btn-lg btn-primary" href="{{ $texto5->enlace??'' }}" role="button">

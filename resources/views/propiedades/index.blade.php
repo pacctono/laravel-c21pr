@@ -203,6 +203,11 @@
         <h1 style="text-align:center;">{{ $title }}</h1>
     @endif (!isset($accion) or ('html' == $accion))
     </div>
+@if (0 < $alertar)
+    <script>alert('Le fue enviado el correo con el Reporte de Cierre de la propiedad.');</script>
+@elseif (0 > $alertar)
+    <script>alert('No fue enviado el correo con el Reporte de Cierre de la propiedad.');</script>
+@endif
     @if ($propiedades->isNotEmpty())
     <table
     @if (!isset($accion) or ('html' == $accion))
@@ -319,7 +324,9 @@
 
         @foreach ($propiedades as $propiedad)
         <tr class="
-        @if ('I' == $propiedad->estatus)
+        @if ('A' == $propiedad->estatus)
+            table-success
+        @elseif ('I' == $propiedad->estatus)
             table-active
         @elseif ('P' == $propiedad->estatus)
             table-warning
@@ -541,13 +548,28 @@ Estatus en sistema C21: {{ $propiedad->estatus_c21_alfa.(($propiedad->pagado_cas
                     <span class="oi oi-eye"></span>
                 </a>
                 @if (!($propiedad->user_borro || $propiedad->deleted_at))
+                @if (Auth::user()->is_admin)
                 <a href="{{ route('propiedades.edit', $propiedad) }}" class="btn btn-link"
                         title="Editar los datos de esta propiedad ({{ $propiedad->nombre }}).">
                     <span class="oi oi-pencil"></span>
                 </a>
-                @endif
+                @elseif (!(('P' == $propiedad->estatus) || ('C' == $propiedad->estatus) || ('S' == $propiedad->estatus)))
+                <a href="{{ route('propiedades.edit', $propiedad) }}" class="btn btn-link"
+                        title="Editar los datos de esta propiedad ({{ $propiedad->nombre }}).">
+                    <span class="oi oi-pencil"></span>
+                </a>
+                @endif (Auth::user()->is_admin)
+                @endif (!($propiedad->user_borro || $propiedad->deleted_at))
 
-                @if ((1 == Auth::user()->is_admin) && !($propiedad->user_borro || $propiedad->deleted_at))
+                @if ((('P' == $propiedad->estatus) || ('C' == $propiedad->estatus)) &&
+                     (isset($propiedad->fecha_reserva) && isset($propiedad->fecha_firma)))
+                    <a href="{{ route('propiedad.email', [$propiedad->id, 1]) }}" class="btn btn-link"
+                            title="Enviar correo a '{{ $propiedad->user->name }}' sobre esta propiedad ({{ $propiedad->codigo }}, {{ $propiedad->nombre }}).">
+                        <span class="oi oi-envelope-closed"></span>
+                    </a>
+                @endif (('P' == $propiedad->estatus) || ('C' == $propiedad->estatus))
+                @if ((Auth::user()->is_admin) && !($propiedad->user_borro || $propiedad->deleted_at) &&
+                     !(('P' == $propiedad->estatus) || ('C' == $propiedad->estatus)))
                 <form action="{{ route('propiedades.destroy', $propiedad) }}" method="POST" 
                         class="form-inline mt-0 mt-md-0"
                         onSubmit="return confirm('Realmente, desea borrar (borrado lógico) los datos de esta propiedad de la base de datos?')">
@@ -558,7 +580,7 @@ Estatus en sistema C21: {{ $propiedad->estatus_c21_alfa.(($propiedad->pagado_cas
                         </span>
                     </button>
                 </form>
-                @endif
+                @endif ((Auth::user()->is_admin) && !($propiedad->user_borro || $propiedad->deleted_at) && ...)
             </td>
         {{-- @endif (!isset($accion) or ('html' == $accion)) --}}
         @endif ((!$movil) and (!isset($accion) or ('html' == $accion)))

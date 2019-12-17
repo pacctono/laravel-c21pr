@@ -184,6 +184,7 @@ class TipoController extends Controller
             'tx_modelo' => 'Tipo',
             'tx_data' => $datos,
             'tx_tipo' => 'B',
+	    'tx_host' => $_SERVER['REMOTE_ADDR']
         ]);
 
         return redirect()->route($this->ruta);

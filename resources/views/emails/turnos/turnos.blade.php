@@ -9,7 +9,7 @@ Por medio del presente te recuerdo tus turnos.
 
 @component('mail::panel')
     <ul>
-    @foreach ($asesor->turnos()->orderBy('turno')->get() as $turno)
+    @foreach ($turnos as $turno)
     <li>El {{ $turno->turno_dia_semana }}
     {{ $turno->turno_con_hora }}.
     @endforeach

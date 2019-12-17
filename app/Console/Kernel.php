@@ -15,6 +15,8 @@ class Kernel extends ConsoleKernel
     protected $commands = [
         'App\Console\Commands\GrabarArchivo',
         'App\Console\Commands\CorreoCumpleano',
+        'App\Console\Commands\TurnosSemanaPasada',
+        'App\Console\Commands\ActualizarAvisosTurnoNoConectado',
     ];
 
     /**
@@ -55,9 +57,16 @@ class Kernel extends ConsoleKernel
 //                    ->twiceDaily(21, 23)
 //                    ->sendOutputTo('/home/pablo/salidas/cronLaravelCorreoCumpleano.txt')
                     ;
-//        $schedule->command('correo:cumpleano')
-//                    ->dailyAt('8:00')
-//                    ;
+        $schedule->command('correo:turnosIncSemPas')
+                    ->timezone('America/Caracas')   // Definido en la funcion anterior +5.8.
+                    ->twiceDaily(11, 21)
+                    ->sundays()
+                    ;
+        $schedule->command('actualizar:turnoNoConectado')
+                    ->timezone('America/Caracas')   // Definido en la funcion anterior +5.8.
+                    ->hourly()
+                    ->between('18:30', '23:30')
+                    ;
     }
 
     /**

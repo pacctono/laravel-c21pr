@@ -2,7 +2,17 @@
 
 @section('content')
 <div class="card col-10">
-    <h4 class="card-header">{{ $title }}</h4>
+    <div class="row card-header">
+        <div class="col-8">
+            <h4>{{ $title }}</h4>
+        </div>
+        <div class="col-2">
+            <a href="{{ route('contactos.create') }}" class="btn btn-primary"
+                title="Dejar esta p&aacute;gina e ir a crear un nuevo Contacto Inicial">
+                Crear Contacto Inicial
+            </a>
+        </div>
+    </div>
     <div class="card-body">
     @include('include.errorData')
 
@@ -50,6 +60,15 @@
                     <input type="email" class="form-control col-lg-6" maxlength="30" name="email" 
                             id="email" placeholder="correo electronico"
                             value="{{ old('email', $contacto->email) }}">
+                </div>
+            </div>
+            <div class="form-row bg-suave my-0 py-0">
+                <div class="form-group col-lg-8 d-flex">
+                    <label class="control-label" for="otro_telefono">Otro telefono</label>
+                    <input type="text" class="form-control col-lg-6" size="20" maxlength="20"
+                            name="otro_telefono" id="otro_telefono"
+                            placeholder="Quizas internacional"
+                            value="{{ old('otro_telefono', $contacto->otro_telefono) }}">
                 </div>
             </div>
 

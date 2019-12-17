@@ -176,6 +176,7 @@ class CaracteristicaController extends Controller
             'tx_modelo' => 'Caracteristica',
             'tx_data' => $datos,
             'tx_tipo' => 'B',
+	    'tx_host' => $_SERVER['REMOTE_ADDR']
         ]);
 
         return redirect()->route($this->ruta);

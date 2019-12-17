@@ -21,6 +21,8 @@ class CreateClientesTable extends Migration
             $table->enum('tipo', ['C','V','A','F','O'])
                 ->comment('[C]omprador,[V]endedor,[A]mbos,[F]amiliar,[O]tro');
             $table->string('telefono', 10)->nullable();
+            $table->string('otro_telefono', 20)->nullable()
+                ->comment('Otro numero de telefono adicional, podria ser un numero internacional.');
             $table->unsignedInteger('user_id');
             $table->foreign('user_id')->references('id')->on('users');
             $table->string('email', 160)->nullable();

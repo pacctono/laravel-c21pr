@@ -224,27 +224,30 @@ class Propiedad extends Model
 
     public function getFechaReservaBdAttribute()
     {
-        if (null == $this->fecha_reserva) return '';
+        if (is_null($this->fecha_reserva)) return '';
         return $this->fecha_reserva->format('Y-m-d');
     }
 
     public function getFecResAttribute()
     {
-        if (null == $this->fecha_reserva) return '';
+        if (is_null($this->fecha_reserva)) return '';
         return $this->fecha_reserva->format('d/m/Y');
     }
 
     public function getReservaDiaSemanaAttribute()
     {
-        if (null == $this->fecha_reserva) return '';
-        return substr(Fecha::$diaSemana[$this->fecha_reserva->timezone(Fecha::$ZONA)
+        if (is_null($this->fecha_reserva)) return '';
+// Eliminando timezone. Todas las fechas en la BD, se asumen UTC.
+//        return substr(Fecha::$diaSemana[$this->fecha_reserva->timezone(Fecha::$ZONA)
+        return substr(Fecha::$diaSemana[$this->fecha_reserva
                         ->dayOfWeek], 0, 3);
     }
 
     public function getReservaConHoraAttribute()
     {
-        if (null == $this->fecha_reserva) return '';
-        return $this->fecha_reserva->timezone(Fecha::$ZONA)->format('d/m/Y h:i a');
+        if (is_null($this->fecha_reserva)) return '';
+//        return $this->fecha_reserva->timezone(Fecha::$ZONA)->format('d/m/Y h:i a');
+        return $this->fecha_reserva->format('d/m/Y h:i a');
     }
 
     public function getFechaFirmaBdAttribute()
@@ -321,6 +324,16 @@ class Propiedad extends Model
     public function getIvaPAttribute()          // J
     {
         return number_format($this->iva, 2, ',', '.') . '%';
+    }
+
+    public function getMontoIvaAttribute()
+    {
+        return ($this->iva*$this->precio)/100.00;
+    }
+
+    public function getMontoIvaVenAttribute()
+    {
+        return number_format($this->getMontoIvaAttribute(), 2, ',', '.');
     }
 
 /*    public function reservaSinIva()             // I

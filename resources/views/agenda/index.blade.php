@@ -244,6 +244,7 @@
           <span class="oi oi-pencil"></span>
         </a>
       @if (Auth::user()->is_admin)
+      @if ($agenda->fecha_evento > $hoy)
         <a href="
       @if ('C' == $agenda->tipo)  {{-- Esta cita es con un contacto incial --}}
           {{ route('agenda.emailcita', $agenda->contacto) }}
@@ -256,6 +257,7 @@
             title="Enviar correo a '{{ $users->find($agenda->user_id)->name }}' sobre esta cita">
           <span class="oi oi-envelope-closed"></span>
         </a>
+      @endif ($agenda->fecha_evento > $hoy)
       @endif (Auth::user()->is_admin)
       @endif (('T' == $agenda->tipo) or (NULL == $agenda->contacto_id))
       </td>

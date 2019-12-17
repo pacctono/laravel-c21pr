@@ -20,6 +20,8 @@ class CreateContactosTable extends Migration
             $table->unsignedInteger('veces_name')->default(0);
             $table->string('telefono', 10)->nullable();
             $table->unsignedInteger('veces_telefono')->default(0);
+            $table->string('otro_telefono', 20)->nullable()
+                ->comment('Otro numero de telefono adicional, podria ser un numero internacional.');
             $table->unsignedInteger('user_id');
             $table->foreign('user_id')->references('id')->on('users');
             $table->string('email', 160)->nullable();

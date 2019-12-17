@@ -131,6 +131,9 @@
             </td>
             <td>
                 {{ $cliente->telefono_f }}
+                @if ($cliente->otro_telefono)
+                    <br>{{ $cliente->otro_telefono }}
+                @endif ($contacto->otro_telefono)
             </td>
             <td>{{ $cliente->email }}</td>
             <td>

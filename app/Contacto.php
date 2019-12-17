@@ -14,6 +14,7 @@ class Contacto extends Model
 
     protected $fillable = [
         'cedula', 'name', 'veces_name', 'telefono', 'veces_telefono',
+        'otro_telefono',
         'user_id', 'email', 'veces_email', 'direccion', 'deseo_id',
         'tipo_id', 'zona_id', 'precio_id', 'origen_id', 'resultado_id',
         'fecha_evento', 'observaciones', 'user_actualizo', 'user_borro'

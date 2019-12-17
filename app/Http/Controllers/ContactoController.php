@@ -12,8 +12,10 @@ use App\Zona;
 use App\Venezueladdn;
 use App\User;
 use App\Bitacora;
+use \App\Mail\OfertaServicio;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;        // PC
+use Illuminate\Support\Facades\Mail;
 use Carbon\Carbon;                          // PC
 use Jenssegers\Agent\Agent;                 // PC
 use Mpdf\Mpdf;
@@ -44,17 +46,19 @@ class ContactoController extends Controller
             $orden = '';
             $alertar = 1;
         }
+        $sentido = 'asc';
         if ('' == $orden or is_null($orden)) {
             $orden = 'id';
+            $sentido = 'desc';
         }
 
         $agente = new Agent();
         $movil  = $agente->isMobile() and true;             // Fuerzo booleana. No funciona al usar el metodo directamente.
         if (Auth::user()->is_admin) {
-            $contactos = Contacto::orderBy($orden);
+            $contactos = Contacto::orderBy($orden, $sentido);
         } else {
             $contactos = User::find(Auth::user()->id)
-                                ->contactos()->whereNull('user_borro')->orderBy($orden);
+                        ->contactos()->whereNull('user_borro')->orderBy($orden, $sentido);
             //return redirect('/contactos/create');
         }
         if ($movil or ('html' != $accion)) $contactos = $contactos->get();
@@ -173,6 +177,7 @@ class ContactoController extends Controller
             'name' => 'required',
             'ddn' => '',
             'telefono' => ['sometimes', 'nullable', 'digits:7'],
+            'otro_telefono' => '',
             'email' => ['sometimes', 'nullable', 'email'],
             'direccion' => '',
             'deseo_id' => 'required',
@@ -214,19 +219,24 @@ class ContactoController extends Controller
         }
         unset($data['ddn']);
         $data['veces_name'] = Contacto::ofVeces($data['name'], 'name') + 1;
-        $data['veces_telefono'] = Contacto::ofVeces($data['telefono'], 'telefono') + 1;
-        $data['veces_email'] = Contacto::ofVeces($data['email'], 'email') + 1;
+        if ('' != $data['telefono'])
+            $data['veces_telefono'] = Contacto::ofVeces($data['telefono'], 'telefono') + 1;
+        else $data['veces_telefono'] = 1;
+        if ((isset($data['email'])) and ('' != $data['email']) and (!is_null($data['email'])))
+            $data['veces_email'] = Contacto::ofVeces($data['email'], 'email') + 1;
+        else $data['veces_email'] = 1;
         if (!(is_null($data['fecha_evento']))) {
 // El tipo 'time' decuelve la hora militar (formato de 24 horas) por eso 'H:i' no incluye am/pm.
             $data['fecha_evento'] = Carbon::createFromFormat('Y-m-d H:i', $data['fecha_evento'] . ' ' . $data['hora_evento']);
         }
 
-        Contacto::create([
+        $contacto = Contacto::create([          // Devuelve el modelo.
             'cedula' => $data['cedula'],
             'name' => $data['name'],
             'veces_name' => $data['veces_name'],
             'telefono' => $data['telefono'],
             'veces_telefono' => $data['veces_telefono'],
+            'otro_telefono' => $data['otro_telefono']??null,
             'user_id' => Auth::user()->id,
             'email' => $data['email'],
             'veces_email' => $data['veces_email'],
@@ -240,6 +250,10 @@ class ContactoController extends Controller
             'fecha_evento' => $data['fecha_evento'],
             'observaciones' => $data['observaciones']
         ]);
+
+//        if (($data['email']) and            // Se suministró un email.
+//            ((2 == $data['deseo_id']) or (4 == $data['deseo_id'])))   // Vende o da en alquiler.
+//            self::correoOfertaServicio($contacto);
 
         session(['exito' => "El contacto inicial '" . $data['name'] .
                             "' fue agregado con exito."]);
@@ -318,6 +332,7 @@ class ContactoController extends Controller
             'name' => 'required',
             'ddn' => '',
             'telefono' => ['sometimes', 'nullable', 'digits:7'],
+            'otro_telefono' => '',
             'email' => ['sometimes', 'nullable', 'email'],
             'direccion' => '',
             'observaciones' => '',
@@ -365,6 +380,7 @@ class ContactoController extends Controller
             'tx_modelo' => 'Contacto',
             'tx_data' => implode(';', $data),
             'tx_tipo' => 'A',
+	    'tx_host' => $_SERVER['REMOTE_ADDR']
         ]);
 
         return redirect()->route('contactos.show', ['contacto' => $contacto]);
@@ -403,8 +419,21 @@ class ContactoController extends Controller
             'tx_modelo' => 'Contacto',
             'tx_data' => $datos,
             'tx_tipo' => 'B',
+	    'tx_host' => $_SERVER['REMOTE_ADDR']
         ]);
 
         return redirect()->route('contactos.index');
     }
+
+    public static function correoOfertaServicio(Contacto $contacto)
+    {
+        $correoCopiar = \App\User::CORREO_COPIAR;
+
+        $user = User::find(Auth::user()->id);
+        //dd($contacto, $user);
+        Mail::to($contacto->email, $contacto->name)
+                ->bcc($correoCopiar)
+                ->send(new OfertaServicio($contacto, $user));
+        return;
+    }   // Final del metodo correoCumpleano.
 }

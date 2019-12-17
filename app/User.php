@@ -15,7 +15,17 @@ class User extends Authenticatable
     use Notifiable;
     use SoftDeletes;
 
-    public const CORREO_COPIAR = 'aliriomendozacarrero@gmail.com';
+    public const CORREO_COPIAR = ['email' => 'aliriomendozacarrero@gmail.com', 'name' => 'Alirio Mendoza'];
+    public const CORREO_GERENTE = ['email' => 'scaraballoc21puentereal@gmail.com', 'name' => 'Silvia Caraballo'];
+    public const CORREO_ADMINISTRADOR = ['email' => '', 'name' => ''];
+    public const CORREO_SOCIOS = [
+        ['email' => 'aliriomendozacarrero@gmail.com', 'name' => 'Alirio Mendoza'],
+        ['email' => 'davidh.plc@gmail.com', 'name' => 'David Henandez'],
+        ['email' => 'scaraballoc21puentereal@gmail.com', 'name' => 'Silvia Caraballo'], 
+        ['email' => 'migdamar_1@hotmail.com', 'name' => 'Migdamar Brito']
+    ];
+    public const CORREO_ADMIN = 'aliriomendozacarrero@gmail.com';
+
     /**
      * The attributes that are mass assignable.
      *
@@ -24,7 +34,7 @@ class User extends Authenticatable
     protected $fillable = [
         'cedula', 'name', 'telefono', 'email', 'email_c21', 'licencia_mls',
 	    'fecha_ingreso', 'fecha_nacimiento', 'sexo', 'estado_civil', 'profesion',
-        'direccion', 'password',
+        'direccion', 'password', 'activo'
     ];
     /**
      * The attributes that should be hidden for arrays.
@@ -72,9 +82,42 @@ class User extends Authenticatable
         return $this->hasMany(Turno::class); // Si llave foranea, diferente a esperada, usamos 2do parametro.
     }
 
+    public function turnosBorrados()
+    {
+        return $this->hasMany(Turno::class, 'user_borro'); // Si llave foranea, diferente a esperada, usamos 2do parametro.
+    }
+
+    public function turnosActualizados()
+    {
+        return $this->hasMany(Turno::class, 'user_actualizo'); // Si llave foranea, diferente a esperada, usamos 2do parametro.
+    }
+
     public function agendas()    // user_id
     {
-        return $this->hasMany(Agenda::class); // Si llave foranea, diferente a esperada, usamos 2do parametro.
+        return $this->hasMany(Agenda::class)->orderBy('fecha_evento'); // Si llave foranea, diferente a esperada, usamos 2do parametro.
+    }
+
+    public function agenda_personals()    // user_id
+    {
+        return $this->hasMany(AgendaPersonal::class); // Si llave foranea, diferente a esperada, usamos 2do parametro.
+    }
+
+    public function agendaPersonalsBorrados()
+    {
+        return $this->hasMany(AgendaPersonal::class, 'user_borro'); // Si llave foranea, diferente a esperada, usamos 2do parametro.
+    }
+
+    public function agendaPersonalsActualizados()
+    {
+        return $this->hasMany(AgendaPersonal::class, 'user_actualizo'); // Si llave foranea, diferente a esperada, usamos 2do parametro.
+    }
+
+    public function citas($fecha=null)
+    {
+// Todas las fechas grabadas en la bd se asumen 'UTC'. Esto es un tema un poco complejo.
+// 'fecha_evento' asume hora '00:00' UTC, Si $fecha es en Caracas, hora:00:00 es 04:00 UTC.
+        $fecha = $fecha??Carbon::today();    // hoy en UTC
+        return $this->agendas->where('fecha_evento', '>=', $fecha);
     }
 
     public function propiedades()    // user_id
@@ -85,6 +128,16 @@ class User extends Authenticatable
     public function clientes()    // user_id
     {
         return $this->hasMany(Cliente::class); // Si llave foranea, diferente a esperada, usamos 2do parametro.
+    }
+
+    public function clientesBorrados()
+    {
+        return $this->hasMany(Cliente::class, 'user_borro'); // Si llave foranea, diferente a esperada, usamos 2do parametro.
+    }
+
+    public function clientesActualizados()
+    {
+        return $this->hasMany(Cliente::class, 'user_actualizo'); // Si llave foranea, diferente a esperada, usamos 2do parametro.
     }
 
     public function captadorPropiedades()    // asesor_captador_id
@@ -122,6 +175,12 @@ class User extends Authenticatable
         $value = $this->cedula;
         if (null == $value) return '';
         return number_format($value, 0, ',', '.');
+    }
+
+    public function getNombreAttribute()     // Nombre del asesor, si id es 1, decolver 'Administrador'.
+    {
+        if (1 < $this->id) return $this->name;
+        return 'Administrador';
     }
 
     public function setNameAttribute($value) {
@@ -292,6 +351,21 @@ class User extends Authenticatable
                             $query->whereIn('estatus', ['P', 'C'])
                                   ->whereBetween($fecha, [$fecha_desde, $fecha_hasta]);
                     }]);
+    }
+
+    public function avisos()    // user_id
+    {
+        return $this->hasMany(Aviso::class); // Si llave foranea, diferente a esperada, usamos 2do parametro.
+    }
+
+    public function avisosBorrados()
+    {
+        return $this->hasMany(Aviso::class, 'user_borro'); // Si llave foranea, diferente a esperada, usamos 2do parametro.
+    }
+
+    public function avisosActualizados()
+    {
+        return $this->hasMany(Aviso::class, 'user_actualizo'); // Si llave foranea, diferente a esperada, usamos 2do parametro.
     }
 
     public static function cumpleanos($fecha=null, $fecha_hasta=null) {

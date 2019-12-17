@@ -13,6 +13,7 @@ class Cliente extends Model
 
     protected $fillable = [
         'cedula', 'rif', 'name', 'tipo', 'telefono', 'user_id', 'email',
+        'otro_telefono',
         'fecha_nacimiento', 'direccion', 'observaciones', 'contacto_id',
         'user_actualizo', 'user_borro'
     ];
@@ -29,6 +30,16 @@ class Cliente extends Model
     public function user()    // user_id
     {
         return $this->belongsTo(User::class); // Si llave foranea, diferente a esperada, usamos 2do parametro.
+    }
+
+    public function userActualizo()    // user_actualizo
+    {
+        return $this->belongsTo(User::class, 'user_actualizo'); // Si llave foranea, diferente a esperada, usamos 2do parametro.
+    }
+
+    public function userBorro()    // user_borro
+    {
+        return $this->belongsTo(User::class, 'user_borro'); // Si llave foranea, diferente a esperada, usamos 2do parametro.
     }
 
     public function propiedades()    // cliente_id
@@ -85,16 +96,6 @@ class Cliente extends Model
                                         use ($fecha_desde, $fecha_hasta) {  // 'use' permite heredar variables del scope del padre, donde el closure es definido.
                             $query->whereBetween('created_at', [$fecha_desde, $fecha_hasta]);
                     }]);
-    }
-
-    public function userActualizo()    // user_id
-    {
-        return $this->belongsTo(User::class, 'user_actualizo'); // Si llave foranea, diferente a esperada, usamos 2do parametro.
-    }
-
-    public function userBorro()    // user_id
-    {
-        return $this->belongsTo(User::class, 'user_borro'); // Si llave foranea, diferente a esperada, usamos 2do parametro.
     }
 
     public function scopeOfFecha($query, $fechaDesde, $fechaHasta)

@@ -142,13 +142,20 @@
     @endif
     @if (!$movil)
       <th scope="col">Preparado por</th>
+    @if ((Auth::user()->is_admin) and (!isset($accion) or ('html' == $accion)))
+      <th scope="col"></th>
+    @endif ((Auth::user()->is_admin) and (!isset($accion) or ('html' == $accion)))
     @endif
     </tr>
   </thead>
   <tbody>
   @foreach ($turnos as $turno)
     <tr class="
-    @if (0 == ($loop->iteration % 2))
+    @if ('C' == $turno->tarde)
+        table-warning" title="No se conecto en su turno
+    @elseif (('m' == $turno->tarde) or ('t' == $turno->tarde))
+        table-danger" title="Llego tarde a su turno
+    @elseif (0 == ($loop->iteration % 2))
         table-primary
     @else
         table-info
@@ -162,11 +169,35 @@
         {{ $turno->fec_tur }}
       </td>
     @if (Auth::user()->is_admin)
-      <td>{{ $turno->user->name }}</td>
-    @endif
+      <td>
+      @if (!isset($accion) or ('html' == $accion))
+        <select name="{{ $turno->id }}" disabled class="asesor"
+      id="sa{{ $turno->id }}-{{ $turno->user_id }}">
+        @foreach ($users as $user)
+        @if ($turno->user->id == $user->id)
+          <option value="{{ $user->id }}" selected>{{ $user->name }}</option>
+        @else ($turno->user->id == $user->id)
+          <option value="{{ $user->id }}">{{ $user->name }}</option>
+        @endif ($turno->user->id == $user->id)
+        @endforeach
+        </select>
+      @else (!isset($accion) or ('html' == $accion))
+        {{ $turno->user->name }}
+      @endif (!isset($accion) or ('html' == $accion))
+      </td>
+    @endif (Auth::user()->is_admin)
     @if (!$movil)
       <td>{{ $turno->userCreo->name }}</td>
-    @endif
+    @if ((Auth::user()->is_admin) and (!isset($accion) or ('html' == $accion)))
+      <td>
+        <a href="#" class="btn btn-link editarTurno"
+            id="{{ $turno->id }}-{{ $turno->user_id }}"
+            title="Cambiar al asesor '{{ $turno->user->name }}' de este turno">
+          <span class="oi oi-brush"></span>
+        </a>
+      </td>
+    @endif ((Auth::user()->is_admin) and (!isset($accion) or ('html' == $accion)))
+    @endif (!$movil)
     </tr>
   @endForeach
   </tbody>
@@ -198,8 +229,8 @@
 
 @section('js')
 
-@if ($movil)
 <script>
+@if ($movil)
 function alertaFechaRequerida() {
   var fecha_desde = document.getElementById('fecha_desde').value;
   var fecha_hasta = document.getElementById('fecha_hasta').value;
@@ -218,9 +249,46 @@ function alertaFechaRequerida() {
   }
   return true;
 }
-</script>
 @else
-<script>
+  $(document).ready(function(){
+    $("a.editarTurno").click(function(ev) {
+      ev.preventDefault();
+      var id  = $(this).attr('id');        // Tambien $(ev.target).attr('id')
+      var sel = document.getElementById('sa'+id);
+      var nombre = sel.options[sel.selectedIndex].text;
+      var accion;
+      accion = confirm('Desea cambiar al asesor ' + nombre + ' del turno.');
+      if (accion) {
+        //alert('sa'+id);
+        $('#sa'+id).prop('disabled', false);
+      }
+    })
+    $("select.asesor").change(function(ev) {
+      var idSel = $(this).attr('id');        // Tambien $(ev.target).attr('id')
+      var sel = document.getElementById(idSel); // No es necesario. Pude usar $this.
+      var idAseNvo = sel.value;
+      var arrIds = idSel.split('-');
+      var idAseAct = arrIds[1];
+      var nombre = sel.options[sel.selectedIndex].text;
+// Debe funcionar, tambien.      var nombre = $("#" + idSel + " option:selected").text();
+// Debe funcionar, tambien.      var nombre = $("#" + idSel).find("option:selected").text();
+// Debe funcionar, tambien.      var nombre = $(this).find("option:selected").text();
+      var idTurno = sel.name;     // Tambien podria sel idSel.split('-')[0].substr(2)
+      var accion;
+      //alert(idAseNvo+'|'+idAseAct+'|'+nombre+'|'+idTurno);
+      if (idAseNvo != idAseAct) {
+        accion = confirm('Desea colocar al asesor ' + nombre + ' en ese turno.');
+        if (accion) {
+          //alert('Se procedera a cambiar al asesor de este turno. Ir a:' + location.href);
+          nvoUrl = '/turnos/editar/' + idTurno + '/' + idAseNvo;
+          location.href = nvoUrl;
+        } else {
+          sel.value = idAseAct;
+          $('#'+idSel).prop('disabled', true);  // $('#'+idSel) === $(this)
+        }
+      }
+    })
+  })
 function alertaFechaRequerida() {
   var periodo    = document.getElementsByName('periodo');
   var fecha_desde = document.getElementById('fecha_desde').value;
@@ -247,6 +315,6 @@ function alertaFechaRequerida() {
   }
   return true;
 }
-</script>
 @endif
+</script>
 @endsection

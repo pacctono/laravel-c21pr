@@ -43,12 +43,36 @@
         @endif ('html' != $accion)
         >
         @if (!$movil)
-            <th scope="col">#</th>
+            <th scope="col">id</th>
         @endif
-            <th scope="col">Nombre</th>
-            <th scope="col">Teléfono</th>
+            <th scope="col">
+            @if (!isset($accion) or ('html' == $accion))
+                <a href="{{ route('users.orden', 'name') }}" class="btn btn-link">
+                    Nombre
+                </a>
+            @else (!isset($accion) or ('html' == $accion))
+                Nombre
+            @endif (!isset($accion) or ('html' == $accion))
+            </th>
+            <th scope="col">
+            @if (!isset($accion) or ('html' == $accion))
+                <a href="{{ route('users.orden', 'telefono') }}" class="btn btn-link">
+                    Telefono
+                </a>
+            @else (!isset($accion) or ('html' == $accion))
+                Telefono
+            @endif (!isset($accion) or ('html' == $accion))
+            </th>
         @if (!$movil)
-            <th scope="col">Correo</th>
+            <th scope="col">
+            @if (!isset($accion) or ('html' == $accion))
+                <a href="{{ route('users.orden', 'email') }}" class="btn btn-link">
+                    Correo
+                </a>
+            @else (!isset($accion) or ('html' == $accion))
+                Correo
+            @endif (!isset($accion) or ('html' == $accion))
+            </th>
         @if (Auth::user()->is_admin)
             <th scope="col">Lados</th>
             <th scope="col">Comision</th>
@@ -78,20 +102,20 @@
         @if (!isset($accion) or ('html' == $accion))
             @if ($movil)
                 <a href="{{ route('users.show', $user) }}" class="btn btn-link" style="text-decoration:none;">
-                    {{ $user->name }}
+                    {{ $user->nombre }} {{-- nombre devuelve 'Administrador', cuando id = 1. --}}
                 </a>
             @else
             @if (1 < $user->id)
                 <a href="{{ route('reporte.contactosUser', [$user->id, 'id']) }}" class="btn btn-link"
                     title="Mostrar reporte de contactos del asesor.">
             @endif
-                    {{ $user->name }}
+                    {{ $user->nombre }}
             @if (1 < $user->id)
                 </a>
             @endif
             @endif
         @else ('html' == $accion)
-                {{ $user->name }}
+                {{ $user->nombre }}
         @endif ('html' == $accion)
             </td>
             <td>{{ $user->telefono_f }}
@@ -176,24 +200,37 @@
                             title="Motrar los datos personales de {{ $user->name }}">
                         <span class="oi oi-eye"></span>
                     </a>
-                    @if ((1 == Auth::user()->id) or (1 < $user->id))
+                @if (1 == Auth::user()->id)
+                    @if (1 < $user->id)
                     <a href="{{ route('users.edit', $user) }}" class="btn btn-link"
                             title="Editar los datos personales de {{ $user->name }}">
                         <span class="oi oi-pencil"></span>
                     </a>
-                    @if (Auth::user()->id != $user->id)
+                    <a href="{{ route('users.updateActivo', $user) }}" id="{{ $user->id }}"
+                            class="btn btn-link desAct"
+{{-- onClick="seguroDesActivar('desActivar_{{ $user->id}}', '{{ $user->name }}', {{ ($user->activo)?'true':'false' }})"--}}
+                    @if ($user->activo)
+                            title="Desactivar al asesor {{ $user->name }}">
+                        <span class="oi oi-thumb-down"></span>
+                    @else ($user->activo)
+                            title="Activar al asesor {{ $user->name }}">
+                        <span class="oi oi-thumb-up"></span>
+                    @endif ($user->activo)
+                    </a>
+                    <input type="hidden" id="nombre{{ $user->id }}" value="{{ $user->name }}">
+                    <input type="hidden" id="activo{{ $user->id }}" value="{{ ($user->activo)?'A':'D' }}">
                     <button class="btn btn-link" title="Borrar este asesor. Mucho cuidado!!!">
                         <span class="oi oi-trash">
                         </span>
                     </button>
-                    @endif (Auth::user()->id != $user->id)
-                    @if (0 < $user->contactos->count())
+                    @if (0 < $user->citas()->count())
                     <a href="{{ route('agenda.emailcitas', $user) }}" class="btn btn-link"
                             title="Enviar correo a '{{ $user->name }}' con sus citas.">
                         <span class="oi oi-envelope-closed"></span>
                     </a>
-                    @endif (0 < $user->contactos->count())
-                    @endif ((1 == Auth::user()->id) or (1 < $user->id))
+                    @endif (0 < $user->citas()->count())
+                    @endif (1 < $user->id)
+                @endif (1 == Auth::user()->id)
                 </form>
             </td>
         @endif ('html' == $accion)
@@ -202,9 +239,11 @@
         @endForeach
         </tbody>
     </table>
+{{-- De acuerdo a la reunion del lunes 25/11/2019, se elimino la paginacion de asesores.
 @if ((!$movil) and (!isset($accion) or ('html' == $accion)))
     {{ $users->links() }}
 @endif
+--}}
 
 @else ($users->isNotEmpty())
     <p>No hay asesores registrados.</p>
@@ -217,6 +256,36 @@
 @if (!isset($accion) or ('html' == $accion))
 @section('js')
 <script>
+    $(document).ready(function() {
+        $('a.desAct').click(function(ev) {
+            var id = $(this).attr('id');        // Tambien $(ev.target).attr('id')
+            var nombre = document.getElementById('nombre'+id).value;
+            var activo = document.getElementById('activo'+id).value;
+            var accion;
+            if ('A' == activo)
+                accion = confirm('Desea desactivar al asesor ' + nombre);
+            else
+                accion = confirm('Desea activar al asesor ' + nombre);
+            if (!accion) {
+                ev.preventDefault();
+            }
+        })
+    })
+function seguroDesActivar(sId, nombre, activo) {
+    var id = document.getElementById(sId);
+    var accion;
+
+    if (activo)
+        accion = confirm('Desea desactivar al asesor ' + nombre);
+    else
+        accion = confirm('Desea activar al asesor ' + nombre);
+    if (!accion) {
+        alert('Falso'+sId+id);
+        id.addEventListener("click", function(event){
+            event.preventDefault()
+        });
+    } else alert('Verdadero');
+}
 function estaSeguro(id) {
     var nroContactos         = document.getElementById('contactos.'+id).value;
     var nroContactosBorrados = document.getElementById('contactosBorrados.'+id).value;

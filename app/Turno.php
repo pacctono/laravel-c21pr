@@ -11,7 +11,7 @@ class Turno extends Model
     use SoftDeletes;
 
     protected $fillable = [
-        'turno', 'user_id', 'user_creo', 'user_actualizo', 'user_borro'
+        'turno', 'user_id', 'llegada', 'user_creo', 'user_actualizo', 'user_borro'
     ];
     protected $dates = [
         'turno', 'deleted_at', 'updated_at', 'created_at'
@@ -20,7 +20,7 @@ class Turno extends Model
         'turno', 'deleted_at', 'updated_at', 'created_at'
     ];
     protected $appends = [
-        'fecha', 'turnoFecha', 'creado'
+        'fecha', 'turnoFecha', 'fecTur', 'tarde', 'creado'
     ];
 
     public function user()    // user_id
@@ -45,25 +45,28 @@ class Turno extends Model
 
     public function getTurnoFechaAttribute()
     {
-        if (null == $this->turno) return '';    // No tiene sentido, pero.........
+        if (is_null($this->turno)) return '';    // No tiene sentido, pero.........
         return $this->turno->format('d/m/Y');
     }
 
     public function getFecTurAttribute()
     {
-        if (null == $this->turno) return '';    // No tiene sentido, pero.........
-        return ('08' == $this->turno->format('H'))?'Mañana':'Tarde';
+        if (is_null($this->turno)) return '';    // No tiene sentido, pero.........
+        if (is_null($this->llegada))
+            return ('08' == $this->turno->format('H'))?'Mañana':'Tarde';
+        return (('08' == $this->turno->format('H'))?'M':'T') . '-' .
+                    $this->llegada;
     }
 
     public function getTurnoDiaSemanaAttribute()
     {
-        if (null == $this->turno) return '';    // No tiene sentido, pero.........
+        if (is_null($this->turno)) return '';    // No tiene sentido, pero.........
         return substr(Fecha::$diaSemana[$this->turno->dayOfWeek], 0, 3);
     }
 
     public function getFechaAttribute()
     {
-        if (null == $this->turno) return '';
+        if (is_null($this->turno)) return '';
         return $this->getTurnoDiaSemanaAttribute() . ', ' .
                 $this->getTurnoFechaAttribute() . ' ' .
                 $this->getFecTurAttribute();
@@ -75,9 +78,53 @@ class Turno extends Model
         return $this->turno->format('d/m/Y H:i a');
     }
 
+    public function getHoraTurnoAttribute()
+    {
+        if (null == $this->turno) return '';    // No tiene sentido, pero.........
+        return $this->turno->format('H');
+    }
+
+    public function getTardeAttribute()
+    {
+        $ZONA = Fecha::$ZONA;
+        $ahora = now($ZONA);
+        if ($this->turno > $ahora) return '';
+        else {
+            if (is_null($this->llegada)) return 'C';
+            else {
+                if (('08' == $this->getHoraTurnoAttribute()) and ('09:00' < $this->llegada))
+                    return 'm';
+                if (('12' == $this->getHoraTurnoAttribute()) and ('13:00' < $this->llegada))
+                    return 't';
+                return '';
+            }
+        }
+    }
+
+    public function getObservacionAttribute()
+    {
+        switch($this->getTardeAttribute()) {
+            case '':
+                $mensaje = 'Puntual en su turno';
+                break;
+            case 'C':
+                $mensaje = 'No se conecto';
+                break;
+            case 'm':
+                $mensaje = 'Llego tarde a su turno de la mañana';
+                break;
+            case 't':
+                $mensaje = 'Llego tarde a su turno de la tarde';
+                break;
+            default:
+                $mensaje = 'Mensaje inesperado';
+                break;
+        }
+        return $mensaje;
+    }
+
     public function getCreadoAttribute()
     {
         return $this->created_at->timezone(Fecha::$ZONA)->format('d/m/Y');
     }
-
 }

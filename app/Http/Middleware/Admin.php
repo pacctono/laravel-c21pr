@@ -19,9 +19,9 @@ class Admin
         if (!(Auth::check())) {
             return redirect('login');
         } 
-        if (1 == auth()->user()->is_admin) {
+        if (auth()->user()->is_admin) {
             return $next($request);
         }
-        return redirect('home')->with('error', ['No puedes acceder esa página.']);
+        return redirect()->route('home', ['alert' => -1]);
     }
 }

@@ -47,7 +47,8 @@ class Fecha
     public static function periodo($periodo, $fecha_min=null, $fecha_max=null)
     {
         $ZONA = self::$ZONA;
-        switch ($periodo['periodo']) {
+	$perio = str_replace(' ', '_', $periodo['periodo']);
+        switch ($perio) {
             case 'hoy':
                 $fecha_desde = Carbon::today($ZONA);
                 $fecha_hasta = Carbon::today($ZONA);
@@ -103,7 +104,13 @@ class Fecha
                 $fecha_desde = new Carbon($periodo['fecha_desde']);
                 $fecha_hasta = new Carbon($periodo['fecha_hasta']);
                 break;
+            default:
+                $fecha_desde = $fecha_min;
+                $fecha_hasta = $fecha_max;
+                break;
         }
-        return array ($fecha_desde->startOfDay(), $fecha_hasta->endOfDay());
+	if (!is_null($fecha_desde)) $fecha_desde->startOfDay();
+	if (!is_null($fecha_hasta)) $fecha_hasta->endOfDay();
+        return array ($fecha_desde, $fecha_hasta);
     }
 }

@@ -140,6 +140,12 @@
                         placeholder="Mayor a 6 caracteres">
             </div>
 
+            <div class="form-group form-inline row bg-suave my-0 py-0">
+                <label class="control-label" for="activo">Activo</label>
+                <input type="checkbox" class="form-control form-control-sm" name="activo"
+                        id="activo" {{ old('activo', $user->activo) ? "checked" : "" }}>
+            </div>
+
             <div class="form-group form-inline row my-0 py-0">
                 <button class="btn btn-primary">Actualizar Asesor</button>
                 @if (auth()->user()->is_admin)

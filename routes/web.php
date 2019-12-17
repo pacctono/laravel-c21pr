@@ -17,7 +17,9 @@ Route::get('/', function () {
 
 Auth::routes();
 
-Route::get('/home', 'HomeController@index')->name('home');
+Route::get('/home/{alertar?}', 'HomeController@index')
+    ->where('alertar', '(-[1-3])|[0-1]')       // Permite -3, -2, -1, -0, 0, 1, 2, 3
+    ->name('home');
 
 Route::get('/usuarios', 'UserController@index')
     ->name('users');
@@ -40,6 +42,10 @@ Route::post('/usuarios', 'UserController@store');
 Route::get('/usuarios/{user}/editar', 'UserController@edit')
     ->where('user', '[0-9]+')
     ->name('users.edit');
+
+Route::get('/usuarios/{user}/desActivar', 'UserController@updateActivo')
+    ->where('user', '[0-9]+')
+    ->name('users.updateActivo');
 
 Route::put('/usuarios/{user}', 'UserController@update');
 
@@ -72,6 +78,11 @@ Route::post('/turnos', 'TurnoController@store');
 Route::get('/turnos/{turno}/editar', 'TurnoController@editar')
     ->where('turno', '[0-9]+')
     ->name('turnos.editar');
+
+Route::get('/turnos/editar/{turno}/{asesor}', 'TurnoController@editarTurno')
+    ->where('turno', '[0-9]+')
+    ->where('asesor', '[0-9]+')
+    ->name('turnos.editarTurno');
 
 Route::put('/turnos/{turno}', 'TurnoController@update');
 
@@ -163,6 +174,11 @@ Route::resource('propiedades', 'PropiedadController')
 Route::get('/propiedades/{propiedad}/{rutRetorno}', 'PropiedadController@show')
     ->where('propiedad', '[0-9]+')
     ->name('propiedades.muestra');
+
+Route::get('/propiedades/email/{propiedad}/{ruta}', 'PropiedadController@correoReporteCierre')
+    ->where('propiedad', '[0-9]+')
+    ->where('ruta', '[01]')
+    ->name('propiedad.email');
 
 Route::get('/reportes/tipo/{tipo}/accion/{accion?}', 'ReporteController@index')
     ->name('reportes');
@@ -512,6 +528,21 @@ Route::get('/cumpleano/{user}', 'AgendaController@cumpleano')
 
 Route::get('pdf','PdfController@getIndex');
 Route::get('pdf/generar','PdfController@getGenerar');
+
+Route::get('/email', function() {
+//    $turnos = \App\Turno::whereBetween('turno', ['2019-12-02 00:00:00', '2019-12-08 23:59:59'])
+//    $user   = \App\User::find(18);
+//    $turnos = \App\Turno::where('user_id', $user->id)
+//                        ->where('turno', '>', now('America/Caracas'))
+//                        ->orderBy('turno')
+//                        ->get();
+//    $contacto   = \App\Contacto::find(21);
+    $propiedad   = \App\Propiedad::find(64);
+//    return new \App\Mail\TurnosErradosSemanaPasada($turnos);
+//    return new \App\Mail\TurnosAsesor($user, $turnos);
+    return new \App\Mail\ReporteCierre($propiedad);
+});
+
 //Route::get('/clientes/filtrar/{filtro}', 'ClienteController@filtro')
 //    ->name('clientes.filtro');
 

@@ -8,7 +8,7 @@
     <div class="card-body">
     @include('include.errorData')
 
-        <form class="form align-items-end-horizontal" method="POST" 
+        <form class="form align-items-end-horizontal" method="POST"  id="formulario"
                 action="{{ url("/propiedades/{$propiedad->id}") }}">
             {{ method_field('PUT') }}
             {!! csrf_field() !!}
@@ -72,8 +72,58 @@
                     <input type="date" class="form-control form-control-sm" name="fecha_firma"
                         id="fecha_firma" max="{{ now()->addWeeks(4)->format('d/m/Y') }}"
                         value="{{ old('fecha_firma', $propiedad->fecha_firma_bd) }}">
+                    <input type="hidden" name="fecha_firma_ant" value="{{ $propiedad->fecha_firma }}">
                 </div>
             </div>
+
+        @if (!Auth::user()->is_admin)
+            <div class="form-row my-0 py-0">
+                <div class="form-group form-inline mx-1 px-2">
+                    <label class="control-label" for="asesor_captador_id">
+                        *Asesor captador</label>
+                    <select name="asesor_captador_id" id="asesor_captador_id">
+                    @foreach ($users as $user)
+                        <option value="{{ $user->id }}"
+                        @if (old("asesor_captador_id",
+                                $propiedad->asesor_captador_id) == $user->id)
+                            selected
+                        @endif
+                            >{{ $user->name }}</option>
+                    @endforeach
+                    </select>
+                </div>
+                <div class="form-group form-inline mx-1 px-2">
+                    <label class="control-label" for="asesor_captador">
+                        +Nombre asesor captador otra oficina</label>
+                    <input type="text" class="form-control form-control-sm" size="60"
+                        maxlength="100" name="asesor_captador" id="asesor_captador"
+                        value="{{ old('asesor_captador', $propiedad->asesor_captador) }}">
+                </div>
+            </div>
+
+            <div class="form-row my-0 py-0 bg-suave">
+                <div class="form-group form-inline mx-1 px-2">
+                    <label class="control-label" for="asesor_cerrador_id">
+                        *Asesor cerrador</label>
+                    <select name="asesor_cerrador_id" id="asesor_cerrador_id">
+                @foreach ($users as $user)
+                    @if (old("asesor_cerrador_id", $propiedad->asesor_cerrador_id) == $user->id)
+                        <option value="{{ $user->id }}" selected>{{ $user->name }}</option>
+                    @else
+                        <option value="{{ $user->id }}">{{ $user->name }}</option>
+                    @endif
+                @endforeach
+                    </select>
+                </div>
+                <div class="form-group form-inline mx-1 px-2">
+                    <label class="control-label" for="asesor_cerrador">
+                        +Nombre asesor cerrador otra oficina</label>
+                    <input type="text" class="form-control form-control-sm" size="60"
+                        maxlength="100" name="asesor_cerrador" id="asesor_cerrador"
+                        value="{{ old('asesor_cerrador', $propiedad->asesor_cerrador) }}">
+                </div>
+            </div>
+        @endif (!Auth::user()->is_admin)
 
             <div class="form-row my-0 py-0 bg-suave">
                 <div class="form-group form-inline mx-1 px-2">
@@ -505,8 +555,6 @@
                 <input type="hidden" name="porc_captador_prbr" value="{{ $propiedad->porc_captador_prbr }}">
                 <input type="hidden" name="porc_cerrador_prbr" value="{{ $propiedad->porc_cerrador_prbr }}">
                 <input type="hidden" name="porc_bonificacion" value="{{ $propiedad->porc_bonificacion }}">
-                <input type="hidden" name="asesor_captador_id" value="{{ $propiedad->asesor_captador_id }}">
-                <input type="hidden" name="asesor_cerrador_id" value="{{ $propiedad->asesor_cerrador_id }}">
                 <input type="hidden" name="estatus_sistema_c21" value="{{ $propiedad->estatus_sistema_c21 }}">
         @endif
 
@@ -538,6 +586,112 @@
         $("#datosOficina").click(function(event){           // Id "datosOficina"
             $("fieldset.datosOficina").children("div").toggle(1000);  // Clase "datosOficina"
             event.preventDefault();
+        })
+        $("#asesor_captador_id").change(function(ev){            // Id "asesor_captador_id"
+            if ('1' == $('#asesor_captador_id').val()) {
+                alert('Proceda a incluir el nombre de la oficina CAPTADORA ' +
+                        '(y el nombre del asesor CAPTADOR, si es posible)');
+                $("#asesor_captador").focus();
+            }
+        })
+        $("#asesor_cerrador_id").change(function(ev){            // Id "asesor_cerrador_id"
+            if ('1' == $('#asesor_cerrador_id').val()) {
+                alert('Proceda a incluir el nombre de la oficina CERRADORA ' +
+                        '(y el nombre del asesor CERRADOR, si es posible)');
+                $("#asesor_cerrador").focus();
+            }
+        })
+        $("#fecha_reserva").change(function(ev) {
+            var j;
+            var opciones = $("#estatus option");
+            var l = opciones.length;
+            if ('' != $(this).val()) {
+                for (j=0; j<l; j++) {
+                    if ('I' == opciones[j].value) break;
+                }
+                var pendiente = opciones[j].text;
+                alert("Al colocar la 'fecha de reserva', debemos comenzar una negociacion," +
+                        " por eso el 'estatus' debe ser " + pendiente);
+                $("#estatus").val('I');
+                if ('' != $("#fecha_firma").val()) {
+                    for (j=0; j<l; j++) {
+                        if ('P' == opciones[j].value) break;
+                    }
+                    var pagosPendientes = opciones[j].text;
+                    for (j=0; j<l; j++) {
+                        if ('C' == opciones[j].value) break;
+                    }
+                    var cerrado = opciones[j].text;
+                    alert("Como tenemos 'fecha de la firma':" + $("#fecha_firma").val() +
+                            ", también; el 'estatus'" + ' debe ser ' + pagosPendientes +
+                            ' o ' + cerrado);
+                    $("#estatus").val('P');
+                }
+                $("#estatus").focus();
+            }
+        })
+        $("#fecha_firma").change(function(ev) {
+            if (('' == $("#fecha_reserva").val()) && ('' != $(this).val())) {
+                alert("Una propiedad no deberia tener 'fecha de la firma':" +
+                        $("#fecha_firma").val() + " y vacia la 'fecha de reserva'");
+                var resp = confirm("Desea asignar la 'fecha de reserva' igual a la " +
+                                    "'fecha de la firma'");
+                if (resp) {
+                    alert("También, procederé a cambiar el 'estatus'.");
+                    $("#fecha_reserva").val($(this).val());
+                    $("#estatus").val('P');
+                    $("#estatus").focus();
+                } else
+                    $("#fecha_reserva").focus();
+                return
+            }
+            if ('' != $(this).val()) {
+                var j;
+                var opciones = $("#estatus option");
+                var l = opciones.length;
+                for (j=0; j<l; j++) {
+                    if ('P' == opciones[j].value) break;
+                }
+                var pagosPendientes = opciones[j].text;
+                for (j=0; j<l; j++) {
+                    if ('C' == opciones[j].value) break;
+                }
+                var cerrado = opciones[j].text;
+                alert('Al colocar la fecha de la firma, debemos comenzar el cierre de la negociacion,' +
+                        " por eso el <estatus> debe ser " + pagosPendientes + ' o ' + cerrado);
+                $("#estatus").val('P');
+                $("#estatus").focus();
+            }
+        })
+        $("#formulario").submit(function(ev) {
+            if (('' == $("#fecha_reserva").val()) && ('' != $("#fecha_firma").val())) {
+                ev.preventDefault();
+                alert("Una propiedad no puede tener 'fecha de la firma':" +
+                        $("#fecha_firma").val() + " y vacia la 'fecha de reserva'");
+                return
+            }
+            if (('' != $("#fecha_reserva").val()) && (('A' == $("#estatus").val()) ||
+                                                      ('S' == $("#estatus").val()))) {
+                ev.preventDefault();
+                alert("Una propiedad no puede tener 'fecha de reserva':" +
+                        $("#fecha_reserva").val() + " y el 'estatus' [A]ctivo o [S]");
+                return
+            }
+            if (('' != $("#fecha_firma").val()) && (('A' == $("#estatus").val()) ||
+                        ('I' == $("#estatus").val()) || ('S' == $("#estatus").val()))) {
+                ev.preventDefault();
+                alert("Una propiedad no puede tener 'fecha de la firma':" + $("#fecha_firma").val()
+                        + " y el 'estatus' [A]ctivo, [I]nmueble pendiente o [S]");
+                return
+            }
+            if ('1' == $('#asesor_captador_id').val()) {
+                if ('' == $('#asesor_captador').val()) {
+                    ev.preventDefault();
+                    alert('No puede crear esta propiedad sin agregar el nombre de la ' +
+                        'oficina CAPTADORA (y, opcionalmente, el nombre del asesor CAPTADOR)');
+                    $("#asesor_captador").focus();
+                }
+            }
         })
     })
 </script>

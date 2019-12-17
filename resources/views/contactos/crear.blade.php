@@ -46,6 +46,14 @@
                     id="email" placeholder="correo electronico" value="{{ old('email') }}">
           </div>
         </div>
+        <div class="form-row bg-suave my-0 py-0">
+          <div class="form-group col-lg-8 d-flex">
+            <label class="control-label" for="otro_telefono">Otro telefono</label>
+            <input type="text" class="form-control col-lg-6" size="20" maxlength="20"
+                    name="otro_telefono" id="otro_telefono"
+                    placeholder="Quizas internacional" value="{{ old('otro_telefono') }}">
+          </div>
+        </div>
 
         <div class="form-row my-0 py-0">
           <div class="form-group col-lg-12 d-flex">

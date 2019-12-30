@@ -35,10 +35,14 @@ class OfertaServicio extends Mailable
     {
         return $this->markdown('emails.contactos.ofertaServicio')
                 ->subject('Oferta de Servicio')
-//                ->attach('/ruta/a/ofertaServicio', [
-//                    'as' => 'ofertaServicio.pdf',
-//                    'mime' => 'application/pdf',
-//                ])
+                ->attach('storage/archivos/Oferta_de_Servicios_C21-MODELO_2020.pdf', [
+                    'as' => 'ofertaServicio.pdf',
+                    'mime' => 'application/pdf',
+                ])
+                ->attach('storage/archivos/Oferta_de_Servicios_C21-MODELO_2020.docx', [
+                    'as' => 'ofertaServicio.docx',
+                    'mime' => 'application/docx',
+                ])
                 ->from('puentereal@centurt21.com.ve', 'Century21 Puente Real');
     }
 }

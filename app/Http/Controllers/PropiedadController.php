@@ -82,14 +82,14 @@ class PropiedadController extends Controller
                                                                 $fecha_max);*/
         }
 //        dd($dato, $fecha_desde, $fecha_hasta);
-// En caso de volver luego de haber enviado un correo, ver el metodo 'emailcita', en AgendaController.
+// En caso de volver luego de haber enviado un correo, ver el metodo 'self::correoReporteCierre'.
         $alertar = 0;
-        if ('EFE' == $orden) {
-            $orden = '';
-            $alertar = 1;
-        } elseif ('ENFE' == $orden) {
-            $orden = '';
-            $alertar = -1;
+        if (isset($_GET['correo']) and ($correo = $_GET['correo'])) {
+            if ('S' == $correo) {
+                $alertar = 1;
+            } elseif ('N' == $correo) {
+                $alertar = -1;
+            }
         }
         $sentido = 'asc';
         if ('' == $orden or is_null($orden)) {
@@ -475,10 +475,19 @@ class PropiedadController extends Controller
             return redirect('login');
         }
 
+        $alertar = 0;
+        if (isset($_GET['correo']) and ($correo = $_GET['correo'])) {
+            if ('S' == $correo) {
+                $alertar = 1;
+            } elseif ('N' == $correo) {
+                $alertar = -1;
+            }
+        }
         $col_id = '';
         $orden = '';
         $nroPagina = '';
-        if ((0 == stripos($rutRetorno, 'propiedades')) or (0 == stripos($rutRetorno, 'reporte'))) {
+        if ((0 == stripos($rutRetorno, 'propiedades')) or
+            (0 == stripos($rutRetorno, 'reporte'))) {
             $rutaPrevia = redirect()->getUrlGenerator()->previous();
             if (17 < strlen($rutRetorno)) {     // 17 = len(propiedades/orden)
                 $col_id = strtolower(substr($rutRetorno, 19)) . '_id';  // 19 = len(reporte.propiedades)
@@ -494,17 +503,9 @@ class PropiedadController extends Controller
 // $rutaPrevia: 'propiedades' o 'propiedades/orden/nombre' o 'propiedades/orden/nombre?page=5' o
 //          'reportes/propiedadesCaracteristica/1/id' o 'reportes/propiedadesCaracteristica/1/codigo?page=3' o etc.
                 $nroPagina = substr($rutaPrevia, stripos($rutaPrevia, '?page'));
-/* Esto no funcionaria en un sitio en produccion porque las filas seran borradas y el # id no necesariamente identificaria a la pagina.
-            $id = $propiedad->id;   // Desde aqui se busca la pagina a la que se volvera.
-            $lineas = Propiedad::$lineasXPagina;
-            $pagina = round((($id/$lineas)+0.5), 0, PHP_ROUND_HALF_DOWN);
-//            if (0 < ($id%$lineas)) $pagina++;
-            if (1 < $pagina) $nroPagina = '?page=' . $pagina;*/
         }
         
-        //dd($propiedad);
-        //dd($rutaPrevia);
-        //dd(redirect()->getUrlGenerator());    // No consegui nada que pueda ayudar.
+        //dd($alertar, $rutRetorno, $rutaPrevia, redirect()->getUrlGenerator());    // No consegui nada que pueda ayudar.
         $agente = new Agent();
         $movil  = $agente->isMobile() and true;             // Fuerzo booleana. No funciona al usar el metodo directamente.
         $tipos = Tipo::all();
@@ -521,7 +522,7 @@ class PropiedadController extends Controller
             return view('propiedades.show',
                         compact('propiedad', 'rutRetorno', 'nroPagina', 'col_id', 'movil',
                                 'orden', 'tipos', 'ciudades', 'caracteristicas', 'municipios',
-                                'estados', 'clientes'));
+                                'estados', 'clientes', 'alertar'));
         } else {
             return redirect()->back();
         }
@@ -685,10 +686,10 @@ class PropiedadController extends Controller
         ]);
 
         if (is_null($data['fecha_firma_ant']) and isset($data['fecha_firma'])) {
-            $resp = self::correoReporteCierre($propiedad->id, 0);
+            $correo = self::correoReporteCierre($propiedad->id, 0);
         }
         return redirect()->route('propiedades.show',
-                                ['propiedad' => $propiedad, 'resp' => $resp]);
+                                ['propiedad' => $propiedad, 'correo' => $correo]);
     }
 
     /**
@@ -729,26 +730,34 @@ class PropiedadController extends Controller
         return redirect()->route('propiedades.index');
     }
 
-    public static function correoReporteCierre($id, $ruta)
+    public static function correoReporteCierre(Propiedad $propiedad, $ruta=0)
     {
-/*
- * ENFE: Email No Fue Enviada.
- * EFE:  Email Fue Enviada.
- */
+//        $propiedad = Propiedad::findOrFail($id);  // Si falla produce 'ModelNotFoundException'.
         $host = env('MAIL_HOST');
-        if (!($ip=gethostbyname($host))) { // No hay conexon a Internet.
-            if (1 == $ruta) return redirect()->route('propiedades.orden', 'ENFE');
-            else return 'ENFE';
+        if (!($ip = gethostbyname($host)) or ($ip == $host)) { // No hay conexon a Internet.
+            //dd($id, $ruta, $host, $ip);
+            $correo = 'N';
+            if (1 == $ruta)
+                return redirect()->route('propiedades.index', ['correo' => $correo]);
+            elseif (2 == $ruta)
+                return redirect()->route('propiedades.show',
+                                ['propiedad' => $propiedad, 'correo' => $correo]);
+            else return $correo;
         }
 
-        $propiedad = Propiedad::find($id);
         $correoSocios = \App\User::CORREO_SOCIOS;
+        //dd($id, $ruta, $host, $ip, $correoSocios);
 
         $user = User::find(Auth::user()->id);
         Mail::to($user->email, $user->name)
                 ->cc($correoSocios)
                 ->send(new ReporteCierre($propiedad, $user));
-        if (1 == $ruta) return redirect()->route('propiedades.orden', 'EFE');
-        else return 'EFE';
-    }   // Final del metodo correoCumpleano.
+        $correo = 'S';
+        if (1 == $ruta)
+            return redirect()->route('propiedades.index', ['correo' => $correo]);
+        elseif (2 == $ruta)
+            return redirect()->route('propiedades.show',
+                                ['propiedad' => $propiedad, 'correo' => $correo]);
+        else return $correo;
+    }   // Final del metodo correoReporteCierre.
 }

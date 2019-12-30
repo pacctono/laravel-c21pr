@@ -75,7 +75,7 @@
                     <span class="oi oi-eye"></span>
                 </a>
                 @if ((4 <= $contacto->resultado_id) and (7 >= $contacto->resultado_id))
-                    <a href="{{ route('agenda.emailcita', $contacto) }}" class="btn btn-link"
+                    <a href="{{ route('agenda.correoCita', $contacto) }}" class="btn btn-link"
                             title="Enviar correo a '{{ $contacto->user->name }}' con esta cita.">
                         <span class="oi oi-envelope-closed"></span>
                     </a>
@@ -93,11 +93,10 @@
                     </a>
                 </td>
                 <td colspan="4">
-                    <a href="{{-- route('agenda.emailtodascitas', $tipo) --}}" class="btn btn-link">
-                        Enviar correo{{ (('users'==$tipo)?'':', a los asesores, ') }}
-                        de las citas con Contactos inciales
-                        {{ (('users'==$tipo)?'a':'para este') }}
-                        {{ (('users'==$tipo)?$contacto->user->name:$tipo) }}
+                    <a href="{{ route('agenda.correoCitas', $contacto->user) }}"
+                            class="btn btn-link">
+                        Enviar correo de las citas con Contactos inciales
+                        a {{ $contacto->user->name }}
                     </a>
                 </td>
             </tr>

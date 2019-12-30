@@ -40,11 +40,17 @@ class ContactoController extends Controller
         $title = 'Listado de ' . $this->tipoPlural;
         $ruta = request()->path();
 
-// En caso de volver luego de haber enviado un correo, ver el metodo 'emailcita', en AgendaController.
+// En caso de volver luego de haber enviado un correo 's', ver el metodo 'emailcita', en AgendaController.
+// En caso de volver luego de haber enviado un correo 'S', 'N', ver el metodo 'self::correoReporteCierre'.
         $alertar = 0;
-        if ('alert' == $orden) {
-            $orden = '';
-            $alertar = 1;
+        if (isset($_GET['correo']) and ($correo = $_GET['correo'])) {
+            if ('S' == $correo) {
+                $alertar = 1;
+            } elseif ('s' == $correo) {
+                $alertar = 2;
+            } elseif ('N' == $correo) {
+                $alertar = -1;
+            }
         }
         $sentido = 'asc';
         if ('' == $orden or is_null($orden)) {
@@ -251,12 +257,16 @@ class ContactoController extends Controller
             'observaciones' => $data['observaciones']
         ]);
 
+        $exito = "El contacto inicial '" . $data['name'] . "' fue agregado con exito.";
 //        if (($data['email']) and            // Se suministró un email.
-//            ((2 == $data['deseo_id']) or (4 == $data['deseo_id'])))   // Vende o da en alquiler.
-//            self::correoOfertaServicio($contacto);
+//            ((2 == $data['deseo_id']) or (4 == $data['deseo_id']))) { // Vende o da en alquiler.
+//            $correo = self::correoOfertaServicio($contacto, 0);
+//            if ('S' == $correo) $exito .= " También, se le envió";
+//            else $exito .= " Pero, no pudo enviarsele";
+//            $exito .= " la 'Oferta de Servicio'.";
+//        }       
 
-        session(['exito' => "El contacto inicial '" . $data['name'] .
-                            "' fue agregado con exito."]);
+        session(['exito' => $exito]);
         return redirect()->route('contactos.create');
     }
 
@@ -270,23 +280,30 @@ class ContactoController extends Controller
             return redirect('login');
         }
 
+        $alertar = 0;
+        if (isset($_GET['correo']) and ($correo = $_GET['correo'])) {
+            if ('S' == $correo) {
+                $alertar = 1;
+            } elseif ('s' == $correo) {
+                $alertar = 2;
+            } elseif ('N' == $correo) {
+                $alertar = -1;
+            }
+        }
         $col_id = '';
         if (15 < strlen($rutRetorno)) {
             $col_id = strtolower(substr($rutRetorno, 17)) . '_id';
         }
         
         $cols = General::columnas('clientes');
-        $tipos = $cols['tipo']['opcion'];
+        $tipos = $cols['tipo']['opcion'];   // Usado para convertir 'contacto' a 'cliente'.
         unset($cols);
-        if (Auth::user()->is_admin) {
-            return view('contactos.show', compact('contacto', 'tipos', 'rutRetorno', 'col_id'));
-        }
-        if (!(is_null($contacto->user_borro))) {
-            return redirect()->back();
-        }
-        if ($contacto->user->id == Auth::user()->id) {
-            unset($tipos['F']);
-            return view('contactos.show', compact('contacto', 'tipos', 'rutRetorno', 'col_id'));
+        if ((Auth::user()->is_admin) or 
+            (is_null($contacto->user_borro) and ($contacto->user_id == Auth::user()->id))) {
+// Si no es el administrador elimine en tipo de cliente 'F' (Familiar).
+            if (!Auth::user()->is_admin) unset($tipos['F']);
+            return view('contactos.show',
+                        compact('contacto', 'tipos', 'rutRetorno', 'col_id', 'alertar'));
         } else {
             return redirect()->back();
         }
@@ -425,15 +442,35 @@ class ContactoController extends Controller
         return redirect()->route('contactos.index');
     }
 
-    public static function correoOfertaServicio(Contacto $contacto)
+    public static function correoOfertaServicio(Contacto $contacto, $ruta=0)
     {
-        $correoCopiar = \App\User::CORREO_COPIAR;
+        $host = env('MAIL_HOST');
+        if (!($ip = gethostbyname($host)) or ($ip == $host)) { // No hay conexon a Internet.
+            //dd($id, $ruta, $host, $ip);
+            $correo = 'N';
+            if (1 == $ruta)
+                return redirect()->route('contactos.index', ['correo' => $correo]);
+            elseif (2 == $ruta)
+                return redirect()->route('contactos.show',
+                                ['contacto' => $contacto, 'correo' => $correo]);
+            else return $correo;
+        }
+
+//        $correoCopiar = \App\User::CORREO_COPIAR;
+        $correoCopiar = \App\User::CORREO_SOCIOS;
 
         $user = User::find(Auth::user()->id);
         //dd($contacto, $user);
         Mail::to($contacto->email, $contacto->name)
+                ->cc($user->email, $user->name)
                 ->bcc($correoCopiar)
                 ->send(new OfertaServicio($contacto, $user));
-        return;
+        $correo = 'S';
+        if (1 == $ruta)
+            return redirect()->route('contactos.index', ['correo' => $correo]);
+        elseif (2 == $ruta)
+            return redirect()->route('contactos.show',
+                                ['contacto' => $contacto, 'correo' => $correo]);
+        else return $correo;
     }   // Final del metodo correoCumpleano.
 }

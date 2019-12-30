@@ -311,6 +311,11 @@ class UserController extends Controller
 
     public static function correoCumpleano()
     {
+        $host = env('MAIL_HOST');
+        if (!($ip = gethostbyname($host)) or ($ip == $host)) { // No hay conexon a Internet.
+            return;
+        }
+
         $users = \App\User::cumpleanosHoy()->get();   // Todos los asesores cumpleaneros.
         if (0 >= $users->count()) return;
         $correoCopiar = \App\User::CORREO_COPIAR;

@@ -3,6 +3,7 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Carbon\Carbon;
 use App\MisClases\Fecha;
 
 class Agenda extends Model
@@ -65,13 +66,16 @@ class Agenda extends Model
     public function getEventoConHoraAttribute()
     {
         if (null == $this->fecha_evento) return '';
-        return $this->fecha_evento->format('d/m/Y H:i (h:i a)');
+        return $this->fecha_evento->format('d/m/Y') . ' ' .
+                $this->getEventoHoraAttribute();
     }
 
     public function getEventoHoraAttribute()
     {
         if (null == $this->fecha_evento) return '';
-        return $this->fecha_evento->format('H:i');
+        if ('T' == $this->tipo) return $this->hora_evento;
+        $fecha = new Carbon(now()->format('Y-m-d ') . $this->hora_evento);
+        return $fecha->format('H:i (h:i a)');
     }
 
     public function getTelefonoFAttribute()

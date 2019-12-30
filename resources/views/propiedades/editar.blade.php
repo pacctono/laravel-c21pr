@@ -8,7 +8,7 @@
     <div class="card-body">
     @include('include.errorData')
 
-        <form class="form align-items-end-horizontal" method="POST"  id="formulario"
+        <form class="form align-items-end-horizontal" method="POST" id="formulario"
                 action="{{ url("/propiedades/{$propiedad->id}") }}">
             {{ method_field('PUT') }}
             {!! csrf_field() !!}
@@ -646,21 +646,23 @@
                 return
             }
             if ('' != $(this).val()) {
-                var j;
-                var opciones = $("#estatus option");
-                var l = opciones.length;
-                for (j=0; j<l; j++) {
-                    if ('P' == opciones[j].value) break;
+                if (!(('P' == $("#estatus").val()) || ('C' == $("#estatus").val()))) {
+                    var j;
+                    var opciones = $("#estatus option");
+                    var l = opciones.length;
+                    for (j=0; j<l; j++) {
+                        if ('P' == opciones[j].value) break;
+                    }
+                    var pagosPendientes = opciones[j].text;
+                    for (j=0; j<l; j++) {
+                        if ('C' == opciones[j].value) break;
+                    }
+                    var cerrado = opciones[j].text;
+                    alert('Al colocar la fecha de la firma, debemos comenzar el cierre de la negociacion,' +
+                            " por eso el <estatus> debe ser " + pagosPendientes + ' o ' + cerrado);
+                    $("#estatus").val('P');
+                    $("#estatus").focus();
                 }
-                var pagosPendientes = opciones[j].text;
-                for (j=0; j<l; j++) {
-                    if ('C' == opciones[j].value) break;
-                }
-                var cerrado = opciones[j].text;
-                alert('Al colocar la fecha de la firma, debemos comenzar el cierre de la negociacion,' +
-                        " por eso el <estatus> debe ser " + pagosPendientes + ' o ' + cerrado);
-                $("#estatus").val('P');
-                $("#estatus").focus();
             }
         })
         $("#formulario").submit(function(ev) {
@@ -668,6 +670,7 @@
                 ev.preventDefault();
                 alert("Una propiedad no puede tener 'fecha de la firma':" +
                         $("#fecha_firma").val() + " y vacia la 'fecha de reserva'");
+                $("#fecha_reserva").focus();
                 return
             }
             if (('' != $("#fecha_reserva").val()) && (('A' == $("#estatus").val()) ||
@@ -675,6 +678,7 @@
                 ev.preventDefault();
                 alert("Una propiedad no puede tener 'fecha de reserva':" +
                         $("#fecha_reserva").val() + " y el 'estatus' [A]ctivo o [S]");
+                $("#estatus").focus();
                 return
             }
             if (('' != $("#fecha_firma").val()) && (('A' == $("#estatus").val()) ||
@@ -682,6 +686,7 @@
                 ev.preventDefault();
                 alert("Una propiedad no puede tener 'fecha de la firma':" + $("#fecha_firma").val()
                         + " y el 'estatus' [A]ctivo, [I]nmueble pendiente o [S]");
+                $("#estatus").focus();
                 return
             }
             if ('1' == $('#asesor_captador_id').val()) {

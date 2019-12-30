@@ -104,9 +104,13 @@
   @endif ((!$movil) and (!isset($accion) or ('html' == $accion)))
 </div>
 
-@if ($alertar)
+@if (isset($alertar))
+@if (0 < $alertar)
   <script>alert('El correo con los turnos fue enviado a cada asesor');</script>
-@endif
+@elseif (0 > $alertar)
+    <script>alert("No fue enviado el correo con los turnos. Probablemente, problemas con Internet! Revise su conexión");</script>
+@endif (0 < $alertar)
+@endif (isset($alertar))
 @if ($turnos->isNotEmpty())
 <table
 @if (!isset($accion) or ('html' == $accion))
@@ -206,7 +210,7 @@
   <tfoot>
     <tr>
       <td colspan="4">
-        <a href="{{ route('agenda.emailturnos') }}" class="btn btn-link">
+        <a href="{{ route('turnos.correoTurnos') }}" class="btn btn-link">
           Enviar correo de los turnos a los asesores
         </a>
       </td>

@@ -314,9 +314,9 @@ class General {
  */
         $control = self::fechaDiaSemana(Carbon::now(Fecha::$ZONA)) . ', ' .
                     Carbon::now(Fecha::$ZONA)->format('d-m-Y h:i a') . "\n";
-        Storage::put('public/asesores.txt', $asesores);
+        Storage::put('public/celular/asesores.txt', $asesores);
         $control .= "asesores.txt\n";
-        Storage::put('public/propiedades.txt', $props);
+        Storage::put('public/celular/propiedades.txt', $props);
         $control .= "propiedades.txt\n";
         $props = '';
 //        $propiedades = \App\Propiedad::where('id', '>', 0)->get();
@@ -324,29 +324,29 @@ class General {
             $props .= str_replace(',"comBanc":"",', ',"comBanc":0,',
                                 str_replace('null', '""', json_encode($p))) . "\n";
         }
-        Storage::put('public/propiedads.txt', $props);
+        Storage::put('public/celular/propiedads.txt', $props);
         $control .= "propiedads.txt\n";
         $clients = '';
         $clientes = \App\Cliente::get();
         foreach ($clientes as $c) $clients .= json_encode($c) . "\n";
-        Storage::put('public/clientes.txt', $clients);
+        Storage::put('public/celular/clientes.txt', $clients);
         $control .= "clientes.txt\n";
         $contacts = '';
         $contactos = \App\Contacto::get();
         foreach ($contactos as $c) $contacts .= json_encode($c) . "\n";
-        Storage::put('public/contactos.txt', $contacts);
+        Storage::put('public/celular/contactos.txt', $contacts);
         $control .= "contactos.txt\n";
         $agends = '';
         $agendas = \App\Agenda::get();
         foreach ($agendas as $a) $agends .= json_encode($a) . "\n";
-        Storage::put('public/agendas.txt', $agends);
+        Storage::put('public/celular/agendas.txt', $agends);
         $control .= "agendas.txt\n";
         $turns = '';
         $turnos = \App\Turno::get();
         foreach ($turnos as $t) $turns .= json_encode($t) . "\n";
-        Storage::put('public/turnos.txt', $turns);
+        Storage::put('public/celular/turnos.txt', $turns);
         $control .= "turnos.txt\n";
-        Storage::put('public/totales.txt', $totales);
+        Storage::put('public/celular/totales.txt', $totales);
         $control .= "totales.txt\n";
         foreach($colsPropiedad as $nombCol => $arr) {
             if (strpos($nombCol, '_id')) {
@@ -357,12 +357,12 @@ class General {
                     $arreglo = $modelo::get(['id', 'descripcion']);
                     $objeto  = Array();
                     foreach($arreglo as $obj) $objeto[$obj['id']] = $obj['descripcion'];
-                    Storage::put('public/' . $nombMod . 's.txt', json_encode($objeto));
+                    Storage::put('public/celular/' . $nombMod . 's.txt', json_encode($objeto));
                     $control .= $nombMod . "s.txt\n";
                 }
             }
             if ('enum' == $arr['tipo']) {
-                Storage::put('public/' . $nombCol . '.txt', json_encode($arr['opcion']));
+                Storage::put('public/celular/' . $nombCol . '.txt', json_encode($arr['opcion']));
                 $control .= $nombCol . ".txt\n";
             }
         }	// foreach($colsPropiedad as $nombCol => $arr) {
@@ -377,16 +377,16 @@ class General {
                     $arreglo = $modelo::get(['id', 'descripcion']);
                     $objeto  = Array();
                     foreach($arreglo as $obj) $objeto[$obj['id']] = $obj['descripcion'];
-                    Storage::put('public/' . $nombMod . 's.txt', json_encode($objeto));
+                    Storage::put('public/celular/' . $nombMod . 's.txt', json_encode($objeto));
                     $control .= $nombMod . "s.txt\n";
                 }
             }
             if ('enum' == $arr['tipo']) {
-                Storage::put('public/' . $nombCol . '.txt', json_encode($arr['opcion']));
+                Storage::put('public/celular/' . $nombCol . '.txt', json_encode($arr['opcion']));
                 $control .= $nombCol . ".txt\n";
             }
         }	// foreach($colsContacto as $nombCol => $arr) {
-        Storage::put('public/control.txt', $control);
+        Storage::put('public/celular/control.txt', $control);
     }       // Final del metodo grabarArchivo.
 
     public static function generarPdf($html, $nombre, $accion="ver")

@@ -203,12 +203,17 @@
         <h1 style="text-align:center;">{{ $title }}</h1>
     @endif (!isset($accion) or ('html' == $accion))
     </div>
+@if (isset($alertar))
 @if (0 < $alertar)
-    <script>alert('Le fue enviado el correo con el Reporte de Cierre de la propiedad.');</script>
+    <script>alert("Le fue enviado el correo con el 'Reporte de Cierre' de la propiedad.");</script>
 @elseif (0 > $alertar)
-    <script>alert('No fue enviado el correo con el Reporte de Cierre de la propiedad.');</script>
-@endif
+    <script>alert("No fue enviado el correo con el 'Reporte de Cierre' de la propiedad. Probablemente, problemas con Internet! Revise su conexión");</script>
+@endif (0 < $alertar)
+@endif (isset($alertar))
     @if ($propiedades->isNotEmpty())
+@if ($paginar)
+    {{ $propiedades->links() }}
+@endif ($paginar)
     <table
     @if (!isset($accion) or ('html' == $accion))
         class="table table-striped table-hover table-bordered"
@@ -563,8 +568,8 @@ Estatus en sistema C21: {{ $propiedad->estatus_c21_alfa.(($propiedad->pagado_cas
 
                 @if ((('P' == $propiedad->estatus) || ('C' == $propiedad->estatus)) &&
                      (isset($propiedad->fecha_reserva) && isset($propiedad->fecha_firma)))
-                    <a href="{{ route('propiedad.email', [$propiedad->id, 1]) }}" class="btn btn-link"
-                            title="Enviar correo a '{{ $propiedad->user->name }}' sobre esta propiedad ({{ $propiedad->codigo }}, {{ $propiedad->nombre }}).">
+                    <a href="{{ route('propiedad.correo', [$propiedad->id, 1]) }}" class="btn btn-link"
+                            title="Enviar correo de 'Reporte de Cierre' a '{{ (1 == $propiedad->user->id)?'Administrador':$propiedad->user->name }}' sobre esta propiedad ({{ $propiedad->codigo }}, {{ $propiedad->nombre }}).">
                         <span class="oi oi-envelope-closed"></span>
                     </a>
                 @endif (('P' == $propiedad->estatus) || ('C' == $propiedad->estatus))

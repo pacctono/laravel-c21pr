@@ -68,11 +68,14 @@ class AgendaController extends Controller
             list ($fecha_desde, $fecha_hasta) = Fecha::periodo($periodo, $fecha_min, $fecha_max);
         }
         //dd($periodo, $fecha_desde, $fecha_hasta);
-// En caso de volver luego de haber enviado un correo, ver el metodo 'emailcita', en AgendaController.
+// En caso de volver luego de haber enviado un correo, ver el metodo 'correoCita', en Agenda(Personal)Controller.
         $alertar = 0;
-        if ('alert' == $orden) {
-            $orden = '';
-            $alertar = 1;
+        if (isset($_GET['correo']) and ($correo = $_GET['correo'])) {
+            if ('s' == $correo) {
+                $alertar = 2;
+            } elseif ('N' == $correo) {
+                $alertar = -1;
+            }
         }
         if ('' == $orden or $orden == null) {
             $orden = 'fecha_evento';
@@ -135,7 +138,7 @@ class AgendaController extends Controller
             return redirect('login');
         }
 
-        if ((!Auth::user()->is_admin) and ($contacto->user->id != Auth::user()->id)) {
+        if ((!Auth::user()->is_admin) and ($contacto->user_id != Auth::user()->id)) {
             return redirect('/agenda');
         }
 
@@ -147,13 +150,13 @@ class AgendaController extends Controller
             $rutaPrevia = null;
 
         //dd($rutaPrevia);
-        $cita = Cita::where('contacto_id', $contacto->id)->get();
+        $cita = Cita::where('contacto_id', $contacto->id);
         if (0 >= $cita->count()) {
             $cita->contacto = $contacto;
             $cita->fecha_cita = NULL;
             $cita->comentarios = NULL;
         } else {
-            $cita=$cita->all()[0];      // Primera fila devuelta de 'Cita' del $contacto->id.
+            $cita=$cita->firstOrFail(); // Primera fila devuelta de 'Cita' del $contacto->id.
         }
         //dd($cita);
         return view('agenda.show', compact('cita', 'rutaPrevia'));
@@ -286,37 +289,60 @@ class AgendaController extends Controller
         return redirect()->route('agenda.show', ['contacto' => $contacto]);
     } // public function update(Request $request, Cita $cita)
 
-    public function emailcita(Contacto $contacto)
+    public function correoCita(Contacto $contacto, $ruta=1) // No puede usar el modelo 'Agenda' porque no esta atado a una 'tabla' de la BD.
     {
         if (!(Auth::check())) {
             return redirect('login');
         }
+/* Permite que el asesor se envie correo.        
         if (!Auth::user()->is_admin) {
             return redirect()->back();
         }
+ */
+        $host = env('MAIL_HOST');
+        if (!($ip = gethostbyname($host)) or ($ip == $host)) { // No hay conexon a Internet.
+            $correo = 'N';
+            if (1 == $ruta)
+                return redirect()->route('agenda', ['correo' => $correo]);
+            elseif (2 == $ruta)
+                return redirect()->route('agenda.show',
+                                ['contacto' => $contacto, 'correo' => $correo]);
+            else return $correo;
+        }
 
-        //return new CitaAsesor($contacto);   // Vista preliminar del correo, en el navegador.
+        //return new CitaAsesor('Contacto', $contacto->id);   // Vista preliminar del correo, en el navegador.
         Mail::to($contacto->user->email, $contacto->user->name)
-                ->send(new CitaAsesor($contacto));
-        return redirect()->route('contactos.orden', 'alert');
-    } // public function emailcita(Contacto $contacto)
+                ->send(new CitaAsesor('Contacto', $contacto->id));
+        return redirect()->route('agenda', ['correo' => 's']);
+    } // public function correoCita(Contacto $contacto)
 
-    public function emailcitas(User $user)
+    public function correoCitas(User $user) // Todas las citas de un asesor.
     {
         if (!(Auth::check())) {
             return redirect('login');
         }
         if (!Auth::user()->is_admin) {
             return redirect()->back();
+        }
+
+        $host = env('MAIL_HOST');
+        if (!($ip = gethostbyname($host)) or ($ip == $host)) { // No hay conexon a Internet.
+            $correo = 'N';
+            if (1 == $ruta)
+                return redirect()->route('users', ['correo' => $correo]);
+            elseif (2 == $ruta)
+                return redirect()->route('users.show',
+                                ['user' => $user, 'correo' => $correo]);
+            else return $correo;
         }
 
         //return new CitasAsesor($user);  // Vista preliminar del correo, en el navegador.
         Mail::to($user->email, $user->name)
                 ->send(new CitasAsesor($user));
-        return redirect()->route('users.orden', 'alert');
-    } // public function emailcitas(User $user)
+        return redirect()->route('users', ['correo' => 's']);
+    } // public function correoCitas(User $user)
 
-    public function emailturnos()
+    public static function correoTodasCitas($desde=null, $hasta=null) // Todas las citas de todos los asesores.
     {
         if (!(Auth::check())) {
             return redirect('login');
@@ -325,42 +351,31 @@ class AgendaController extends Controller
             return redirect()->back();
         }
 
-        //return new TurnosAsesor(User::find(2));  // Vista preliminar del correo, en el navegador.
-        $users = Turno::select("user_id") // Devuelve arreglo de Turno.
-                            ->where('turno', '>', now(Fecha::$ZONA))
-                            ->get();
-        foreach ($users as $user) {
-            $turnos = Turno::where('user_id', $user)
-                            ->where('turno', '>', now(Fecha::$ZONA))
-                            ->orderBy('turno')
-                            ->get();
-            Mail::to($user->email, $user->name)
-                    ->send(new TurnosAsesor($user, $turnos));
-        }
-        return redirect()->route('turnos.orden', 'alert');
-    } // public function emailturnos()
-
-    public function emailtodascitas($tipo='todas')
-    {
-        if (!(Auth::check())) {
-            return redirect('login');
-        }
-        if (!Auth::user()->is_admin) {
-            return redirect()->back();
+        $host = env('MAIL_HOST');
+        if (!($ip = gethostbyname($host)) or ($ip == $host)) { // No hay conexon a Internet.
+            $correo = 'N';
+            if (1 == $ruta)
+                return redirect()->route('agenda', ['correo' => $correo]);
+            elseif (2 == $ruta)
+                return redirect()->route('agenda.show',
+                                ['contacto' => $contacto, 'correo' => $correo]);
+            else return $correo;
         }
 
+        $desde = $desde??Fecha::hoy();  // La hora es colocada en "00:00:00.0".
         //return new CitasAsesor(User::find(2));  // Vista preliminar del correo, en el navegador.
-        $contactos = Contacto::select(DB::raw("user_id"))   // Devuelve arreglo de Contacto.
-                            ->where('fecha_evento','>','now')
-                            ->groupBy('user_id')
-                            ->get();
-        foreach ($contactos as $contacto) {
-            $user = $contacto->user;
+        $usersIds = Agenda::select(DB::raw("distinct user_id"));
+        if ($hasta) $usersIds = $usersIds->whereBetween('fecha_evento', [$desde, $hasta]);
+        else $usersIds = $usersIds->where('fecha_evento', '>=', $desde);
+        $usersIds = $usersIds->get();
+        //dd($usersIds);
+        foreach ($usersIds as $userId) {
+            $user = User::find($userId);
             Mail::to($user->email, $user->name)
-                    ->send(new CitasAsesor($user));
+                    ->send(new CitasAsesor($user, $desde, $hasta));
         }
-        return redirect()->route('agenda.orden', 'alert');
-    } // public function emailtodascitas($tipo='todas')
+        return redirect()->route('agenda', ['correo' => 's']);
+    } // public function correoTodasCitas($tipo='todas')
 
     public function cumpleano(User $user)
     {

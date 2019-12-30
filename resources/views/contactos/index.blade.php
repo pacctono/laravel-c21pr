@@ -24,9 +24,15 @@
         </p>
         @endif (!isset($accion) or ('html' == $accion))
     </div>
-    @if ($alertar)
-        <script>alert('El correo fue enviado al asesor');</script>
-    @endif
+@if (isset($alertar))
+@if (1 == $alertar)
+    <script>alert("Fue enviado el correo con la 'Oferta de Servicio' al contacto inicial.");</script>
+@elseif (2 == $alertar)
+    <script>alert('El correo fue enviado al asesor');</script>
+@elseif (0 > $alertar)
+    <script>alert("No fue enviado el correo con la 'Oferta de Servcio' al contacto inicial. Probablemente, problemas con Internet! Revise su conexión");</script>
+@endif (0 < $alertar)
+@endif (isset($alertar))
     @if ($contactos->isNotEmpty())
     <table
     @if (!isset($accion) or ('html' == $accion))
@@ -149,7 +155,7 @@
                 </form>
                     @if ((4 <= $contacto->resultado_id) and (7 >= $contacto->resultado_id) and
                          (!is_null($contacto->fecha_evento)) and ($contacto->fecha_evento > now()))
-                    <a href="{{ route('agenda.emailcita', $contacto) }}" class="btn btn-link"
+                    <a href="{{ route('agenda.correoCita', $contacto) }}" class="btn btn-link"
                             title="Enviar correo a '{{ $contacto->user->name }}', sobre cita con este contacto inicial">
                         <span class="oi oi-envelope-closed"></span>
                     </a>

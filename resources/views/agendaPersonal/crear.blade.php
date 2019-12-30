@@ -7,7 +7,7 @@
     @include('include.exitoCrear')
     @include('include.errorData')
 
-        <form method="POST" class="form align-items-end-horizontal"
+        <form method="POST" class="form align-items-end-horizontal" id="formulario"
                 action="{{ route('agendaPersonal.store') }}">
         {!! csrf_field() !!}
 
@@ -25,8 +25,43 @@
                         required value="{{ old('hora_cita') }}">
             </div>
             <div class="form-group form-inline mx-1 px-2">
+                <label>Seleccione</label>
+                <select class="form-control form-control-sm" id="seleccion"
+                        title="Seleccione para definir el nombre de la persona de la cita">
+                    <option value="C" title="El nombre de la cita se seleccionara de la lista de contactos registrados">Contacto</option>
+                    <option value="L" title="El nombre de la cita se seleccionara de la lista de clientes registrados">Cliente</option>
+                    <option value="N" title="El nombre de la cita sera suministrada">Nombre</option>
+                </select>
+            </div>
+            <div class="form-group form-inline mx-1 px-2 nombre contacto">
+                <label for="contacto_id">Contacto</label>
+                <select class="form-control form-control-sm" name="contacto_id" id="contacto_id">
+                    <option value="0">Lista de contactos</option>
+                @foreach ($contactos as $contacto)
+                @if (old('contacto_id') == $contacto->id)
+                    <option value="{{ $contacto->id }}" selected>{{ $contacto->name }}</option>
+                @else
+                    <option value="{{ $contacto->id }}">{{ $contacto->name }}</option>
+                @endif
+                @endforeach
+                </select>
+            </div>
+            <div class="form-group form-inline mx-1 px-2 nombre cliente">
+                <label for="cliente_id">Cliente</label>
+                <select class="form-control form-control-sm" name="cliente_id" id="cliente_id">
+                    <option value="0">Lista de clientes</option>
+                @foreach ($clientes as $cliente)
+                @if (old('cliente_id') == $cliente->id)
+                    <option value="{{ $cliente->id }}" selected>{{ $cliente->name }}</option>
+                @else
+                    <option value="{{ $cliente->id }}">{{ $cliente->name }}</option>
+                @endif
+                @endforeach
+                </select>
+            </div>
+            <div class="form-group form-inline mx-1 px-2 nombre name">
                 <label class="control-label" for="name">Nombre</label>
-                <input type="text" class="form-control form-control-sm" size="60"
+                <input type="text" class="form-control form-control-sm" size="50"
                         maxlength="150" name="name" id="name"
                         placeholder="Nombre de la persona, si existe o la conoce"
                         title="Nombre de la persona de la cita"
@@ -44,7 +79,7 @@
 
         <div class="form-row my-0 py-0">
             <div class="form-group form-inline mx-1 px-2">
-                <label for="telefono">Tel&eacute;fono</label>
+                <label for="telefono">Tel&eacute;fono&nbsp;</label>
                 0<select class="form-control form-control-sm" name="ddn" id="ddn">
                     <option value="">ddn</option>
                 @foreach ($ddns as $ddn)
@@ -93,4 +128,85 @@
         </form>
     </div>
 </div>
+@endsection
+
+@section('js')
+<script>
+    $(document).ready(function(){
+        $("div.nombre").hide();
+        if (1 < $("#contacto_id option").length) {    // Se muestra el select si hay contactos.
+            $("#seleccion").val('C');
+            $("div.contacto").show();
+            return;
+        } else if (1 < $("#cliente_id option").length) {  // Se muestra el select si hay clientes.
+            $("#seleccion").val('L');
+            $("div.cliente").show();
+            return;
+        } else {
+            $("#seleccion").val('N');   // Se muestra el input (texto) del name.
+            $("div.name").show();
+            return;
+        }
+        $('#seleccion').on('focusin', function(){
+            console.log("Saving value " + $(this).val());
+            $(this).data('val', $(this).val());
+        });
+        $("#seleccion").change(function(ev){
+            var previo = $(this).data('val');
+            var actual = $(this).val();
+            console.log("Prev value " + previo);
+            console.log("New value " + actual);
+            if ('C' == $(this).val()) {
+                if (1 >= $("#contacto_id option").length) {
+                    alert("Usted no tiene contactos registrados que pueda seleccionar");
+                    $(this).val(previo);
+                    return;
+                }
+                $("div.nombre").hide();
+                $("div.contacto").show();
+                $("#cliente_id").val('0');
+                $("#name").val('');
+                alert('Seleccione el nombre de un contacto de la lista de ' +
+                        'contactos iniciales registrados. Si son los mismos, no necesita ' +
+                        'incluir: telefono, otro_telefono, email y direccion.');
+                $("#contacto_id").focus();
+            } else if ('L' == $(this).val()) {
+                if (1 >= $("#cliente_id option").length) {
+                    alert("Usted no tiene clientes registrados que pueda seleccionar");
+                    $(this).val(previo);
+                    return;
+                }
+                $("div.nombre").hide();
+                $("div.cliente").show();
+                $("#contacto_id").val('0');
+                $("#name").val('');
+                alert('Seleccione el nombre de un cliente de la lista de ' +
+                        'clientes registrados. Si son los mismos, no necesita ' +
+                        'incluir: telefono, otro_telefono, email y direccion.');
+                $("#cliente_id").focus();
+            } else {
+                $("div.nombre").hide();
+                $("div.name").show();
+                $("#contacto_id").val('0');
+                $("#cliente_id").val('0');
+                alert('Suministre el nombre de la persona con quien realizara la cita');
+                $("#name").focus();
+            }
+        })
+        $("#formulario").submit(function(ev) {
+            if (('0' == $("#contacto_id").val()) && ('0' == $("#cliente_id").val()) &&
+                ('' == $("#name").val())) {
+                ev.preventDefault();
+                alert('Tiene que colocar un nombre, seleccionar un contacto o un cliente.');
+                $("div.nombre").hide();
+                $("div.name").show();
+                $("#seleccion").val('N');
+                $("#contacto_id").val('0');
+                $("#cliente_id").val('0');
+                $("#name").focus();
+            }
+        })
+    })
+</script>
+
 @endsection

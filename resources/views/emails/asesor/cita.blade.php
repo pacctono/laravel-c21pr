@@ -1,5 +1,5 @@
 @component('mail::message')
-# Buenos días, {{ $contacto->user->name }}!
+# Buenos días, {{ $modelo->user->name }}!
 
 Por medio del presente te recuerdo tu cita.
 
@@ -8,9 +8,9 @@ Por medio del presente te recuerdo tu cita.
 {{-- @endcomponent --}}
 
 @component('mail::panel')
-    {{ $contacto->name }} el
-    {{ $contacto->evento_dia_semana }}
-    {{ $contacto->evento_con_hora }}.
+    {{ $modelo->name }} el
+    {{ $modelo->evento_dia_semana }}
+    {{ $modelo->evento_con_hora }}.
 @endcomponent
 
 Gracias,<br>

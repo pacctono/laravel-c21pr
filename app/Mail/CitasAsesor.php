@@ -13,14 +13,18 @@ class CitasAsesor extends Mailable
     use Queueable, SerializesModels;
 
     public $asesor;
+    public $desde;
+    public $hasta;
     /**
      * Create a new message instance.
      *
      * @return void
      */
-    public function __construct(User $asesor)
+    public function __construct(User $asesor, $desde=null, $hasta=null)
     {
         $this->asesor = $asesor;
+        $this->desde = $desde;
+        $this->hasta = $hasta;
     }
 
     /**

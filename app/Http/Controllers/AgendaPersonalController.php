@@ -4,7 +4,10 @@ namespace App\Http\Controllers;
 
 use App\AgendaPersonal;
 use App\User;
+use App\Contacto;
+use App\Cliente;
 use App\Bitacora;
+use \App\Mail\CitaPersonalAsesor;
 use App\Venezueladdn;
 use \App\Mail\CitaAsesor;
 use \App\Mail\CitasAsesor;
@@ -112,13 +115,13 @@ class AgendaPersonalController extends Controller
                     'rPeriodo', 'fecha_desde', 'fecha_hasta', 'asesor', 'alertar', 'movil'));
     }
 
-    public function show(AgendaPersonal $agenda)
+    public function show(AgendaPersonal $cita)
     {
         if (!(Auth::check())) {
             return redirect('login');
         }
 
-        if ((!Auth::user()->is_admin) and ($agenda->id != Auth::user()->id)) {
+        if ((!Auth::user()->is_admin) and ($cita->id != Auth::user()->id)) {
             return redirect('/agenda');
         }
 
@@ -129,7 +132,6 @@ class AgendaPersonalController extends Controller
             (1 === preg_match('@agenda/([0-9]+)/@', $rutaPrevia)))
             $rutaPrevia = null;
 
-        $cita = AgendaPersonal::where('id', $agenda->id)->get()[0];
         //dd($cita, $cita->cita_dia_semana);
         return view('agendaPersonal.show', compact('cita', 'rutaPrevia'));
     }
@@ -154,8 +156,16 @@ class AgendaPersonalController extends Controller
         session(['exito' => '']);
         $agente = new Agent();
         $movil  = $agente->isMobile() and true;             // Fuerzo booleana. No funciona al usar el metodo directamente.
+        if (Auth::user()->is_admin) {
+            $contactos = Contacto::all();
+            $clientes  = Cliente::all();
+        } else {
+            $contactos = Contacto::where('user_id', Auth::user()->id)->get();
+            $clientes  = Cliente::where('user_id', Auth::user()->id)->get();
+        }
         $ddns = Venezueladdn::distinct()->get(['ddn'])->all();
-        return view('agendaPersonal.crear', compact('title', 'ddns', 'exito'));
+        return view('agendaPersonal.crear',
+                compact('title', 'contactos', 'clientes', 'ddns', 'exito'));
     }
 
     /**
@@ -171,6 +181,8 @@ class AgendaPersonalController extends Controller
             'fecha_cita' => ['date'],
             'hora_cita'  => ['date_format:H:i'],
             'descripcion' => 'required',
+            'contacto_id' => '',
+            'cliente_id' => '',
             'name' => '',
             'ddn' => '',
             'telefono' => '',
@@ -192,11 +204,69 @@ class AgendaPersonalController extends Controller
         }
         unset($data['ddn']);
 
+        $extra = '';
+        if ('0' == $data['contacto_id']) $data['contacto_id'] = null;
+        else {
+            $contacto = Contacto::findOrFail($data['contacto_id']); // Si falla produce 'ModelNotFoundException'.
+            if ($contacto->telefono) {
+                if (is_null($data['telefono'])) $data['telefono'] = $contacto->telefono;
+                elseif ($data['telefono'] != $contacto->telefono)
+                    $extra .= 'Telefono registrado:' . $contacto->telefono . '. ';
+            }
+            if ($contacto->otro_telefono) {
+                $extra .= 'Otro telefono registrado:' . $contacto->otro_telefono . '. ';
+            }
+            if ($contacto->email) {
+                if (is_null($data['email']) or ('' == trim($data['email'])))
+                    $data['email'] = $contacto->email;
+                elseif ($data['email'] != $contacto->email)
+                    $extra .= 'Email registrado:' . $contacto->email . '. ';
+            }
+            if ($contacto->direccion) {
+                if (is_null($data['direccion']) or ('' == trim($data['direccion'])))
+                    $data['direccion'] = $contacto->direccion;
+                elseif ($data['direccion'] != $contacto->direccion)
+                    $extra .= 'Direccion registrada:' . $contacto->direccion . '. ';
+            }
+            $data['comentarios'] = $extra . trim($data['comentarios']??'');
+        }
+
+        $extra = '';
+        if ('0' == $data['cliente_id']) $data['cliente_id'] = null;
+        else {
+            $cliente = Cliente::findOrFail($data['cliente_id']);    // Si falla produce 'ModelNotFoundException'.
+            if ($cliente->telefono) {
+                if (is_null($data['telefono'])) $data['telefono'] = $cliente->telefono;
+                elseif ($data['telefono'] != $cliente->telefono)
+                    $extra .= 'Telefono registrado:' . $cliente->telefono . '. ';
+            }
+            if ($cliente->otro_telefono) {
+                $extra .= 'Otro telefono registrado:' . $cliente->otro_telefono . '. ';
+            }
+            if ($cliente->email) {
+                if (is_null($data['email']) or ('' == trim($data['email'])))
+                    $data['email'] = $cliente->email;
+                elseif ($data['email'] != $cliente->email)
+                    $extra .= 'Email registrado:' . $cliente->email . '. ';
+            }
+            if ($cliente->direccion) {
+                if (is_null($data['direccion']) or ('' == trim($data['direccion'])))
+                    $data['direccion'] = $cliente->direccion;
+                elseif ($data['direccion'] != $cliente->direccion)
+                    $extra .= 'Direccion registrada:' . $cliente->direccion . '. ';
+            }
+            $data['comentarios'] = $extra . trim($data['comentarios']??'');
+        }
+        if (500 < strlen($data['comentarios']))
+            $data['comentarios'] = substr($data['comentarios'], 0, 500);
+
         $cita = AgendaPersonal::create([        // Devuelve el modelo.
             'user_id'     => Auth::user()->id,
             'fecha_cita'  => $data['fecha_cita'],
             'hora_cita'   => $data['hora_cita'],
             'descripcion' => $data['descripcion'],
+            'contacto_id' => $data['contacto_id'],
+            'cliente_id' => $data['cliente_id'],
             'name'        => $data['name'],
             'telefono'    => $data['telefono'],
             'email'       => $data['email'],
@@ -218,13 +288,13 @@ class AgendaPersonalController extends Controller
      * @param  \App\Contacto  $contacto
      * @return \Illuminate\Http\Response
      */
-    public function edit(AgendaPersonal $agenda)
+    public function edit(AgendaPersonal $cita)
     {
         if (!(Auth::check())) {
             return redirect('login');
         }
 
-        if ((!Auth::user()->is_admin) and ($agenda->id != Auth::user()->id)) {
+        if ((!Auth::user()->is_admin) and ($cita->id != Auth::user()->id)) {
             return redirect('/agenda');
         }
 
@@ -238,9 +308,16 @@ class AgendaPersonalController extends Controller
         $title = 'Editar ' . $this->tipo;
         $agente = new Agent();
         $movil  = $agente->isMobile() and true;             // Fuerzo booleana. No funciona al usar el metodo directamente.
+        if (Auth::user()->is_admin) {
+            $contactos = Contacto::all();
+            $clientes  = Cliente::all();
+        } else {
+            $contactos = Contacto::where('user_id', Auth::user()->id)->get();
+            $clientes  = Cliente::where('user_id', Auth::user()->id)->get();
+        }
         $ddns = Venezueladdn::distinct()->get(['ddn'])->all();
-        $cita = AgendaPersonal::where('id', $agenda->id)->get()[0]; // Devuelve un array de 1 item.
-        return view('agendaPersonal.editar', compact('title', 'cita', 'ddns', 'rutaPrevia'));
+        return view('agendaPersonal.editar',
+                    compact('title', 'cita', 'contactos', 'clientes', 'ddns', 'rutaPrevia'));
     }
 
     /**
@@ -250,13 +327,15 @@ class AgendaPersonalController extends Controller
      * @param  \App\Contacto  $contacto
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, AgendaPersonal $cita)
     {
-        //dd($request, $id);
+        //dd($request, $cita);
         $data = request()->validate([   // Si ocurre error, laravel nos envia al url anterior.
             'fecha_cita' => ['date'],
             'hora_cita'  => ['date_format:H:i:s'],
             'descripcion' => 'required',
+            'contacto_id' => '',
+            'cliente_id' => '',
             'name' => '',
             'ddn' => '',
             'telefono' => '',
@@ -281,7 +360,63 @@ class AgendaPersonalController extends Controller
         }
         unset($data['ddn']);
 
-        $cita = AgendaPersonal::where('id', $id)->get()[0];
+        $extra = '';
+        if ('0' == $data['contacto_id']) $data['contacto_id'] = null;
+        else {
+            $contacto = Contacto::findOrFail($data['contacto_id']); // Si falla produce 'ModelNotFoundException'.
+            if ($contacto->telefono) {
+                if (is_null($data['telefono'])) $data['telefono'] = $contacto->telefono;
+                elseif ($data['telefono'] != $contacto->telefono)
+                    $extra .= 'Telefono registrado:' . $contacto->telefono . '. ';
+            }
+            if ($contacto->otro_telefono) {
+                $extra .= 'Otro telefono registrado:' . $contacto->otro_telefono . '. ';
+            }
+            if ($contacto->email) {
+                if (is_null($data['email']) or ('' == trim($data['email'])))
+                    $data['email'] = $contacto->email;
+                elseif ($data['email'] != $contacto->email)
+                    $extra .= 'Email registrado:' . $contacto->email . '. ';
+            }
+            if ($contacto->direccion) {
+                if (is_null($data['direccion']) or ('' == trim($data['direccion'])))
+                    $data['direccion'] = $contacto->direccion;
+                elseif ($data['direccion'] != $contacto->direccion)
+                    $extra .= 'Direccion registrada:' . $contacto->direccion . '. ';
+            }
+            $data['comentarios'] = $extra . trim($data['comentarios']??'');
+        }
+
+        $extra = '';
+        if ('0' == $data['cliente_id']) $data['cliente_id'] = null;
+        else {
+            $cliente = Cliente::findOrFail($data['cliente_id']);    // Si falla produce 'ModelNotFoundException'.
+            if ($cliente->telefono) {
+                if (is_null($data['telefono'])) $data['telefono'] = $cliente->telefono;
+                elseif ($data['telefono'] != $cliente->telefono)
+                    $extra .= 'Telefono registrado:' . $cliente->telefono . '. ';
+            }
+            if ($cliente->otro_telefono) {
+                $extra .= 'Otro telefono registrado:' . $cliente->otro_telefono . '. ';
+            }
+            if ($cliente->email) {
+                if (is_null($data['email']) or ('' == trim($data['email'])))
+                    $data['email'] = $cliente->email;
+                elseif ($data['email'] != $cliente->email)
+                    $extra .= 'Email registrado:' . $cliente->email . '. ';
+            }
+            if ($cliente->direccion) {
+                if (is_null($data['direccion']) or ('' == trim($data['direccion'])))
+                    $data['direccion'] = $cliente->direccion;
+                elseif ($data['direccion'] != $cliente->direccion)
+                    $extra .= 'Direccion registrada:' . $cliente->direccion . '. ';
+            }
+            $data['comentarios'] = $extra . trim($data['comentarios']??'');
+        }
+        if (500 < strlen($data['comentarios']))
+            $data['comentarios'] = substr($data['comentarios'], 0, 500);
+
+        //$cita = AgendaPersonal::where('id', $id)->get()[0];   // No se necesita, si el parametro de la funcion, arriba, es el mismo del routes/web.php. En todo caso deberia usar findOrFail.
         //dd(gettype($id), $id, (int)$id, $cita, $data);
         $cita->update($data);
         //dd('despues de update', $data, $cita);
@@ -299,4 +434,31 @@ class AgendaPersonalController extends Controller
                                     ['cita' => $cita, 'rutaPrevia' => null]);
     }
 
+    public function correoCita(AgendaPersonal $cita, $ruta=1)
+    {
+        if (!(Auth::check())) {
+            return redirect('login');
+        }
+/* Permite que el asesor se envie correo.        
+        if (!Auth::user()->is_admin) {
+            return redirect()->back();
+        }
+ */
+        $host = env('MAIL_HOST');
+        if (!($ip = gethostbyname($host)) or ($ip == $host)) { // No hay conexon a Internet.
+            $correo = 'N';
+            //dd($cita, $ruta, $ip);
+            if (1 == $ruta)
+                return redirect()->route('agenda', ['correo' => $correo]);
+            elseif (2 == $ruta)
+                return redirect()->route('agenda.show',
+                                ['cita' => $cita, 'correo' => $correo]);
+            else return $correo;
+        }
+
+        //return new CitaAsesor('AgendaPersonal', $cita->id);   // Vista preliminar del correo, en el navegador.
+        Mail::to($cita->user->email, $cita->user->name)
+                ->send(new CitaAsesor('AgendaPersonal', $cita->id));
+        return redirect()->route('agenda', ['correo' => 's']);
+    } // public function correoCita(Contacto $contacto)
 }

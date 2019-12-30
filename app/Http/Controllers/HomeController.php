@@ -40,7 +40,7 @@ class HomeController extends Controller
         $texto4 = $textos->find(4);
         $texto5 = $textos->find(5);
         //dd($cumpleaneros);
-        //dd($cumpleaneros[0]->fecha_cumpleanos);
+        //dd($cumpleaneros->first()->fecha_cumpleanos);
         //dd($alert);
         $nombre = Auth::user()->name;
         if (0 == $alert) {

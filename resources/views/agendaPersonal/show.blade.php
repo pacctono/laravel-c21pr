@@ -7,7 +7,7 @@
                 {{ $cita->cita_dia_semana }}
                 {{ $cita->cita_con_hora }}
             </span>
-        con {{ $cita->name??'<Nombre no suministrado>' }}
+        con {{ $cita->nombre??'<Nombre no suministrado>' }}
     </h4>
     <div class="card-body">
         <p>Telefono de la cita: <span class="alert-info">

@@ -74,13 +74,13 @@ class Turno extends Model
 
     public function getTurnoConHoraAttribute()
     {
-        if (null == $this->turno) return '';    // No tiene sentido, pero.........
+        if (is_null($this->turno)) return '';    // No tiene sentido, pero.........
         return $this->turno->format('d/m/Y H:i a');
     }
 
     public function getHoraTurnoAttribute()
     {
-        if (null == $this->turno) return '';    // No tiene sentido, pero.........
+        if (is_null($this->turno)) return '';    // No tiene sentido, pero.........
         return $this->turno->format('H');
     }
 
@@ -125,6 +125,7 @@ class Turno extends Model
 
     public function getCreadoAttribute()
     {
+        if (is_null($this->create_at)) return '';
         return $this->created_at->timezone(Fecha::$ZONA)->format('d/m/Y');
     }
 }

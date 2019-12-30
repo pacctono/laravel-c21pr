@@ -67,6 +67,11 @@ Route::get('/contactos/{contacto}/{rutRetorno}', 'ContactoController@show')
     ->where('contacto', '[0-9]+')
     ->name('contactos.muestra');
 
+Route::get('/contactos/correo/{contacto}/{ruta}', 'ContactoController@correoOfertaServicio')
+    ->where('contacto', '[0-9]+')
+    ->where('ruta', '[0-2]')
+    ->name('contacto.correo');
+
 Route::get('/turnos', 'TurnoController@index')
     ->name('turnos');
 
@@ -97,6 +102,9 @@ Route::get('/turnos/orden/{orden}/accion/{accion?}', 'TurnoController@index')
 Route::get('/turnos/filtro', 'TurnoController@index');     // Para paginación con filtro.
 Route::post('/turnos/filtro', 'TurnoController@index')
     ->name('turnos.post');
+
+Route::get('/correoTurnos/', 'TurnoController@correoTurnos')
+    ->name('turnos.correoTurnos');
 
 Route::get('/clientes/orden/{orden}/accion/{accion?}', 'ClienteController@index')
     ->where('orden', '[a-zA-Z]+[a-zA-Z0-9_]+(?<!nuevo|crear)')
@@ -137,8 +145,8 @@ Route::get('/agenda/{contacto}/editar', 'AgendaController@edit')
 Route::put('/agenda/{cita}', 'AgendaController@update')
     ->name('agenda.update');
 
-Route::get('/agendaPersonal/{agenda}', 'AgendaPersonalController@show')
-    ->where('agenda', '[0-9]+')
+Route::get('/agendaPersonal/{cita}', 'AgendaPersonalController@show')
+    ->where('cita', '[0-9]+')
     ->name('agendaPersonal.show');
 
 Route::get('/agendaPersonal/crear', 'AgendaPersonalController@create')
@@ -147,12 +155,12 @@ Route::get('/agendaPersonal/crear', 'AgendaPersonalController@create')
 Route::post('/agendaPersonal', 'AgendaPersonalController@store')
     ->name('agendaPersonal.store');
 
-Route::get('/agendaPersonal/{agenda}/editar', 'AgendaPersonalController@edit')
-    ->where('agenda', '[0-9]+')
+Route::get('/agendaPersonal/{cita}/editar', 'AgendaPersonalController@edit')
+    ->where('cita', '[0-9]+')
     ->name('agendaPersonal.edit');
 
-Route::put('/agendaPersonal/{agenda}', 'AgendaPersonalController@update')
-    ->where('agenda', '[0-9]+')
+Route::put('/agendaPersonal/{cita}', 'AgendaPersonalController@update')
+    ->where('cita', '[0-9]+')
     ->name('agendaPersonal.update');
 
 Route::get('/propiedades/orden/{orden}/accion/{accion?}', 'PropiedadController@index')
@@ -175,10 +183,10 @@ Route::get('/propiedades/{propiedad}/{rutRetorno}', 'PropiedadController@show')
     ->where('propiedad', '[0-9]+')
     ->name('propiedades.muestra');
 
-Route::get('/propiedades/email/{propiedad}/{ruta}', 'PropiedadController@correoReporteCierre')
+Route::get('/propiedades/correo/{propiedad}/{ruta?}', 'PropiedadController@correoReporteCierre')
     ->where('propiedad', '[0-9]+')
-    ->where('ruta', '[01]')
-    ->name('propiedad.email');
+    ->where('ruta', '[012]')
+    ->name('propiedad.correo');
 
 Route::get('/reportes/tipo/{tipo}/accion/{accion?}', 'ReporteController@index')
     ->name('reportes');
@@ -511,17 +519,19 @@ Route::delete('/textos/{texto}', 'TextoController@destroy')
     ->name('texto.destroy')
     ->middleware('admin');
 
-Route::get('/emailcita/{contacto}', 'AgendaController@emailcita')
-    ->name('agenda.emailcita');
+Route::get('/correoCita/{contacto}/{ruta?}', 'AgendaController@correoCita')
+    ->where('ruta', '[12]')
+    ->name('agenda.correoCita');
 
-Route::get('/emailcitas/{user}', 'AgendaController@emailcitas')
-    ->name('agenda.emailcitas');
+Route::get('/correoCitaPersonal/{cita}/{ruta?}', 'AgendaPersonalController@correoCita')
+    ->where('ruta', '[12]')
+    ->name('agendaPersonal.correoCita');
 
-Route::get('/emailturnos/', 'AgendaController@emailturnos')
-    ->name('agenda.emailturnos');
+Route::get('/correoCitas/{user}', 'AgendaController@correoCitas')
+    ->name('agenda.correoCitas');
 
-Route::get('/emailtodascitas/{tipo}', 'AgendaController@emailtodascitas')
-    ->name('agenda.emailtodascitas');
+Route::get('/correoTodasCitas/{desde?}/{hasta?}', 'AgendaController@correoTodasCitas')
+    ->name('agenda.correoTodasCitas');
 
 Route::get('/cumpleano/{user}', 'AgendaController@cumpleano')
     ->name('agenda.cumpleano');
@@ -529,7 +539,7 @@ Route::get('/cumpleano/{user}', 'AgendaController@cumpleano')
 Route::get('pdf','PdfController@getIndex');
 Route::get('pdf/generar','PdfController@getGenerar');
 
-Route::get('/email', function() {
+Route::get('/correo', function() {
 //    $turnos = \App\Turno::whereBetween('turno', ['2019-12-02 00:00:00', '2019-12-08 23:59:59'])
 //    $user   = \App\User::find(18);
 //    $turnos = \App\Turno::where('user_id', $user->id)

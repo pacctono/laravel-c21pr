@@ -6,10 +6,9 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use App\Contacto;       // Este 'name space' no es necesario. No se usa el modelo, directamente.
-use App\AgendaPersonal; // Este 'name space' no es necesario. No se usa el modelo, directamente.
+use App\AgendaPersonal;
 
-class CitaAsesor extends Mailable
+class CitaPersonalAsesor extends Mailable
 {
     use Queueable, SerializesModels;
 
@@ -19,10 +18,9 @@ class CitaAsesor extends Mailable
      *
      * @return void
      */
-    public function __construct($modelo, $id)
+    public function __construct(AgendaPersonal $cita)
     {
-        $nombreModelo = "\App\\$modelo";
-        $this->modelo = $nombreModelo::findOrFail($id); // Si falla produce 'ModelNotFoundException'.
+        $this->modelo = $cita;
     }
 
     /**
@@ -33,7 +31,7 @@ class CitaAsesor extends Mailable
     public function build()
     {
         return $this->markdown('emails.asesor.cita')
-                ->subject('Cita con su contacto inicial ' . $this->modelo->name)
+                ->subject('Cita personal con ' . $this->modelo->name)
                 ->from('puentereal@centurt21.com.ve', 'Century21 Puente Real');
     }
 }

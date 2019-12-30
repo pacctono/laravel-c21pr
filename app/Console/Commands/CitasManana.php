@@ -3,23 +3,24 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
-use App\Http\Controllers\TurnoController;
+use App\MisClases\Fecha;
+use App\Http\Controllers\AgendaController;
 
-class TurnosSemanaPasada extends Command
+class CitasManana extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'correo:turnosIncSemPas';
+    protected $signature = 'citas:manana';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Envia correo a la Gerente (Sra Silvia Caraballo) con los turnos incumplidos de la semana pasada.';
+    protected $description = 'Envia por correo electronico las citas de mañana a cada asesor.';
 
     /**
      * Create a new command instance.
@@ -38,6 +39,7 @@ class TurnosSemanaPasada extends Command
      */
     public function handle()
     {
-        TurnoController::correoTurnosSemanaPasada();
+	    $manana = Fecha::manana();
+	    AgendaController::correoTodasCitas($manana, $manana);
     }
 }

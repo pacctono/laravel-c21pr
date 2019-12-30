@@ -2,6 +2,15 @@
 
 @section('content')
 <div class="card">
+@if (isset($alertar))
+@if (1 == $alertar)
+    <script>alert("Fue enviado el correo con la 'Oferta de Servicio' al contacto inicial.");</script>
+{{--@elseif (2 == $alertar)
+    <script>alert('El correo fue enviado al asesor');</script>--}}
+@elseif (0 > $alertar)
+    <script>alert("No fue enviado el correo con la 'Oferta de Servcio' al contacto inicial. Probablemente, problemas con Internet! Revise su conexión");</script>
+@endif (0 > $alertar)
+@endif (isset($alertar))
     <div class="row card-header ft-grande">
         <div class="col-lg-10">
             Contacto inicial:
@@ -234,6 +243,12 @@
             @endif ('' == $col_id)
 		            Regresar
                 </a>
+            @if (($contacto->email) and ((2 == $contacto->deseo_id) or (4 == $contacto->deseo_id)))
+                <a href="{{ route('contacto.correo', [$contacto, 2]) }}" class="btn btn-link"
+                        title="Enviar correo con la 'Oferta de Servicio' a este contacto inicial.">
+                    Oferta de Servicio
+                </a>
+            @endif (($contacto->email) and ((2 == $contacto->deseo_id) or (4 == $contacto->deseo_id)))
             </div>
         </div>
     </div>

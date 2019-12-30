@@ -73,11 +73,14 @@ class TurnoController extends Controller
             list ($fecha_desde, $fecha_hasta) = Fecha::periodo($periodo, $fecha_min, $fecha_max);
         }
 //        dd($periodo, $fecha_desde, $fecha_hasta);
-// En caso de volver luego de haber enviado un correo, ver el metodo 'emailcita', en AgendaController.
+// En caso de volver luego de haber enviado un correo, ver el metodo 'correocita', en AgendaController.
         $alertar = 0;
-        if ('alert' == $orden) {
-            $orden = '';
-            $alertar = 1;
+        if (isset($_GET['correo']) and ($correo = $_GET['correo'])) {
+            if ('s' == $correo) {
+                $alertar = 2;
+            } elseif ('N' == $correo) {
+                $alertar = -1;
+            }
         }
         if ('' == $orden or is_null($orden)) {
             $orden = 'turno';
@@ -363,8 +366,51 @@ class TurnoController extends Controller
     {
     }
 
-    public static function emailTurnosSemanaPasada()
+    public function correoTurnos()
     {
+        if (!(Auth::check())) {
+            return redirect('login');
+        }
+        if (!Auth::user()->is_admin) {
+            return redirect()->back();
+        }
+
+        $host = env('MAIL_HOST');
+        if (!($ip = gethostbyname($host)) or ($ip == $host)) { // No hay conexon a Internet.
+            $correo = 'N';
+            if (1 == $ruta)
+                return redirect()->route('turnos.index', ['correo' => $correo]);
+            elseif (2 == $ruta)         // Nunca deberia suceder porque 'show' no existe.
+                return redirect()->route('turnos.index',     // La ruta 'show' no existe.
+                                ['correo' => $correo]);
+            else return $correo;
+        }
+
+        //return new TurnosAsesor(User::find(2));  // Vista preliminar del correo, en el navegador.
+        $users = Turno::select("user_id") // Devuelve arreglo de Turno.
+                            ->where('turno', '>', now())    // Laravel asume 'UTC' para todas las columnas 'date' de la BdD.
+//                            ->where('turno', '>', now(Fecha::$ZONA))
+                            ->groupBy('turno')
+                            ->get();
+        foreach ($users as $user) { // $users contiene varios objetos Turno, solo con 'user_id'. Ver arriba.
+            $turnos = Turno::where('user_id', $user->user_id)
+                            ->where('turno', '>', now())    // Laravel asume 'UTC' para todas las columnas 'date' de la BdD.
+//                            ->where('turno', '>', now(Fecha::$ZONA))
+                            ->orderBy('turno')
+                            ->get();
+            Mail::to($user->user->email, $user->user->name) // $user es un objeto Turno. Ver arriba.
+                    ->send(new TurnosAsesor($user->user_id, $turnos));
+        }
+        return redirect()->route('turnos.index', ['correo' => 's']);
+    } // public function correoTurnos()
+
+    public static function correoTurnosSemanaPasada()
+    {
+        $host = env('MAIL_HOST');
+        if (!($ip = gethostbyname($host)) or ($ip == $host)) { // No hay conexon a Internet.
+            return;
+        }
+
         $periodo['periodo'] = 'semana_pasada';
         list($fecha_desde, $fecha_hasta) = Fecha::periodo($periodo);
         $turnos = Turno::whereBetween('turno', [$fecha_desde, $fecha_hasta])->get();
@@ -373,7 +419,7 @@ class TurnoController extends Controller
         Mail::to($correoGerente)
                 ->send(new TurnosErradosSemanaPasada($turnos));
         return;
-    }
+    } // function correoTurnosSemanaPasada()
 
     public static function actualizarAviso()
     {

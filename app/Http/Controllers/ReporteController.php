@@ -357,9 +357,9 @@ class ReporteController extends Controller
             return redirect()->back();
         }
 
-        $ruta = request()->path();
-        $tipo = strtolower(substr($ruta, 18, strpos($ruta, '/', 18)-18));
-        $title = $this->titulo . 'del ' . 'asesor' . ': ' . User::find($id)->name;
+        $ruta = request()->path();  // reportes/contactosUser/[id]/id; 18: "User..."
+        $tipo = strtolower(substr($ruta, 18, strpos($ruta, '/', 18)-18));   // "user"
+        $title = $this->titulo . 'del ' . 'asesor' . ': ' . User::findOrFail($id)->name;
 
         if ('' == $orden or is_null($orden)) {
             $orden = 'id';

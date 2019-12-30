@@ -86,7 +86,7 @@ class LoginController extends Controller
             //dd($ahora, $horaTardeMananaDesde, $horaTardeTardeDesde, $nroTurnosHoy, $tarde);
             $loginTurno = True;
             if (1 == $nroTurnosHoy) {
-                $turno = $turnos[0];    // Turno de la ma#ana o la tarde.
+                $turno = $turnos[0];    // Turno de la ma#ana o la tarde. También, $turnos->first();
                 $horaTurno = $turno->hora_turno;
                 if ('08' == $horaTurno) {
                     if ('tm' == $tarde) $alertar = -2;   // tm:tarde en la ma#ana

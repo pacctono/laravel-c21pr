@@ -10,9 +10,10 @@ use App\MisClases\General;
 class AgendaPersonal extends Model
 {
     protected $fillable = [
-        'user_id', 'fecha_cita', 'hora_cita', 'descripcion', 'name',
-        'telefono', 'email', 'direccion', 'fecha_evento', 'hora_evento',
-        'comentarios', 'user_actualizo', 'user_borro',
+        'user_id', 'fecha_cita', 'hora_cita', 'descripcion', 'contacto_id',
+        'cliente_id', 'name', 'telefono', 'email', 'direccion',
+        'fecha_evento', 'hora_evento', 'comentarios', 'user_actualizo',
+        'user_borro',
     ];
     protected $dates = [
         'fecha_cita', 'fecha_evento', 'created_at', 'updated_at', 'deleted_at'
@@ -26,6 +27,16 @@ class AgendaPersonal extends Model
         return $this->belongsTo(User::class); // Si llave foranea, diferente a esperada, usamos 2do parametro.
     }
 
+    public function contacto()    // user_id
+    {
+        return $this->belongsTo(Contacto::class); // Si llave foranea, diferente a esperada, usamos 2do parametro.
+    }
+
+    public function cliente()    // user_id
+    {
+        return $this->belongsTo(Cliente::class); // Si llave foranea, diferente a esperada, usamos 2do parametro.
+    }
+
     public function userActualizo()    // user_id
     {
         return $this->belongsTo(User::class, 'user_actualizo'); // Si llave foranea, diferente a esperada, usamos 2do parametro.
@@ -36,6 +47,12 @@ class AgendaPersonal extends Model
         return $this->belongsTo(User::class, 'user_borro'); // Si llave foranea, diferente a esperada, usamos 2do parametro.
     }
 
+    public function getNombreAttribute()
+    {
+        if (0 < $this->contacto_id) return $this->contacto->name;
+        elseif (0 < $this->cliente_id) return $this->cliente->name;
+        else return $this->name;
+    }
     public function getFechaCitaBdAttribute()
     {
         return General::fechaBd($this->fecha_cita);

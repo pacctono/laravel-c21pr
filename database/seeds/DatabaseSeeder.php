@@ -68,8 +68,12 @@ class DatabaseSeeder extends Seeder
          from turnos t)
         union
         (select id AS contacto_id, a.user_id AS user_id, 'A' AS tipo, a.fecha_cita AS fecha_evento,
-                a.hora_cita AS hora_evento, a.descripcion AS descripcion, a.name AS name,
-		a.telefono AS telefono, a.email AS email, a.direccion AS direccion
+                a.hora_cita AS hora_evento, a.descripcion AS descripcion,
+                IF(0<IFNULL(contacto_id,0),
+                    (SELECT name FROM contactos c WHERE c.id=a.contacto_id),
+                        IF(0<IFNULL(cliente_id,0),(SELECT name FROM clientes c WHERE c.id=a.cliente_id),
+                            a.name)) AS name,
+		        a.telefono AS telefono, a.email AS email, a.direccion AS direccion
          from agenda_personals a)
         order by 1,2;");
     }

@@ -1,12 +1,14 @@
 @extends('layouts.app')
 
 @section('content')
-@if ('EFE' == $resp)
-    <script>alert('Le fue enviado el correo con el Reporte de Cierre de la propiedad.');</script>
-@elseif ('ENFE' == $resp)
-    <script>alert('No fue enviado el correo con el Reporte de Cierre de la propiedad.');</script>
-@endif
 <div class="card">
+@if (isset($alertar))
+@if (0 < $alertar)
+    <script>alert("Le fue enviado el correo con el 'Reporte de Cierre' de esta propiedad.");</script>
+@elseif (0 > $alertar)
+    <script>alert("No fue enviado el correo con el 'Reporte de Cierre' de esta propiedad. Probablemente, problemas con Internet! Revise su conexión");</script>
+@endif ('S' == $alertar)
+@endif (isset($alertar))
     <h4 class="card-header">Propiedad:
         [{{ $propiedad->id}}]{{ $propiedad->codigo }} 
         {{ substr($propiedad->nombre, 0, 30) }}
@@ -341,6 +343,13 @@
                 Ir a la lista de propiedades
             </button>
         </a>
+    @if ((('P' == $propiedad->estatus) || ('C' == $propiedad->estatus)) &&
+            (isset($propiedad->fecha_reserva) && isset($propiedad->fecha_firma)))
+        <a href="{{ route('propiedad.correo', [$propiedad->id, 2]) }}" class="btn btn-link"
+                title="Enviar correo de 'Reporte de Cierre' a '{{ (1 == $propiedad->user->id)?'Administrador':$propiedad->user->name }}' sobre esta propiedad ({{ $propiedad->codigo }}, {{ $propiedad->nombre }}).">
+            Reporte de Cierre
+        </a>
+    @endif (('P' == $propiedad->estatus) || ('C' == $propiedad->estatus))
     </p>
     </div>
 </div>

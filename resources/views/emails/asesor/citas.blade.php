@@ -9,10 +9,11 @@ Por medio del presente te recuerdo tus citas.
 
 @component('mail::panel')
     <ul>
-    @foreach ($asesor->contactos()->orderBy('fecha_evento')->get() as $contacto)
-        <li>{{ $contacto->name }} el
-        {{ $contacto->evento_dia_semana }}
-        {{ $contacto->evento_con_hora }}.
+{{--    @foreach ($asesor->agendas()->orderBy('fecha_evento')->get() as $cita) --}}
+    @foreach ($asesor->citas($desde, $hasta) as $cita)
+        <li>{{ $cita->name??'Turno' }} el
+        {{ $cita->evento_dia_semana }}
+        {{ $cita->evento_con_hora }}.
     @endforeach
     </ul>
 @endcomponent

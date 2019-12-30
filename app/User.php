@@ -15,16 +15,21 @@ class User extends Authenticatable
     use Notifiable;
     use SoftDeletes;
 
-    public const CORREO_COPIAR = ['email' => 'aliriomendozacarrero@gmail.com', 'name' => 'Alirio Mendoza'];
-    public const CORREO_GERENTE = ['email' => 'scaraballoc21puentereal@gmail.com', 'name' => 'Silvia Caraballo'];
-    public const CORREO_ADMINISTRADOR = ['email' => '', 'name' => ''];
+    public const CORREO_COPIAR = [
+        [ 'email' => 'aliriomendozacarrero@gmail.com', 'name' => 'Alirio Mendoza' ]
+    ];
+    public const CORREO_GERENTE = [
+        ['email' => 'scaraballoc21puentereal@gmail.com', 'name' => 'Silvia Caraballo']
+    ];
+    public const CORREO_ADMINISTRADOR = [
+        ['email' => '', 'name' => 'Javier Aponte']
+    ];
     public const CORREO_SOCIOS = [
         ['email' => 'aliriomendozacarrero@gmail.com', 'name' => 'Alirio Mendoza'],
         ['email' => 'davidh.plc@gmail.com', 'name' => 'David Henandez'],
         ['email' => 'scaraballoc21puentereal@gmail.com', 'name' => 'Silvia Caraballo'], 
         ['email' => 'migdamar_1@hotmail.com', 'name' => 'Migdamar Brito']
     ];
-    public const CORREO_ADMIN = 'aliriomendozacarrero@gmail.com';
 
     /**
      * The attributes that are mass assignable.
@@ -112,12 +117,14 @@ class User extends Authenticatable
         return $this->hasMany(AgendaPersonal::class, 'user_actualizo'); // Si llave foranea, diferente a esperada, usamos 2do parametro.
     }
 
-    public function citas($fecha=null)
+    public function citas($fecha_desde=null, $fecha_hasta=null)
     {
 // Todas las fechas grabadas en la bd se asumen 'UTC'. Esto es un tema un poco complejo.
 // 'fecha_evento' asume hora '00:00' UTC, Si $fecha es en Caracas, hora:00:00 es 04:00 UTC.
-        $fecha = $fecha??Carbon::today();    // hoy en UTC
-        return $this->agendas->where('fecha_evento', '>=', $fecha);
+        $fecha_desde = $fecha_desde??Fecha::hoy();
+        if ($fecha_hasta)
+            return $this->whereBetween('fecha_evento', [$fecha_desde, $fecha_hasta]);
+        else return $this->agendas->where('fecha_evento', '>=', $fecha_desde);
     }
 
     public function propiedades()    // user_id

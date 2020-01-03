@@ -121,9 +121,11 @@ class User extends Authenticatable
     {
 // Todas las fechas grabadas en la bd se asumen 'UTC'. Esto es un tema un poco complejo.
 // 'fecha_evento' asume hora '00:00' UTC, Si $fecha es en Caracas, hora:00:00 es 04:00 UTC.
-        $fecha_desde = $fecha_desde??Fecha::hoy();
+        $fecha_desde = $fecha_desde??Fecha::hoy()->format('Y-m-d');
         if ($fecha_hasta)
-            return $this->whereBetween('fecha_evento', [$fecha_desde, $fecha_hasta]);
+            return $this->agendas   // No existe whereBetween en Collection.
+                        ->where('fecha_evento', '>=', new Carbon($fecha_desde)) // Collection funciona mejor
+                        ->where('fecha_evento', '<=', new Carbon($fecha_hasta));// con Carbon.
         else return $this->agendas->where('fecha_evento', '>=', $fecha_desde);
     }
 

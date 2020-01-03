@@ -39,7 +39,7 @@ class CitasManana extends Command
      */
     public function handle()
     {
-	    $manana = Fecha::manana();
-	    AgendaController::correoTodasCitas($manana, $manana);
+	    $manana = Fecha::manana()->format('Y-m-d');
+	    AgendaController::correoTodasCitas($manana, $manana, 'C');
     }
 }

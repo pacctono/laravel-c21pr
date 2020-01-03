@@ -62,6 +62,7 @@ class Kernel extends ConsoleKernel
         $schedule->command('citas:manana')
                     ->timezone('America/Caracas')   // Definido en la funcion anterior +5.8.
                     ->twiceDaily(17, 21)
+                    ->sendOutputTo('/home/pablo/salidas/citasManana.txt')
                     ;
 
         $schedule->command('correo:turnosIncSemPas')

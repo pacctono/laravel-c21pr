@@ -342,39 +342,47 @@ class AgendaController extends Controller
         return redirect()->route('users', ['correo' => 's']);
     } // public function correoCitas(User $user)
 
-    public static function correoTodasCitas($desde=null, $hasta=null) // Todas las citas de todos los asesores.
+    public static function correoTodasCitas($desde=null, $hasta=null, $comando=null) // Todas las citas de todos los asesores.
     {
-        if (!(Auth::check())) {
-            return redirect('login');
-        }
-        if (!Auth::user()->is_admin) {
-            return redirect()->back();
+        if (is_null($comando)) {
+            if (!(Auth::check())) {
+                return redirect('login');
+            }
+            if (!Auth::user()->is_admin) {
+                return redirect()->back();
+            }
         }
 
         $host = env('MAIL_HOST');
+        $correo = 'N';
         if (!($ip = gethostbyname($host)) or ($ip == $host)) { // No hay conexon a Internet.
-            $correo = 'N';
-            if (1 == $ruta)
-                return redirect()->route('agenda', ['correo' => $correo]);
-            elseif (2 == $ruta)
-                return redirect()->route('agenda.show',
-                                ['contacto' => $contacto, 'correo' => $correo]);
-            else return $correo;
+            if (is_null($comando)) return redirect()->route('agenda', ['correo' => $correo]);
+            return $correo;
         }
 
-        $desde = $desde??Fecha::hoy();  // La hora es colocada en "00:00:00.0".
-        //return new CitasAsesor(User::find(2));  // Vista preliminar del correo, en el navegador.
+        $correo = 'X';
+        $desde = $desde??Fecha::hoy()->format('Y-m-d');  // La BdD funciona con 'YYYY-mm-dd'.
+        //return new CitasAsesor(User::find(1));  // Vista preliminar del correo, en el navegador.
         $usersIds = Agenda::select(DB::raw("distinct user_id"));
         if ($hasta) $usersIds = $usersIds->whereBetween('fecha_evento', [$desde, $hasta]);
         else $usersIds = $usersIds->where('fecha_evento', '>=', $desde);
         $usersIds = $usersIds->get();
+        if ($usersIds->isEmpty()) {
+            if ('C' == $comando) return $correo;
+            else return redirect()->route('agenda', ['correo' => $correo]);
+        }
         //dd($usersIds);
         foreach ($usersIds as $userId) {
-            $user = User::find($userId);
-            Mail::to($user->email, $user->name)
-                    ->send(new CitasAsesor($user, $desde, $hasta));
+            $user = User::findOrFail($userId)->first();
+            //dd($user);
+            if ($user->citas($desde, $hasta)->isNotEmpty()) {
+                Mail::to($user->email, $user->name)
+                        ->send(new CitasAsesor($user, $desde, $hasta));
+                $correo = 's';
+            }
         }
-        return redirect()->route('agenda', ['correo' => 's']);
+        if ('C' == $comando) return $correo;
+        else return redirect()->route('agenda', ['correo' => $correo]);
     } // public function correoTodasCitas($tipo='todas')
 
     public function cumpleano(User $user)

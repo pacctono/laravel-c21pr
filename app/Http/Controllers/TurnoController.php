@@ -413,8 +413,9 @@ class TurnoController extends Controller
 
         $periodo['periodo'] = 'semana_pasada';
         list($fecha_desde, $fecha_hasta) = Fecha::periodo($periodo);
-        $turnos = Turno::whereBetween('turno', [$fecha_desde, $fecha_hasta])->get();
-        $turnos = $turnos->where('tarde', '!=', '');
+        $turnos = Turno::whereBetween('turno', [$fecha_desde, $fecha_hasta])->get();    // "whereBetween" en es metodo de Eloquent.
+        $turnos = $turnos->where('tarde', '!=', '');    // 'where' es un metodo de la Collection.
+        if ($turnos->isEmpty()) return;
         $correoGerente = User::CORREO_GERENTE;
         Mail::to($correoGerente)
                 ->send(new TurnosErradosSemanaPasada($turnos));

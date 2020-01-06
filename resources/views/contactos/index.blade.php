@@ -34,6 +34,9 @@
 @endif (0 < $alertar)
 @endif (isset($alertar))
     @if ($contactos->isNotEmpty())
+@if ((!$movil) and (!isset($accion) or ('html' == $accion)))
+    {{ $contactos->links() }}
+@endif ((!$movil) and (!isset($accion) or ('html' == $accion)))
     <table
     @if (!isset($accion) or ('html' == $accion))
         class="table table-striped table-hover table-bordered"

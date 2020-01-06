@@ -100,6 +100,9 @@
     <script>alert('Fue enviado un correo a cada asesor con todas sus citas.');</script>
 @endif
 @if ($agendas->isNotEmpty())
+@if (!$movil)
+{{ $agendas->links() }}
+@endif
 <table class="table table-striped table-hover table-bordered">
   <thead class="thead-dark">
     <tr>

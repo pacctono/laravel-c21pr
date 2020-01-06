@@ -125,7 +125,7 @@ class LoginController extends Controller
                     'tipo' => 'T',
                     'fecha' => $ahora,
                     'descripcion' => 'Llego tarde el ' . $fecha . ' en la ' . $turno->fec_tur,
-                    'user_creo' => $user->user_creo
+                    'user_creo' => $user->id
                 ]);
             }
         }

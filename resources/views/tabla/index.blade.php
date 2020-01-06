@@ -18,6 +18,9 @@
     @endif (!isset($accion) or ('html' == $accion))
 
     @if ($arreglo->isNotEmpty())
+@if ((!$movil) and (!isset($accion) or ('html' == $accion)))
+    {{ $arreglo->links() }}
+@endif ((!$movil) and (!isset($accion) or ('html' == $accion)))
     <table
     @if (!isset($accion) or ('html' == $accion))
         class="table table-striped table-hover table-bordered"

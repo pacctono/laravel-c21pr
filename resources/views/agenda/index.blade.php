@@ -111,6 +111,9 @@
 @endif (0 < $alertar)
 @endif (isset($alertar))
 @if ($agendas->isNotEmpty())
+@if ((!$movil) and (!isset($accion) or ('html' == $accion)))
+    {{ $agendas->links() }}
+@endif ((!$movil) and (!isset($accion) or ('html' == $accion)))
 <table
 @if (!isset($accion) or ('html' == $accion))
   class="table table-striped table-hover table-bordered"

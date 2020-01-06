@@ -6,6 +6,7 @@ use App\Turno;
 use App\User;
 use App\Bitacora;
 use App\Aviso;
+use \App\Mail\TurnosAsesor;
 use \App\Mail\TurnosErradosSemanaPasada;
 use Illuminate\Validation\Rule;
 use Illuminate\Http\Request;
@@ -376,32 +377,34 @@ class TurnoController extends Controller
         }
 
         $host = env('MAIL_HOST');
+        $correo = 'N';
         if (!($ip = gethostbyname($host)) or ($ip == $host)) { // No hay conexon a Internet.
-            $correo = 'N';
             if (1 == $ruta)
-                return redirect()->route('turnos.index', ['correo' => $correo]);
+                return redirect()->route('turnos', ['correo' => $correo]);
             elseif (2 == $ruta)         // Nunca deberia suceder porque 'show' no existe.
-                return redirect()->route('turnos.index',     // La ruta 'show' no existe.
+                return redirect()->route('turnos',     // La ruta 'show' no existe.
                                 ['correo' => $correo]);
             else return $correo;
         }
 
         //return new TurnosAsesor(User::find(2));  // Vista preliminar del correo, en el navegador.
-        $users = Turno::select("user_id") // Devuelve arreglo de Turno.
+        $usersIds = Turno::select(DB::raw("distinct user_id")) // Devuelve arreglo de Turno.
                             ->where('turno', '>', now())    // Laravel asume 'UTC' para todas las columnas 'date' de la BdD.
 //                            ->where('turno', '>', now(Fecha::$ZONA))
-                            ->groupBy('turno')
                             ->get();
-        foreach ($users as $user) { // $users contiene varios objetos Turno, solo con 'user_id'. Ver arriba.
-            $turnos = Turno::where('user_id', $user->user_id)
-                            ->where('turno', '>', now())    // Laravel asume 'UTC' para todas las columnas 'date' de la BdD.
-//                            ->where('turno', '>', now(Fecha::$ZONA))
-                            ->orderBy('turno')
-                            ->get();
-            Mail::to($user->user->email, $user->user->name) // $user es un objeto Turno. Ver arriba.
-                    ->send(new TurnosAsesor($user->user_id, $turnos));
+        if ($usersIds->isEmpty()) {
+            return redirect()->route('turnos', ['correo' => $correo]);
         }
-        return redirect()->route('turnos.index', ['correo' => 's']);
+        foreach ($usersIds as $userId) {
+            $user = User::findOrFail($userId)->first(); // No entiendo porque find me devuelve un arreglo.
+            //dd($user);
+            $turnos = $user->turnos
+                            ->where('turno', '>', now());   // Laravel asume 'UTC' para todas las columnas 'date' de la BdD.
+            //dd($turnos);
+            Mail::to($user->email, $user->name) // $user es un objeto Turno. Ver arriba.
+                    ->send(new TurnosAsesor($user, $turnos));
+        }
+        return redirect()->route('turnos', ['correo' => 's']);
     } // public function correoTurnos()
 
     public static function correoTurnosSemanaPasada()

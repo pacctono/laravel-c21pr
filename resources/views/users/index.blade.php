@@ -200,7 +200,7 @@
                             title="Motrar los datos personales de {{ $user->name }}">
                         <span class="oi oi-eye"></span>
                     </a>
-                @if (1 == Auth::user()->id)
+                @if (Auth::user()->is_admin)
                     @if (1 < $user->id)
                     <a href="{{ route('users.edit', $user) }}" class="btn btn-link"
                             title="Editar los datos personales de {{ $user->name }}">
@@ -230,7 +230,7 @@
                     </a>
                     @endif (0 < $user->citas()->count())
                     @endif (1 < $user->id)
-                @endif (1 == Auth::user()->id)
+                @endif (Auth::user()->is_admin)
                 </form>
             </td>
         @endif ('html' == $accion)

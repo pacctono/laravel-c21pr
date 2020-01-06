@@ -112,6 +112,9 @@
 @endif (0 < $alertar)
 @endif (isset($alertar))
 @if ($turnos->isNotEmpty())
+@if ((!$movil) and (!isset($accion) or ('html' == $accion)))
+    {{ $turnos->links() }}
+@endif ((!$movil) and (!isset($accion) or ('html' == $accion)))
 <table
 @if (!isset($accion) or ('html' == $accion))
   class="table table-striped table-hover table-bordered"

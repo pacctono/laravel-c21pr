@@ -188,14 +188,14 @@
 
     <div class="row">
     @if (!isset($accion) or ('html' == $accion))
-        <div class="col-sm-8">
+        <div class="col-sm-9">
         @if ($movil)
             <h5 class="pb-1">{{ substr($title, 11) }}</h5>
         @else ($movil)
-            <h1 class="pb-1">{{ $title }}</h1>
+            <h2 class="pb-1">{{ $title }}</h2>
         @endif ($movil)
         </div>
-        <div class="col-sm-4">
+        <div class="col-sm-3">
             <a href="{{ route('propiedades.create') }}" class="btn btn-primary float-right">
                 Crear Propiedad</a>
         </div>

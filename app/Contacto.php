@@ -54,6 +54,11 @@ class Contacto extends Model
         return $this->belongsTo(Precio::class); // Si llave foranea, diferente a esperada, usamos 2do parametro.
     }
 
+    public function price()    // precio_id
+    {
+        return $this->belongsTo(Price::class, 'precio_id'); // Si llave foranea, diferente a esperada, usamos 2do parametro.
+    }
+
     public function origen()    // tipo_id
     {
         return $this->belongsTo(Origen::class); // Si llave foranea, diferente a esperada, usamos 2do parametro.

@@ -11,7 +11,7 @@
         </p> --}}
     </div>
 
-    @if ($contactos->isNotEmpty())
+    @if ($vclientes->isNotEmpty())
     <table class="table table-striped table-hover table-bordered">
         <thead class="thead-dark">
         <tr>
@@ -37,40 +37,40 @@
                 </a>
             </th>
             <th scope="col">
-                <a href="{{ route($rutRetorno, [$id, 'user_id']) }}" class="btn btn-link">
-                    Contactado por
+                <a href="{{ route($rutRetorno, [$id, 'tipo']) }}" class="btn btn-link">
+                    Tipo
                 </a>
             </th>
-            <th scope="col">Acción</th>
+            {{--<th scope="col">Acción</th>--}}
         @endif (!$movil)
         </tr>
         </thead>
         <tbody>
-        @foreach ($contactos as $contacto)
+        @foreach ($vclientes as $vcliente)
         <tr>
             <td>
             @if ($movil)
-                <a href="{{ route('contactos.muestra', [$contacto, $rutRetorno]) }}" class="btn btn-link">
-                    {{ $contacto->name }}
+                <a href="{{ route('contactos.muestra', [$vcliente, $rutRetorno]) }}" class="btn btn-link">
+                    {{ $vcliente->name }}
                 </a>
             @else ($movil)
-                {{ $contacto->name }}
+                {{ $vcliente->name }}
             @endif ($movil)
             </td>
             <td>
-                {{ $contacto->telefono_f }}
+                {{ $vcliente->telefono_f }}
             </td>
         @if (!$movil)
-            <td>{{ $contacto->email }}</td>
+            <td>{{ $vcliente->email }}</td>
             <td>
-                {{ $contacto->creado_dia_semana }}
-                {{ $contacto->creado }}
-                @if ('' != $contacto->user_borro and $contacto->user_borro != null)
+                {{ $vcliente->creado_dia_semana }}
+                {{ $vcliente->creado }}
+                @if ('' != $vcliente->user_borro and $vcliente->user_borro != null)
                     [B]
                 @endif
             </td>
-            <td>{{ $contacto->user->name }}</td>
-            <td class="d-flex align-items-end">
+            <td>{{ $vcliente->tipo_alfa }}</td>
+            {{--<td class="d-flex align-items-end">
                 <a href="{{ route('contactos.muestra', [$contacto, $rutRetorno]) }}" class="btn btn-link">
                     <span class="oi oi-eye"></span>
                 </a>
@@ -80,12 +80,12 @@
                         <span class="oi oi-envelope-closed"></span>
                     </a>
                 @endif
-            </td>
+            </td>--}}
         @endif (!$movil)
         </tr>
         @endforeach
         </tbody>
-        <tfoot>
+        {{--<tfoot>
             <tr>
                 <td colspan="2">
                     <a href="{{ route($tipo) }}" class="btn btn-link">
@@ -100,9 +100,12 @@
                     </a>
                 </td>
             </tr>
-        </tfoot>
+        </tfoot>--}}
     </table>
-    {{ $contactos->links() }}
+    <a href="{{ route($tipo) }}" class="btn btn-link">
+        Volver
+    </a>
+    {{ $vclientes->links() }}
     @else
         <p>No hay contactos iniciales registrados.</p>
     @endif

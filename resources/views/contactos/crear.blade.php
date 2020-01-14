@@ -108,9 +108,15 @@
             <select class="form-control" name="precio_id" id="precio">
             @foreach ($precios as $precio)
             @if (old('precio_id') == $precio->id)
-              <option value="{{ $precio->id }}" selected>{{ $precio->descripcion }}</option>
+              <option value="{{ $precio->id }}" selected>
+                {{ $precio->descripcion }}
+                {{-- Entre {{ $precio->menor }} y {{ $precio->mayor --}}
+              </option>
             @else
-              <option value="{{ $precio->id }}">{{ $precio->descripcion }}</option>
+              <option value="{{ $precio->id }}">
+                {{ $precio->descripcion }}
+                {{-- Entre {{ $precio->menor }} y {{ $precio->mayor --}}
+              </option>
             @endif
             @endforeach
             </select>

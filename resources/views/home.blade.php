@@ -42,7 +42,8 @@
         </ol>
         <div class="carousel-inner">
           <div class="carousel-item active">
-            <img class="first-slide" src="{{ (asset('img/imagen0.jpg')) }}"
+            <img class="first-slide"
+                  src="{{ (asset((file_exists($foto))?$foto:'img/imagen0.jpg')) }}"
                     alt="Primera slide" style="width:100%;height:600px;">
             <div class="container">
               <div class="carousel-caption text-left">

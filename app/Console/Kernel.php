@@ -44,25 +44,25 @@ class Kernel extends ConsoleKernel
                     ->timezone('America/Caracas')   // Definido en la funcion anterior +5.8.
                     ->weekdays()->everyThirtyMinutes()
                     ->between('9:00', '21:00')
-//                    ->sendOutputTo('/home/pablo/salidas/cronLaravelGrabarArchivo.txt')
+//                    ->sendOutputTo('/home/c21pr/salidas/cronLaravelGrabarArchivo.txt')
                     ;
         $schedule->command('grabar:archivo')
                     ->timezone('America/Caracas')   // Definido en la funcion anterior +5.8.
                     ->saturdays()->everyThirtyMinutes()
                     ->between('9:00', '13:00');
-//                    ->sendOutputTo('/home/pablo/salidas/cronLaravelGrabarArchivo.txt');
+//                    ->sendOutputTo('/home/c21pr/salidas/cronLaravelGrabarArchivo.txt');
 
         $schedule->command('correo:cumpleano')
                     ->timezone('America/Caracas')   // Definido en la funcion anterior +5.8.
                     ->twiceDaily(6, 10)
 //                    ->twiceDaily(21, 23)
-//                    ->sendOutputTo('/home/pablo/salidas/cronLaravelCorreoCumpleano.txt')
+//                    ->sendOutputTo('/home/c21pr/salidas/cronLaravelCorreoCumpleano.txt')
                     ;
 
         $schedule->command('citas:manana')
                     ->timezone('America/Caracas')   // Definido en la funcion anterior +5.8.
                     ->twiceDaily(17, 21)
-                    ->sendOutputTo('/home/pablo/salidas/citasManana.txt')
+//                    ->sendOutputTo('/home/c21pr/salidas/cronLaravelCitasManana.txt')
                     ;
 
         $schedule->command('correo:turnosIncSemPas')

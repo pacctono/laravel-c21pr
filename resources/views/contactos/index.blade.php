@@ -61,6 +61,13 @@
             <th scope="col">
                 <a class=@if('html'==$accion) "btn btn-link" href=
                    @else "enlaceDesabilitado" name=
+                   @endif "{{ route('contactos.orden', 'deseo_id') }}">
+                    Desea
+                </a>
+            </th>
+            <th scope="col">
+                <a class=@if('html'==$accion) "btn btn-link" href=
+                   @else "enlaceDesabilitado" name=
                    @endif "{{ route('contactos.orden', 'telefono') }}">
                     Telefono
                 </a>
@@ -113,6 +120,9 @@
                 @else
                 {{ $contacto->name }}
                 @endif
+            </td>
+            <td>
+                {{ $contacto->deseo->descripcion }}
             </td>
             <td>
                 {{ $contacto->telefono_f }}

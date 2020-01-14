@@ -38,7 +38,7 @@ class PropiedadController extends Controller
             return redirect('login');
         }
 
-        $title = 'Listado de ' . $this->tipoPlural;
+        $title = $this->tipoPlural;
         $ruta = request()->path();
         $dato = request()->all();
         //dd($ruta, $dato);
@@ -102,15 +102,17 @@ class PropiedadController extends Controller
             $users[0]['name'] = 'Asesor otra oficina';
             $propiedades = Propiedad::where('id', '>', 0);   // condición dummy, solo para continuar armando la consulta.
             $asesor = 0;
+            $title = 'Listado de ' . $title;
         } else {
             $user   = User::find(Auth::user()->id);
-            $title .= ' de ' . $user->name;
+            $title .= ' de ' . $user->name . ' (incluye [A]ctivas)';
             $asesor = $user->id;
             $propiedades = Propiedad::where(
                                     function ($query) use ($asesor) {
                                 $query->where('user_id', $asesor)
                                         ->orWhere('asesor_captador_id', $asesor)
-                                        ->orWhere('asesor_cerrador_id', $asesor);
+                                        ->orWhere('asesor_cerrador_id', $asesor)
+                                        ->orWhere('estatus', 'A');
                                 })
                             ->whereNull('user_borro');
         }
@@ -516,8 +518,9 @@ class PropiedadController extends Controller
         $clientes = Cliente::all();
         if ((Auth::user()->is_admin) or
             (is_null($propiedad->user_borro) and (($propiedad->user_id == Auth::user()->id) or
-            ($propiedad->asesor_captador_id == Auth::user()->id) or
-            ($propiedad->asesor_cerrador_id == Auth::user()->id)))) {
+                ($propiedad->asesor_captador_id == Auth::user()->id) or
+                ($propiedad->asesor_cerrador_id == Auth::user()->id))) or
+            ('A' == $propiedad->estatus)) {
 //            return view((($movil)?'celular.showPropiedad':'propiedades.show'),
             return view('propiedades.show',
                         compact('propiedad', 'rutRetorno', 'nroPagina', 'col_id', 'movil',
@@ -685,6 +688,7 @@ class PropiedadController extends Controller
 	        'tx_host' => $_SERVER['REMOTE_ADDR']
         ]);
 
+        $correo = '';
         if (is_null($data['fecha_firma_ant']) and isset($data['fecha_firma'])) {
             $correo = self::correoReporteCierre($propiedad->id, 0);
         }

@@ -13,6 +13,11 @@ class Price extends Model
         return $this->hasMany(Contacto::class); // Si llave foranea, diferente a esperada, usamos 2do parametro.
     }
 
+    public function getDescripcionAttribute()
+    {
+        return 'Entre ' . $this->menor . ' y ' . $this->mayor;
+    }
+
     public static function contactosBorrados($id)
     {
         return self::find($id)->contactos->where('user_borro', '!=', null);

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Contacto;
+use App\VistaCliente;
 use App\Propiedad;
 use App\Cliente;
 use App\Deseo;
@@ -359,19 +360,22 @@ class ReporteController extends Controller
 
         $ruta = request()->path();  // reportes/contactosUser/[id]/id; 18: "User..."
         $tipo = strtolower(substr($ruta, 18, strpos($ruta, '/', 18)-18));   // "user"
-        $title = $this->titulo . 'del ' . 'asesor' . ': ' . User::findOrFail($id)->name;
+        $title = $this->titulo . 'y clientes del ' . 'asesor' . ': ' .
+                    User::findOrFail($id)->name;
 
         if ('' == $orden or is_null($orden)) {
             $orden = 'id';
         }
-        $tipoId   = $tipo . '_id';
-        $contactos = Contacto::where($tipoId, $id)->orderBy($orden)->paginate($this->lineasXPagina);
+        $tipoId   = $tipo . '_id';      // $tipo = 'user', $tipoId = 'user_id'.
+        $vclientes = VistaCliente::where($tipoId, $id)->orderBy($orden)
+                                ->paginate($this->lineasXPagina);
 
 	    $rutRetorno = 'reporte.contactos' . ucfirst($tipo);
 	    $tipo .= 's';						// route 'users'
         $agente = new Agent();
         $movil  = $agente->isMobile() and true;             // Fuerzo booleana. No funciona al usar el metodo directamente.
-        return view('reportes.contactos', compact('title', 'contactos', 'tipo', 'rutRetorno', 'id', 'movil'));
+        return view('reportes.contactos', compact('title', 'vclientes', 'tipo',
+                                                    'rutRetorno', 'id', 'movil'));
     }
 /*
     public function contactosXDeseo($id = 0, $orden = 'id')

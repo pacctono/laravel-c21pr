@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Contacto;
+use App\Propiedad;
 use App\Deseo;
 use App\Origen;
 use App\Precio;
+use App\Price;
 use App\Tipo;
 use App\Resultado;
 use App\Zona;
@@ -156,7 +158,7 @@ class ContactoController extends Controller
         $title = 'Crear ' . $this->tipo;
         $deseos = Deseo::all();
         $origenes = Origen::all();
-        $precios = Precio::all();
+        $precios = Price::all();
         $tipos = Tipo::all();
         $resultados = Resultado::all();
         $zonas = Zona::all();
@@ -202,9 +204,9 @@ class ContactoController extends Controller
             'telefono.digits:7' => 'La parte del telefono, sin ddn, debe contener 7 dígitos',
             'email.email' => 'Debe suministrar un correo electrónico válido.',
             'deseo_id.required' => 'El deseo del contacto inicial es obligatorio suministrarlo.',
-            'tipo_id.required' => 'El tipo de tipo es obligatorio suministrarlo.',
-            'zona_id.required' => 'La zona de la tipo es obligatorio suministrarla.',
-            'precio_id.required' => 'El precio de la tipo es obligatorio suministrarlo.',
+            'tipo_id.required' => 'El tipo de inmueble es obligatorio suministrarlo.',
+            'zona_id.required' => 'La zona donde esta ubicado el inmueble es obligatorio suministrarla.',
+            'precio_id.required' => 'El precio del inmueble es obligatorio suministrarlo.',
             'origen_id.required' => 'El origen de como conocio de nuestra oficina es obligatorio suministrarlo.',
             'resultado_id.required' => 'El resultado de la conversación con el contacto inicial es obligatorio suministrarlo.',
             'fecha_evento.required_if' => 'La fecha del evento es requerida, cuando el resultado es llamada o cita',
@@ -267,7 +269,7 @@ class ContactoController extends Controller
 //        }       
 
         session(['exito' => $exito]);
-        return redirect()->route('contactos.create');
+        return redirect()->route('contactos.show', $contacto);
     }
 
     /**
@@ -302,8 +304,20 @@ class ContactoController extends Controller
             (is_null($contacto->user_borro) and ($contacto->user_id == Auth::user()->id))) {
 // Si no es el administrador elimine en tipo de cliente 'F' (Familiar).
             if (!Auth::user()->is_admin) unset($tipos['F']);
-            return view('contactos.show',
-                        compact('contacto', 'tipos', 'rutRetorno', 'col_id', 'alertar'));
+            if (1 == $contacto->deseo_id) $buscaPropiedad = 'V';    // El contacto desea comprar.
+            elseif (3 == $contacto->deseo_id) $buscaPropiedad = 'A';// El contacto desea alquilar.
+            else $buscaPropiedad = null;
+            if (isset($buscaPropiedad)) {
+                $propiedades = Propiedad::where('estatus', 'A')
+                                        ->where('negociacion', $buscaPropiedad)
+                ->whereBetween('precio', [$contacto->price->menor, $contacto->price->mayor])
+                                        ->orderBy('precio')
+                                        ->get();
+                //->get(['codigo', 'nombre', 'precio', 'ciudad_id', 'asesor_captador_id', 'asesor_captador']);
+            }
+            else $propiedades = collect(array());
+            return view('contactos.show', compact('contacto', 'propiedades', 'tipos',
+                                                'rutRetorno', 'col_id', 'alertar'));
         } else {
             return redirect()->back();
         }

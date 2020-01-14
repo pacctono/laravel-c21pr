@@ -126,7 +126,8 @@
             <div class="col-lg">
                 Precio:
                 <span class="alert-info">
-                    {{ $contacto->precio->descripcion }}
+                    {{ $contacto->price->descripcion }}
+                    {{-- Entre {{ $contacto->price->menor }} y {{ $contacto->price->mayor --}}
                 </span>
             </div>
         </div>
@@ -253,6 +254,77 @@
         </div>
     </div>
 </div>
+
+    @if ($propiedades->isNotEmpty())
+    <table
+    @if (!isset($accion) or ('html' == $accion))
+        class="table table-striped table-hover table-bordered"
+    @else (!isset($accion) or ('html' == $accion))
+        class="center"
+    @endif (!isset($accion) or ('html' == $accion))
+    >
+        <thead class="thead-dark my-0 py-0">
+        <tr
+        @if ((isset($accion) and ('html' != $accion)))
+            class="encabezado"
+        @else ((isset($accion) and ('html' != $accion)))
+            class="my-0 py-0"
+        @endif ((isset($accion) and ('html' != $accion)))
+        >
+            <caption style="caption-side:top;text-align:center">
+                Propiedades disponibles
+            </caption>
+            <th scope="col">
+                C&oacute;digo
+            </th>
+            <th scope="col">
+                Nombre
+            </th>
+            <th scope="col">
+                Precio
+            </th>
+            <th scope="col">
+                Ciudad
+            </th>
+            <th scope="col">
+                Captador
+            </th>
+            <th scope="col">
+                Mostrar
+            </th>
+        </tr>
+        @foreach ($propiedades as $propiedad)
+        <tr class="table-success">
+            <td>
+                {{ $propiedad->codigo }}
+            </td>
+            <td>
+                {{ $propiedad->nombre }}
+            </td>
+            <td>
+                <span class="float-right" title="Precio del inmueble">
+                    {{ $propiedad->precio_ven }}
+                </span>
+            </td>
+            <td>
+                {{ $propiedad->ciudad->descripcion }}
+            </td>
+            <td>
+                {{ (1<$propiedad->asesor_captador_id)?$propiedad->captador->name:$propiedad->asesor_captador }}
+            </td>
+            @if (!isset($accion) or ('html' == $accion))
+            <td class="d-flex align-items-end">
+                <a href="{{ route('propiedades.show', $propiedad) }}" class="btn btn-link" 
+                        title="Mostrar los datos de la propiedad ({{ $propiedad->nombre }}).">
+                    <span class="oi oi-eye"></span>
+                </a>
+            </td>
+            @endif (!isset($accion) or ('html' == $accion))
+        </tr>
+        @endforeach
+        </tbody>
+    </table>
+    @endif ($propiedades->isNotEmpty())
 @endsection
 
 @section('js')

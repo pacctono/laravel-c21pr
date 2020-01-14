@@ -57,7 +57,9 @@ class HomeController extends Controller
                 else $alertar = 'Disculpe! Esta notificación no debería existir.';
             }
         }
-        return view('home', compact('cumpleaneros', 'hoy', 'manana',
+        $foto = substr(Auth::user()->email, 0, strpos(Auth::user()->email, '@')) . '-0.jpg';
+        $foto = 'fotos/' . $foto;
+        return view('home', compact('cumpleaneros', 'hoy', 'manana', 'foto',
                     'texto1', 'texto2', 'texto3', 'texto4', 'texto5', 'alertar'));
     }
 }

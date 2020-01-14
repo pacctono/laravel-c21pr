@@ -1,5 +1,6 @@
 <?php
 
+use App\Price;
 use Illuminate\Database\Seeder;
 
 class PriceSeeder extends Seeder
@@ -17,7 +18,7 @@ class PriceSeeder extends Seeder
         ]);
     
         Price::create([
-            'menor' => 5000,01,
+            'menor' => 5000.01,
             'mayor' => 10000.00
         ]);
     

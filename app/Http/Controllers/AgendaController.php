@@ -328,12 +328,7 @@ class AgendaController extends Controller
         $host = env('MAIL_HOST');
         if (!($ip = gethostbyname($host)) or ($ip == $host)) { // No hay conexon a Internet.
             $correo = 'N';
-            if (1 == $ruta)
-                return redirect()->route('users', ['correo' => $correo]);
-            elseif (2 == $ruta)
-                return redirect()->route('users.show',
-                                ['user' => $user, 'correo' => $correo]);
-            else return $correo;
+            return redirect()->route('users', ['correo' => $correo]);
         }
 
         //return new CitasAsesor($user);  // Vista preliminar del correo, en el navegador.

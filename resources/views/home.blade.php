@@ -4,7 +4,7 @@
 @if ('' != $alertar)
     <script>alert("{{ $alertar }}");</script>
 @endif
-@if ((Auth::user()->is_admin) && ($cumpleaneros->isNotEmpty()))
+@if ((Auth::user()->is_admin) && ($cumpleaneros->isNotEmpty()) && $login)
 
 <div class="mb-0 col-lg-8">
   <div class="row">
@@ -29,6 +29,7 @@
   </div>
   @endForeach
 </div>
+<!--div><span>{{ $login }}: {{ $rutaPrevia }}</span></div-->
 
 @else
 <div class="container">

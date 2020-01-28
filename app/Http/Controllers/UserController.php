@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\User;
+use App\Aviso;
 use App\Venezueladdn;
 use App\Bitacora;
 use \App\Mail\Cumpleano;
@@ -37,10 +38,14 @@ class UserController extends Controller
 
 // En caso de volver luego de haber enviado un correo, ver el metodo 'emailcita', en AgendaController.
         $alertar = 0;
-        if ('alert' == $orden) {
-            $orden = '';
-            $alertar = 1;
+        if (isset($_GET['correo']) and ($correo = $_GET['correo'])) {
+            if ('s' == $correo) {
+                $alertar = 2;
+            } elseif ('N' == $correo) {
+                $alertar = -1;
+            }
         }
+        if ('alert' == $orden) $orden = ''; // Evitando errores heredados por usar $orden para alertar.
         if ('' == $orden or is_null($orden)) {
             $orden = 'id';
         }

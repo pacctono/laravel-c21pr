@@ -25,9 +25,13 @@
         @endif (!isset($accion) or ('html' == $accion))
     </div>
 
-    @if ($alertar)
-        <script>alert('El correo fue enviado al asesor');</script>
-    @endif
+@if (isset($alertar))
+@if (0 < $alertar)
+  <script>alert('El correo con la(s) cita(s) fue enviado al asesor');</script>
+@elseif (0 > $alertar)
+    <script>alert("No fue enviado el correo al asesor. Probablemente, problemas con Internet! Revise su conexión");</script>
+@endif (0 < $alertar)
+@endif (isset($alertar))
 @if ($users->isNotEmpty())
     <table
     @if (!isset($accion) or ('html' == $accion))
@@ -79,7 +83,7 @@
             <th scope="col">Puntos</th>
         @endif (Auth::user()->is_admin)
         @if (!isset($accion) or ('html' == $accion))
-            <th scope="col">Acciones</th>
+            <th scope="col" style="width:25%;">Acciones</th>
         @endif ('html' == $accion)
         @endif (!$movil)
         </tr>
@@ -229,6 +233,22 @@
                         <span class="oi oi-envelope-closed"></span>
                     </a>
                     @endif (0 < $user->citas()->count())
+                    @if (0 < $user->avisos()->count())
+                    <a href="" class="btn btn-link aviso" id="aviso{{ $user->id }}"
+                            title="'{{ $user->name }}' tiene {{ $user->avisos()->count() }} aviso(s).">
+                        <span class="oi oi-bell"></span>
+                    </a>
+                    <input type="hidden" id="numAvisos{{ $user->id }}"
+                            value="{{ $user->avisos()->count() }}">
+                    @foreach($user->avisos as $aviso)
+                        <input type="hidden" id="tipo{{ $user->id }}_{{ $loop->index }}"
+                                value="{{ $aviso->tipo }}">
+                        <input type="hidden" id="fecha{{ $user->id }}_{{ $loop->index }}"
+                                value="{{ $aviso->fec }}">
+                        <input type="hidden" id="descripcion{{ $user->id }}_{{ $loop->index }}"
+                                value="{{ $aviso->descripcion }}">
+                    @endForeach
+                    @endif (0 < $user->citas()->count())
                     @endif (1 < $user->id)
                 @endif (Auth::user()->is_admin)
                 </form>
@@ -269,6 +289,26 @@
             if (!accion) {
                 ev.preventDefault();
             }
+        })
+        $('a.aviso').click(function(ev) {
+            ev.preventDefault();
+            var id = $(this).attr('id').substring(5);        // 'avisoid'
+            var numAvisos = document.getElementById('numAvisos'+id).value;
+            var fecha, descripcion, mensaje='', accion;
+            for (i=0; i<numAvisos; i++) {
+                tipo = document.getElementById('tipo'+id+'_'+i).value;
+                fecha = document.getElementById('fecha'+id+'_'+i).value;
+                descripcion = document.getElementById('descripcion'+id+'_'+i).value;
+                if ('C' == tipo) mensaje += descripcion + '. ' + fecha;
+                else if ('T' == tipo) {
+                    descripcion = descripcion.replace(/M-/, 'Mañana a ');
+                    descripcion = descripcion.replace(/T-/, 'Tarde a ');
+                    mensaje += descripcion;
+                }
+                mensaje += '.';
+                if (i < (numAvisos-1)) mensaje += '\n';
+            }
+            alert(mensaje);
         })
     })
 function seguroDesActivar(sId, nombre, activo) {

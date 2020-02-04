@@ -435,4 +435,42 @@ class General {
             $mpdf->Output($namefile,"D");   // "D": Descargar el archivo. "F": Guardar el archivo.
         }
     }
+
+    public static function idAlAzar($arregloIds, $min, $max, $arregloUsers) {
+        $nroIndex = random_int($min, $max);
+        $nroId = $arregloUsers[$nroIndex]->id;
+        $iPare = 0;
+        while (in_array($nroId, $arregloIds)) {
+            $nroIndex = random_int($min, $max);
+            $nroId = $arregloUsers[$nroIndex]->id;
+            $iPare++;
+            if (100 < $iPare) {
+                $nroId = 1;
+                break;
+            }
+        }
+        return $nroId;
+    }
+
+    public static function idDelArreglo($indexIds, $arregloIds, $arregloIdsInicial, $index) {
+        $indexIds++;
+        if (!isset($arregloIds[$indexIds])) $indexIds = 0;
+        $nroId = $arregloIds[$indexIds];
+        if (5 == $index) {
+            $bPare = false;
+            while (in_array($nroId, $arregloIdsInicial)) {
+                $indexIds++;
+                if (!isset($arregloIds[$indexIds])) $indexIds = 0;
+                $nroId = $arregloIds[$indexIds];
+                if (0 == $indexIds) {
+                    if ($bPare) {
+                        $nroId = 1;
+                        break;
+                    }
+                    $bPare = true;
+                }
+            }
+        }
+        return array($nroId, $indexIds);
+    }
 }

@@ -109,8 +109,8 @@ class Fecha
                 $fecha_hasta = $fecha_max;
                 break;
         }
-	if (!is_null($fecha_desde)) $fecha_desde->startOfDay();
-	if (!is_null($fecha_hasta)) $fecha_hasta->endOfDay();
+    	if (!is_null($fecha_desde)) $fecha_desde->startOfDay();
+    	if (!is_null($fecha_hasta)) $fecha_hasta->endOfDay();
         return array ($fecha_desde, $fecha_hasta);
     }
 }

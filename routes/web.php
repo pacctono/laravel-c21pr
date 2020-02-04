@@ -536,6 +536,10 @@ Route::get('/correoTodasCitas/{desde?}/{hasta?}', 'AgendaController@correoTodasC
 Route::get('/cumpleano/{user}', 'AgendaController@cumpleano')
     ->name('agenda.cumpleano');
 
+Route::get('/avisos/asesor/{user}', 'UserController@avisos')
+    ->where('user', '[0-9]+')
+    ->name('users.avisos');
+
 Route::get('pdf','PdfController@getIndex');
 Route::get('pdf/generar','PdfController@getGenerar');
 

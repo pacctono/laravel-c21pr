@@ -260,13 +260,13 @@ class ContactoController extends Controller
         ]);
 
         $exito = "El contacto inicial '" . $data['name'] . "' fue agregado con exito.";
-//        if (($data['email']) and            // Se suministró un email.
-//            ((2 == $data['deseo_id']) or (4 == $data['deseo_id']))) { // Vende o da en alquiler.
-//            $correo = self::correoOfertaServicio($contacto, 0);
-//            if ('S' == $correo) $exito .= " También, se le envió";
-//            else $exito .= " Pero, no pudo enviarsele";
-//            $exito .= " la 'Oferta de Servicio'.";
-//        }       
+        if (($data['email']) and            // Se suministró un email.
+            ((2 == $data['deseo_id']) or (4 == $data['deseo_id']))) { // Vende o da en alquiler.
+            $correo = self::correoOfertaServicio($contacto, 0);
+            if ('S' == $correo) $exito .= " También, se le envió";
+            else $exito .= " Pero, no pudo enviarsele";
+            $exito .= " la 'Oferta de Servicio'.";
+        }       
 
         session(['exito' => $exito]);
         return redirect()->route('contactos.show', $contacto);

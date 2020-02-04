@@ -311,8 +311,28 @@ class UserController extends Controller
 	    'tx_host' => $_SERVER['REMOTE_ADDR']
         ]);
 
-        return redirect()->route('users');
+        return redirect()->route('users');app/VistaCliente.php;
     } // Final del metodo destroy(User $user)
+
+    public function avisos(User $user)
+    {
+        $avisos = Aviso::where('user_id', $user->id)->get();
+	//dd($user, $avisos);
+        if (0 < count($avisos)) {
+            $mensaje = '<table>';
+            $final   = '</table>';
+            //$mensaje = '<html><head><title>Avisos</title></head><body><table>';
+            //$final   = '</table></body>';
+        } else {
+            $mensaje = '';
+            $final   = '';
+        }
+        foreach ($avisos as $aviso) {
+            //$mensaje .= "<tr><td>{$aviso->tipo}</td><td>{$aviso->fec}</td><td>{$aviso->descripcion}</td></tr>";
+            $mensaje .= "<tr><td>{$aviso->descripcion}</td></tr>";
+        }
+        return $mensaje . $final;
+    }
 
     public static function correoCumpleano()
     {

@@ -238,7 +238,8 @@
                             title="'{{ $user->name }}' tiene {{ $user->avisos()->count() }} aviso(s).">
                         <span class="oi oi-bell"></span>
                     </a>
-                    <input type="hidden" id="numAvisos{{ $user->id }}"
+                    <div id="div{{ $user->id }}"></div>
+                    {{-- <input type="hidden" id="numAvisos{{ $user->id }}"
                             value="{{ $user->avisos()->count() }}">
                     @foreach($user->avisos as $aviso)
                         <input type="hidden" id="tipo{{ $user->id }}_{{ $loop->index }}"
@@ -247,7 +248,7 @@
                                 value="{{ $aviso->fec }}">
                         <input type="hidden" id="descripcion{{ $user->id }}_{{ $loop->index }}"
                                 value="{{ $aviso->descripcion }}">
-                    @endForeach
+                    @endForeach --}}
                     @endif (0 < $user->citas()->count())
                     @endif (1 < $user->id)
                 @endif (Auth::user()->is_admin)
@@ -289,8 +290,8 @@
             if (!accion) {
                 ev.preventDefault();
             }
-        })
-        $('a.aviso').click(function(ev) {
+        });
+        /*$('a.aviso').click(function(ev) {
             ev.preventDefault();
             var id = $(this).attr('id').substring(5);        // 'avisoid'
             var numAvisos = document.getElementById('numAvisos'+id).value;
@@ -309,8 +310,16 @@
                 if (i < (numAvisos-1)) mensaje += '\n';
             }
             alert(mensaje);
-        })
-    })
+        });*/
+        $("a.aviso").click(function(ev) {
+            ev.preventDefault();
+            var user_id = $(this).attr('id').substring(5);        // 'avisoid'
+            //var numAvisos = document.getElementById('numAvisos'+user_id).value;
+            $.ajax({url: "/avisos/users/"+user_id, success: function(resultado) {
+                        $("#div"+user_id).html(resultado);
+                    }});
+        });
+    });
 function seguroDesActivar(sId, nombre, activo) {
     var id = document.getElementById(sId);
     var accion;

@@ -23,6 +23,15 @@ class TurnoController extends Controller
     protected $tipo = 'Turnos';
     protected $lineasXPagina = 15;  //General::LINEASXPAGINA;
 
+    protected static function turnoNuevo($semana, $index, $hora, $nroId) {
+        return [
+            'turno'  => Fecha::primerLunesDePrimeraSemana()
+                            ->addWeeks($semana)
+                            ->addDays($index)
+                            ->format("Y-m-d $hora:00:00"),
+            'user_id'   => $nroId,
+        ];
+    }
     public function index($orden=null, $accion='html')
     {
         if (!(Auth::check())) {
@@ -114,8 +123,14 @@ class TurnoController extends Controller
         if ('user_id' == $orden) {              // Si se pidió ordenar por id de usuario,
             $turnos = $turnos->orderBy('turno');   // ordenar por turno en cada usuario.
         }
+	//dd($periodo, $rPeriodo);
+        if (isset($rPeriodo)) {
+	    if (false === strpos($rPeriodo, 'mes')) $lineasXPagina = $this->lineasXPagina;
+            else $lineasXPagina = Turno::whereBetween('turno', [$fecha_desde, $fecha_hasta.' 23:59:59'])->count();
+        } else $lineasXPagina = $this->lineasXPagina;
+        if (!isset($lineasXPagina) or (0 >= $lineasXPagina)) $lineasXPagina = $this->lineasXPagina;
         if ($movil or ('html' != $accion)) $turnos = $turnos->get();
-        else $turnos = $turnos->paginate($this->lineasXPagina);               // Pagina la impresión de 10 en 10
+        else $turnos = $turnos->paginate($lineasXPagina);               // Pagina la impresión de 10 en 10
 // Devolver las fechas sin la hora. Los diez primeros caracteres son: yyyy-mm-dd.
         session(['rPeriodo' => $rPeriodo, 'fecha_desde' => $fecha_desde,    // Asignar valores en sesión.
                     'fecha_hasta' => $fecha_hasta, 'asesor' => $asesor]);
@@ -154,19 +169,95 @@ class TurnoController extends Controller
         $title = 'Crear ' . $this->tipo . ' para la semana que comienza el lunes, ' . 
                     $fecha->format('d/m/Y');
 
+        $users = User::where('activo', True)->where('socio', False)
+                        ->get(['id', 'name']);     // Todos los usuarios (asesores) activos.
+        $min = 1;
+        $max = $users->count() - 1;
+
+// Se prepara el arreglo '$ids' con los ids de los asesores que estuvieron el lunes y sabado de la semana pasada.
+        $lunesAnt = Fecha::primerLunesDePrimeraSemana()->addWeeks($semana-1)->format("Y-m-d");
+        $sabadoAnt = Fecha::primerLunesDePrimeraSemana()->addWeeks($semana)->subDays(2)
+                                ->format("Y-m-d");
+        $usersLunesAnt = Turno::whereBetween('turno', [$lunesAnt.' 00:00', $lunesAnt.' 23:59'])
+                                ->get(['user_id'])->all();
+        $usersSabadoAnt = Turno::whereBetween('turno', [$sabadoAnt.' 00:00', $sabadoAnt.' 23:59'])
+                                ->get(['user_id'])->all();
+        if ((isset($usersLunesAnt) and (0 < count($usersLunesAnt))) and // Tenemos los turnos de la semana pasada?
+            (isset($usersSabadoAnt) and (0 < count($usersSabadoAnt)))) {
+            $ids = [];
+// user_id = 1 (administrador/feriado) no debo incluirlo en el 'WHERE' de '$users... = Turno...', porque
+// si el lunes/sabado anterior es feriado, no queremos que me arroje arreglos vacios.
+            foreach ($usersLunesAnt as $id) {
+                if (!in_array($id->user_id, $ids) and (1 < $id->user_id)) $ids[] = $id->user_id;
+            }
+            if (isset($usersSabadoAnt) and (!in_array($usersSabadoAnt[0]->user_id, $ids))) {
+                if (1 < $usersSabadoAnt[0]->user_id) {
+                    $idSabado = $usersSabadoAnt[0]->user_id;
+                    $ids[] = $idSabado;
+                }
+            }
+            $idsInicial = $ids;
+// Ya tenemos el arreglo '$ids'.
+            $j = -1;
+            $nuevosTurnos = [];
+            for ($i = 0; $i < 3; $i++) {
+                if ($max > count($ids)) {
+                    $nroId = General::idAlAzar($ids, $min, $max, $users);
+                    if (!in_array($nroId, $ids)) $ids[] = $nroId;
+                } else {	// Se acabaron los id de asesores, ubicaremos el resto de turnos de acuerdo al arreglo $ids.
+                    list($nroId, $j) = General::idDelArreglo($j, $ids, $idsInicial, $i);
+                }
+                $nuevosTurnos[] = $this::turnoNuevo($semana, $i, '08', $nroId);
+            }
+            for ($i = 0; $i < 3; $i++) {
+                if ($max > count($ids)) {
+                    $nroId = General::idAlAzar($ids, $min, $max, $users);
+                    if (!in_array($nroId, $ids)) $ids[] = $nroId;
+                } else {	// Se acabaron los id de asesores, ubicaremos el resto de turnos de acuerdo al arreglo $ids.
+                    list($nroId, $j) = General::idDelArreglo($j, $ids, $idsInicial, $i);
+                }
+                $nuevosTurnos[] = $this::turnoNuevo($semana, $i, '12', $nroId);
+            }
+            for ($i = 3; $i < 6; $i++) {
+                if ($max > count($ids)) {
+                    $nroId = General::idAlAzar($ids, $min, $max, $users);
+                    if (!in_array($nroId, $ids)) $ids[] = $nroId;
+                } else {	// Se acabaron los id de asesores, ubicaremos el resto de turnos de acuerdo al arreglo $ids.
+                    list($nroId, $j) = General::idDelArreglo($j, $ids, $idsInicial, $i);
+                }
+                $nuevosTurnos[] = $this::turnoNuevo($semana, $i, '08', $nroId);
+            }
+            for ($i = 3; $i < 5; $i++) {
+                if ($max > count($ids)) {
+                    $nroId = General::idAlAzar($ids, $min, $max, $users);
+                    if (!in_array($nroId, $ids)) $ids[] = $nroId;
+                } else {	// Se acabaron los id de asesores, ubicaremos el resto de turnos de acuerdo al arreglo $ids.
+                    list($nroId, $j) = General::idDelArreglo($j, $ids, $idsInicial, $i);
+                }
+                $nuevosTurnos[] = $this::turnoNuevo($semana, $i, '12', $nroId);
+            }
+            //dd("min: $min", "max: $max", 'ids:', $ids, 'idsInicial:', $idsInicial, 'nuevosTurnos:', $nuevosTurnos, 'users: ', $users);
+            foreach ($nuevosTurnos as $turno) {
+                Turno::create([
+                    'turno'     => $turno['turno'],
+                    'user_id'   => $turno['user_id'],
+                    'user_creo' => Auth::user()->id,
+                ]);
+            }
+            return redirect()->route('turnos.editar', $semana);
+        }   // if ((isset($usersLunesAnt) and (0 < count($usersLunesAnt))) and (isset($usersSabadoAnt) and (0 < count($usersSabadoAnt)))) {
+// Crea el arreglo '$dia' con la fecha de cada dia de la semana; para el cual, se va a crear el turno.
         for ($d = 0; $d < 6; $d++) {
+// Si '$fecha' no la inicia; nuevamente, es modificada cada vez que se ejecuta este comando.
             $fecha = Fecha::primerLunesDePrimeraSemana()->addWeeks($semana);
             $dia[$d] = $fecha->addDays($d)->format('Y-m-d');    // Fecha de cada dia.
         }
-
-        $users = User::where('activo', True)->where('socio', False)
-                        ->get(['id', 'name']);     // Todos los usuarios (asesores) activos.
-
+// Crea el arreglo '$semanas' con la fecha del lunes de cada una de las proximas once semanas.
         for ($d = 0; $d < 11; $d++) {
             $semanaInicial = Fecha::primerLunesDePrimeraSemana();
             $semanas[$d] = $semanaInicial->addWeeks($d);            // Proximos once lunes.
         }
-        //dd($semanas);
+
         return view('turnos.crear', compact('title', 'diaSemana', 'dia', 'users',
                     'semanas', 'semana'));
     }

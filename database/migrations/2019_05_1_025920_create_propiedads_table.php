@@ -119,14 +119,30 @@ class CreatePropiedadsTable extends Migration
                 ->comment('Nombre del asesor cerrador, cuando es de otra oficina');
             $table->string('pago_gerente', 100)->nullable()
                 ->comment('Forma de pago al gerente');
+            $table->unsignedInteger('forma_pago_gerente_id')->nullable();
+            $table->foreign('forma_pago_gerente_id')->references('id')->on('forma_pagos');
+            $table->date('fecha_pago_gerente')->nullable();
             $table->string('factura_gerente', 100)->nullable()
                 ->comment('Factura de pago al gerente');
             $table->string('pago_asesores', 100)->nullable()
                 ->comment('Forma de pago a los asesores');
+            $table->unsignedInteger('forma_pago_captador_id')->nullable();
+            $table->foreign('forma_pago_captador_id')->references('id')->on('forma_pagos');
+            $table->date('fecha_pago_captador')->nullable();
+            $table->string('factura_captador', 100)->nullable()
+                ->comment('Factura de pago al captador');
+            $table->unsignedInteger('forma_pago_cerrador_id')->nullable();
+            $table->foreign('forma_pago_cerrador_id')->references('id')->on('forma_pagos');
+            $table->date('fecha_pago_cerrador')->nullable();
+            $table->string('factura_cerrador', 100)->nullable()
+                ->comment('Factura de pago al cerrador');
             $table->string('factura_asesores', 100)->nullable()
                 ->comment('Factura de pago al(a los) asesor(es)');
             $table->string('pago_otra_oficina', 100)->nullable()
                 ->comment('Forma de pago a la(s) otra(s) oficina(s)');
+            $table->unsignedInteger('forma_pago_otra_oficina_id')->nullable();
+            $table->foreign('forma_pago_otra_oficina_id')->references('id')->on('forma_pagos');
+            $table->date('fecha_pago_otra_oficina')->nullable();
             $table->boolean('pagado_casa_nacional')->default(false);
             $table->enum('estatus_sistema_c21', ['V', 'A', 'P'])->default('P')
                 ->comment('[V]endido,(A)ctivo,[P]endiente');

@@ -60,13 +60,14 @@ class VistaCliente extends Model
 
     public function getCreadoAttribute()
     {
+        if (!isset($this->created_at)) return '';
         return $this->created_at->timezone(Fecha::$ZONA)->format('d/m/Y');
     }
 
     public function getCreadoDiaSemanaAttribute()
     {
+        if (!isset($this->created_at)) return '';
         return substr(Fecha::$diaSemana[$this->created_at->timezone(Fecha::$ZONA)
                         ->dayOfWeek], 0, 3);
     }
-
 }

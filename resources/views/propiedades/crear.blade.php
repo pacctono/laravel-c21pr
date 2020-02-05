@@ -148,24 +148,25 @@
                 </datalist>
                 <input type="float" class="form-control form-control-sm" size="20" maxlength="20"
                     name="precio" id="precio" required placeholder="Precio del inmueble"
-                    value="{{ old('precio') }}">
+                    min="0.00" value="{{ old('precio') }}">
             </div>
             <div class="form-group form-inline mx-1 px-2">
                 <label class="control-label" for="comision">*Comision</label>
                 <input type="float" class="form-control form-control-sm" size="6" maxlength="6"
-                    name="comision" id="comision" required
+                    name="comision" id="comision" required min="0.000" max="50.000"
                     value="{{ old('comision', $cols['comision']['xdef']) }}">%
             </div>
             <div class="form-group form-inline mx-1 px-2">
                 <label class="control-label" for="iva">*IVA</label>
                 <input type="float" class="form-control form-control-sm" size="5" maxlength="5"
-                    required name="iva" id="iva"
+                    required name="iva" id="iva" min="0.000" max="99.99"
                     value="{{ old('iva', $cols['iva']['xdef']) }}">%
             </div>
             <div class="form-group form-inline mx-1 px-2">
                 <label class="control-label" for="lados">Lados</label>
                 <input type="number" class="form-control form-control-sm" size="1" maxlength="1"
-                    required name="lados" id="lados" value="{{ old('lados', $cols['lados']['xdef']) }}">
+                    required name="lados" id="lados" min="1" max="2"
+                    value="{{ old('lados', $cols['lados']['xdef']) }}">
             </div>
         </div>
 
@@ -193,19 +194,19 @@
             <div class="form-group form-inline mx-1 px-2">
                 <label class="control-label" for="metraje">Metraje</label>
                 <input type="float" class="form-control form-control-sm" size="8" maxlength="11"
-                    name="metraje" id="metraje"
+                    name="metraje" id="metraje" min="0.00"
                     value="{{ old('metraje', $cols['metraje']['xdef']) }}">
             </div>
             <div class="form-group form-inline mx-1 px-2">
                 <label class="control-label" for="habitaciones">Habitaciones</label>
                 <input type="integer" class="form-control form-control-sm" size="2" maxlength="3"
-                    name="habitaciones" id="habitaciones"
+                    name="habitaciones" id="habitaciones" min="0"
                     value="{{ old('habitaciones', $cols['habitaciones']['xdef']) }}">
             </div>
             <div class="form-group form-inline mx-1 px-2">
                 <label class="control-label" for="banos">Ba&ntilde;os</label>
                 <input type="integer" class="form-control form-control-sm" size="1" maxlength="2"
-                    name="banos" id="banos"
+                    name="banos" id="banos" min="1"
                     value="{{ old('banos', $cols['banos']['xdef']) }}">
             </div>
         </div>
@@ -214,19 +215,19 @@
             <div class="form-group form-inline mx-1 px-2">
                 <label class="control-label" for="niveles">Niveles</label>
                 <input type="float" class="form-control form-control-sm" size="2" maxlength="3"
-                    name="niveles" id="niveles"
+                    name="niveles" id="niveles" min="1"
                     value="{{ old('niveles', $cols['niveles']['xdef']) }}">
             </div>
             <div class="form-group form-inline mx-1 px-2">
                 <label class="control-label" for="puestos">Puestos de estacionamiento</label>
                 <input type="integer" class="form-control form-control-sm" size="2" maxlength="3"
-                    name="puestos" id="puestos"
+                    name="puestos" id="puestos" min="1"
                     value="{{ old('puestos', $cols['puestos']['xdef']) }}">
             </div>
             <div class="form-group form-inline mx-1 px-2">
                 <label class="control-label" for="anoc">A&ntilde;o de construccion</label>
                 <input type="integer" class="form-control form-control-sm" size="4" maxlength="4"
-                    name="anoc" id="anoc"
+                    name="anoc" id="anoc" min="1900" max="{{ now()->format('Y') }}"
                     value="{{ old('anoc', $cols['anoc']['xdef']) }}">
             </div>
             <div class="form-group form-inline mx-1 px-2">
@@ -326,7 +327,7 @@
             </div>
             <div class="form-group form-inline mx-1 px-1 nuevo">
                 <label class="control-label" for="cedula">C&eacute;dula Id.</label>
-                <input type="text" class="form-control form-control-sm" size="8" maxlength="8" minlength="7" 
+                <input type="text" class="form-control form-control-sm" size="8" maxlength="8" minlength="6" 
                         name="cedula" id="cedula" placeholder="# cedula"
                         value="{{ old('cedula') }}">
             </div>
@@ -415,7 +416,7 @@
         <div class="form-row my-0 py-0">
             <div class="form-group form-inline mx-1 px-2">
                 <label class="control-label" for="porc_franquicia">*Franquicia</label>
-                <input type="float" class="form-control" size="5" maxlength="5"
+                <input type="float" class="form-control" size="5" maxlength="5" min="0.000" max="50.000"
                     name="porc_franquicia" id="porc_franquicia" placeholder="10" required
                     value="{{ old('porc_franquicia', $cols['porc_franquicia']['xdef']) }}">%
             </div>
@@ -430,21 +431,21 @@
             <div class="form-group form-inline mx-1 px-2">
                 <label class="control-label" for="porc_regalia">*Regalia</label>
                 <input type="float" class="form-control" size="5" maxlength="5"
-                    name="porc_regalia" id="porc_regalia" required
+                    name="porc_regalia" id="porc_regalia" required min="0.000" max="50.000"
                     value="{{ old('porc_regalia', $cols['porc_regalia']['xdef']) }}">%
             </div>
             <div class="form-group form-inline mx-1 px-2">
                 <label class="control-label" for="porc_gerente">
                     *Porc gerente</label>
                 <input type="float" class="form-control" size="5" maxlength="5"
-                    name="porc_gerente" id="porc_gerente" required
+                    name="porc_gerente" id="porc_gerente" required min="0.000" max="20.000"
                     value="{{ old('porc_gerente', $cols['porc_gerente']['xdef']) }}">%
             </div>
             <div class="form-group form-inline mx-1 px-2">
                 <label class="control-label" for="porc_compartido">
                     *Porc compartido</label>
                 <input type="float" class="form-control" size="5" maxlength="5"
-                    name="porc_compartido" id="porc_compartido" required
+                    name="porc_compartido" id="porc_compartido" required min="0.000" max="99.999"
                     value="{{ old('porc_compartido', $cols['porc_compartido']['xdef']) }}">%
             </div>
         </div>
@@ -454,7 +455,7 @@
                 <label class="control-label" for="porc_bonificacion">
                     *Porcentaje bonificacion</label>
                 <input type="float" class="form-control" size="5" maxlength="5"
-                    name="porc_bonificacion" id="porc_bonificacion" required
+                    name="porc_bonificacion" id="porc_bonificacion" required min="0.000" max="50.000"
                     value="{{ old('porc_bonificacion',
                         $cols['porc_bonificacion']['xdef']) }}">%
             </div>
@@ -462,7 +463,7 @@
                 <label class="control-label" for="comision_bancaria">
                     Comision bancaria</label>
                 <input type="float" class="form-control" size="15" maxlength="15"
-                    name="comision_bancaria" id="comision_bancaria"
+                    name="comision_bancaria" id="comision_bancaria" min="0.00"
                     placeholder="ddd.ddd,dd" value="{{ old('comision_bancaria') }}">
             </div>
             <div class="form-group form-inline mx-1 px-2">
@@ -479,7 +480,7 @@
             <div class="form-group form-inline mx-1 px-2">
                 <label class="control-label" for="porc_captador_prbr">
                     *Porcentaje captador PRBR</label>
-                <input type="float" class="form-control" size="5" maxlength="5"
+                <input type="float" class="form-control" size="5" maxlength="5" min="0.000" max="50.000"
                     name="porc_captador_prbr" id="porc_captador_prbr" required
                     value="{{ old('porc_captador_prbr', $cols['porc_captador_prbr']['xdef']) }}">%
             </div>
@@ -511,7 +512,7 @@
                 <label class="control-label" for="porc_cerrador_prbr">
                     *Porcentaje cerrador PRBR</label>
                 <input type="float" class="form-control" size="5" maxlength="5"
-                    name="porc_cerrador_prbr" id="porc_cerrador_prbr" required
+                    name="porc_cerrador_prbr" id="porc_cerrador_prbr" required min="0.000" max="50.000"
                     value="{{ old('porc_cerrador_prbr', $cols['porc_cerrador_prbr']['xdef']) }}">%
             </div>
             <div class="form-group form-inline mx-1 px-2">

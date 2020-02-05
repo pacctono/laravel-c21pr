@@ -436,39 +436,43 @@ class General {
         }
     }
 
-    public static function idAlAzar($arregloIds, $min, $max, $arregloUsers) {
+    public static function idAlAzar($indexIds, &$arregloIds, $min, $max, $arregloUsers, $idNoPermitido=0) {
         $nroIndex = random_int($min, $max);
-        $nroId = $arregloUsers[$nroIndex]->id;
+        $nroId = $arregloUsers[$nroIndex];
         $iPare = 0;
-        while (in_array($nroId, $arregloIds)) {
+        while (in_array($nroId, $arregloIds) or
+                (($max > count($arregloIds)) and ($nroId == $idNoPermitido))) {  // Ultimo elemento del arreglo.
             $nroIndex = random_int($min, $max);
-            $nroId = $arregloUsers[$nroIndex]->id;
+            $nroId = $arregloUsers[$nroIndex];
             $iPare++;
-            if (100 < $iPare) {
+            if (100 < $iPare) {     // Evita ciclo infinito.
                 $nroId = 1;
                 break;
             }
         }
-        return $nroId;
+        if (!in_array($nroId, $arregloIds)) $arregloIds[] = $nroId;
+        if ($nroId == $idNoPermitido) {  // Solo sucede cuando el id del sabado es el último de '$ids'.
+            $indexIds = 0;
+            $nroId = $arregloIds[$indexIds];
+        }
+        return array($nroId, $indexIds);
     }
 
-    public static function idDelArreglo($indexIds, $arregloIds, $arregloIdsInicial, $index) {
+    public static function idDelArreglo($indexIds, $arregloIds, $index, $idNoPermitido=0) {
         $indexIds++;
         if (!isset($arregloIds[$indexIds])) $indexIds = 0;
         $nroId = $arregloIds[$indexIds];
-        if (5 == $index) {
-            $bPare = false;
-            while (in_array($nroId, $arregloIdsInicial)) {
-                $indexIds++;
-                if (!isset($arregloIds[$indexIds])) $indexIds = 0;
-                $nroId = $arregloIds[$indexIds];
-                if (0 == $indexIds) {
-                    if ($bPare) {
-                        $nroId = 1;
-                        break;
-                    }
-                    $bPare = true;
+        $bPare = false;
+        while ($nroId == $idNoPermitido) {
+            $indexIds++;
+            if (!isset($arregloIds[$indexIds])) $indexIds = 0;
+            $nroId = $arregloIds[$indexIds];
+            if (0 == $indexIds) {
+                if ($bPare) {   // Evita ciclo infinito.
+                    $nroId = 1;
+                    break;
                 }
+                $bPare = true;
             }
         }
         return array($nroId, $indexIds);

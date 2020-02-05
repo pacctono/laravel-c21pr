@@ -169,74 +169,104 @@ class TurnoController extends Controller
         $title = 'Crear ' . $this->tipo . ' para la semana que comienza el lunes, ' . 
                     $fecha->format('d/m/Y');
 
-        $users = User::where('activo', True)->where('socio', False)
+        $users = User::where('activo', True)->where('socio', False)->where('id', '>', 1)
                         ->get(['id', 'name']);     // Todos los usuarios (asesores) activos.
-        $min = 1;
+
+        $min = 0;
         $max = $users->count() - 1;
+        $idAsesores = [];
+        foreach ($users as $user) $idAsesores[] = $user->id;    // Solo los ids de cada asesor posible.
 
 // Se prepara el arreglo '$ids' con los ids de los asesores que estuvieron el lunes y sabado de la semana pasada.
         $lunesAnt = Fecha::primerLunesDePrimeraSemana()->addWeeks($semana-1)->format("Y-m-d");
         $sabadoAnt = Fecha::primerLunesDePrimeraSemana()->addWeeks($semana)->subDays(2)
                                 ->format("Y-m-d");
-        $usersLunesAnt = Turno::whereBetween('turno', [$lunesAnt.' 00:00', $lunesAnt.' 23:59'])
+        $asesoresLunesAnt = [];
+        $asesoresSabadosAnt = [];
+        for ($i=1; $i<=24; $i++) {
+            $arTmp = Turno::whereBetween('turno', [$lunesAnt.' 00:00', $lunesAnt.' 11:59']) // Solo turno de mañana.
                                 ->get(['user_id'])->all();
-        $usersSabadoAnt = Turno::whereBetween('turno', [$sabadoAnt.' 00:00', $sabadoAnt.' 23:59'])
+            if (isset($arTmp) and (0 < count($arTmp))) {
+                $idTmp = $arTmp[0]->user_id;
+                if (!in_array($idTmp, $asesoresLunesAnt) and in_array($idTmp, $idAsesores) and (1 < $idTmp))
+                    $asesoresLunesAnt[] = $idTmp;
+            }
+            $arTmp = Turno::whereBetween('turno', [$sabadoAnt.' 00:00', $sabadoAnt.' 11:59'])
                                 ->get(['user_id'])->all();
-        if ((isset($usersLunesAnt) and (0 < count($usersLunesAnt))) and // Tenemos los turnos de la semana pasada?
-            (isset($usersSabadoAnt) and (0 < count($usersSabadoAnt)))) {
+            if (isset($arTmp) and (0 < count($arTmp))) {
+                $idTmp = $arTmp[0]->user_id;
+                if (!in_array($idTmp, $asesoresSabadosAnt) and in_array($idTmp, $idAsesores) and (1 < $idTmp))
+                    $asesoresSabadosAnt[] = $idTmp;
+            }
+            $lunesAnt = (new Carbon($lunesAnt))->subWeek()->format("Y-m-d");
+            $sabadoAnt = (new Carbon($sabadoAnt))->subWeek()->format("Y-m-d");
+        }
+        $asesoresLunesAnt = array_reverse(  // Al revertir el arreglo, quedan primero los id que tienen mas tiempo sin hacer turno.
+                                array_merge($asesoresLunesAnt,      // Une los ids de los turnos anteriores, con los que no han hecho (nuevos).
+                                    array_diff($idAsesores, $asesoresLunesAnt)));   // Devuelve los id de quienes no han hecho turno.
+        $asesoresSabadosAnt = array_reverse(// Al revertir el arreglo, quedan primero los id que tienen mas tiempo sin hacer turno.
+                                array_merge($asesoresSabadosAnt,    // Une los ids de los turnos anteriores, con los que no han hecho (nuevos).
+                                    array_diff($idAsesores, $asesoresSabadosAnt))); // Devuelve los id de quienes no han hecho turno.
+        //dd($idAsesores, $asesoresLunesAnt, $asesoresSabadosAnt);
+        if ((isset($asesoresLunesAnt) and (0 < count($asesoresLunesAnt))) and // Tenemos los turnos de la semana pasada?
+            (isset($asesoresSabadosAnt) and (0 < count($asesoresSabadosAnt)))) {
             $ids = [];
+            $idLunes = array_shift($asesoresLunesAnt);  // Asesor del lunes en la mañana.
+            $idSabado = $asesoresSabadosAnt[0];
+            if ($idSabado == $idLunes) $idSabado = $asesoresSabadosAnt[1];
+/*
 // user_id = 1 (administrador/feriado) no debo incluirlo en el 'WHERE' de '$users... = Turno...', porque
 // si el lunes/sabado anterior es feriado, no queremos que me arroje arreglos vacios.
-            foreach ($usersLunesAnt as $id) {
+            foreach ($asesoresLunesAnt as $id) {
                 if (!in_array($id->user_id, $ids) and (1 < $id->user_id)) $ids[] = $id->user_id;
             }
-            if (isset($usersSabadoAnt) and (!in_array($usersSabadoAnt[0]->user_id, $ids))) {
-                if (1 < $usersSabadoAnt[0]->user_id) {
-                    $idSabado = $usersSabadoAnt[0]->user_id;
+            if (isset($asesoresSabadosAnt) and (!in_array($asesoresSabadosAnt[0]->user_id, $ids))) {
+                if (1 < $asesoresSabadosAnt[0]->user_id) {
+                    $idSabado = $asesoresSabadosAnt[0]->user_id;
                     $ids[] = $idSabado;
                 }
             }
             $idsInicial = $ids;
+ */
 // Ya tenemos el arreglo '$ids'.
             $j = -1;
             $nuevosTurnos = [];
-            for ($i = 0; $i < 3; $i++) {
-                if ($max > count($ids)) {
-                    $nroId = General::idAlAzar($ids, $min, $max, $users);
-                    if (!in_array($nroId, $ids)) $ids[] = $nroId;
+            $nuevosTurnos[] = $this::turnoNuevo($semana, 0, '08', $idLunes);
+            $ids[] = $idLunes;  // Asesor del lunes en la mañana.
+            for ($i = 1; $i < 3; $i++) {
+                if ($max >= count($ids)) {
+                    list($nroId, $j) = General::idAlAzar($j, $ids, $min, $max, $idAsesores);
                 } else {	// Se acabaron los id de asesores, ubicaremos el resto de turnos de acuerdo al arreglo $ids.
-                    list($nroId, $j) = General::idDelArreglo($j, $ids, $idsInicial, $i);
+                    list($nroId, $j) = General::idDelArreglo($j, $ids, $i);
                 }
                 $nuevosTurnos[] = $this::turnoNuevo($semana, $i, '08', $nroId);
             }
             for ($i = 0; $i < 3; $i++) {
-                if ($max > count($ids)) {
-                    $nroId = General::idAlAzar($ids, $min, $max, $users);
-                    if (!in_array($nroId, $ids)) $ids[] = $nroId;
+                if ($max >= count($ids)) {
+                    list($nroId, $j) = General::idAlAzar($j, $ids, $min, $max, $idAsesores);
                 } else {	// Se acabaron los id de asesores, ubicaremos el resto de turnos de acuerdo al arreglo $ids.
-                    list($nroId, $j) = General::idDelArreglo($j, $ids, $idsInicial, $i);
+                    list($nroId, $j) = General::idDelArreglo($j, $ids, $i);
                 }
                 $nuevosTurnos[] = $this::turnoNuevo($semana, $i, '12', $nroId);
-            }
-            for ($i = 3; $i < 6; $i++) {
-                if ($max > count($ids)) {
-                    $nroId = General::idAlAzar($ids, $min, $max, $users);
-                    if (!in_array($nroId, $ids)) $ids[] = $nroId;
-                } else {	// Se acabaron los id de asesores, ubicaremos el resto de turnos de acuerdo al arreglo $ids.
-                    list($nroId, $j) = General::idDelArreglo($j, $ids, $idsInicial, $i);
-                }
-                $nuevosTurnos[] = $this::turnoNuevo($semana, $i, '08', $nroId);
             }
             for ($i = 3; $i < 5; $i++) {
-                if ($max > count($ids)) {
-                    $nroId = General::idAlAzar($ids, $min, $max, $users);
-                    if (!in_array($nroId, $ids)) $ids[] = $nroId;
+                if ($max >= count($ids)) {
+                    list($nroId, $j) = General::idAlAzar($j, $ids, $min, $max, $idAsesores, $idSabado);
                 } else {	// Se acabaron los id de asesores, ubicaremos el resto de turnos de acuerdo al arreglo $ids.
-                    list($nroId, $j) = General::idDelArreglo($j, $ids, $idsInicial, $i);
+                    list($nroId, $j) = General::idDelArreglo($j, $ids, $i, $idSabado);
+                }
+                $nuevosTurnos[] = $this::turnoNuevo($semana, $i, '08', $nroId);
+            }
+            $nuevosTurnos[] = $this::turnoNuevo($semana, 5, '08', $idSabado);
+            for ($i = 3; $i < 5; $i++) {
+                if ($max >= count($ids)) {
+                    list($nroId, $j) = General::idAlAzar($j, $ids, $min, $max, $idAsesores, $idSabado);
+                } else {	// Se acabaron los id de asesores, ubicaremos el resto de turnos de acuerdo al arreglo $ids.
+                    list($nroId, $j) = General::idDelArreglo($j, $ids, $i, $idSabado);
                 }
                 $nuevosTurnos[] = $this::turnoNuevo($semana, $i, '12', $nroId);
             }
-            //dd("min: $min", "max: $max", 'ids:', $ids, 'idsInicial:', $idsInicial, 'nuevosTurnos:', $nuevosTurnos, 'users: ', $users);
+            //dd("min: $min", "max: $max", 'ids:', $ids, 'idSabado:', $idSabado, 'nuevosTurnos:', $nuevosTurnos, 'idAsesores: ', $idAsesores);
             foreach ($nuevosTurnos as $turno) {
                 Turno::create([
                     'turno'     => $turno['turno'],
@@ -245,7 +275,7 @@ class TurnoController extends Controller
                 ]);
             }
             return redirect()->route('turnos.editar', $semana);
-        }   // if ((isset($usersLunesAnt) and (0 < count($usersLunesAnt))) and (isset($usersSabadoAnt) and (0 < count($usersSabadoAnt)))) {
+        }   // if ((isset($asesoresLunesAnt) and (0 < count($asesoresLunesAnt))) and (isset($asesoresSabadosAnt) and (0 < count($asesoresSabadosAnt)))) {
 // Crea el arreglo '$dia' con la fecha de cada dia de la semana; para el cual, se va a crear el turno.
         for ($d = 0; $d < 6; $d++) {
 // Si '$fecha' no la inicia; nuevamente, es modificada cada vez que se ejecuta este comando.

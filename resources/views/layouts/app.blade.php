@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="es">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -13,15 +13,17 @@
 @if (!isset($accion) or ('html' == $accion){{-- or ('reportes-chart' == $view_name)--}})
     <!-- Bootstrap core CSS -->
     <!--link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous"-->
-    <link href="{{ asset('css/app.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/app.css') }}" rel="stylesheet"><!-- bootstrap {{ $view_name }} -->
+  @if ((strpos($view_name, 'calendario') === false) and (strpos($view_name, 'editar') === false))
     <!--link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/open-iconic/1.1.1/font/css/open-iconic-bootstrap.css" integrity="sha256-CNwnGWPO03a1kOlAsGaH5g8P3dFaqFqqGFV/1nkX5OU=" crossorigin="anonymous" /-->
     <link rel="stylesheet" href="{{ asset('open-iconic-master/font/css/open-iconic-bootstrap.css') }}">
+  @endif (!strpos($view_name, 'calendario'))
     <!-- Custom styles for this template -->
-    <link href="{{ asset('css/style.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/style.css') }}" rel="stylesheet"><!-- permite comenzar debajo de la barra 'header' del menu -->
     <link href="{{ asset('css/c21pr.css') }}" rel="stylesheet">
-    <script src="{{ asset('js/app.js') }}"></script>
+    <script src="{{ asset('js/app.js') }}"></script><!-- jQuery -->
 
-    @yield('jshead')
+  @yield('jshead')
 @else (!isset($accion) or ('html' == $accion))
     <link href="{{ asset('css/pdf.css') }}" rel="stylesheet">
     <link href="{{ asset('css/Chart.min.css') }}" rel="stylesheet">
@@ -47,11 +49,11 @@
           <img src="{{ (asset('img/c21pr.jpg')) }}" title="C21 Puente Real"
                 alt="C21 Puente Real" style="width:32px;height:31px;">
         </a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse"
+        <!--button class="navbar-toggler" type="button" data-toggle="collapse"
                 data-target="#navbarCollapse" aria-controls="navbarCollapse"
                 aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
-        </button>
+        </button-->
         <div class="collapse navbar-collapse" id="navbarCollapse">
         @auth
           <ul class="navbar-nav mr-auto col-md-10">
@@ -66,10 +68,12 @@
             <li class="nav-item">
             @endif
               <a class="nav-link" 
-            @if ('users' != $hMenu)
-              href="/{{ $hMenu }}"
-            @else
+            @if ('users' == $hMenu)
               href="/usuarios"
+            @elseif ('turnos' == $hMenu)
+              href="/{{ $hMenu }}/calendario"
+            @else
+              href="/{{ $hMenu }}"
             @endif
               >
               {{ $muestraMenu }} <!-- span class="sr-only">(current)</span -->
@@ -190,19 +194,19 @@
 @endif (!isset($accion) or ('html' == $accion))
 
     <!-- Begin page content -->
-    <main role="main" class="container">
-        <div class="row mt-1">  <!-- margen de arriba (top margin) es 1 -->
-            <div class="col-lg-12"> <!-- Cambie de sm a lg el 15/09/2019 -->
-            @auth
-              @yield('content')
-            @else
-              @if ('auth' == substr($view_name, 0, 4))
-                @yield('content')
-              @endif
-            @endauth
-            </div>
+    <main role="main" class="container"><!-- rem depende del elemento raiz de la pagina, o sea del tamaño fuente del elemento <html> -->
+      <div class="row mt-1 ml-0 pl-0 no-gutters">  <!-- margen de arriba (top margin) es 0.25rem -->
+        <div class="col-lg-12 ml-0 pl-0 no-gutters"> <!-- Cambie de sm a lg el 15/09/2019 -->
+        @auth
+          @yield('content')
+        @else
+          @if ('auth' == substr($view_name, 0, 4))
+            @yield('content')
+          @endif
+        @endauth
         </div>
-     </main>
+      </div>
+    </main>
 
 @if (!isset($accion) or ('html' == $accion))
     <footer class="footer">

@@ -9,7 +9,7 @@ use Mpdf\Mpdf;
 //use MisClases\Fecha;
 
 class General {
-    public const LINEASXPAGINA = 10;
+    public const LINEASXPAGINA = 15;
 
     public const menuHorizontal = [
                     'home' => 'Home', 'contactos' => 'Contactos',

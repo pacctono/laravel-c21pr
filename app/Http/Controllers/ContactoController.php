@@ -21,6 +21,7 @@ use Illuminate\Support\Facades\Mail;
 use Carbon\Carbon;                          // PC
 use Jenssegers\Agent\Agent;                 // PC
 use Mpdf\Mpdf;
+use App\MisClases\Fecha;                    // PC
 use App\MisClases\General;                  // PC
 
 class ContactoController extends Controller
@@ -41,6 +42,44 @@ class ContactoController extends Controller
 
         $title = 'Listado de ' . $this->tipoPlural;
         $ruta = request()->path();
+        $dato = request()->all();
+        //dd($ruta, $dato);
+        if (1 >= count($dato)) $paginar = True; // Inicialmente, el arreglo '$dato' esta vacio.
+        else $paginar = False;
+// Todo se inicializa, cuando se selecciona 'Contactos' desde el menu vertical.
+        if (('GET' == request()->method()) and ('' == $orden) and (0 == count($dato))) {
+            session(['fecha_desde' => '', 'fecha_hasta' => '', 'deseo' => '',
+                        'asesor' => '0']);
+        }
+/*
+ * Manejo de las variables de la forma lateral. $dato (fecha_desde, fecha_hasta, deseo,
+ * asesor).
+ * Cuando el arreglo $dato contiene un solo item, este es el número de página (page=n).
+ * Si el arreglo $dato está vacio (count($arreglo) == 0, esta opcion fue manejada arriba),
+ * es una ruta 'GET' con o sin $orden.
+ * Si $dato tiene más de 1 item. Fue seleccionado una fecha y/o deseo y/o un asesor.
+ */
+        if (1 >= count($dato)) {    // Arriba, paginar es True.
+            $fecha_desde = session('fecha_desde', '');
+            $fecha_hasta = session('fecha_hasta', '');
+            $deseo       = session('deseo', '');
+            $asesor      = session('asesor', '0');
+        } else {
+            if (isset($dato['asesor'])) $asesor = $dato['asesor'];
+            else $asesor = 0;
+
+            if (isset($dato['deseo'])) $deseo = $dato['deseo'];
+            else $deseo = '';
+
+            if (!isset($dato['fecha_desde']) or ('' == $dato['fecha_desde']))
+                $fecha_desde = (new Carbon(Propiedad::min('created_at')));
+            else $fecha_desde = (new Carbon($dato['fecha_desde']));
+            if (!isset($dato['fecha_hasta']) or ('' == $dato['fecha_hasta']))
+                $fecha_hasta = (new Carbon(Propiedad::max('created_at')));
+            else $fecha_hasta = (new Carbon($dato['fecha_hasta']));
+/*            list ($fecha_desde, $fecha_hasta) = Fecha::periodo($dato, $fecha_min,
+                                                                $fecha_max);*/
+        }
 
 // En caso de volver luego de haber enviado un correo 's', ver el metodo 'emailcita', en AgendaController.
 // En caso de volver luego de haber enviado un correo 'S', 'N', ver el metodo 'self::correoReporteCierre'.
@@ -60,58 +99,54 @@ class ContactoController extends Controller
             $sentido = 'desc';
         }
 
-        $agente = new Agent();
-        $movil  = $agente->isMobile() and true;             // Fuerzo booleana. No funciona al usar el metodo directamente.
         if (Auth::user()->is_admin) {
-            $contactos = Contacto::orderBy($orden, $sentido);
+            $contactos = Contacto::where('id', '>', 0);     // dummy
+            $users   = User::where('activo', True)->get(['id', 'name']);     // Todos los usuarios (asesores), excepto los no activos.
+            $users[0]['name'] = 'Administrador';
         } else {
             $contactos = User::find(Auth::user()->id)
-                        ->contactos()->whereNull('user_borro')->orderBy($orden, $sentido);
+                        ->contactos()->whereNull('user_borro');
+            $users = '';
             //return redirect('/contactos/create');
         }
-        if ($movil or ('html' != $accion)) $contactos = $contactos->get();
-        else $contactos = $contactos->paginate($this->lineasXPagina);
-        //dd(Auth::user()->id);
+        //dd($asesor, $deseo, $fecha_desde, $fecha_hasta, $contactos);
+        if (0 < $asesor) {      // Se selecciono un asesor cerrador o esta conectado.
+            $contactos = $contactos->where('user_id', $asesor);
+        }
+        if ('' != $deseo) {       // Se selecciono una deseo.
+            $contactos = $contactos->where('deseo_id', $deseo);
+        }
 
+        if ('' != $fecha_desde and '' != $fecha_hasta) {    // Se seleccionaron fechas.
+            $fecha_desde = substr($fecha_desde, 0, 10);
+            $fecha_hasta = substr($fecha_hasta, 0, 10);
+            $contactos = $contactos->whereBetween('created_at', [$fecha_desde, $fecha_hasta]);
+        } else $contactos = $contactos->where('created_at', '<=', now(Fecha::$ZONA));
+
+        $contactos = $contactos->orderBy($orden, $sentido);
+        $deseos = Deseo::get();    // Todos los deseos.
+
+        $agente = new Agent();
+        $movil  = $agente->isMobile() and true;             // Fuerzo booleana. No funciona al usar el metodo directamente.
+        $paginar = ($paginar)?!($movil or ('html' != $accion)):$paginar;
+        if ($paginar) $contactos = $contactos->paginate($this->lineasXPagina);      // Pagina la impresión de 10 en 10
+        else $contactos = $contactos->get();                // Mostrar todos los registros.
+        session(['fecha_desde' => $fecha_desde, 'fecha_hasta' => $fecha_hasta,    // Asignar valores en sesión.
+                    'deseo' => $deseo, 'asesor' => $asesor,
+                    'orden' => $orden
+                ]);
+        //dd($asesor, $deseo, $fecha_desde, $fecha_hasta, $contactos);
         if ('html' == $accion)
             return view('contactos.index',
-                    compact('title', 'contactos', 'ruta', 'alertar', 'orden', 'movil', 'accion'));
+                    compact('title', 'contactos', 'ruta', 'users', 'asesor',
+                            'deseos', 'deseo',
+                            'alertar', 'orden', 'movil', 'accion', 'paginar'));
         $html = view('contactos.index',
-                    compact('title', 'contactos', 'ruta', 'alertar', 'orden', 'movil', 'accion'))
+                    compact('title', 'contactos', 'ruta', 'users', 'asesor',
+                            'deseos', 'deseo',
+                            'alertar', 'orden', 'movil', 'accion', 'paginar'))
                 ->render();
-        //dd($html);
         General::generarPdf($html, 'contactosIniciales', $accion);
-/*
-        $namefile = 'contactosIniciales_'.time().'.pdf';
- 
-        $defaultConfig = (new \Mpdf\Config\ConfigVariables())->getDefaults();
-        $fontDirs = $defaultConfig['fontDir'];
- 
-        $defaultFontConfig = (new \Mpdf\Config\FontVariables())->getDefaults();
-        $fontData = $defaultFontConfig['fontdata'];
-        $mpdf = new Mpdf([
-            'fontDir' => array_merge($fontDirs, [
-                public_path() . '/fonts',
-            ]),
-            'fontdata' => $fontData + [
-                'arial' => [
-                    'R' => 'arial.ttf',
-                    'B' => 'arialbd.ttf',
-                ],
-            ],
-            'default_font' => 'arial',
-            "format" => "letter",  // Carta. Otras opciones: A4, A3, A2, etc.
-        ]);
-        // $mpdf->SetTopMargin(5);
-        $mpdf->SetDisplayMode('fullpage');
-        $mpdf->WriteHTML($html);
-        // dd($mpdf);
-        if($accion=='ver'){
-            $mpdf->Output($namefile,"I");
-        }elseif($accion=='descargar'){
-            $mpdf->Output($namefile,"D");   // "D": Descargar el archivo. "F": Guardar el archivo.
-        }
- */
     }
 
     public function filtro($filtro)
@@ -126,7 +161,7 @@ class ContactoController extends Controller
         if ('' == $filtro or is_null($filtro)) {
             $filtro = 'created_at';
         }
-        if (1 == Auth::user()->is_admin) {
+        if (Auth::user()->is_admin) {
             $contactos = Contacto::whereNull('user_borro')
                                     ->orderBy($filtro)
                                     ->paginate($this->lineasXPagina);

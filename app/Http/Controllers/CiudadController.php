@@ -22,6 +22,7 @@ class CiudadController extends Controller
     protected $vistaCrear  = 'tabla.crear';
     protected $vistaIndice = 'tabla.index';
     protected $vistaEditar = 'tabla.editar';
+    protected $lineasXPagina = General::LINEASXPAGINA;
 
     public function index($orden=null, $accion='html')
     {
@@ -48,7 +49,7 @@ class CiudadController extends Controller
             $orden = 'id';
         }
         if ($movil or ('html' != $accion)) $arreglo = Ciudad::orderBy($orden)->get();
-	else $arreglo = Ciudad::orderBy($orden)->paginate(10);
+	else $arreglo = Ciudad::orderBy($orden)->paginate($this->lineasXPagina);
 //        dd($arreglo);
         if ('html' == $accion)
             return view($this->vistaIndice,
@@ -158,10 +159,10 @@ class CiudadController extends Controller
      */
     public function destroy(Ciudad $ciudad)
     {
-        if (0 < ($ciudad->propiedades->count()-$ciudad->propiedadesBorradas($ciudad->id)->count())) {
+        if (0 < ($ciudad->propiedades->count()-$ciudad->propiedadesBorrados($ciudad->id)->count())) {
             return redirect()->route($this->ruta);  // Existen propiedades asignados a este usuario.
         }
-        if (0 < $ciudad->propiedadesBorradas($ciudad->id)->count()) {    // Existen propiedades borrados (logico).
+        if (0 < $ciudad->propiedadesBorrados($ciudad->id)->count()) {    // Existen propiedades borrados (logico).
             $propiedades = $ciudad->propiedades;         // Todos los propiedades con este ciudad, estan borrados.
             foreach ($propiedades as $propiedad) {     // Ciclo para borrar fisicamente los propiedades.
                 $propiedad->delete();

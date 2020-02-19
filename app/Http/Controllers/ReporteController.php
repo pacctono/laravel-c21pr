@@ -367,14 +367,14 @@ class ReporteController extends Controller
             $orden = 'id';
         }
         $tipoId   = $tipo . '_id';      // $tipo = 'user', $tipoId = 'user_id'.
-        $vclientes = VistaCliente::where($tipoId, $id)->orderBy($orden)
+        $contactos = VistaCliente::where($tipoId, $id)->orderBy($orden)		// Para mantener la herencia de los contactos.
                                 ->paginate($this->lineasXPagina);
 
 	    $rutRetorno = 'reporte.contactos' . ucfirst($tipo);
 	    $tipo .= 's';						// route 'users'
         $agente = new Agent();
         $movil  = $agente->isMobile() and true;             // Fuerzo booleana. No funciona al usar el metodo directamente.
-        return view('reportes.contactos', compact('title', 'vclientes', 'tipo',
+        return view('reportes.contactos', compact('title', 'contactos', 'tipo',
                                                     'rutRetorno', 'id', 'movil'));
     }
 /*
@@ -576,9 +576,12 @@ class ReporteController extends Controller
         }
 
         $ruta = request()->path();
-        $tipo = strtolower(substr($ruta, 20, strpos($ruta, '/', 20)-20));
+        $tipo = strtolower(substr($ruta, 20, strpos($ruta, '/', 20)-20));   // Los primeros 20 caracteres de $ruta: 'reportes/propiedades'.
 	    $modelo = 'App\\' . ucfirst($tipo);
-        $title = $this->titProp . 'con ' . $tipo . ': ' . $modelo::find($id)->descripcion;
+        $title = $this->titProp;
+        if ('user' != $tipo)
+            $title .= 'con ' . $tipo . ': ' . $modelo::findOrFail($id)->descripcion;
+        else $title .= ' del asesor: ' . User::findOrFail($id)->name;
 
         if ('' == $orden or is_null($orden)) {
             $orden = 'id';

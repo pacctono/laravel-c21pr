@@ -25,6 +25,7 @@ use App\MisClases\General;               // PC
 class AgendaController extends Controller
 {
     protected $tipo = 'cita ';
+    protected $lineasXPagina = 20/*General::LINEASXPAGINA*/;
 
     public function index($orden=null, $accion='html') {
         if (!(Auth::check())) {             // No esta conectado.
@@ -117,7 +118,7 @@ class AgendaController extends Controller
             $agendas = $agendas->orderBy('fecha_evento');   // ordenar por fecha_evento en cada usuario.
         }
         if ($movil or ('html' != $accion)) $agendas = $agendas->get();
-        else $agendas = $agendas->paginate(10);               // Pagina la impresión de 10 en 10
+        else $agendas = $agendas->paginate($this->lineasXPagina);               // Pagina la impresión de 10 en 10
         session(['rPeriodo' => $rPeriodo, 'fecha_desde' => $fecha_desde,    // Asignar valores en sesión.
                     'fecha_hasta' => $fecha_hasta, 'asesor' => $asesor]);
         //if ('este_mes' == $rPeriodo) dd($agendas, $users, $fecha_desde, $fecha_hasta, $asesor);

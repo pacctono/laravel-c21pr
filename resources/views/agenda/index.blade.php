@@ -1,107 +1,13 @@
 @extends('layouts.app')
 
 @section('content')
-  <!-- div class="card-body">
-    <h1>{{ $title }}</h1>
-  </div -->
-@if ((!$movil) and (!isset($accion) or ('html' == $accion)))
+@if (isset($accion) and ('html' != $accion))
 <div>
-    <form method="POST" class="form-horizontal" action="{{ route('agenda.post') }}"
-          onSubmit="return alertaFechaRequerida()">
-      {!! csrf_field() !!}
-
-    @includeWhen(!$movil, 'include.intervalo')
-
-      <div class="form-row my-0 py-0 mx-1 px-1">
-    @include('include.fechas')
-    @includeWhen(Auth::user()->is_admin, 'include.asesor', ['berater' => 'asesor']) {{-- Obligatorio berater (asesor en aleman) --}}
-    @include('include.botonMostrar')
-      </div>
-    {{--@if (!$movil)
-      <div class="form-row my-0 py-0 mx-1 px-1">
-        @foreach (['hoy', 'ayer', 'manana', 'esta_semana', 'semana_pasada', 'proxima_semana',
-                  'este_mes', 'mes_pasado', 'proximo_mes', 'todo', 'intervalo'] as $intervalo)
-        <div class="form-check form-check-inline my-1 py-0 mx-1 px-0">
-          <input class="form-check-input form-check-input-sm" type="radio" required name="periodo"
-                  id="_{{ $intervalo }}" value="{{ $intervalo }}"
-          @if ($rPeriodo == $intervalo)
-            checked
-          @endif
-          >
-          <label class="form-check-label form-check-label-sm" for="_{{ $intervalo }}">
-          @if ('manana' == $intervalo)
-          Mañana
-          @elseif ('intervalo' == $intervalo)
-          Otro
-          @else
-          {{ str_replace('_', ' ', ucfirst($intervalo)) }}
-          @endif
-          </label>
-        </div>
-        @endforeach
-      </div>
-    @endif
-      <div class="form-row my-0 py-0 mx-1 px-1">
-        <div class="form-group form-inline my-1 py-0 mx-0 px-0">
-          <label class="control-label" for="fecha_desde">
-            Desde:</label>
-          <input class="form-control form-control-sm" type="date" name="fecha_desde"
-                  id="fecha_desde" min="{{ now() }}" max="{{ now() }}"
-                  value="{{ old('fecha_desde', $fecha_desde) }}">
-        </div>
-        <div class="form-group form-inline my-1 py-0 mx-0 px-0">
-          <label class="control-label" for="fecha_hasta">
-            Hasta</label>
-          <input class="form-control form-control-sm" type="date" name="fecha_hasta"
-                  id="fecha_hasta" min="{{ now() }}" max="{{ now() }}"
-                  value="{{ old('fecha_hasta', $fecha_hasta) }}">
-        </div>
-      @if (Auth::user()->is_admin)
-        <div class="form-group form-inline my-1 py-0 mx-0 px-0">
-          <select class="form-control form-control-sm" name="asesor" id="asesor">
-            <option value="0">Asesor</option>
-            @foreach ($users as $user)
-              <option value="{{ $user->id }}"
-              @if (old("asesor", $asesor) == $user->id)
-                selected
-              @endif
-              >
-                {{ $user->name }}
-              </option>
-            @endforeach
-          </select>
-        </div>
-      @endif
-        <div class="col-lg-2">
-          <button type="submit" class="btn btn-success">Mostrar</button>
-        </div>
-      </div>--}}
-    </form>
+    <h4 style="text-align:center;margin:0.25px 0px 0.25px 0px;padding:0px">
+      {{ $title }}
+    </h4>
 </div>
-@endif ((!$movil) and (!isset($accion) or ('html' == $accion)))
-<div class="d-flex justify-content-between align-items-end mb-1">
-  @if (!isset($accion) or ('html' == $accion))
-    @if ($movil)
-    <h4 class="pb-1">Agenda</h4>
-    @else
-    <h1 class="pb-1">Agenda</h1>
-    @endif
-  @else (!isset($accion) or ('html' == $accion))
-    <h1 style="text-align:center;">Agenda</h1>
-  @endif (!isset($accion) or ('html' == $accion))
-
-  @if (!isset($accion) or ('html' == $accion))
-    <p>
-        <a href="{{ route('agendaPersonal.crear') }}" class="btn btn-primary">
-        @if ($movil)
-            Crear
-        @else
-            Crear Cita Personal
-        @endif
-        </a>
-    </p>
-  @endif (!isset($accion) or ('html' == $accion))
-</div>
+@endif (isset($accion) and ('html' != $accion))
 
 @if (isset($alertar))
 @if (0 < $alertar)
@@ -110,13 +16,48 @@
     <script>alert("No fue enviado el correo al asesor. Probablemente, problemas con Internet! Revise su conexión");</script>
 @endif (0 < $alertar)
 @endif (isset($alertar))
-@if ($agendas->isNotEmpty())
+
 @if ((!$movil) and (!isset($accion) or ('html' == $accion)))
-    {{ $agendas->links() }}
+<div class="row no-gutters">
+<div class="col-2 no-gutters" style="font-size:0.75rem">
+  <div class="card mt-0 mb-1 mx-0 p-0">
+    <h4 class="card-header m-0 p-0">Filtrar listado</h4>
+    <div class="card-body m-0 p-0">
+      <form method="POST" class="form-vertical m-0 p-0"
+            action="{{ route('agenda.post') }}" onSubmit="return alertaFechaRequerida()">
+        {!! csrf_field() !!}
+
+        @includeWhen(!$movil, 'include.intervalo')
+
+        @include('include.fechas')
+        @includeWhen(Auth::user()->is_admin, 'include.asesor', ['berater' => 'asesor'])   {{-- Obligatorio pasar la variable 'berater' --}}
+        @include('include.botonMostrar')
+      </form>
+    </div>
+  </div>
+  <div class="card mt-1 mb-0 p-0 mx-0">
+    <h4 class="card-header m-0 p-0">Cita personal</h4>
+    <div class="card-body m-0 p-0">
+      <a href="{{ route('agendaPersonal.crear') }}" class="btn btn-primary my-0 py-0 mx-auto px-auto">
+      @if ($movil)
+        Crear
+      @else
+        Crear Cita Personal
+      @endif
+      </a>
+    </div>
+  </div>
+</div>
+<div class="col-10 no-gutters">
 @endif ((!$movil) and (!isset($accion) or ('html' == $accion)))
+
+{{--@if ((!$movil) and (!isset($accion) or ('html' == $accion)))
+    {{ $agendas->links() }}
+@endif ((!$movil) and (!isset($accion) or ('html' == $accion)))--}}
+@if ($agendas->isNotEmpty())
 <table
 @if (!isset($accion) or ('html' == $accion))
-  class="table table-striped table-hover table-bordered"
+  class="table table-striped table-hover table-bordered my-0 py-0"
 @else (!isset($accion) or ('html' == $accion))
   class="center"
 @endif (!isset($accion) or ('html' == $accion))
@@ -126,19 +67,19 @@
     @if (isset($accion) and ('html' != $accion))
       class="encabezado"
     @else (isset($accion) and ('html' != $accion))
-      class="my-0 py-0"
+      class="my-0 py-0 mx-0 px-0"
     @endif (isset($accion) and ('html' != $accion))
     >
-      <th scope="col">
-        <a class=@if('html'==$accion) "btn btn-link" href=
+      <th class="my-0 py-0" scope="col">
+        <a class=@if('html'==$accion) "btn btn-link m-0 p-0" href=
             @else "enlaceDesabilitado" name=
             @endif "{{ route('agenda.orden', 'fecha_evento') }}">
           Fecha
         </a>
       </th>
-      <th scope="col">Hora</th>
-      <th scope="col">Cita</th>
-      <th scope="col">
+      <th class="my-0 py-0" scope="col">Hora</th>
+      <th class="my-0 py-0" scope="col">Cita</th>
+      <th class="my-0 py-0" scope="col">
       @if ($movil)
         Contacto
       @else
@@ -146,7 +87,7 @@
           @if (Auth::user()->is_admin)
             title="Al ordenar por nombre de contacto, no mostrará los turnos"
           @endif
-            class=@if('html'==$accion) "btn btn-link" href=
+            class=@if('html'==$accion) "btn btn-link m-0 p-0" href=
             @else "enlaceDesabilitado" name=
             @endif "{{ route('agenda.orden', 'name') }}">
           Nombre de la cita
@@ -154,10 +95,10 @@
       @endif
       </th>
     @if (!$movil)
-      <th scope="col">Telefono</th>
-      <th scope="col">
+      <th class="my-0 py-0" scope="col">Telefono</th>
+      <th class="my-0 py-0" scope="col">
       @if (Auth::user()->is_admin)
-      <a class=@if('html'==$accion) "btn btn-link" href=
+      <a class=@if('html'==$accion) "btn btn-link m-0 p-0" href=
          @else "enlaceDesabilitado" name=
          @endif "{{ route('agenda.orden', 'user_id') }}">
         Nombre Asesor
@@ -167,7 +108,7 @@
       @endif
       </th>
     @if (!isset($accion) or ('html' == $accion))
-      <th scope="col">Acciones</th>
+      <th class="my-0 py-0" scope="col">Acciones</th>
     @endif (!isset($accion) or ('html' == $accion))
     @endif (!$movil)
     </tr>
@@ -180,10 +121,10 @@
     @else
         table-info
     @endif
-    ">
-      <td>
+     m-0 p-0">
+      <td class="m-0 p-0">
       @if (($movil) && (NULL != $agenda->contacto_id))
-        <a href="{{ route('agenda.show', $agenda->contacto) }}" class="btn btn-link">
+        <a href="{{ route('agenda.show', $agenda->contacto) }}" class="btn btn-link m-0 p-0">
           {{ $agenda->evento_dia_semana }}
         </a>
       @else (($movil) && (NULL != $agenda->contacto_id))
@@ -195,20 +136,20 @@
         {{ $agenda->fec_eve }}
       @endif ($movil)
       </td>
-      <td>
+      <td class="m-0 p-0">
         {{ $agenda->hora_evento }}
       </td>
-      <td>
-        {{ $agenda->descripcion }}
+      <td class="m-0 p-0">
+        {{ (false === strpos($agenda->descripcion, 'Turno'))?$agenda->descripcion:'Turno' }}
       </td>
-      <td title="DIRECCIÓN: {{ $agenda->direccion??'No fue suministrada' }}">
+      <td class="m-0 p-0" title="DIRECCIÓN: {{ $agenda->direccion??'No fue suministrada' }}">
         {{ $agenda->name }}
       </td>
     @if (!$movil)
     @if (Auth::user()->is_admin)
-      <td title="CORREO: {{ $agenda->email??'No fue suministrado' }}">
+      <td class="m-0 p-0" title="CORREO: {{ $agenda->email??'No fue suministrado' }}">
     @else (Auth::user()->is_admin)
-      <td>
+      <td class="m-0 p-0">
     @endif (Auth::user()->is_admin)
       @if ('' != $agenda->telefono)
         {{ $agenda->telefono_f }}
@@ -216,7 +157,7 @@
         {{ $agenda->user->telefono_f }}
       @endif (Auth::user()->is_admin)
       </td>
-      <td>
+      <td class="m-0 p-0">
       @if (Auth::user()->is_admin)
         {{ $users->find($agenda->user_id)->name }}  {{-- Si el indice es 1, retorna 'Administrador'; de la manera "correcta", retorna 'Feriado'. --}}
       @else (Auth::user()->is_admin)
@@ -224,7 +165,7 @@
       @endif (Auth::user()->is_admin)
       </td>
     @if (!isset($accion) or ('html' == $accion))
-      <td class="d-flex align-items-end"> {{-- Acciones: mostrar, editar, email, borrar, etc. --}}
+      <td class="d-flex align-items-end m-0 p-0"> {{-- Acciones: mostrar, editar, email, borrar, etc. --}}
       @if (('T' == $agenda->tipo) or (NULL == $agenda->contacto_id))  {{-- La cita es un turno --}}
         &nbsp;
       @else (('T' == $agenda->tipo) or (NULL == $agenda->contacto_id))  {{-- La cita no es un turno --}}
@@ -236,8 +177,8 @@
       @else
         #
       @endif ('C' == $agenda->tipo)  {{-- Esta cita es con un contacto incial --}}
-            " class="btn btn-link" title="Motrar datos de esta cita.">
-          <span class="oi oi-eye"></span>
+            " class="btn btn-link m-0 p-0" title="Motrar datos de esta cita.">
+          <span class="oi oi-eye my-0 py-0 ml-0 mr-1 px-0"></span>
         </a>
       @if ((Auth::user()->is_admin) || ($agenda->fecha_evento > $hoy))
         <a href="
@@ -248,8 +189,8 @@
       @else
         #
       @endif ('C' == $agenda->tipo)  {{-- Esta cita es con un contacto incial --}}
-            " class="btn btn-link" title="Editar datos de esta cita.">
-          <span class="oi oi-pencil"></span>
+            " class="btn btn-link m-0 p-0" title="Editar datos de esta cita.">
+          <span class="oi oi-pencil my-0 py-0 ml-0 mr-1 px-0"></span>
         </a>
       @endif ((Auth::user()->is_admin) || ($agenda->fecha_evento > $hoy))
       {{--@if (Auth::user()->is_admin)--}}
@@ -262,9 +203,9 @@
       @else
         #
       @endif ('C' == $agenda->tipo)  {{-- Esta cita es con un contacto incial --}}
-            " class="btn btn-link"
+            " class="btn btn-link m-0 p-0"
             title="Enviar{{ (Auth::user()->is_admin)?'':'me' }} correo a '{{ (Auth::user()->is_admin)?$users->find($agenda->user_id)->name:'mi' }}' sobre esta cita">
-          <span class="oi oi-envelope-closed"></span>
+          <span class="oi oi-envelope-closed my-0 py-0 ml-0 mr-1 px-0"></span>
         </a>
       @endif ($agenda->fecha_evento > $hoy)
       {{--@endif (Auth::user()->is_admin)--}}
@@ -278,9 +219,9 @@
 @if (!isset($accion) or ('html' == $accion))
   @if (Auth::user()->is_admin)
   <tfoot>
-    <tr>
-      <td colspan="7">
-        <a href="{{ route('agenda.correoTodasCitas') }}" class="btn btn-link">
+    <tr class="my-0 py-0">
+      <td class="my-0 py-0" colspan="7">
+        <a href="{{ route('agenda.correoTodasCitas') }}" class="btn btn-link m-0 p-0">
           Enviar correo de las citas a los asesores
         </a>
       </td>
@@ -296,8 +237,13 @@
 @include('include.botonesPdf', ['enlace' => 'agenda'])
 
 @else ($agendas->isNotEmpty())
-    <p>No tiene agenda registrada.</p>
+    @includeif('include.noRegistros', ['elemento' => 'citas'])
 @endif ($agendas->isNotEmpty())
+
+@if ((!$movil) and (!isset($accion) or ('html' == $accion)))
+</div><!--div class="col-9"-->
+</div><!--div class="row"-->
+@endif ((!$movil) and (!isset($accion) or ('html' == $accion)))
 
 @endsection
 

@@ -1,6 +1,6 @@
       @if (isset($berater))
-        <div class="form-group form-inline my-1 py-0 mx-0 px-0">
-          <select class="form-control form-control-sm" name="{{ $berater }}" id="{{ $berater }}">
+        <div class="form-group form-inline mt-0 mb-1 p-0 mx-0">
+          <select class="form-control form-control-sm my-0 py-0" name="{{ $berater }}" id="{{ $berater }}">
             <option value="0">{{ ucfirst($berater) }}</option>
             @foreach ($users as $user)
               <option value="{{ $user->id }}"

@@ -11,7 +11,7 @@
         </p> --}}
     </div>
 
-    @if ($vclientes->isNotEmpty())
+    @if ($contactos->isNotEmpty())
     <table class="table table-striped table-hover table-bordered">
         <thead class="thead-dark">
         <tr>
@@ -46,7 +46,7 @@
         </tr>
         </thead>
         <tbody>
-        @foreach ($vclientes as $vcliente)
+        @foreach ($contactos as $vcliente)
         <tr>
             <td>
             @if ($movil)
@@ -105,7 +105,7 @@
     <a href="{{ route($tipo) }}" class="btn btn-link">
         Volver
     </a>
-    {{ $vclientes->links() }}
+    {{ $contactos->links() }}
     @else
         <p>No hay contactos iniciales registrados.</p>
     @endif

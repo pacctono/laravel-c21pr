@@ -154,7 +154,17 @@ class User extends Authenticatable
         return $this->hasMany(Propiedad::class, 'asesor_captador_id'); // Si llave foranea, diferente a esperada, usamos 2do parametro.
     }
 
-    public function cerradorPropiedades()    // asesor_cerrador_id
+    public function propiedadesCaptadas()    // Deberia ser el numero correcto. asesor_captador_id
+    {
+        return $this->hasMany(Propiedad::class, 'asesor_captador_id'); // Si llave foranea, diferente a esperada, usamos 2do parametro.
+    }
+
+    public function cerradorPropiedades()    // Deberia ser el numero correcto. asesor_cerrador_id
+    {
+        return $this->hasMany(Propiedad::class, 'asesor_cerrador_id'); // Si llave foranea, diferente a esperada, usamos 2do parametro.
+    }
+
+    public function propiedadesCerradas()    // asesor_cerrador_id
     {
         return $this->hasMany(Propiedad::class, 'asesor_cerrador_id'); // Si llave foranea, diferente a esperada, usamos 2do parametro.
     }

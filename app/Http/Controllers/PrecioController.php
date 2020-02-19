@@ -22,6 +22,7 @@ class PrecioController extends Controller
     protected $vistaCrear  = 'tabla.crear';
     protected $vistaIndice = 'tabla.index';
     protected $vistaEditar = 'tabla.editar';
+    protected $lineasXPagina = General::LINEASXPAGINA;
 
     public function index($orden=null, $accion='html')
     {
@@ -48,7 +49,7 @@ class PrecioController extends Controller
             $orden = 'id';
         }
         if ($movil or ('html' != $accion)) $arreglo = Precio::orderBy($orden)->get();
-	else $arreglo = Precio::orderBy($orden)->paginate(10);
+	else $arreglo = Precio::orderBy($orden)->paginate($this->lineasXPagina);
 
         if ('html' == $accion)
             return view($this->vistaIndice,

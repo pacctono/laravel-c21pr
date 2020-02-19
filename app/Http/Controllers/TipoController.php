@@ -18,10 +18,11 @@ class TipoController extends Controller
      */
     protected $tipo = 'Tipos';
     protected $ruta = 'tipo';
-    protected $enlace = 'contactos';
+    protected $enlace = 'propiedades';
     protected $vistaCrear  = 'tabla.crear';
     protected $vistaIndice = 'tabla.index';
     protected $vistaEditar = 'tabla.editar';
+    protected $lineasXPagina = General::LINEASXPAGINA;
 
     public function index($orden=null, $accion='html')
     {
@@ -35,7 +36,7 @@ class TipoController extends Controller
         $tipo = $this->tipo;
         $elemento = $this->ruta;
         $enlace   = $this->enlace;
-        $metBorradas = $enlace . 'Borrados';
+        $metBorradas = $enlace . 'Borradas';
         $title = 'Listado de ' . $tipo;
         $rutCrear = $elemento . '.crear';
         $rutMostrar = $elemento . '.show';
@@ -48,7 +49,7 @@ class TipoController extends Controller
             $orden = 'id';
         }
         if ($movil or ('html' != $accion)) $arreglo = Tipo::orderBy($orden)->get();
-	else $arreglo = Tipo::orderBy($orden)->paginate(10);
+	else $arreglo = Tipo::orderBy($orden)->paginate($this->lineasXPagina);
 
         if ('html' == $accion)
             return view($this->vistaIndice,

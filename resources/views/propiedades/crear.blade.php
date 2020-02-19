@@ -1,9 +1,5 @@
 @extends('layouts.app')
 
-@section('jshead')
-
-@endsection
-
 @section('content')
 <div class="card">
     <h4 class="card-header">{{ $title }}</h4>

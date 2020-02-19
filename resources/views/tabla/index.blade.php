@@ -2,19 +2,17 @@
 
 @section('content')
     @if (!isset($accion) or ('html' == $accion))
-    <div class="d-flex justify-content-between align-items-end mb-3">
-        <h1 class="pb-1">{{ $title }}</h1>
+    <div class="d-flex justify-content-between align-items-end my-0 py-0">
+        <h3 class="my-0 py-0">{{ $title }}</h3>
 
     @if ('texto' != $elemento)
-        <p>
-            <a href="{{ route($rutCrear) }}" class="btn btn-primary">
-                Crear {{ ucfirst($elemento) }}
-            </a>
-        </p>
+        <a href="{{ route($rutCrear) }}" class="btn btn-primary my-0 py-0">
+            Crear {{ ucfirst($elemento) }}
+        </a>
     @endif ('texto' != $elemento)
     </div>
     @else (!isset($accion) or ('html' == $accion))
-        <h1 style="text-align:center">{{ $title }}</h1>
+        <h3 style="text-align:center">{{ $title }}</h3>
     @endif (!isset($accion) or ('html' == $accion))
 
     @if ($arreglo->isNotEmpty())
@@ -23,7 +21,7 @@
 @endif ((!$movil) and (!isset($accion) or ('html' == $accion)))
     <table
     @if (!isset($accion) or ('html' == $accion))
-        class="table table-striped table-hover table-bordered"
+        class="table table-striped table-hover table-bordered my-0 py-0"
     @else (!isset($accion) or ('html' == $accion))
         class="center"
     @endif (!isset($accion) or ('html' == $accion))
@@ -31,22 +29,22 @@
         <thead class="thead-dark">
         <tr
         @if (isset($accion) and ('html' != $accion))
-            class="encabezado"
+            class="encabezado my-0 py-0"
         @endif ('html' != $accion)
         >
         @if ((!$movil) and ('texto' != $elemento))
         @if (!isset($accion) or ('html' == $accion))
-            <th scope="col">#</th>
+            <th class="my-0 py-0" scope="col">#</th>
         @endif (!isset($accion) or ('html' == $accion))
-            <th scope="col">id</th>
+            <th class="my-0 py-0" scope="col">id</th>
         @endif ((!$movil) and ('texto' != $elemento))
-            <th scope="col">Descripcion</th>
+            <th class="my-0 py-0" scope="col">Descripcion</th>
         @if ('texto' == $elemento)
-            <th scope="col">Enlace</th>
-            <th scope="col">Texto del enlace</th>
+            <th class="my-0 py-0" scope="col">Enlace</th>
+            <th class="my-0 py-0" scope="col">Texto del enlace</th>
         @endif ('texto' != $elemento)
         @if (!$movil and (!isset($accion) or ('html' == $accion)))
-            <th scope="col">Acciones</th>
+            <th class="my-0 py-0" scope="col">Acciones</th>
         @endif (!$movil and (!isset($accion) or ('html' == $accion)))
         </tr>
         </thead>
@@ -58,34 +56,38 @@
         @else
             table-info
         @endif
-        ">
+        my-0 py-0">
         @if ((!$movil) and ('texto' != $elemento))
         @if (!isset($accion) or ('html' == $accion))
-            <th scope="row">{{ $loop->iteration }}</th>
+            <th class="my-0 py-0" scope="row">{{ $loop->iteration }}</th>
         @endif (!isset($accion) or ('html' == $accion))
-            <td>{{ $arrInd->id }}</td>
+            <td class="my-0 py-0">{{ $arrInd->id }}</td>
         @endif ((!$movil) and ('texto' != $elemento))
-            <td>
-            @if ($enlace and (!isset($accion) or ('html' == $accion)))
+            <td class="my-0 py-0">
+            @if ($enlace and (!isset($accion) or ('html' == $accion)) and (0 < $arrInd->$enlace->count()))
                 <a href="{{ route('reporte.'.$enlace.ucfirst($elemento), [$arrInd->id, 'id']) }}"
-                    class="btn btn-link">
+                    class="btn btn-link"i title="{{ $arrInd->$enlace->count() . ' ' .$enlace }}">
                     {{ $arrInd->descripcion }}
                 </a>
-            @else ($enlace)
+            @else ($enlace){{-- $enlace:contactos|propiedades|False --}}
                 {{ $arrInd->descripcion }}
             @endif ($enlace)
             </td>
         @if ('texto' == $elemento)
-            <td>
+            <td class="my-0 py-0">
                 {{ $arrInd->enlace??'' }}
             </td>
-            <td>
+            <td class="my-0 py-0">
                 {{ $arrInd->textoEnlace??'' }}
             </td>
         @endif ('texto' != $elemento)
         @if (!$movil and (!isset($accion) or ('html' == $accion)))
-            <td>
-            @if ($enlace)
+            <td class="d-flex align-items-end my-0 py-0">
+                <a href="{{ route($rutEditar, $arrInd) }}" class="btn btn-link"
+                    onclick="return seguroEditar({{ $arrInd->id }}, '{{ $elemento }}', '{{ $arrInd->descripcion }}')">
+                    <span class="oi oi-pencil"></span>
+                </a>
+            @if ($enlace){{-- $enlace:contactos|propiedades|False --}}
                 <form action="{{ route($rutBorrar, $arrInd) }}" method="POST"
                         id="forma.{{ $arrInd->id }}" name="forma.{{ $arrInd->id }}"
                         onSubmit="return seguroBorrar({{ $arrInd->id }}, '{{ $elemento }}', '{{ $arrInd->descripcion }}')">
@@ -97,12 +99,14 @@
                     <input type="hidden" name="{{ $enlace }}Borradas"
                             id="{{ $enlace }}Borradas.{{ $arrInd->id }}"
                             value="{{ $arrInd->$metBorradas($arrInd->id)->count() }}">
-                    <a href="{{ route($rutEditar, $arrInd) }}" class="btn btn-link"
-                        onclick="return seguroEditar({{ $arrInd->id }}, '{{ $elemento }}', '{{ $arrInd->descripcion }}')">
-                        <span class="oi oi-pencil"></span>
-                    </a>
                     <button class="btn btn-link"><span class="oi oi-trash"></span></button>
                 </form>
+                @if (('tipo' == $elemento) and (0 < $arrInd->contactos->count()))
+                <a href="{{ route('reporte.contactos'.ucfirst($elemento), [$arrInd->id, 'id']) }}"
+                    class="btn btn-link" title="{{ $arrInd->contactos->count() . ' contactos' }}">
+                    <span class="oi oi-people"></span>
+                </a>
+                @endif ('tipo' == $elemento)
             @else ($enlace)
                 <a href="{{ route($rutEditar, $arrInd) }}" class="btn btn-link">
                     <span class="oi oi-pencil"></span>

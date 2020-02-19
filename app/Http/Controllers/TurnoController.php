@@ -15,13 +15,14 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use Carbon\Carbon;
 use Jenssegers\Agent\Agent;                 // PC
+use Calendar;
 use App\MisClases\Fecha;
 use App\MisClases\General;               // PC
 
 class TurnoController extends Controller
 {
     protected $tipo = 'Turnos';
-    protected $lineasXPagina = 15;  //General::LINEASXPAGINA;
+    protected $lineasXPagina = 20/*General::LINEASXPAGINA*/;
 
     protected static function turnoNuevo($semana, $index, $hora, $nroId) {
         return [
@@ -49,8 +50,8 @@ class TurnoController extends Controller
             session(['rPeriodo' => '', 'fecha_desde' => '', 'fecha_hasta' => '',
                         'asesor' => '0']);
         }
-        $diaSemana = Fecha::$diaSemana;
 
+        $diaSemana = Fecha::$diaSemana;
         for ($d = 0; $d < 11; $d++) {
             $semanas[$d] = Fecha::primerLunesDePrimeraSemana()
                                     ->addWeeks($d);            // Proximos once lunes.
@@ -143,6 +144,50 @@ class TurnoController extends Controller
                     'fecha_hasta', 'asesor', 'alertar', 'orden', 'movil', 'accion'))
                 ->render();
         General::generarPdf($html, 'turnos', $accion);
+    }
+
+    public function calendario()
+    {
+        if (!(Auth::check())) {
+            return redirect('login');
+        }
+        
+        $eventos = [];
+        $data = Turno::all();
+        if($data->count()) {
+            foreach ($data as $key => $value) {
+                $eventos[] = Calendar::event(
+                    $value->user->name,
+                    false,
+                    new \DateTime($value->turno),
+                    new \DateTime($value->turno.' +4 hour')
+                );
+            }
+        }
+        $calendar = Calendar::addEvents($eventos)->setOptions([
+                        'header' => [
+                            'left' => 'prev,next today',
+                            'center' => 'title',
+                            'right' => 'month,agendaWeek,agendaDay,listMonth',
+                        ],
+                        'firstDay' => 1,			// El primer dia de la semana es el lunes.
+                        'hiddenDays' => [0],		// No se muestra el domingo.
+                        'fixedWeekCount' => false,	// Numero de semana variable, dependiendo del mes.
+                        'weekNumbers' => true,		// Muestra el numero de la semana, con respecto el año.
+                        'aspectRatio' => 2.5,		// Mientras mas grande menos altura.
+                   ]);
+
+        $diaSemana = Fecha::$diaSemana;
+        for ($d = 0; $d < 11; $d++) {
+            $semanas[$d] = Fecha::primerLunesDePrimeraSemana()
+                                    ->addWeeks($d);            // Proximos once lunes.
+        }
+
+        $agente = new Agent();
+        $movil  = $agente->isMobile() and true;             // Fuerzo booleana. No funciona al usar el metodo directamente.
+        return view('turnos.calendario',
+                            compact('calendar', 'diaSemana', 'semanas', 'movil'));
+
     }
 
     public function crear($semana = null)
@@ -275,7 +320,7 @@ class TurnoController extends Controller
                 ]);
             }
             return redirect()->route('turnos.editar', $semana);
-        }   // if ((isset($asesoresLunesAnt) and (0 < count($asesoresLunesAnt))) and (isset($asesoresSabadosAnt) and (0 < count($asesoresSabadosAnt)))) {
+        }   // if ((isset($asesoresLunesAnt) and (0 < count($asesoresLunesAnt))) and (isset($asesoresSabadosAnt) and (0 < count($asesoresSabadosAnt))))
 // Crea el arreglo '$dia' con la fecha de cada dia de la semana; para el cual, se va a crear el turno.
         for ($d = 0; $d < 6; $d++) {
 // Si '$fecha' no la inicia; nuevamente, es modificada cada vez que se ejecuta este comando.
@@ -367,12 +412,13 @@ class TurnoController extends Controller
         }
 
         $fecha = Fecha::primerLunesDePrimeraSemana()->addWeeks($semana);
-        $turnoExiste = Turno::where('turno', $fecha->format('Y-m-d') . ' 08:00:00')->get()->all();
+        $turnoExiste = Turno::where('turno', $fecha->format('Y-m-d') . ' 08:00:00')
+                                ->get()->all();
         if (!$turnoExiste) {
             return redirect()->route('turnos.crear', $semana);
         }
 
-        $diaSemana = Fecha::$diaSemana;
+        $diaSemana = Fecha::$diaSemana;         // Domingo, Lunes, Martes, ...
         array_shift($diaSemana);                // Desaparece el domingo y comienza el lunes.
         $title = 'Editar ' . $this->tipo . ' para la semana que comienza el lunes, ' . 
                     $fecha->format('d/m/Y');
@@ -394,11 +440,37 @@ class TurnoController extends Controller
         $fecha2 = Fecha::primerLunesDePrimeraSemana()->addWeeks($semana)->addDays(6);                              // Domingo
         $turnos = Turno::whereBetween('turno', [$fecha1->format('Y-m-d'), $fecha2->format('Y-m-d')])
                     ->orderBy('id')         // Puede estar demas, pero, me aseguro el orden correcto.
-                    ->get()->all();
+                    ->get()->all();         // Turnos a editar.
 //        dd($turnos);
-        $turno = $turnos[0];
-        return view('turnos.editar', compact('title', 'diaSemana', 'dia', 'users', 'semanas', 'semana',
-                    'turnos', 'turno'));
+        $turno = $turnos[0];                // Datos del turno del primer dia.
+
+        $eventos = [];
+        $primerDia = (new Carbon($turno->turno->format('Y-m-01')))->startOfDay();
+        $ultimoDia = (new Carbon($turno->turno->format('Y-m-t')))->endOfDay();
+        $data = Turno::whereBetween('turno', [$primerDia, $ultimoDia])->get();
+        if($data->count()) {
+            foreach ($data as $key => $value) {
+                $eventos[] = Calendar::event(
+                    $value->user->name,
+                    false,
+                    new \DateTime($value->turno),
+                    new \DateTime($value->turno.' +4 hour')
+                );
+            }
+        }
+        $calendar = Calendar::addEvents($eventos)->setOptions([
+                        'header' => false,
+                        'firstDay' => 1,			// El primer dia de la semana es el lunes.
+                        'hiddenDays' => [0],		// No se muestra el domingo.
+                        'fixedWeekCount' => false,	// Numero de semana variable, dependiendo del mes.
+                        'defaultDate' => $turno->turno->format('Y-m-d'),	// Fecha del mes a mostrar.
+                        'columnHeader' => false,	// esconde los titulos de los dias de la semana.
+                        'aspectRatio' => 3,		    // Mientras mas grande menos altura.
+                   ]);
+
+        return view('turnos.editar',
+                    compact('title', 'diaSemana', 'dia', 'users', 'semanas', 'semana',
+                            'turnos', 'turno', 'calendar'));
     }
 
     public function update(Request $request, Turno $turno)

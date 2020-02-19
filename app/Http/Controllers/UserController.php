@@ -319,7 +319,9 @@ class UserController extends Controller
         $avisos = Aviso::where('user_id', $user->id)->get();
 	//dd($user, $avisos);
         if (0 < count($avisos)) {
-            $mensaje = '<table>';
+            $inicio = '<table>';
+            //$mensaje = $inicio;
+            $mensaje = '';
             $final   = '</table>';
             //$mensaje = '<html><head><title>Avisos</title></head><body><table>';
             //$final   = '</table></body>';
@@ -329,9 +331,11 @@ class UserController extends Controller
         }
         foreach ($avisos as $aviso) {
             //$mensaje .= "<tr><td>{$aviso->tipo}</td><td>{$aviso->fec}</td><td>{$aviso->descripcion}</td></tr>";
-            $mensaje .= "<tr><td>{$aviso->descripcion}</td></tr>";
+            //$mensaje .= "<tr><td>{$aviso->descripcion}</td></tr>";
+            $mensaje .= "{$aviso->descripcion}\n";
         }
-        return $mensaje . $final;
+        //return $mensaje . $final;
+        return $mensaje;
     }
 
     public static function correoCumpleano()

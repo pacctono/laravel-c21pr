@@ -58,6 +58,10 @@ Route::get('/contactos/orden/{orden}/accion/{accion?}', 'ContactoController@inde
     ->where('accion', 'ver|descargar')
     ->name('contactos.orden');
 
+Route::get('/contactos/filtro', 'ContactoController@index');     // Para paginación con filtro.
+Route::post('/contactos/filtro', 'ContactoController@index')
+    ->name('contactos.post');
+
 Route::pattern('contactos', '[0-9]+');  // Para no crear conflictos con el resource contacto
 /* Las rutas de resource estan traducidos (crear y editar) en el metodo 'boot'
  * de "app/Providers/AppServiceProvider.php".*/
@@ -74,6 +78,9 @@ Route::get('/contactos/correo/{contacto}/{ruta}', 'ContactoController@correoOfer
 
 Route::get('/turnos', 'TurnoController@index')
     ->name('turnos');
+
+Route::get('/turnos/calendario', 'TurnoController@calendario')
+    ->name('turnos.calendario');
 
 Route::get('/turnos/crear/{semana}', 'TurnoController@crear')
     ->name('turnos.crear');
@@ -203,6 +210,9 @@ Route::post('/reportes/chart/{chart}/{accion?}', 'ReporteController@chart')
 Route::get('/reportes/contactosUser/{id}/{orden}', 'ReporteController@contactosXUser')
     ->name('reporte.contactosUser');
 
+Route::get('/reportes/propiedadesUser/{id}/{orden}', 'ReporteController@propiedadesX')
+    ->name('reporte.propiedadesUser');
+
 Route::get('/reportes/propiedadesCaracteristica/{id}/{orden}', 'ReporteController@propiedadesX')
     ->name('reporte.propiedadesCaracteristica');
 
@@ -217,6 +227,9 @@ Route::get('/reportes/contactosPrecio/{id}/{orden}', 'ReporteController@contacto
 
 Route::get('/reportes/contactosResultado/{id}/{orden}', 'ReporteController@contactosX')
     ->name('reporte.contactosResultado');
+
+Route::get('/reportes/propiedadesTipo/{id}/{orden}', 'ReporteController@propiedadesX')
+    ->name('reporte.propiedadesTipo');
 
 Route::get('/reportes/contactosTipo/{id}/{orden}', 'ReporteController@contactosX')
     ->name('reporte.contactosTipo');

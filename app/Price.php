@@ -15,7 +15,16 @@ class Price extends Model
 
     public function getDescripcionAttribute()
     {
-        return 'Entre ' . $this->menor . ' y ' . $this->mayor;
+        return 'Entre ' . number_format($this->menor, 2, ',', '.') . ' y ' .
+                number_format($this->mayor, 0, ',', '.');
+    }
+
+    public function getDescripcionAlquilerAttribute()
+    {
+        $menor = $this->menor;
+        return 'Entre ' .
+                number_format(((0 < $menor)?((($menor-0.01)/100)+0.01):'0'), 2, ',', '.') .
+                ' y ' . number_format(($this->mayor/100), 0, ',', '.');
     }
 
     public static function contactosBorrados($id)

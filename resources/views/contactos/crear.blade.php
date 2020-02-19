@@ -1,16 +1,16 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="card">
+<div class="card m-0 p-0">
   <h4 class="card-header">{{ $title }}</h4>
-  <div class="card-body">
+  <div class="card-body m-0 p-0">
     @include('include.exitoCrear')
     @include('include.errorData')
 
     <form method="POST" class="form align-items-end-horizontal" action="{{ url('contactos') }}">
         {!! csrf_field() !!}
 
-        <div class="form-row my-0 py-0">  {{-- margen(m) arriba y abajo(y) 0 y padding(p) arriba y abajo(y) 0(0) --}}
+        <div class="form-row m-0 p-0">  {{-- margen(m) arriba y abajo(y) 0 y padding(p) arriba y abajo(y) 0(0) --}}
 {{-- Otros valores para margen y padding: 't':tope, 'b':bottom, 'l':left, 'r':right y 'x':left y right --}}
           <div class="form-group col-lg-3 d-flex">
             <label class="control-label" for="cedula">Cedula</label>
@@ -63,11 +63,11 @@
           </div>
         </div>
 
-        <div class="form-row bg-suave my-0 py-0">
-          <div class="form-group col-lg-3 d-flex">
-            <label class="control-label" for="deseo">Desea</label>
+        <div class="form-row bg-suave m-0 p-0 no-gutters">
+          <div class="form-group col-2 d-flex my-1 mx-0 p-0 no-gutters">
+            <label class="control-label mx-0 p-0" for="deseo">Desea</label>
             <select class="form-control" name="deseo_id" id="deseo">
-              <option value="">Qué desea hacer?</option>
+              <option value="">Qué desea?</option>
             @foreach ($deseos as $deseo)
             @if (old('deseo_id') == $deseo->id)
               <option value="{{ $deseo->id }}" selected>{{ $deseo->descripcion }}</option>
@@ -77,8 +77,8 @@
             @endforeach
             </select>
           </div>
-          <div class="form-group col-lg-3 d-flex">
-            <label class="control-label" for="tipo">Tipo</label>
+          <div class="form-group col-2 d-flex my-1 mx-1 p-0 no-gutters">
+            <label class="control-label mx-1 p-0" for="tipo">Tipo</label>
             <select class="form-control" name="tipo_id" id="tipo_id">
               <option value="">Qué tipo?</option>
             @foreach ($tipos as $tipo)
@@ -90,8 +90,8 @@
             @endforeach
             </select>
           </div>
-          <div class="form-group col-lg-3 d-flex">
-            <label class="control-label" for="zona">Zona</label>
+          <div class="form-group col-3 d-flex my-1 mx-1 p-0 no-gutters">
+            <label class="control-label mx-0 p-0" for="zona">Zona</label>
             <select class="form-control" name="zona_id" id="zona">
               <option value="">Qué zona?</option>
             @foreach ($zonas as $zona)
@@ -103,23 +103,23 @@
             @endforeach
             </select>
           </div>
-          <div class="form-group col-lg-3 d-flex">
-            <label class="control-label" for="precio">Precio</label>
+          <div class="form-group col-4 d-flex my-1 mx-1 p-0 no-gutters">
+            <label class="control-label mx-0 p-0" for="precio">Precio</label>
+            <div id="idPrecio">
             <select class="form-control" name="precio_id" id="precio">
             @foreach ($precios as $precio)
             @if (old('precio_id') == $precio->id)
               <option value="{{ $precio->id }}" selected>
                 {{ $precio->descripcion }}
-                {{-- Entre {{ $precio->menor }} y {{ $precio->mayor --}}
               </option>
             @else
               <option value="{{ $precio->id }}">
                 {{ $precio->descripcion }}
-                {{-- Entre {{ $precio->menor }} y {{ $precio->mayor --}}
               </option>
             @endif
             @endforeach
             </select>
+            </div>
           </div>
         </div>
 
@@ -181,6 +181,34 @@
 @section('js')
 
 <script>
+  $(document).ready(function() {
+    var descrComprar = '';
+    var descrAlquilar = '';
+    @foreach ($precios as $precio)
+    descrComprar +=
+"        <option value='{{ $precio->id }}'>" +
+"          {{ $precio->descripcion }}" +
+"        </option>";
+    @endforeach
+    @foreach ($precios as $precio)
+    descrAlquilar +=
+"        <option value='{{ $precio->id }}'>" +
+"          {{ $precio->descripcion_alquiler }}" +
+"        </option>";
+    @endforeach
+    $("#deseo").change(function(ev) {
+      var deseo = $(this).val();
+      var descr = $("option:selected", this).text();  // opcion seleccionada en el 'this' ambito.
+      //var descr = $(this).children("option:selected").text();  // FUNCIONA. Toma 'option:selected' de todos los hijos diretos.
+      var precio = $("select#precio").val();
+      //alert('Deseo:' + deseo + '-' + descr + ' (' + precio + ').');
+      //alert(descrAlquilar);
+      //alert(descrComprar);
+      $("select#precio").empty();
+      if ((1 == deseo) || (2 == deseo)) $("select#precio").html(descrComprar);
+      else if ((3 == deseo) || (4 == deseo)) $("select#precio").html(descrAlquilar);
+    });
+  });
 function alertaFechaRequerida() {
   var resValor = document.getElementById('resultado').value;
   var fecha    = document.getElementById('fecha_evento');

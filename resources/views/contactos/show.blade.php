@@ -126,8 +126,14 @@
             <div class="col-lg">
                 Precio:
                 <span class="alert-info">
+                @if ((1 == $contacto->deseo_id) or (2 == $contacto->deseo_id))
                     {{ $contacto->price->descripcion }}
                     {{-- Entre {{ $contacto->price->menor }} y {{ $contacto->price->mayor --}}
+                @elseif ((3 == $contacto->deseo_id) or (4 == $contacto->deseo_id))
+                    {{ $contacto->price->descripcion_alquiler }}
+                @else ((1 == $contacto->deseo_id) or (2 == $contacto->deseo_id))
+                    &nbsp;
+                @endif ((1 == $contacto->deseo_id) or (2 == $contacto->deseo_id))
                 </span>
             </div>
         </div>

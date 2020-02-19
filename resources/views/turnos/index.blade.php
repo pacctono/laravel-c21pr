@@ -1,94 +1,43 @@
-
 @extends('layouts.app')
 
 @section('content')
-@if ((!$movil) and (!isset($accion) or ('html' == $accion)))
+@if (isset($accion) and ('html' != $accion))
 <div>
-    <form method="POST" class="form-horizontal" action="{{ route('turnos.post') }}"
-          onSubmit="return alertaFechaRequerida()">
-      {!! csrf_field() !!}
-
-    @includeWhen(!$movil, 'include.intervalo')
-
-      <div class="form-row my-0 py-0 mx-1 px-1">
-    @include('include.fechas')
-    @includeWhen(Auth::user()->is_admin, 'include.asesor', ['berater' => 'asesor'])   {{-- Obligatorio pasar la variable 'berater' --}}
-    @include('include.botonMostrar')
-      </div>
-    {{--@if (!$movil)
-      <div class="row form-group">
-        <div class="col-lg-12">
-        @foreach (['hoy', 'ayer', 'manana', 'esta_semana', 'semana_pasada', 'proxima_semana',
-                  'este_mes', 'mes_pasado', 'proximo_mes', 'todo', 'intervalo'] as $intervalo)
-          <input type="radio" required name="periodo" id="_{{ $intervalo }}" value="{{ $intervalo }}"
-          @if ($rPeriodo == $intervalo)
-            checked
-          @endif
-          >
-          <label>
-          @if ('manana' == $intervalo)
-          Mañana
-          @elseif ('intervalo' == $intervalo)
-          Otro
-          @else
-          {{ str_replace('_', ' ', ucfirst($intervalo)) }}
-          @endif
-          </label>
-        @endforeach
-        </div>
-      </div>
-    @endif
-      <div class="row form-group">
-        <div class="col-lg-3">
-          <label>Desde:</label>
-          <input type="date" name="fecha_desde" id="fecha_desde" min="{{ now() }}" max="{{ now() }}"
-                          value="{{ old('fecha_desde', $fecha_desde) }}">
-        </div>
-        <div class="col-lg-3">
-          <label>Hasta:</label>
-          <input type="date" name="fecha_hasta" id="fecha_hasta" min="{{ now() }}" max="{{ now() }}"
-                          value="{{ old('fecha_hasta', $fecha_hasta) }}">
-        </div>
-      @if (Auth::user()->is_admin)
-        <div class="col-lg-2">
-          <select name="asesor" id="asesor">
-            <option value="0">Asesor</option>
-            @foreach ($users as $user)
-              <option value="{{ $user->id }}"
-              @if (old("asesor", $asesor) == $user->id)
-                selected
-              @endif
-              >
-                {{ $user->name }}
-              </option>
-            @endforeach
-          </select>
-        </div>
-      @endif
-        <div class="col-lg-2">
-          <button type="submit" class="btn btn-success">Mostrar</button>
-        </div>
-      </div>--}}
-    </form>
+    <h4 style="text-align:center;margin:0.25px 0px 0.25px 0px0px;padding:0px">
+      {{ $title }}
+    </h4>
 </div>
-@endif ((!$movil) and (!isset($accion) or ('html' == $accion)))
+@endif (isset($accion) and ('html' != $accion))
 
-<div class="d-flex justify-content-between align-items-end my-0">
-  @if (!isset($accion) or ('html' == $accion))
-  @if ($movil)
-    <h4 class="pb-0">{{ substr($title, 11) }}</h4>
-  @else
-    <h1 class="pb-0">{{ $title }}</h1>
-  @endif
-  @else (!isset($accion) or ('html' == $accion))
-    <h1 style="text-align:center;">{{ $title }}</h1>
-  @endif (!isset($accion) or ('html' == $accion))
+@if (isset($alertar))
+@if (0 < $alertar)
+  <script>alert('El correo con los turnos fue enviado a cada asesor');</script>
+@elseif (0 > $alertar)
+    <script>alert("No fue enviado el correo con los turnos. Probablemente, problemas con Internet! Revise su conexión");</script>
+@endif (0 < $alertar)
+@endif (isset($alertar))
 
-  @if ((!$movil) and (!isset($accion) or ('html' == $accion)))
-    @if (Auth::user()->is_admin)
-    <p>
-        <!-- a href="{{ route('turnos.crear', '0') }}" class="btn btn-primary">Preparar turno</a -->
-        Preparar turno para:
+@if ((!$movil) and (!isset($accion) or ('html' == $accion)))
+<div class="row no-gutters">
+<div class="col-3 no-gutters">
+  <div class="card mt-0 mb-1 py-0 mx-0 py-0">
+    <h3 class="card-header my-0 py-0 mx-0 py-0">Filtrar listado</h3>
+    <div class="card-body my-0 py-0 mx-0 py-0">
+      <form method="POST" class="form-vertical my-0 py-0 mx-0 px-0"
+            action="{{ route('turnos.post') }}" onSubmit="return alertaFechaRequerida()">
+        {!! csrf_field() !!}
+
+        @includeWhen(!$movil, 'include.intervalo')
+
+        @include('include.fechas')
+        @includeWhen(Auth::user()->is_admin, 'include.asesor', ['berater' => 'asesor'])   {{-- Obligatorio pasar la variable 'berater' --}}
+        @include('include.botonMostrar')
+      </form>
+    </div>
+  </div>
+  <div class="card mt-1 mb-0 py-0 mx-0 py-0">
+    <h3 class="card-header my-0 py-0 mx-0 py-0">Crear turno</h3>
+    <div class="card-body my-0 py-0 mx-0 py-0">
         <select name="semana" id="semana"
           onchange="javascript:location.href = this.value;">
           <option value="">Semana</option>
@@ -99,30 +48,24 @@
               </option>
           @endforeach
         </select>
-    </p>
-    @endif
-  @endif ((!$movil) and (!isset($accion) or ('html' == $accion)))
+    </div>
+  </div>
 </div>
-
-@if (isset($alertar))
-@if (0 < $alertar)
-  <script>alert('El correo con los turnos fue enviado a cada asesor');</script>
-@elseif (0 > $alertar)
-    <script>alert("No fue enviado el correo con los turnos. Probablemente, problemas con Internet! Revise su conexión");</script>
-@endif (0 < $alertar)
-@endif (isset($alertar))
-@if ($turnos->isNotEmpty())
-@if ((!$movil) and (!isset($accion) or ('html' == $accion)))
-    {{ $turnos->links() }}
+<div class="col-9 no-gutters">
 @endif ((!$movil) and (!isset($accion) or ('html' == $accion)))
+
+@if ($turnos->isNotEmpty())
+{{--@if ((!$movil) and (!isset($accion) or ('html' == $accion)))
+    {{ $turnos->links() }}
+@endif ((!$movil) and (!isset($accion) or ('html' == $accion)))--}}
 <table
 @if (!isset($accion) or ('html' == $accion))
-  class="table table-striped table-hover table-bordered"
+  class="table table-striped table-hover table-bordered my-0 py-0"
 @else (!isset($accion) or ('html' == $accion))
   class="center"
 @endif (!isset($accion) or ('html' == $accion))
 >
-  <thead class="thead-dark my-0 py-0">
+  <thead class="thead-dark">
     <tr
     @if (isset($accion) and ('html' != $accion))
       class="encabezado"
@@ -130,17 +73,17 @@
       class="my-0 py-0"
     @endif (isset($accion) and ('html' != $accion))
     >
-      <th scope="col">
-        <a class=@if('html'==$accion) "btn btn-link" href=
+      <th class="my-0 py-0" scope="col">
+        <a class=@if('html'==$accion) "btn btn-link my-0 py-0" href=
             @else "enlaceDesabilitado" name=
             @endif "{{ route('turnos.orden', 'turno') }}">
           Fecha
         </a>
       </th>
-      <th scope="col">Turno</th>
+      <th class="my-0 py-0" scope="col">Turno</th>
     @if (Auth::user()->is_admin)
-      <th scope="col">
-        <a class=@if('html'==$accion) "btn btn-link" href=
+      <th class="my-0 py-0" scope="col">
+        <a class=@if('html'==$accion) "btn btn-link my-0 py-0" href=
             @else "enlaceDesabilitado" name=
             @endif "{{ route('turnos.orden', 'user_id') }}">
           Asesor
@@ -148,9 +91,9 @@
       </th>
     @endif
     @if (!$movil)
-      <th scope="col">Preparado por</th>
+      <th class="my-0 py-0" scope="col">Preparado por</th>
     @if ((Auth::user()->is_admin) and (!isset($accion) or ('html' == $accion)))
-      <th scope="col"></th>
+      <th class="my-0 py-0" scope="col">Acci&oacute;n</th>
     @endif ((Auth::user()->is_admin) and (!isset($accion) or ('html' == $accion)))
     @endif
     </tr>
@@ -167,18 +110,18 @@
     @else
         table-info
     @endif
-    ">
-      <td>
+    my-0 py-0">
+      <td class="my-0 py-0">
         {{ $diaSemana[$turno->turno->dayOfWeek] }}
         {{ $turno->turno_fecha }}
       </td>
-      <td>
+      <td class="my-0 py-0">
         {{ $turno->fec_tur }}
       </td>
     @if (Auth::user()->is_admin)
-      <td>
+      <td class="my-0 py-0">
       @if (!isset($accion) or ('html' == $accion))
-        <select name="{{ $turno->id }}" disabled class="asesor"
+        <select name="{{ $turno->id }}" disabled class="my-0 py-0 asesor"
       id="sa{{ $turno->id }}-{{ $turno->user_id }}">
         @foreach ($users as $user)
         @if ($turno->user->id == $user->id)
@@ -194,13 +137,13 @@
       </td>
     @endif (Auth::user()->is_admin)
     @if (!$movil)
-      <td>{{ $turno->userCreo->name }}</td>
+      <td class="my-0 py-0">{{ $turno->userCreo->name }}</td>
     @if ((Auth::user()->is_admin) and (!isset($accion) or ('html' == $accion)))
-      <td>
-        <a href="#" class="btn btn-link editarTurno"
+      <td class="my-0 py-0">
+        <a href="#" class="btn btn-link my-0 py-0 editarTurno"
             id="{{ $turno->id }}-{{ $turno->user_id }}"
             title="Cambiar al asesor '{{ $turno->user->name }}' de este turno">
-          <span class="oi oi-brush"></span>
+          <span class="oi oi-brush my-0 py-0"></span>
         </a>
       </td>
     @endif ((Auth::user()->is_admin) and (!isset($accion) or ('html' == $accion)))
@@ -211,9 +154,9 @@
 @if (!isset($accion) or ('html' == $accion))
   @if (Auth::user()->is_admin)
   <tfoot>
-    <tr>
-      <td colspan="4">
-        <a href="{{ route('turnos.correoTurnos') }}" class="btn btn-link">
+    <tr class="my-0 py-0">
+      <td colspan="4" class="my-0 py-0">
+        <a href="{{ route('turnos.correoTurnos') }}" class="btn btn-link my-0 py-0">
           Enviar correo de los turnos a los asesores
         </a>
       </td>
@@ -229,8 +172,13 @@
 @include('include.botonesPdf', ['enlace' => 'turnos'])
 
 @else ($turnos->isNotEmpty())
-  <p>No hay turnos registrados.</p>
+  @includeif('include.noRegistros', ['elemento' => 'turnos'])
 @endif ($turnos->isNotEmpty())
+
+@if ((!$movil) and (!isset($accion) or ('html' == $accion)))
+</div><!--div class="col-9"-->
+</div><!--div class="row"-->
+@endif ((!$movil) and (!isset($accion) or ('html' == $accion)))
 
 @endsection
 

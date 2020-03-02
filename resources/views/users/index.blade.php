@@ -64,10 +64,10 @@
             <th class="my-0 py-0" scope="col">
             @if (!isset($accion) or ('html' == $accion))
                 <a href="{{ route('users.orden', 'telefono') }}" class="btn btn-link my-0 py-0">
-                    Telefono
+                    Tel&eacute;fono
                 </a>
             @else (!isset($accion) or ('html' == $accion))
-                Telefono
+                Tel&eacute;fono
             @endif (!isset($accion) or ('html' == $accion))
             </th>
         @if (!$movil)
@@ -86,7 +86,7 @@
             <th class="my-0 py-0" scope="col">Puntos</th>
         @endif (Auth::user()->is_admin)
         @if (!isset($accion) or ('html' == $accion))
-            <th class="my-0 py-0" scope="col" style="width:25%;">Acciones</th>
+            <th class="my-0 py-0" scope="col" style="width:20%;">Acciones</th>
         @endif ('html' == $accion)
         @endif (!$movil)
         </tr>
@@ -101,14 +101,14 @@
         @else
             class="table-info
         @endif
-                my-0 py-0">
+                m-0 p-0">
         @if (!$movil)
-            <td class="my-0 py-0" scope="row">{{ $user->id }}</td>
+            <td class="text-right m-0 py-0 px-1" scope="row">{{ $user->id }}</td>
         @endif
-            <td class="my-0 py-0">
+            <td class="text-left m-0 py-0 px-1">
         @if (!isset($accion) or ('html' == $accion))
             @if ($movil)
-                <a href="{{ route('users.show', $user) }}" class="btn btn-link my-0 py-0"
+                <a href="{{ route('users.show', $user) }}" class="btn btn-link m-0 p-0"
                     style="text-decoration:none;">
                     {{ $user->nombre }} {{-- nombre devuelve 'Administrador', cuando id = 1. --}}
                 </a>
@@ -116,7 +116,7 @@
                                       (0 < $user->propiedadesCaptadas->count()) or
                                       (0 < $user->propiedadesCerradas->count())))
                 <a href="{{ route('reporte.propiedadesUser', [$user->id, 'id']) }}"
-                    class="btn btn-link my-0 py-0"
+                    class="btn btn-link m-0 p-0"
                     title="Mostrar reporte de propiedades del asesor.">
                     {{ $user->nombre }}
                 </a>
@@ -127,26 +127,24 @@
                 {{ $user->nombre }}
         @endif ('html' == $accion)
             </td>
-            <td class="my-0 py-0">{{ $user->telefono_f }}
+            <td class="text-right m-0 py-0 px-1">{{ $user->telefono_f }}
             </td>
         @if (!$movil)
-            <td class="my-0 py-0">
+            <td class="m-0 p-0">
                 {{ $user->email }}
             </td>
         @if (Auth::user()->is_admin)
             <td
         @if (!isset($accion) or ('html' == $accion))
-                class="my-0 py-0"
+                class="text-right m-0 py-0 px-1"
             @if (1 == $user->id)
                 title="Estos lados representan los 'lados' producidos por 'Otra oficina'"><!-- cierra td -->
-                <span class="float-right my-0 py-0">0</span>
+                0
             @else
             >
-                <span class="float-right my-0 py-0">
-                    {{ Prop::numeroVen($user->lados, 0) }}{{-- 'Prop' es un alias definido en config/app.php --}}
-                </span>
+                {{ Prop::numeroVen($user->lados, 0) }}{{-- 'Prop' es un alias definido en config/app.php --}}
             @endif (1 == $user->id)
-        @else ('html' == $accion)
+        @else ('html' == $accion)<!-- PDF -->
             style="text-align:right;">
             @if (1 == $user->id)
                 0
@@ -157,13 +155,13 @@
             </td>
             <td
         @if (!isset($accion) or ('html' == $accion))
-                class="my-0 py-0"
+                class="m-0 py-0 px-1"
             @if (1 == $user->id)
                 title="Este monto representa la 'comision' producida para 'Otra oficina'"><!-- cierra td -->
-                <span class="float-right my-0 py-0">0,00</span>
+                <span class="float-right m-0 p-0">0,00</span>
             @else
             >
-                <span class="float-right my-0 py-0">
+                <span class="float-right m-0 p-0">
                     {{ Prop::numeroVen($user->comision, 2) }}{{-- 'Prop' es un alias definido en config/app.php --}}
                 </span>
             @endif (1 == $user->id)
@@ -178,13 +176,13 @@
             </td>
             <td
         @if (!isset($accion) or ('html' == $accion))
-                class="my-0 py-0"
+                class="m-0 py-0 px-1"
             @if (1 == $user->id)
                 title="Estos puntos representan los producidos por 'Otra oficina'"><!-- cierra td -->
-                <span class="float-right my-0 py-0">0,00</span>
+                <span class="float-right m-0 p-0">0,00</span>
             @else
             >
-                <span class="float-right my-0 py-0">
+                <span class="float-right m-0 p-0">
                     {{ Prop::numeroVen($user->puntos, 2) }}{{-- 'Prop' es un alias definido en config/app.php --}}
                 </span>
             @endif (1 == $user->id)
@@ -199,7 +197,7 @@
             </td>
         @endif (Auth::user()->is_admin)
         @if (!isset($accion) or ('html' == $accion))
-            <td class="d-flex align-items-end my-0 py-0">
+            <td class="d-flex align-items-end m-0 py-0 px-1">
                 <a href="{{ route('users.show', $user) }}" class="btn btn-link my-0 py-0 mx-0 px-0"
                         title="Motrar los datos personales de {{ $user->name }}">
                     <span class="oi oi-eye my-0 py-0 ml-0 mr-1 pl-0 pr-0"></span>

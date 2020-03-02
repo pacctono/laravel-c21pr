@@ -19,28 +19,6 @@
                'include.asesor', ['berater' => 'asesor']) {{-- Obligatorio berater (asesor en aleman) --}}
   @include('include.botonMostrar')
     </div>
-    {{--<input type="hidden" name="periodo" value="intervalo">
-    <label>Desde:</label>
-    <input type="date" name="fecha_desde" id="fecha_desde" min="{{ now() }}" max="{{ now() }}"
-                    value="{{ old('fecha_desde', substr($fecha_desde, 0, 10)) }}">
-    <label>Hasta:</label>
-    <input type="date" name="fecha_hasta" id="fecha_hasta" min="{{ now() }}" max="{{ now() }}"
-                    value="{{ old('fecha_hasta', substr($fecha_hasta, 0, 10)) }}">
-    @if ((Auth::user()->is_admin) and ('Fecha' == $muestra))
-    <select name="asesor" id="asesor">
-      <option value="0">Asesor</option>
-      @foreach ($users as $user)
-        <option value="{{ $user->id }}"
-        @if (old("asesor", $asesor) == $user->id)
-          selected
-        @endif
-        >
-          {{ $user->name }}
-        </option>
-      @endforeach
-    </select>
-    @endif
-    <button type="submit" class="btn btn-success">Mostrar</button>--}}
   </form>
   </div>
 @endif (!$movil)
@@ -74,20 +52,20 @@
 @if ($elemsRep->isNotEmpty())
 <table
 @if (!isset($accion) or ('html' == $accion))
-  class="table table-striped table-hover table-bordered"
+  class="table table-striped table-hover table-bordered m-0 p-0"
 @else (!isset($accion) or ('html' == $accion))
   class="center"
 @endif (!isset($accion) or ('html' == $accion))
 >
-  <thead class="thead-dark my-0 py-0">
+  <thead class="thead-dark">
     <tr
     @if ((isset($accion) and ('html' != $accion)))
         class="encabezado"
     @else ((isset($accion) and ('html' != $accion)))
-        class="my-0 py-0"
+        class="m-0 p-0"
     @endif ((isset($accion) and ('html' != $accion)))
     >
-      <th scope="col">
+      <th class="m-0 py-0 px-1" scope="col">
       @if (('Conexion' == $muestra) ||
            ('Lados' == $muestra) ||
            ('Comision' == $muestra))
@@ -100,7 +78,7 @@
         {{ $muestra }}
       @endif
       </th>
-      <th scope="col">
+      <th class="m-0 py-0 px-1" scope="col">
       @if ('Conexion' == $muestra)
         Conexiones
       @elseif (('Lados' == $muestra) ||
@@ -115,7 +93,7 @@
         Atendidos
       @endif
       </th>
-      <th scope="col">
+      <th class="m-0 py-0 px-1" scope="col">
       @if (('Conexion' == $muestra) ||
            ('Lados' == $muestra) ||
            ('Comision' == $muestra))
@@ -128,7 +106,7 @@
         {{ $muestra }}
       @endif
       </th>
-      <th scope="col">
+      <th class="m-0 py-0 px-1" scope="col">
       @if ('Conexion' == $muestra)
         Conexiones
       @elseif (('Lados' == $muestra) ||
@@ -155,9 +133,9 @@
     @else
         table-info
     @endif
-    ">
+    m-0 p-0">
     @endif
-      <td>
+      <td class="m-0 py-0 px-1">
     @if ('Fecha' == $muestra)
       {{ $elemento->fechaContacto }}
     @elseif ('Origen' == $muestra)
@@ -174,7 +152,7 @@
       {{ $elemento->name }}
     @endif
       </td>
-      <td>
+      <td class="m-0 py-0 px-1">
     @if ('Lados' == $muestra)
       {{ $elemento->captadas + $elemento->cerradas }}
     @elseif ('Comision' == $muestra)

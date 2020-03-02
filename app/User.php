@@ -219,7 +219,7 @@ class User extends Authenticatable
 
     public static function contactosXAsesor($fecha_desde, $fecha_hasta)
     {
-        return self::where('id', '>', 1)
+        return self::where('id', '>', 1)->where('activo', true)
                     ->withCount(['contactos as atendidos' => function ($query)
                                         use ($fecha_desde, $fecha_hasta) {  // 'use' permite heredar variables del scope del padre, donde el closure es definido.
                             $query->whereBetween('created_at', [$fecha_desde, $fecha_hasta]);
@@ -228,7 +228,7 @@ class User extends Authenticatable
 
     public static function conexionXAsesor($fecha_desde, $fecha_hasta)
     {
-        return self::where('id', '>', 1)
+        return self::where('id', '>', 1)->where('activo', true)
                     ->withCount(['bitacoras as atendidos' => function ($query)
                                         use ($fecha_desde, $fecha_hasta) {
                             $query->where('tx_tipo', 'L')
@@ -363,8 +363,12 @@ class User extends Authenticatable
             $fecha_desde = (new Carbon(Propiedad::min($fecha)))->startOfDay();
         if(null == $fecha_hasta)
             $fecha_hasta = (new Carbon(Propiedad::max($fecha)))->endOfDay();
-        return self::where('id', $cond, $user)
-                    ->withCount(['captadorPropiedades as captadas',
+        return self::where('id', $cond, $user)->where('activo', true)
+                    ->withCount(['captadorPropiedades as captadas' => function ($query)
+                                        use ($fecha, $fecha_desde, $fecha_hasta) {  // 'use' permite heredar variables del scope del padre, donde el closure es definido.
+                            $query->whereIn('estatus', ['P', 'C'])
+                                  ->whereBetween($fecha, [$fecha_desde, $fecha_hasta]);
+                                        },
                                 'cerradorPropiedades as cerradas' => function ($query)
                                         use ($fecha, $fecha_desde, $fecha_hasta) {  // 'use' permite heredar variables del scope del padre, donde el closure es definido.
                             $query->whereIn('estatus', ['P', 'C'])

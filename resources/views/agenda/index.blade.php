@@ -17,39 +17,8 @@
 @endif (0 < $alertar)
 @endif (isset($alertar))
 
-@if ((!$movil) and (!isset($accion) or ('html' == $accion)))
-<div class="row no-gutters">
-<div class="col-2 no-gutters" style="font-size:0.75rem">
-  <div class="card mt-0 mb-1 mx-0 p-0">
-    <h4 class="card-header m-0 p-0">Filtrar listado</h4>
-    <div class="card-body m-0 p-0">
-      <form method="POST" class="form-vertical m-0 p-0"
-            action="{{ route('agenda.post') }}" onSubmit="return alertaFechaRequerida()">
-        {!! csrf_field() !!}
-
-        @includeWhen(!$movil, 'include.intervalo')
-
-        @include('include.fechas')
-        @includeWhen(Auth::user()->is_admin, 'include.asesor', ['berater' => 'asesor'])   {{-- Obligatorio pasar la variable 'berater' --}}
-        @include('include.botonMostrar')
-      </form>
-    </div>
-  </div>
-  <div class="card mt-1 mb-0 p-0 mx-0">
-    <h4 class="card-header m-0 p-0">Cita personal</h4>
-    <div class="card-body m-0 p-0">
-      <a href="{{ route('agendaPersonal.crear') }}" class="btn btn-primary my-0 py-0 mx-auto px-auto">
-      @if ($movil)
-        Crear
-      @else
-        Crear Cita Personal
-      @endif
-      </a>
-    </div>
-  </div>
-</div>
-<div class="col-10 no-gutters">
-@endif ((!$movil) and (!isset($accion) or ('html' == $accion)))
+@includeWhen((!$movil and (!isset($accion) or ('html' == $accion))),
+                'agenda.vmenu')
 
 {{--@if ((!$movil) and (!isset($accion) or ('html' == $accion)))
     {{ $agendas->links() }}
@@ -67,7 +36,7 @@
     @if (isset($accion) and ('html' != $accion))
       class="encabezado"
     @else (isset($accion) and ('html' != $accion))
-      class="my-0 py-0 mx-0 px-0"
+      class="m-0 p-0"
     @endif (isset($accion) and ('html' != $accion))
     >
       <th class="my-0 py-0" scope="col">
@@ -238,12 +207,15 @@
 
 @else ($agendas->isNotEmpty())
     @includeif('include.noRegistros', ['elemento' => 'citas'])
+    <div class="text-center mt-0 mb-5 mx-5 pt-0 pb-5 px-5">
+      <a href="{{ route('turnos.calendario') }}" class="btn btn-link m-0 p-0">
+        <h2 class="m-0 p-0">Ir al calendario de turnos del mes</h2>
+      </a>
+    </div>
 @endif ($agendas->isNotEmpty())
 
-@if ((!$movil) and (!isset($accion) or ('html' == $accion)))
-</div><!--div class="col-9"-->
-</div><!--div class="row"-->
-@endif ((!$movil) and (!isset($accion) or ('html' == $accion)))
+@includeWhen((!$movil and (!isset($accion) or ('html' == $accion))),
+                'agenda.vmenuCierre')
 
 @endsection
 

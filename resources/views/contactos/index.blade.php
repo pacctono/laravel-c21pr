@@ -25,7 +25,11 @@
         @endif (!isset($accion) or ('html' == $accion))
     </div>--}}
 @if (isset($accion) and ('html' != $accion))
-    <h4 style="text-align:center">{{ $title }}</h4>
+    <div>
+        <h4 style="text-align:center">
+            {{ $title }}
+        </h4>
+    </div>
 @elseif (isset($alertar))
 @if (1 == $alertar)
     <script>alert("Fue enviado el correo con la 'Oferta de Servicio' al contacto inicial.");</script>
@@ -35,44 +39,10 @@
     <script>alert("No fue enviado el correo con la 'Oferta de Servcio' al contacto inicial. Probablemente, problemas con Internet! Revise su conexión");</script>
 @endif (0 < $alertar)
 @endif (isset($accion) and ('html' != $accion))
-@if ((!$movil) and (!isset($accion) or ('html' == $accion)))
-<div class="row no-gutters">
-<div class="col-2 no-gutters" style="font-size:0.65rem">
-  <div class="card mt-0 mb-1 mx-0 p-0">
-    <h3 class="card-header m-0 p-0">Filtrar listado</h3>
-    <div class="card-body m-0 p-0">
-        <form method="POST" class="form-horizontal" action="{{ route('contactos.post') }}"
-                {{--onSubmit="return alertaCampoRequerido()"--}}>
-            {!! csrf_field() !!}
 
-            <div class="form-row my-0 py-0 mx-1 px-1">
-        {{--@includeif('include.fechas', ['tipoFecha' => 'de la firma '])--}}
-        <div style="font-size:0.75rem">
-            {{-- print_r($deseos) --}}
-            @includeif('include.filtro', ['filtro' => 'deseo', 'filtros' => 'deseos',
-                                            'tamFont' => 1.0])
-        </div>
-        @includeWhen(Auth::user()->is_admin, 'include.asesor', ['berater' => 'asesor'])   {{-- Obligatorio pasar la variable 'berater' --}}
-        @include('include.botonMostrar')
-            </div>
-        </form>
-    </div>
-  </div>
-  <div class="card mt-1 mb-0 p-0 mx-0">
-    <h4 class="card-header m-0 p-0">Contacto Inicial</h4>
-    <div class="card-body m-0 p-0">
-        <a href="{{ route('contactos.create') }}" class="btn btn-primary my-0 py-0 mx-2">
-        @if ($movil)
-            Crear
-        @else
-            Crear Contacto Inicial
-        @endif
-        </a>
-    </div>
-  </div>
-</div>
-<div class="col-10 no-gutters">
-@endif ((!$movil) and (!isset($accion) or ('html' == $accion)))
+@includeWhen((!$movil and (!isset($accion) or ('html' == $accion))),
+                'contactos.vmenu')
+
     @if ($contactos->isNotEmpty())
 {{--@if ($paginar)
     {{ $contactos->links() }}
@@ -241,9 +211,7 @@
     @includeif('include.noRegistros', ['elemento' => 'contactos iniciales'])
 @endif ($contactos->isNotEmpty())
 
-@if ((!$movil) and (!isset($accion) or ('html' == $accion)))
-</div><!--div class="col-10"-->
-</div><!--div class="row"-->
-@endif ((!$movil) and (!isset($accion) or ('html' == $accion)))
+@includeWhen((!$movil and (!isset($accion) or ('html' == $accion))),
+                'contactos.vmenuCierre')
 
 @endsection

@@ -148,7 +148,7 @@ class ReporteController extends Controller
                 $elemsRep = User::ladosXAsesor($fecha, $fecha_desde, $fecha_hasta);
                 break;
             case 'Comision':
-                $elemsRep = User::where('id', '>', 1);
+                $elemsRep = User::where('id', '>', 1)->where('activo', true);
                 break;
             case 'Negociaciones':
                 $elemsRep = Propiedad::negociacionesXMes($fecha, $fecha_desde, $fecha_hasta, $asesor);

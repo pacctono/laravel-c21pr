@@ -76,11 +76,17 @@ Route::get('/contactos/correo/{contacto}/{ruta}', 'ContactoController@correoOfer
     ->where('ruta', '[0-2]')
     ->name('contacto.correo');
 
+Route::get('/clientes/vClientes/', 'VistaClienteController@vClientes')
+    ->name('clientes.vClientes');
+
 Route::get('/turnos', 'TurnoController@index')
     ->name('turnos');
 
 Route::get('/turnos/calendario', 'TurnoController@calendario')
     ->name('turnos.calendario');
+
+Route::post('/turnos/calendario/filtro', 'TurnoController@calendario')
+    ->name('calendario.post');
 
 Route::get('/turnos/crear/{semana}', 'TurnoController@crear')
     ->name('turnos.crear');
@@ -117,6 +123,10 @@ Route::get('/clientes/orden/{orden}/accion/{accion?}', 'ClienteController@index'
     ->where('orden', '[a-zA-Z]+[a-zA-Z0-9_]+(?<!nuevo|crear)')
     ->where('accion', 'ver|descargar')
     ->name('clientes.orden');
+
+Route::get('/clientes/filtro', 'ClienteController@index');     // Para paginación con filtro.
+Route::post('/clientes/filtro', 'ClienteController@index')
+    ->name('clientes.post');
 
 Route::pattern('clientes', '[0-9]+');               // Para no crear conflictos con el resource cliente
 /* Las rutas de resource estan traducidos (crear y editar) en el metodo 'boot'

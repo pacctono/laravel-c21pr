@@ -5,23 +5,7 @@
 <div>
     @includeIf('include.totalesPropiedad')
 </div>
-    {{--<div class="row m-0 p-0">
-    @if (!isset($accion) or ('html' == $accion))
-        <div class="col-lg-9 m-0 p-0">
-        @if ($movil)
-            <h5 class="pt-0 pb-1 m-0 px-0">{{ substr($title, 11) }}</h5>
-        @else ($movil)
-            <h4 class="pt-0 pb-1 m-0 px-0">{{ $title }}</h4>
-        @endif ($movil)
-        </div>
-        <div class="col-lg-3 m-0 p-0">
-            <a href="{{ route('propiedades.create') }}" class="btn btn-primary float-right m-0 p-0">
-                Crear Propiedad</a>
-        </div>
-    @else (!isset($accion) or ('html' == $accion))
-        <h1 style="text-align:center;">{{ $title }}</h1>
-    @endif (!isset($accion) or ('html' == $accion))
-    </div>--}}
+
 @if (isset($accion) and ('html' != $accion))
     <div>
         <h4 style="text-align:center;margin:0.25px 0px 0.25px 0px;padding:0px">
@@ -29,6 +13,7 @@
         </h4>
     </div>
 @endif (isset($accion) and ('html' != $accion))
+
 @if (isset($alertar))
 @if (0 < $alertar)
     <script>alert("Le fue enviado el correo con el 'Reporte de Cierre' de la propiedad.");</script>
@@ -37,52 +22,16 @@
 @endif (0 < $alertar)
 @endif (isset($alertar))
 
-@if ((!$movil) and (!isset($accion) or ('html' == $accion)))
-<div class="row no-gutters">
-<div class="col-2 no-gutters" style="font-size:0.65rem">
-  <div class="card mt-0 mb-1 mx-0 p-0">
-    <h3 class="card-header m-0 p-0">Filtrar listado</h3>
-    <div class="card-body m-0 p-0">
-        <form method="POST" class="form-horizontal" action="{{ route('propiedades.post') }}"
-                onSubmit="return alertaCampoRequerido()">
-            {!! csrf_field() !!}
+@includeWhen((!$movil and (!isset($accion) or ('html' == $accion))), 'propiedades.vmenu')
 
-            <div class="form-row my-0 py-0 mx-1 px-1">
-        @includeif('include.fechas', ['tipoFecha' => 'de la firma '])
-        <div style="font-size:0.50rem">
-            {{-- print_r($arrNegociacion) --}}
-            @includeif('include.negociacion')
-            @includeif('include.estatus')
-            @includeif('include.filtro', ['filtro' => 'precio', 'filtros' => 'precios'])
-        </div>
-        @includeWhen(Auth::user()->is_admin, 'include.asesor', ['berater' => 'asesor'])   {{-- Obligatorio pasar la variable 'berater' --}}
-        @include('include.botonMostrar')
-            </div>
-        </form>
-    </div>
-  </div>
-  <div class="card mt-1 mb-0 p-0 mx-0">
-    <h4 class="card-header m-0 p-0">Propiedad</h4>
-    <div class="card-body m-0 p-0">
-      <a href="{{ route('propiedades.create') }}" class="btn btn-primary my-0 py-0 mx-3 px-auto">
-      @if (!$movil)
-        {{--Crear
-      @else--}}
-        Crear Propiedad
-      @endif
-      </a>
-    </div>
-  </div>
-</div>
-<div class="col-10 no-gutters">
-@endif ((!$movil) and (!isset($accion) or ('html' == $accion)))
     @if ($propiedades->isNotEmpty())
 {{--@if ($paginar)
     {{ $propiedades->links() }}
 @endif ($paginar)--}}
     <table
     @if (!isset($accion) or ('html' == $accion))
-        class="table table-striped table-hover table-bordered m-0 p-0" style="font-size:0.75rem"
+        class="table table-striped table-hover table-bordered m-0 p-0"
+        style="font-size:0.75rem"
     @else (!isset($accion) or ('html' == $accion))
         class="center"
     @endif (!isset($accion) or ('html' == $accion))
@@ -190,10 +139,10 @@
             </th>--}}
         @else (Auth::user()->is_admin)
             <th class="m-0 p-0" scope="col" title="Porcentaje de comision cobrado al inmueble">%Com</th>
-            <th class="m-0 p-0" scope="col" title="Porcentaje de IVA cobrado al inmueble">%IVA</th>
+            {{--<th class="m-0 p-0" scope="col" title="Porcentaje de IVA cobrado al inmueble">%IVA</th> Cuatro columnas eliminadas a solicitud de Alirio.
             <th class="m-0 p-0" scope="col" title="Precio de venta real">PrVeRe</th>
             <th class="m-0 p-0" scope="col" title="Pago asesor captador y/o cerrador, y bonificaciones.">Comisi&oacute;n</th>
-            <th class="m-0 p-0" scope="col" title="Puntos por esta propiedad">Puntos</th>
+            <th class="m-0 p-0" scope="col" title="Puntos por esta propiedad">Puntos</th>--}}
         @endif (Auth::user()->is_admin)
             <th class="m-0 p-0" scope="col">Acciones</th>
         @endif ((!$movil) and (!isset($accion) or ('html' == $accion)))
@@ -221,7 +170,7 @@
             <td class="m-0 p-0">
             @if (!isset($accion) or ('html' == $accion))
                 <a href="{{ route('propiedades.show', $propiedad) }}" class="btn btn-link m-0 p-0">
-                    <span class="float-right"> {{ $propiedad->codigo }} </span>
+                    <span class="float-right m-0 p-0">{{ $propiedad->codigo }}</span>
                 </a>
             @else (!isset($accion) or ('html' == $accion))
                 {{ $propiedad->codigo }}
@@ -234,23 +183,23 @@
 Reporte en casa nacional: {{ $propiedad->reporte_casa_nacional_ven }}
 Estatus en sistema C21: {{ $propiedad->estatus_c21_alfa.(($propiedad->pagado_casa_nacional)?' y PAGADO A CASA NACIONAL':'') }}
 {{ (($propiedad->factura_AyS)?'Factura A & S: '.$propiedad->factura_AyS.'.':'') }}">
-                <span class="float-right"> {{ $propiedad->codigo }} </span>
+                <span class="float-right m-0 p-0">{{ $propiedad->codigo }}</span>
         @else (!isset($accion) or ('html' == $accion))
             <td>
                 {{ $propiedad->codigo }}
         @endif (!isset($accion) or ('html' == $accion))
             </td>
 
-            <td class="m-0 p-0">
-                <span class="m-0 p-0" title="Fecha de reserva">
+            <td class="m-0 py-0 px-1">
+                <span class="float-right m-0 p-0" title="Fecha de reserva">
                     {{ $propiedad->fec_res }}</span>
         {{--@if ((Auth::user()->is_admin) and (!isset($accion) or ('html' == $accion)))
                 <br>
         @else (Auth::user()->is_admin)--}}
             </td>
-            <td class="m-0 p-0">
+            <td class="m-0 py-0 px-1">
         {{--@endif ((Auth::user()->is_admin) and (!isset($accion) or ('html' == $accion)))--}}
-                <span class="m-0 p-0" title="Fecha de la firma">
+                <span class="float-right m-0 p-0" title="Fecha de la firma">
                     {{ $propiedad->fec_fir }}</span>
             </td>
 
@@ -308,7 +257,7 @@ Estatus en sistema C21: {{ $propiedad->estatus_c21_alfa.(($propiedad->pagado_cas
             <td class="m-0 p-0">
             @if (!isset($accion) or ('html' == $accion))
                 <a href="{{ route('propiedades.edit', $propiedad) }}" class="btn btn-link m-0 p-0">
-                    <span class="float-right m-0 p-0"> {{ $propiedad->lados }}</span>
+                    <span class="float-right m-0 p-0">{{ $propiedad->lados }}</span>
                 </a>
             @else (!isset($accion) or ('html' == $accion))
                 {{ $propiedad->lados }}
@@ -324,7 +273,7 @@ Estatus en sistema C21: {{ $propiedad->estatus_c21_alfa.(($propiedad->pagado_cas
             <td class="m-0 p-0">
             @endif ((Auth::user()->is_admin) and (!isset($accion) or ('html' == $accion)))
             @if (!isset($accion) or ('html' == $accion))
-                <span class="m-0 p-0"> {{ $propiedad->lados }}</span>
+                <span class="float-right m-0 p-0"> {{ $propiedad->lados }}</span>
             @else (!isset($accion) or ('html' == $accion))
                 {{ $propiedad->lados }}
             @endif (!isset($accion) or ('html' == $accion))
@@ -336,12 +285,12 @@ Estatus en sistema C21: {{ $propiedad->estatus_c21_alfa.(($propiedad->pagado_cas
                 <td class="m-0 p-0"><span class="float-right m-0 p-0">
                     {{ $propiedad->comision_p }}</span>
                 </td>
-                <td class="m-0 p-0"><span class="float-right m-0 p-0">
+                {{--<td class="m-0 p-0"><span class="float-right m-0 p-0"> Dos columnas eliminadas a solicitud de Alirio.
                     {{ $propiedad->iva_p }}</span>
                 </td>
                 <td class="m-0 p-0"><span class="float-right m-0 p-0" title="Precio de venta real">
                     {{ $propiedad->precio_venta_real_ven }}</span>
-                </td>
+                </td>--}}
 
             @else (Auth::user()->is_admin)
             <td class="m-0 p-0" title="Franquicia de reserva sin IVA(O) ({{ $propiedad->porc_franquicia_p }}):{{ $propiedad->franquicia_reservado_sin_iva_ven }};
@@ -404,8 +353,8 @@ Porcentaje reportado a casa nacional(R):{{ $propiedad->reportado_casa_nacional_p
             </td>
             @endif (!(Auth::user()->is_admin))
 
-            @if (!Auth::user()->is_admin){{-- No es administrador --}}
-            <td class="m-0 p-0">
+            {{--@if (!Auth::user()->is_admin)   // No es administrador }}
+            <td class="m-0 p-0"><!-- Comision del asesor. Deberia ser como captador, cerrador o ambas. -->
                 <span class="float-right m-0 p-0"
             @if ($propiedad->asesor_captador_id == Auth::user()->id)
                 title="Captador PRBR(X)
@@ -415,16 +364,16 @@ Porcentaje reportado a casa nacional(R):{{ $propiedad->reportado_casa_nacional_p
                 @else
                     ">
                     {{ $propiedad->captador_prbr_ven }}
-                @endif
+                @endif ($propiedad->asesor_cerrador_id == Auth::user()->id)
             @else
                 @if ($propiedad->asesor_cerrador_id == Auth::user()->id)
                     title="Cerrador PRBR(Z)">
                     {{ $propiedad->cerrador_prbr_ven }}
                 @else
                     >&nbsp;
-                @endif
-            @endif
-                </span>
+                @endif ($propiedad->asesor_cerrador_id == Auth::user()->id)
+            @endif ($propiedad->asesor_captador_id == Auth::user()->id)
+                </span>--}}
             {{--@if (Auth::user()->is_admin)
                 <span class="float-right" title="Gerente(Y)">
                     {{ $propiedad->gerente_ven }}
@@ -441,7 +390,7 @@ Porcentaje reportado a casa nacional(R):{{ $propiedad->reportado_casa_nacional_p
                 <span class="float-right" title="Cerrador PRBR(Z){{ $propiedad->nombre_cerrador }}">
                     {{ $propiedad->cerrador_prbr_ven }}
                 </span>
-            @endif
+            @endif ((Auth::user()->is_admin) or ($propiedad->asesor_cerrador_id == Auth::user()->id))
             {{--@if ((Auth::user()->is_admin) or
                  ($propiedad->asesor_captador_id == Auth::user()->id) or
                  ($propiedad->asesor_cerrador_id == Auth::user()->id))
@@ -452,15 +401,15 @@ Porcentaje reportado a casa nacional(R):{{ $propiedad->reportado_casa_nacional_p
                     </span>
                 @endif
             @endif--}}
-            </td>
-            @endif
-            @if (!Auth::user()->is_admin){{-- El usuario no es administrador --}}
+            {{--</td>
+            @endif (!Auth::user()->is_admin)    // No es administrador }}
+            @if (!Auth::user()->is_admin)       // El usuario no es administrador }}
             <td class="m-0 p-0"><span class="float-right m-0 p-0">
                 {{ (($propiedad->asesor_captador_id == Auth::user()->id)?$propiedad->puntos_captador:0.00) +
                    (($propiedad->asesor_cerrador_id == Auth::user()->id)?$propiedad->puntos_cerrador:0.00) }}
                 </span>
             </td>
-            @endif
+            @endif (!Auth::user()->is_admin)    // El usuario no es administrador --}}
 
         {{-- @if (!isset($accion) or ('html' == $accion)) --}}
             <td class="d-flex align-items-end m-0 p-0">
@@ -522,10 +471,8 @@ Porcentaje reportado a casa nacional(R):{{ $propiedad->reportado_casa_nacional_p
     @includeif('include.noRegistros', ['elemento' => 'propiedades'])
 @endif ($propiedades->isNotEmpty())
 
-@if ((!$movil) and (!isset($accion) or ('html' == $accion)))
-</div><!--div class="col-10"-->
-</div><!--div class="row"-->
-@endif ((!$movil) and (!isset($accion) or ('html' == $accion)))
+@includeWhen((!$movil and (!isset($accion) or ('html' == $accion))),
+                'propiedades.vmenuCierre')
 
 @endsection
 

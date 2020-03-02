@@ -89,6 +89,7 @@ class AgendaController extends Controller
             $agendas = Agenda::select('fecha_evento', 'hora_evento', 'descripcion', 'name',
                                         'telefono', 'user_id', 'contacto_id', 'email',
                                         'tipo', 'direccion');   // Solo estas columnas.
+            $agendas = $agendas->where('tipo', '!=', 'T');  // Elimina los turnos de la agenda para el administrador.
             if ('name' == $orden) {         // Si se ordena por nombre, no muestra turnos (name == '').
                 $agendas = $agendas->where('name', '!=', '');
             }
@@ -97,12 +98,12 @@ class AgendaController extends Controller
             $asesorConectado = User::find($asesor);    // Consigue la clase App\User de la asesor conectado.
             $title  .= 'de ' . $asesorConectado->name;  // Titulo de la página de la Agenda.
             $agendas = Agenda::where('user_id', $asesor)   // Solo el asesor conectado.
-                    ->select('fecha_evento', 'hora_evento', 'descripcion', 'name', 'telefono',
-                                'tipo', 'contacto_id', 'email', 'direccion');           // Solo estas columnas.
+                    ->select('fecha_evento', 'hora_evento', 'descripcion', 'name',
+                            'telefono', 'tipo', 'contacto_id', 'email', 'direccion');   // Solo estas columnas.
         }
 
-        if (0 < $asesor) {      // Se selecciono un asesor o el conectado no es administrador.
-            $agendas = $agendas->where('user_id', $asesor);
+        if ((Auth::user()->is_admin) and (0 < $asesor)) {   // Se selecciono un asesor y esta conectado administrador.
+            $agendas = $agendas->where('user_id', $asesor); // Esta condicion esta arriba para un asesor.
         }
         $hoy = Fecha::hoy();
 // Devolver las fechas sin la hora. Los diez primeros caracteres son: yyyy-mm-dd.

@@ -2,30 +2,31 @@
 
 @section('content')
 <div class="card m-0 p-0">
-  <h4 class="card-header">{{ $title }}</h4>
+  <h4 class="card-header m-0 p-1">{{ $title }}</h4>
   <div class="card-body m-0 p-0">
     @include('include.exitoCrear')
     @include('include.errorData')
 
-    <form method="POST" class="form align-items-end-horizontal" action="{{ url('contactos') }}">
+    <form method="POST" class="form align-items-end-horizontal"
+        id="formulario" action="{{ url('contactos') }}">
         {!! csrf_field() !!}
 
-        <div class="form-row m-0 p-0">  {{-- margen(m) arriba y abajo(y) 0 y padding(p) arriba y abajo(y) 0(0) --}}
+        <div class="form-row my-1 mx-0 p-0">  {{-- margen(m) arriba y abajo(y) 0 y padding(p) arriba y abajo(y) 0(0) --}}
 {{-- Otros valores para margen y padding: 't':tope, 'b':bottom, 'l':left, 'r':right y 'x':left y right --}}
-          <div class="form-group col-lg-3 d-flex">
+          <div class="form-group col-lg-3 d-flex m-0 py-0 px-1">
             <label class="control-label" for="cedula">Cedula</label>
             <input type="text" class="form-control" size="8" maxlength="8" minlength="6" 
                     name="cedula" id="cedula" placeholder="numero de cedula" value="{{ old('cedula') }}">
           </div>
-          <div class="form-group col-lg-9 d-flex">
+          <div class="form-group col-lg-9 d-flex m-0 py-0 px-1">
             <label class="control-label" for="name">Nombre</label>
             <input type="text" class="form-control" required size="30" maxlength="30" 
                     name="name" id="name" placeholder="Nombre del contacto inicial" value="{{ old('name') }}">
           </div>
         </div>
 
-        <div class="form-row bg-suave my-0 py-0">
-          <div class="form-group col-lg-4 d-flex">
+        <div class="form-row bg-suave my-1 mx-0 p-0">
+          <div class="form-group col-lg-4 d-flex m-0 py-0 px-1">
             <label class="control-label" for="telefono">Teléfono</label>
             <select class="form-control" name="ddn" id="ddn">
               <option value="">ddn</option>
@@ -40,14 +41,14 @@
             <input class="form-control" type="text" size="7" maxlength="7" name="telefono"
                     id="telefono" placeholder="numero sin area" value="{{ old('telefono') }}">
           </div>
-          <div class="form-group col-lg-8 d-flex">
+          <div class="form-group col-lg-8 d-flex m-0 py-0 px-1">
             <label class="control-label" for="email">Correo electr&oacute;nico</label>
             <input type="email" class="form-control col-lg-6" size="30" maxlength="30" name="email" 
                     id="email" placeholder="correo electronico" value="{{ old('email') }}">
           </div>
         </div>
-        <div class="form-row bg-suave my-0 py-0">
-          <div class="form-group col-lg-8 d-flex">
+        <div class="form-row bg-suave my-1 mx-0 p-0">
+          <div class="form-group col-lg-8 d-flex m-0 py-0 px-1">
             <label class="control-label" for="otro_telefono">Otro telefono</label>
             <input type="text" class="form-control col-lg-6" size="20" maxlength="20"
                     name="otro_telefono" id="otro_telefono"
@@ -55,17 +56,17 @@
           </div>
         </div>
 
-        <div class="form-row my-0 py-0">
-          <div class="form-group col-lg-12 d-flex">
+        <div class="form-row my-1 mx-0 p-0">
+          <div class="form-group col-lg-12 d-flex m-0 py-0 px-1">
             <label class="control-label" for="direccion">Direcci&oacute;n</label>
             <textarea class="form-control" rows="3" maxlength="190" name="direccion" 
               id="direccion" placeholder="Calle, Casa, Apto, Edificio, Barrio, Ciudad">{{ old('direccion') }}</textarea>
           </div>
         </div>
 
-        <div class="form-row bg-suave m-0 p-0 no-gutters">
-          <div class="form-group col-2 d-flex my-1 mx-0 p-0 no-gutters">
-            <label class="control-label mx-0 p-0" for="deseo">Desea</label>
+        <div class="form-row bg-suave my-1 mx-0 p-0">
+          <div class="form-group d-flex my-1 mx-0 p-0">
+            <label class="control-label mx-1 p-0" for="deseo">Desea</label>
             <select class="form-control" name="deseo_id" id="deseo">
               <option value="">Qué desea?</option>
             @foreach ($deseos as $deseo)
@@ -77,8 +78,8 @@
             @endforeach
             </select>
           </div>
-          <div class="form-group col-2 d-flex my-1 mx-1 p-0 no-gutters">
-            <label class="control-label mx-1 p-0" for="tipo">Tipo</label>
+          <div class="form-group d-flex my-1 mx-2 p-0">
+            <label class="control-label mx-0 p-0" for="tipo">Tipo</label>
             <select class="form-control" name="tipo_id" id="tipo_id">
               <option value="">Qué tipo?</option>
             @foreach ($tipos as $tipo)
@@ -90,7 +91,7 @@
             @endforeach
             </select>
           </div>
-          <div class="form-group col-3 d-flex my-1 mx-1 p-0 no-gutters">
+          <div class="form-group d-flex my-1 mx-2 p-0">
             <label class="control-label mx-0 p-0" for="zona">Zona</label>
             <select class="form-control" name="zona_id" id="zona">
               <option value="">Qué zona?</option>
@@ -103,7 +104,7 @@
             @endforeach
             </select>
           </div>
-          <div class="form-group col-4 d-flex my-1 mx-1 p-0 no-gutters">
+          <div class="form-group d-flex my-1 mx-1 p-0">
             <label class="control-label mx-0 p-0" for="precio">Precio</label>
             <div id="idPrecio">
             <select class="form-control" name="precio_id" id="precio">
@@ -123,8 +124,8 @@
           </div>
         </div>
 
-        <div class="form-row my-0 py-0">
-          <div class="form-group col-lg-3 d-flex">
+        <div class="form-row my-1 mx-0 p-0">
+          <div class="form-group col-lg-3 d-flex m-0 py-0 px-1">
             <label class="control-label" for="origen">Origen</label>
             <select class="form-control" name="origen_id" id="origen_id">
               <option value="">Cómo supo de nosotros?</option>
@@ -137,10 +138,9 @@
             @endforeach
             </select>
           </div>
-          <div class="form-group col-lg-9 d-flex">
+          <div class="form-group col-lg-9 d-flex m-0 py-0 px-1">
             <label class="control-label" for="resultado">Resultado</label>
-            <select class="form-control" name="resultado_id" id="resultado_id"
-                                        onChange="alertaFechaRequerida()">
+            <select class="form-control" name="resultado_id" id="resultado_id">
               <option value="">Cuál fue el resultado?</option>
             @foreach ($resultados as $resultado)
             @if (old('resultado_id') == $resultado->id)
@@ -153,15 +153,17 @@
             <label class="control-label sr-only" for="fecha_evento">Fecha</label>
             <input class="form-control" type="date" name="fecha_evento" id="fecha_evento"
                     min="{{ now()->format('d/m/Y') }}" max="{{ now()->addWeeks(4)->format('d/m/Y') }}"
+                    title="Fecha en caso del Resultado sea llamarle o se haya concretado una cita."
                     value="{{ old('fecha_evento') }}">
             <label class="control-label sr-only" for="hora_evento">Hora</label>
             <input class="form-control" type="time" name="hora_evento" id="hora_evento"
+                    title="Si se concreta una cita o 'llamarle', suministre la hora aproximada."
                     value="{{ old('hora_evento') }}">
           </div>
         </div>
 
-        <div class="form-row my-0 py-0">
-          <div class="col-lg-12 d-flex">
+        <div class="form-row bg-suave my-1 mx-0 p-0">
+          <div class="col-lg-12 d-flex m-0 py-0 px-1">
             <label class="control-label" for="observaciones">Observaciones</label>
             <textarea class="form-control" rows="3" maxlength="190" 
                       name="observaciones" id="observaciones" 
@@ -169,9 +171,13 @@
           </div>
         </div>
 
-        <div class="form-row my-1 py-0">  {{-- margen(m) arriba y abajo(y) 0.25*$spacer(1) y padding(p) arriba y abajo(y) 0(0) --}}
-          <button type="submit" class="btn btn-success col-lg-5">Agregar contacto inicial</button>
-          <a href="{{ url('/contactos') }}" class="btn btn-link">Regresar al listado de contactos iniciales</a>
+        <div class="form-row my-1 mx-0 p-0">  {{-- margen(m) arriba y abajo(y) 0.25*$spacer(1) y padding(p) arriba y abajo(y) 0(0) --}}
+          <button type="submit" class="btn btn-success col-lg-5 m-0 py-0 px-1">
+            Agregar contacto inicial
+          </button>
+          <a href="{{ url('/contactos') }}" class="btn btn-link m-0 py-0 px-1">
+            Regresar al listado de contactos iniciales
+          </a>
         </div>
     </form>
   </div>
@@ -180,53 +186,6 @@
 
 @section('js')
 
-<script>
-  $(document).ready(function() {
-    var descrComprar = '';
-    var descrAlquilar = '';
-    @foreach ($precios as $precio)
-    descrComprar +=
-"        <option value='{{ $precio->id }}'>" +
-"          {{ $precio->descripcion }}" +
-"        </option>";
-    @endforeach
-    @foreach ($precios as $precio)
-    descrAlquilar +=
-"        <option value='{{ $precio->id }}'>" +
-"          {{ $precio->descripcion_alquiler }}" +
-"        </option>";
-    @endforeach
-    $("#deseo").change(function(ev) {
-      var deseo = $(this).val();
-      var descr = $("option:selected", this).text();  // opcion seleccionada en el 'this' ambito.
-      //var descr = $(this).children("option:selected").text();  // FUNCIONA. Toma 'option:selected' de todos los hijos diretos.
-      var precio = $("select#precio").val();
-      //alert('Deseo:' + deseo + '-' + descr + ' (' + precio + ').');
-      //alert(descrAlquilar);
-      //alert(descrComprar);
-      $("select#precio").empty();
-      if ((1 == deseo) || (2 == deseo)) $("select#precio").html(descrComprar);
-      else if ((3 == deseo) || (4 == deseo)) $("select#precio").html(descrAlquilar);
-    });
-  });
-function alertaFechaRequerida() {
-  var resValor = document.getElementById('resultado').value;
-  var fecha    = document.getElementById('fecha_evento');
-
-  if (('' == resValor) || (4 > parseInt(resValor)) || (7 < parseInt(resValor))) {
-    return;
-  }
-
-  if (4 == parseInt(resValor)) {
-    tipo = 'llamada';
-  } else {
-    tipo = 'cita';
-  }
-
-  alert("Como resultado de este contacto inicial, usted debe realizar una '" + tipo +
-    "', suministre la fecha y hora de la '" + tipo + "'");
-  fecha.focus();
-}
-</script>
+@includeIf("contactos.revisar", ['vista' => 'crear'])
 
 @endsection

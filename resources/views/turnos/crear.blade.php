@@ -121,9 +121,13 @@
                         @foreach ($semanas as $lSemana)
                             {{-- $loop->index, comienza desde 0, $loop-iteration, desde 1 --}}
                             @if (($semana) != $loop->index)
-                            <option value="{{ $loop->index }}">
-                                {{ $diaSemana[$lSemana->dayOfWeek - 1] }}
-                                {{ $lSemana->format('d/m/Y') }}
+                            <option value="{{ $loop->index }}"
+                                @if ($lSemana[1])
+                                style="color:red"
+                                @endif ($semana[1])
+                            >
+                                {{ $diaSemana[$lSemana[0]->dayOfWeek - 1] }}
+                                {{ $lSemana[0]->format('d/m/Y') }}
                             </option>
                             @endif
                         @endforeach

@@ -32,6 +32,27 @@ class ClienteController extends Controller
 
         $title = 'Listado de ' . $this->tipoPlural;
         $ruta = request()->path();
+        $dato = request()->all();
+        if (1 >= count($dato)) $paginar = True; // Inicialmente, el arreglo '$dato' esta vacio.
+        else $paginar = False;
+// Todo se inicializa, cuando se selecciona 'Contactos' desde el menu vertical.
+        if (('GET' == request()->method()) and ('' == $orden) and (0 == count($dato))) {
+            session(['fecha_desde' => '', 'fecha_hasta' => '', 'asesor' => '0']);
+        }
+/*
+ * Manejo de las variables de la forma lateral. $dato (fecha_desde, fecha_hasta, deseo,
+ * asesor).
+ * Cuando el arreglo $dato contiene un solo item, este es el número de página (page=n).
+ * Si el arreglo $dato está vacio (count($arreglo) == 0, esta opcion fue manejada arriba),
+ * es una ruta 'GET' con o sin $orden.
+ * Si $dato tiene más de 1 item. Fue seleccionado una fecha y/o deseo y/o un asesor.
+ */
+        if (1 >= count($dato)) {    // Arriba, paginar es True.
+            $asesor      = session('asesor', '0');
+        } else {
+            if (isset($dato['asesor'])) $asesor = $dato['asesor'];
+            else $asesor = 0;
+        }
 
 // En caso de volver luego de haber enviado un correo, ver el metodo 'emailcita', en AgendaController.
         $alertar = 0;
@@ -45,35 +66,33 @@ class ClienteController extends Controller
             $sentido = 'desc';
         }
 
-        $agente = new Agent();
-        $movil  = $agente->isMobile() and true;             // Fuerzo booleana. No funciona al usar el metodo directamente.
-
         if (Auth::user()->is_admin) {
             $clientes = Cliente::orderBy($orden, $sentido);
+            $users   = User::where('activo', True)->get(['id', 'name']);     // Todos los usuarios (asesores), excepto los no activos.
+            $users[0]['name'] = 'Administrador';
         } else {
-            $clientes = User::find(Auth::user()->id)
-                        ->clientes()->whereNull('user_borro')->orderBy($orden, $sentido);
+            $clientes = User::find(Auth::user()->id)->clientes()->whereNull('user_borro');
+            $users    = '';
         }
-/*
-        if (Auth::user()->is_admin) {
-            $contactos = Contacto::orderBy($orden);
-        } else {
-            $contactos = User::find(Auth::user()->id)
-                                ->contactos()->whereNull('user_borro')->orderBy($orden);
-            //return redirect('/contactos/create');
+        if (0 < $asesor) {      // Se selecciono un asesor.
+            $clientes = $clientes->where('user_id', $asesor);
         }
- */
-        if ($movil or ('html' != $accion)) $clientes = $clientes->get();
-        else $clientes = $clientes->paginate($this->lineasXPagina);
+        $clientes = $clientes->orderBy($orden, $sentido);
 
-        session(['orden' => $orden]);
+        $agente = new Agent();
+        $movil  = $agente->isMobile() and true;             // Fuerzo booleana. No funciona al usar el metodo directamente.
+        $paginar = ($paginar)?!($movil or ('html' != $accion)):$paginar;
+        if ($paginar) $clientes = $clientes->paginate($this->lineasXPagina);      // Pagina la impresión de 10 en 10
+        else $clientes = $clientes->get();                // Mostrar todos los registros.
+        session(['orden' => $orden, 'asesor' => $asesor]);
+
         if ('html' == $accion)
             return view('clientes.index',
                         compact('title', 'clientes', 'ruta', 'diaSemana', 'alertar',
-                            'orden','movil', 'accion'));
+                            'users', 'asesor', 'paginar', 'orden', 'movil', 'accion'));
         $html = view('clientes.index',
                     compact('title', 'clientes', 'ruta', 'diaSemana', 'alertar',
-                            'orden','movil', 'accion'))
+                            'users', 'asesor', 'paginar', 'orden', 'movil', 'accion'))
                 ->render();
         General::generarPdf($html, 'clientes', $accion);
     }

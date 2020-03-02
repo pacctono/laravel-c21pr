@@ -1,9 +1,8 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="d-flex justify-content-between align-items-end mb-3">
-        <h1 class="pb-1">{{ $title }}</h1>
-
+    <div class="d-flex justify-content-between align-items-end mt-0 mb-1 mx-0 p-0">
+        <h3 class="m-0 p-0">{{ $title }}</h3>
 	{{-- <p>
             <a href="{{ route('contactos.create') }}" class="btn btn-primary">
                 Crear Contacto Inicial
@@ -12,32 +11,32 @@
     </div>
 
     @if ($contactos->isNotEmpty())
-    <table class="table table-striped table-hover table-bordered">
+    <table class="table table-striped table-hover table-bordered m-0 p-0">
         <thead class="thead-dark">
-        <tr>
-            <th scope="col">
-                <a href="{{ route($rutRetorno, [$id, 'name']) }}" class="btn btn-link">
+        <tr class="m-0 p-0">
+            <th class="m-0 p-0" scope="col">
+                <a href="{{ route($rutRetorno, [$id, 'name']) }}" class="btn btn-link m-0 p-0">
                     Nombre
                 </a>
             </th>
-            <th scope="col">
-                <a href="{{ route($rutRetorno, [$id, 'telefono']) }}" class="btn btn-link">
+            <th class="m-0 p-0" scope="col">
+                <a href="{{ route($rutRetorno, [$id, 'telefono']) }}" class="btn btn-link m-0 p-0">
                     Telefono
                 </a>
             </th>
         @if (!$movil)
-            <th scope="col">
-                <a href="{{ route($rutRetorno, [$id, 'email']) }}" class="btn btn-link">
+            <th class="m-0 p-0" scope="col">
+                <a href="{{ route($rutRetorno, [$id, 'email']) }}" class="btn btn-link m-0 p-0">
                     Correo
                 </a>
             </th>
-            <th scope="col">
-                <a href="{{ route($rutRetorno, [$id, 'created_at']) }}" class="btn btn-link">
+            <th class="m-0 p-0" scope="col">
+                <a href="{{ route($rutRetorno, [$id, 'created_at']) }}" class="btn btn-link m-0 p-0">
                     Contactado
                 </a>
             </th>
-            <th scope="col">
-                <a href="{{ route($rutRetorno, [$id, 'tipo']) }}" class="btn btn-link">
+            <th class="m-0 p-0" scope="col">
+                <a href="{{ route($rutRetorno, [$id, 'tipo']) }}" class="btn btn-link m-0 p-0">
                     Tipo
                 </a>
             </th>
@@ -47,8 +46,8 @@
         </thead>
         <tbody>
         @foreach ($contactos as $vcliente)
-        <tr>
-            <td>
+        <tr class="m-0 py-1 px-0">
+            <td class="m-0 py-0 px-1">
             @if ($movil)
                 <a href="{{ route('contactos.muestra', [$vcliente, $rutRetorno]) }}" class="btn btn-link">
                     {{ $vcliente->name }}
@@ -57,19 +56,19 @@
                 {{ $vcliente->name }}
             @endif ($movil)
             </td>
-            <td>
+            <td class="text-right m-0 py-0 px-1">
                 {{ $vcliente->telefono_f }}
             </td>
         @if (!$movil)
-            <td>{{ $vcliente->email }}</td>
-            <td>
+            <td class="m-0 py-0 px-1">{{ $vcliente->email }}</td>
+            <td class="m-0 py-0 px-1">
                 {{ $vcliente->creado_dia_semana }}
                 {{ $vcliente->creado }}
                 @if ('' != $vcliente->user_borro and $vcliente->user_borro != null)
                     [B]
                 @endif
             </td>
-            <td>{{ $vcliente->tipo_alfa }}</td>
+            <td class="m-0 py-0 px-1">{{ $vcliente->tipo_alfa }}</td>
             {{--<td class="d-flex align-items-end">
                 <a href="{{ route('contactos.muestra', [$contacto, $rutRetorno]) }}" class="btn btn-link">
                     <span class="oi oi-eye"></span>

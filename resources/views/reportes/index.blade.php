@@ -17,45 +17,23 @@
                'include.asesor', ['berater' => 'asesor']) {{-- Obligatorio berater (asesor en aleman) --}}
   @include('include.botonMostrar')
     </div>
-      {{--<label>Desde:</label>
-      <input type="date" name="fecha_desde" id="fecha_desde" min="{{ now() }}" max="{{ now() }}"
-                      value="{{ old('fecha_desde', substr($fecha_desde, 0, 10)) }}">
-      <label>Hasta:</label>
-      <input type="date" name="fecha_hasta" id="fecha_hasta" min="{{ now() }}" max="{{ now() }}"
-                      value="{{ old('fecha_hasta', substr($fecha_hasta, 0, 10)) }}">
-      @if ((Auth::user()->is_admin) and ('Fecha' == $muestra))
-      <select name="asesor" id="asesor">
-        <option value="0">Asesor</option>
-        @foreach ($users as $user)
-          <option value="{{ $user->id }}"
-          @if (old("asesor", $asesor) == $user->id)
-            selected
-          @endif
-          >
-            {{ $user->name }}
-          </option>
-        @endforeach
-      </select>
-      @endif
-      <button type="submit" class="btn btn-success">Mostrar</button>
-    </div>--}}
   </form>
 </div>
 @endif ((!$movil) and (!isset($accion) or ('html' == $accion)))
 
-<div class="d-flex justify-content-between align-items-end mb-1 col-sm-12">
-  <div class="col-sm-9">
+<div class="d-flex justify-content-between align-items-end my-0 py-0 col-lg-12">
+  <div class="col-lg-9">
   @if (!isset($accion) or ('html' == $accion))
-    <h4 class="pb-1">{{ $title }}</h4>
+    <h4 class="m-0 p-0">{{ $title }}</h4>
   @else (!isset($accion) or ('html' == $accion))
     <h5 style="text-align:center;">{{ $title }}</h5>
   @endif (!isset($accion) or ('html' == $accion))
   </div>
 
   @if (!isset($accion) or ('html' == $accion))
-  <div class="col-sm-3">
+  <div class="col-lg-3">
   @if ('Cumpleanos' != $muestra)
-  <p class="text-right">
+  <p class="text-right m-0 p-0">
       <!-- a href="{{ route('reportes.chart', 'bar') }}" class="btn btn-primary">Crear Gráfico</a -->
       Crear gráfico de:
       <select name="grafico" id="grafico"
@@ -80,20 +58,20 @@
 
 <table
 @if (!isset($accion) or ('html' == $accion))
-  class="table table-striped table-hover table-bordered"
+  class="table table-striped table-hover table-bordered m-0 p-0"
 @else (!isset($accion) or ('html' == $accion))
   class="center"
 @endif (!isset($accion) or ('html' == $accion))
 >
-  <thead class="thead-dark my-0 py-0">
+  <thead class="thead-dark">
     <tr
     @if ((isset($accion) and ('html' != $accion)))
         class="encabezado"
     @else ((isset($accion) and ('html' != $accion)))
-        class="my-0 py-0"
+        class="m-0 p-0"
     @endif ((isset($accion) and ('html' != $accion)))
     >
-      <th scope="col">
+      <th class="m-0 py-0 px-1" scope="col">
       @if (('Conexion' == $muestra) ||
            ('Cumpleanos' == $muestra) ||
            ('Lados' == $muestra) ||
@@ -108,7 +86,7 @@
         {{ $muestra }}
       @endif
       </th>
-      <th scope="col">
+      <th class="m-0 py-0 px-1" scope="col">
       @if ('Conexion' == $muestra)
         Conexiones
       @elseif ('Cumpleanos' == $muestra)
@@ -131,13 +109,19 @@
   @foreach ($elemsRep as $elemento)
     {{-- @continue (0 >= $elemento->atendidos) --}}
     <tr class="
-    @if (0 == ($loop->iteration % 2))
+    @if (isset($elemento->activo) and (!$elemento->activo))
+        table-danger
+    @elseif (0 == ($loop->iteration % 2))
         table-primary
     @else
         table-info
-    @endif
-    ">
-      <td>
+    @endif (isset($elemento->activo) and (!$elemento->activo))
+    m-0 p-0">
+      <td class="m-0 py-0 px-1"
+      @if (isset($elemento->activo) and (!$elemento->activo))
+          title="Asesor no est&aacute; activo"
+      @endif (isset($elemento->activo) and (!$elemento->activo))
+      >
     @if ('Fecha' == $muestra)
       {{ $elemento->fechaContacto }}
     @elseif ('Origen' == $muestra)
@@ -157,6 +141,8 @@
       <td
     @if ((isset($accion) and ('html' != $accion)))
         style="text-align:right;"
+    @else
+        class="m-0 py-0 px-1"
     @endif ((isset($accion) and ('html' != $accion)))
       >
     @if ('Cumpleanos' == $muestra)

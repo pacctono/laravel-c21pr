@@ -25,12 +25,8 @@
                         class="btn btn-link m-0 p-0">
                     Reserva
                 </a>
-        @if (Auth::user()->is_admin)
-                /
-        @else
             </th>
             <th class="m-0 p-0" scope="col" title="Fecha de la firma">
-        @endif (Auth::user()->is_admin)
                 <a href="{{ route($rutRetorno, [$id, 'fecha_firma']) }}"
                         class="btn btn-link m-0 p-0">
                     Firma
@@ -129,16 +125,12 @@ Estatus en sistema C21: {{ $propiedad->estatus_c21_alfa.(($propiedad->pagado_cas
             <td class="m-0 p-0">
                 {{ $propiedad->nombre }}({{ $propiedad->negociacion }})
         @else ($movil)
-            <td class="m-0 p-0">
-                <span title="Fecha de reserva">
+            <td class="m-0 py-0 px-1">
+                <span class="float-right m-0 p-0" title="Fecha de reserva">
                     {{ $propiedad->fec_res }}</span>
-        @if (Auth::user()->is_admin)
-                <br>
-        @else
             </td>
-            <td class="m-0 p-0">
-        @endif (Auth::user()->is_admin)
-                <span title="Fecha de la firma">
+            <td class="m-0 py-0 px-1">
+                <span class="float-right m-0 p-0" title="Fecha de la firma">
                     {{ $propiedad->fec_fir }}</span>
             </td>
 

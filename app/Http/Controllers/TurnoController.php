@@ -24,6 +24,15 @@ class TurnoController extends Controller
     protected $tipo = 'Turnos';
     protected $lineasXPagina = 20/*General::LINEASXPAGINA*/;
 
+    protected function crearSemanas() {
+        for ($d = 0; $d < 11; $d++) {
+            $lunes = Fecha::primerLunesDePrimeraSemana()->addWeeks($d);   // Proximos once lunes.
+            $turnoExiste = Turno::where('turno', $lunes->format('Y-m-d') . ' 08:00:00')
+                                ->get()->isEmpty();
+            $semanas[$d] = array($lunes, $turnoExiste);
+        }
+        return $semanas;
+    }
     protected static function turnoNuevo($semana, $index, $hora, $nroId) {
         return [
             'turno'  => Fecha::primerLunesDePrimeraSemana()
@@ -52,10 +61,11 @@ class TurnoController extends Controller
         }
 
         $diaSemana = Fecha::$diaSemana;
-        for ($d = 0; $d < 11; $d++) {
+        $semanas = $this->crearSemanas();      // Proximos once lunes.
+/*        for ($d = 0; $d < 11; $d++) {
             $semanas[$d] = Fecha::primerLunesDePrimeraSemana()
                                     ->addWeeks($d);            // Proximos once lunes.
-        }
+        }*/
 //        dd($semanas);
 /*
  * Manejo de las variables de la forma superior. $periodo (radios, fecha_desde, fecha_hasta y asesor).
@@ -151,9 +161,25 @@ class TurnoController extends Controller
         if (!(Auth::check())) {
             return redirect('login');
         }
-        
+
+        $variables = request()->all();
+        //dd($variables);
+        if ('GET' == request()->method()) session(['asesor' => '0']);
+        else {
+            session(['asesor' => $variables['asesor']]);
+        }
+        $asesor = session('asesor', '0');
+
+        $turnos = Turno::where('id', '>', 0);   // condición dummy, solo para continuar armando la consulta.
+        if (Auth::user()->is_admin) {
+            $users  = User::where('activo', True)->where('socio', False)->get();
+        } else {
+            $users  = '';
+        }
+        if (0 < $asesor) $turnos = $turnos->where('user_id', $asesor);
+    
+        $data = $turnos->get();
         $eventos = [];
-        $data = Turno::all();
         if($data->count()) {
             foreach ($data as $key => $value) {
                 $eventos[] = Calendar::event(
@@ -176,17 +202,45 @@ class TurnoController extends Controller
                         'weekNumbers' => true,		// Muestra el numero de la semana, con respecto el año.
                         'aspectRatio' => 2.5,		// Mientras mas grande menos altura.
                    ]);
+        if (Auth::user()->is_admin)
+            $calendar = $calendar->setCallbacks([ //set fullcalendar callback options (will not be JSON encoded)
+                        'eventClick' => 'function(ev, jq, vista) {
+                                        const milisDia = 1000*60*60*24;
+                                        const ahora = new Date();
+                                        const hoy   = new Date(ahora.getFullYear(),
+                                                            ahora.getMonth(), ahora.getDate());
+                                        const fec   = ev.start.toDate();
+                                        if (fec <= hoy) {
+                                            alert("No puede modificar fechas antes o iguales a \'hoy\'.");
+                                            return;
+                                        }
+                                        var sumarDias;
+                                        if (0 == hoy.getDay()) sumarDias = 1;
+                                        else sumarDias = 1 - hoy.getDay();
+                                        const plunes = new Date(ahora.getFullYear(), ahora.getMonth(),
+                                                            ahora.getDate() + sumarDias);
+                                        const fecha = new Date(fec.getFullYear(), fec.getMonth(),
+                                                            fec.getDate());
+                                        const dtiempo = fecha.getTime() - plunes.getTime();
+                                        const dias  = dtiempo/milisDia;
+                                        const semana = parseInt(dias/7);
+                                        //alert(`Diferencia entre primer lunes(${plunes}) y fecha evento(${fecha}) de evento:${dias}`);
+                                        //alert(`Semana:${semana}`);
+                                        location.href = `/turnos/crear/${semana}`;
+                        }',
+                   ]);
 
         $diaSemana = Fecha::$diaSemana;
-        for ($d = 0; $d < 11; $d++) {
+        $semanas = $this->crearSemanas();      // Proximos once lunes.
+/*        for ($d = 0; $d < 11; $d++) {
             $semanas[$d] = Fecha::primerLunesDePrimeraSemana()
                                     ->addWeeks($d);            // Proximos once lunes.
-        }
+        }*/
 
         $agente = new Agent();
         $movil  = $agente->isMobile() and true;             // Fuerzo booleana. No funciona al usar el metodo directamente.
         return view('turnos.calendario',
-                            compact('calendar', 'diaSemana', 'semanas', 'movil'));
+                compact('calendar', 'users', 'asesor', 'diaSemana', 'semanas', 'movil'));
 
     }
 
@@ -204,8 +258,9 @@ class TurnoController extends Controller
         }
 
         $fecha = Fecha::primerLunesDePrimeraSemana()->addWeeks($semana);
-        $turnoExiste = Turno::where('turno', $fecha->format('Y-m-d') . ' 08:00:00')->get()->all();
-        if ($turnoExiste) {
+        $turnoExiste = Turno::where('turno', $fecha->format('Y-m-d') . ' 08:00:00')->get();
+// Revisa si el turno no existe y si existe, que tenga asignado un asesor (!= 0).
+        if ($turnoExiste->isNotEmpty() and (0 < $turnoExiste->first()->user_id)) {
             return redirect()->route('turnos.editar', $semana);
         }
 
@@ -226,6 +281,7 @@ class TurnoController extends Controller
         $lunesAnt = Fecha::primerLunesDePrimeraSemana()->addWeeks($semana-1)->format("Y-m-d");
         $sabadoAnt = Fecha::primerLunesDePrimeraSemana()->addWeeks($semana)->subDays(2)
                                 ->format("Y-m-d");
+// Creamos los arreglos de asesores de los ultimos 24 lunes/sabados anteriores.                                
         $asesoresLunesAnt = [];
         $asesoresSabadosAnt = [];
         for ($i=1; $i<=24; $i++) {
@@ -233,14 +289,16 @@ class TurnoController extends Controller
                                 ->get(['user_id'])->all();
             if (isset($arTmp) and (0 < count($arTmp))) {
                 $idTmp = $arTmp[0]->user_id;
-                if (!in_array($idTmp, $asesoresLunesAnt) and in_array($idTmp, $idAsesores) and (1 < $idTmp))
+                if (!in_array($idTmp, $asesoresLunesAnt) and
+                    in_array($idTmp, $idAsesores) and (1 < $idTmp))
                     $asesoresLunesAnt[] = $idTmp;
             }
             $arTmp = Turno::whereBetween('turno', [$sabadoAnt.' 00:00', $sabadoAnt.' 11:59'])
                                 ->get(['user_id'])->all();
             if (isset($arTmp) and (0 < count($arTmp))) {
                 $idTmp = $arTmp[0]->user_id;
-                if (!in_array($idTmp, $asesoresSabadosAnt) and in_array($idTmp, $idAsesores) and (1 < $idTmp))
+                if (!in_array($idTmp, $asesoresSabadosAnt) and
+                    in_array($idTmp, $idAsesores) and (1 < $idTmp))
                     $asesoresSabadosAnt[] = $idTmp;
             }
             $lunesAnt = (new Carbon($lunesAnt))->subWeek()->format("Y-m-d");
@@ -276,7 +334,7 @@ class TurnoController extends Controller
 // Ya tenemos el arreglo '$ids'.
             $j = -1;
             $nuevosTurnos = [];
-            $nuevosTurnos[] = $this::turnoNuevo($semana, 0, '08', $idLunes);
+            $nuevosTurnos[] = $this::turnoNuevo($semana, 0, '08', $idLunes);    // Lunes en la ma#ana.
             $ids[] = $idLunes;  // Asesor del lunes en la mañana.
             for ($i = 1; $i < 3; $i++) {
                 if ($max >= count($ids)) {
@@ -284,7 +342,7 @@ class TurnoController extends Controller
                 } else {	// Se acabaron los id de asesores, ubicaremos el resto de turnos de acuerdo al arreglo $ids.
                     list($nroId, $j) = General::idDelArreglo($j, $ids, $i);
                 }
-                $nuevosTurnos[] = $this::turnoNuevo($semana, $i, '08', $nroId);
+                $nuevosTurnos[] = $this::turnoNuevo($semana, $i, '08', $nroId);// Martes y miercoles en la ma#ana.
             }
             for ($i = 0; $i < 3; $i++) {
                 if ($max >= count($ids)) {
@@ -292,7 +350,7 @@ class TurnoController extends Controller
                 } else {	// Se acabaron los id de asesores, ubicaremos el resto de turnos de acuerdo al arreglo $ids.
                     list($nroId, $j) = General::idDelArreglo($j, $ids, $i);
                 }
-                $nuevosTurnos[] = $this::turnoNuevo($semana, $i, '12', $nroId);
+                $nuevosTurnos[] = $this::turnoNuevo($semana, $i, '12', $nroId);// Lunes, martes y miercoles en la tarde.
             }
             for ($i = 3; $i < 5; $i++) {
                 if ($max >= count($ids)) {
@@ -300,24 +358,29 @@ class TurnoController extends Controller
                 } else {	// Se acabaron los id de asesores, ubicaremos el resto de turnos de acuerdo al arreglo $ids.
                     list($nroId, $j) = General::idDelArreglo($j, $ids, $i, $idSabado);
                 }
-                $nuevosTurnos[] = $this::turnoNuevo($semana, $i, '08', $nroId);
+                $nuevosTurnos[] = $this::turnoNuevo($semana, $i, '08', $nroId);// Jueves y viernes en la ma#ana.
             }
-            $nuevosTurnos[] = $this::turnoNuevo($semana, 5, '08', $idSabado);
+            $nuevosTurnos[] = $this::turnoNuevo($semana, 5, '08', $idSabado);   // Sabado en la ma#ana.
             for ($i = 3; $i < 5; $i++) {
                 if ($max >= count($ids)) {
                     list($nroId, $j) = General::idAlAzar($j, $ids, $min, $max, $idAsesores, $idSabado);
                 } else {	// Se acabaron los id de asesores, ubicaremos el resto de turnos de acuerdo al arreglo $ids.
                     list($nroId, $j) = General::idDelArreglo($j, $ids, $i, $idSabado);
                 }
-                $nuevosTurnos[] = $this::turnoNuevo($semana, $i, '12', $nroId);
+                $nuevosTurnos[] = $this::turnoNuevo($semana, $i, '12', $nroId);// Jueves y viernes en la tarde.
             }
             //dd("min: $min", "max: $max", 'ids:', $ids, 'idSabado:', $idSabado, 'nuevosTurnos:', $nuevosTurnos, 'idAsesores: ', $idAsesores);
             foreach ($nuevosTurnos as $turno) {
-                Turno::create([
-                    'turno'     => $turno['turno'],
-                    'user_id'   => $turno['user_id'],
-                    'user_creo' => Auth::user()->id,
-                ]);
+                $turnoExiste = Turno::where('turno', $turno['turno'])->get();
+                if ($turnoExiste->isEmpty()) {
+                    Turno::create([
+                        'turno'     => $turno['turno'],
+                        'user_id'   => $turno['user_id'],
+                        'user_creo' => Auth::user()->id,
+                    ]);
+                } else {
+                    $turnoExiste->update($turno);
+                }
             }
             return redirect()->route('turnos.editar', $semana);
         }   // if ((isset($asesoresLunesAnt) and (0 < count($asesoresLunesAnt))) and (isset($asesoresSabadosAnt) and (0 < count($asesoresSabadosAnt))))
@@ -328,10 +391,11 @@ class TurnoController extends Controller
             $dia[$d] = $fecha->addDays($d)->format('Y-m-d');    // Fecha de cada dia.
         }
 // Crea el arreglo '$semanas' con la fecha del lunes de cada una de las proximas once semanas.
-        for ($d = 0; $d < 11; $d++) {
+        $semanas = $this->crearSemanas();      // Proximos once lunes.
+/*        for ($d = 0; $d < 11; $d++) {
             $semanaInicial = Fecha::primerLunesDePrimeraSemana();
             $semanas[$d] = $semanaInicial->addWeeks($d);            // Proximos once lunes.
-        }
+        }*/
 
         return view('turnos.crear', compact('title', 'diaSemana', 'dia', 'users',
                     'semanas', 'semana'));
@@ -413,8 +477,9 @@ class TurnoController extends Controller
 
         $fecha = Fecha::primerLunesDePrimeraSemana()->addWeeks($semana);
         $turnoExiste = Turno::where('turno', $fecha->format('Y-m-d') . ' 08:00:00')
-                                ->get()->all();
-        if (!$turnoExiste) {
+                                ->get();
+        if (($turnoExiste->isEmpty()) or
+            ($turnoExiste->isNotEmpty() and (0 == $turnoExiste->first()->user_id))) {
             return redirect()->route('turnos.crear', $semana);
         }
 
@@ -431,10 +496,11 @@ class TurnoController extends Controller
         $users = User::where('activo', True)->where('socio', False)
                         ->get(['id', 'name']);     // Todos los usuarios (asesores) activos.
 
-        for ($d = 0; $d < 11; $d++) {
+        $semanas = $this->crearSemanas();      // Proximos once lunes.
+/*        for ($d = 0; $d < 11; $d++) {
             $semanaInicial = Fecha::primerLunesDePrimeraSemana();
             $semanas[$d] = $semanaInicial->addWeeks($d);            // Proximos once lunes.
-        }
+        }*/
 
         $fecha1 = Fecha::primerLunesDePrimeraSemana()->addWeeks($semana);   // Lunes
         $fecha2 = Fecha::primerLunesDePrimeraSemana()->addWeeks($semana)->addDays(6);                              // Domingo
@@ -446,8 +512,9 @@ class TurnoController extends Controller
 
         $eventos = [];
         $primerDia = (new Carbon($turno->turno->format('Y-m-01')))->startOfDay();
-        $ultimoDia = (new Carbon($turno->turno->format('Y-m-t')))->endOfDay();
-        $data = Turno::whereBetween('turno', [$primerDia, $ultimoDia])->get();
+/*        $ultimoDia = (new Carbon($turno->turno->format('Y-m-t')))->endOfDay();
+        $data = Turno::whereBetween('turno', [$primerDia, $ultimoDia])->get();*/
+        $data = Turno::where('turno', '>=', $primerDia)->get();
         if($data->count()) {
             foreach ($data as $key => $value) {
                 $eventos[] = Calendar::event(
@@ -459,13 +526,44 @@ class TurnoController extends Controller
             }
         }
         $calendar = Calendar::addEvents($eventos)->setOptions([
-                        'header' => false,
+//                        'header' => false,
+                        'header' => [
+                            'left' => 'prev,next today',
+                            'center' => 'title',
+                            'right' => 'month,agendaWeek,agendaDay,listMonth',
+                        ],
                         'firstDay' => 1,			// El primer dia de la semana es el lunes.
                         'hiddenDays' => [0],		// No se muestra el domingo.
                         'fixedWeekCount' => false,	// Numero de semana variable, dependiendo del mes.
+                        'weekNumbers' => true,		// Muestra el numero de la semana, con respecto el año.
                         'defaultDate' => $turno->turno->format('Y-m-d'),	// Fecha del mes a mostrar.
                         'columnHeader' => false,	// esconde los titulos de los dias de la semana.
                         'aspectRatio' => 3,		    // Mientras mas grande menos altura.
+                   ]);
+        if (Auth::user()->is_admin)
+            $calendar = $calendar->setCallbacks([ //set fullcalendar callback options (will not be JSON encoded)
+                        'eventClick' => 'function(ev, jq, vista) {
+                                        const milisDia = 1000*60*60*24;
+                                        const ahora = new Date();
+                                        const hoy   = new Date(ahora.getFullYear(),
+                                                            ahora.getMonth(), ahora.getDate());
+                                        const fec   = ev.start.toDate();
+                                        if (fec <= hoy) {
+                                            alert("No puede modificar fechas antes o iguales a \'hoy\'.");
+                                            return;
+                                        }
+                                        var sumarDias;
+                                        if (0 == hoy.getDay()) sumarDias = 1;
+                                        else sumarDias = 1 - hoy.getDay();
+                                        const plunes = new Date(ahora.getFullYear(), ahora.getMonth(),
+                                                            ahora.getDate() + sumarDias);
+                                        const fecha = new Date(fec.getFullYear(), fec.getMonth(),
+                                                            fec.getDate());
+                                        const dtiempo = fecha.getTime() - plunes.getTime();
+                                        const dias  = dtiempo/milisDia;
+                                        const semana = parseInt(dias/7);
+                                        location.href = `/turnos/crear/${semana}`;
+                        }',
                    ]);
 
         return view('turnos.editar',

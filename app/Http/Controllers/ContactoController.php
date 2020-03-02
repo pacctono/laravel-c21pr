@@ -43,7 +43,6 @@ class ContactoController extends Controller
         $title = 'Listado de ' . $this->tipoPlural;
         $ruta = request()->path();
         $dato = request()->all();
-        //dd($ruta, $dato);
         if (1 >= count($dato)) $paginar = True; // Inicialmente, el arreglo '$dato' esta vacio.
         else $paginar = False;
 // Todo se inicializa, cuando se selecciona 'Contactos' desde el menu vertical.
@@ -110,7 +109,7 @@ class ContactoController extends Controller
             //return redirect('/contactos/create');
         }
         //dd($asesor, $deseo, $fecha_desde, $fecha_hasta, $contactos);
-        if (0 < $asesor) {      // Se selecciono un asesor cerrador o esta conectado.
+        if (0 < $asesor) {      // Se selecciono un asesor.
             $contactos = $contactos->where('user_id', $asesor);
         }
         if ('' != $deseo) {       // Se selecciono una deseo.
@@ -198,12 +197,13 @@ class ContactoController extends Controller
         $resultados = Resultado::all();
         $zonas = Zona::all();
         $ddns = Venezueladdn::distinct()->get(['ddn'])->all();
+        $users = User::all();
         $exito = session('exito', '');
         session(['exito' => '']);
 
         return view('contactos.crear', compact(
             'title', 'deseos', 'origenes', 'precios',
-            'tipos', 'resultados', 'zonas', 'ddns', 'exito'));
+            'tipos', 'resultados', 'zonas', 'ddns', 'users', 'exito'));
     }
 
     /**
@@ -270,7 +270,8 @@ class ContactoController extends Controller
         else $data['veces_email'] = 1;
         if (!(is_null($data['fecha_evento']))) {
 // El tipo 'time' decuelve la hora militar (formato de 24 horas) por eso 'H:i' no incluye am/pm.
-            $data['fecha_evento'] = Carbon::createFromFormat('Y-m-d H:i', $data['fecha_evento'] . ' ' . $data['hora_evento']);
+            $data['fecha_evento'] = Carbon::createFromFormat('Y-m-d H:i', $data['fecha_evento'] . ' ' .
+                                                            ($data['hora_evento']??'12:00'));
         }
 
         $contacto = Contacto::create([          // Devuelve el modelo.

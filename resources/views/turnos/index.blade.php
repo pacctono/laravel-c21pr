@@ -21,6 +21,25 @@
 <div class="row no-gutters">
 <div class="col-3 no-gutters">
   <div class="card mt-0 mb-1 py-0 mx-0 py-0">
+    <h3 class="card-header my-0 py-0 mx-0 py-0">Crear turno</h3>
+    <div class="card-body my-0 py-0 mx-0 py-0">
+        <select name="semana" id="semana"
+          onchange="javascript:location.href = this.value;">
+          <option value="">Semana</option>
+          @foreach ($semanas as $semana)
+              <option value="{{ route('turnos.crear', $loop->index) }}"
+                @if ($semana[1])
+                  style="color:red"
+                @endif ($semana[1])
+              >
+                  {{ $diaSemana[$semana[0]->dayOfWeek] }}
+                  {{ $semana[0]->format('d/m/Y') }}
+              </option>
+          @endforeach
+        </select>
+    </div>
+  </div>
+  <div class="card mt-1 mb-0 py-0 mx-0 py-0">
     <h3 class="card-header my-0 py-0 mx-0 py-0">Filtrar listado</h3>
     <div class="card-body my-0 py-0 mx-0 py-0">
       <form method="POST" class="form-vertical my-0 py-0 mx-0 px-0"
@@ -33,21 +52,6 @@
         @includeWhen(Auth::user()->is_admin, 'include.asesor', ['berater' => 'asesor'])   {{-- Obligatorio pasar la variable 'berater' --}}
         @include('include.botonMostrar')
       </form>
-    </div>
-  </div>
-  <div class="card mt-1 mb-0 py-0 mx-0 py-0">
-    <h3 class="card-header my-0 py-0 mx-0 py-0">Crear turno</h3>
-    <div class="card-body my-0 py-0 mx-0 py-0">
-        <select name="semana" id="semana"
-          onchange="javascript:location.href = this.value;">
-          <option value="">Semana</option>
-          @foreach ($semanas as $semana)
-              <option value="{{ route('turnos.crear', $loop->index) }}">
-                  {{ $diaSemana[$semana->dayOfWeek] }}
-                  {{ $semana->format('d/m/Y') }}
-              </option>
-          @endforeach
-        </select>
     </div>
   </div>
 </div>

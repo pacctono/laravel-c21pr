@@ -47,9 +47,9 @@ class PropiedadController extends Controller
         else $paginar = False;
 // Todo se inicializa, cuando se selecciona 'Propiedades' desde el menu horizontal principal.
         if (('GET' == request()->method()) and ('' == $orden) and (0 == count($dato))) {
-            session(['fecha_desde' => '', 'fecha_hasta' => '', 'negociacion' => '',
-                        'estatus' => '', 'precio' => '',
-                        'asesor' => '0', 'captador' => '0', 'cerrador' => '0']);
+            session(['fecha_desde' => '', 'fecha_hasta' => '', 'anoc' => '',
+                    'negociacion' => '', 'codigo' => '', 'estatus' => '', 'desde' => '',
+                    'hasta' => '', 'asesor' => '0', 'captador' => '0', 'cerrador' => '0']);
         }
 /*
  * Manejo de las variables de la forma superior. $dato (fecha_desde, fecha_hasta, estatus,
@@ -62,9 +62,12 @@ class PropiedadController extends Controller
         if (1 >= count($dato)) {    // Arriba, paginar es True.
             $fecha_desde = session('fecha_desde', '');
             $fecha_hasta = session('fecha_hasta', '');
+            $anoc        = session('anoc', '');
+            $codigo      = session('codigo', '');
             $negociacion = session('negociacion', '');
             $estatus     = session('estatus', '');
-            $precio      = session('precio', '');
+            $desde       = session('desde', '');
+            $hasta       = session('hasta', '');
             $captador    = session('captador', '0');
             $cerrador    = session('cerrador', '0');
             $asesor      = session('asesor', '0');
@@ -75,15 +78,21 @@ class PropiedadController extends Controller
             else $cerrador = 0;
             if (isset($dato['asesor'])) $asesor   = $dato['asesor'];
             else $asesor = 0;
-            $captador = $dato['asesor'];
-            $cerrador = $dato['asesor'];
+            $captador = $asesor;
+            $cerrador = $asesor;
 
+            if (isset($dato['anoc'])) $anoc = $dato['anoc'];
+            else $anoc = '';
+            if (isset($dato['codigo'])) $codigo = $dato['codigo'];
+            else $codigo = '';
             if (isset($dato['negociacion'])) $negociacion = $dato['negociacion'];
             else $negociacion = '';
             if (isset($dato['estatus'])) $estatus = $dato['estatus'];
             else $estatus = '';
-            if (isset($dato['precio'])) $precio = $dato['precio'];
-            else $precio = '';
+            if (isset($dato['desde'])) $desde = $dato['desde'];
+            else $desde = '';
+            if (isset($dato['hasta'])) $hasta = $dato['hasta'];
+            else $hasta = '';
 
             if ('' == $dato['fecha_desde'])
                 $fecha_desde = (new Carbon(Propiedad::min('fecha_firma')));
@@ -144,18 +153,34 @@ class PropiedadController extends Controller
             if ($cerrador != $captador)
                 $propiedades = $propiedades->where('asesor_cerrador_id', $cerrador);
         }
+        if ('' != $anoc) {       // Se selecciono un anoc.
+            $propiedades = $propiedades->where(DB::raw("YEAR(created_at)"), $anoc);
+        }
+        if ('' != $codigo) {       // Se selecciono un codigo.
+            $propiedades = $propiedades->where('codigo', 'like', $codigo.'%');
+        }
         if ('' != $negociacion) {       // Se selecciono una negociacion.
             $propiedades = $propiedades->where('negociacion', $negociacion);
         }
         if ('' != $estatus) {       // Se selecciono un estatus.
-            $propiedades = $propiedades->where('estatus', $estatus);
+            if ('V' == $estatus) $propiedades = $propiedades->whereIn('estatus', ['P', 'C']);
+            elseif ('X' == $estatus) {
+                $propiedades = $propiedades
+                                ->where('created_at', '<', (new Carbon(now()))->subDays(90))
+                                ->where('estatus', 'A');
+            }
+            else $propiedades = $propiedades->where('estatus', $estatus);
         }
-        $precios = Price::get();    // Todos los precios, incluye 'descripcion' y 'descripcion_alquiler'.
+        /*$precios = Price::get();    // Todos los precios, incluye 'descripcion' y 'descripcion_alquiler'.
         if ('' != $precio) {       // Se selecciono un precio.
             $menor = $precios->where('id', $precio)->first()->menor;
             $mayor = $precios->where('id', $precio)->first()->mayor;
             $propiedades = $propiedades->whereBetween('precio', [$menor, $mayor]);
-        }
+        }*/
+        if ('' != $desde) {       // Se selecciono un precio minimo.
+            if ('' == $hasta) $propiedades = $propiedades->where('precio', '>=', $desde);
+            else $propiedades = $propiedades->whereBetween('precio', [$desde, $hasta]);
+        } elseif ('' != $hasta) $propiedades = $propiedades->where('precio', '<=', $hasta);
         if ('' != $fecha_desde and '' != $fecha_hasta) {    // Se seleccionaron fechas.
             $fecha_desde = substr($fecha_desde, 0, 10);
             $fecha_hasta = substr($fecha_hasta, 0, 10);
@@ -193,11 +218,13 @@ class PropiedadController extends Controller
         $cols = General::columnas('propiedads');
         $arrEstatus = $cols['estatus']['opcion'];
         $negociaciones = $cols['negociacion']['opcion'];
+        $anosc = Propiedad::select(DB::raw("distinct YEAR(created_at) AS anoc"))->get();
         unset($cols);
         session(['fecha_desde' => $fecha_desde, 'fecha_hasta' => $fecha_hasta,    // Asignar valores en sesión.
-                    'negociacion' => $negociacion, 'estatus' => $estatus,
-                    'precio' => $precio, 'asesor' => $asesor,
-                    'captador' => $captador, 'cerrador' => $cerrador, 'orden' => $orden
+                    'anoc' => $anoc, 'codigo' => $codigo, 'negociacion' => $negociacion,
+                    'estatus' => $estatus, 'desde' => $desde, 'hasta' => $hasta,
+                    'asesor' => $asesor, 'captador' => $captador, 'cerrador' => $cerrador,
+                    'orden' => $orden
                 ]);
         /*dd($tCaptadorPrbr, $tCerradorPrbr, $tPrecioVentaReal, $tCaptadorPrbrSel,
                 $tCerradorPrbrSel, $tLadosCap, $tLadosCer,
@@ -215,7 +242,7 @@ class PropiedadController extends Controller
                     'tCaptadorPrbrSel', 'tCerradorPrbrSel', 'tLadosCap', 'tLadosCer',
                     'tPvrCaptadorPrbrSel', 'tPvrCerradorPrbrSel',
                     'ruta', 'fecha_desde', 'fecha_hasta', 'arrEstatus', 'negociaciones',
-                    'precios', 'precio',
+                    'anosc', 'anoc', 'codigo', 'desde', 'hasta',
                     'asesor', 'captador', 'cerrador', 'tPuntosCaptador', 'tPuntosCerrador',
                     'estatus', 'negociacion', 'orden', 'paginar', 'alertar', 'accion'));
         $html = view('propiedades.index',
@@ -229,7 +256,7 @@ class PropiedadController extends Controller
                     'tCaptadorPrbrSel', 'tCerradorPrbrSel', 'tLadosCap', 'tLadosCer',
                     'tPvrCaptadorPrbrSel', 'tPvrCerradorPrbrSel',
                     'ruta', 'fecha_desde', 'fecha_hasta', 'arrEstatus', 'negociaciones',
-                    'precios', 'precio',
+                    'anosc', 'anoc', 'codigo', 'desde', 'hasta',
                     'asesor', 'captador', 'cerrador', 'tPuntosCaptador', 'tPuntosCerrador',
                     'estatus', 'negociacion', 'orden', 'paginar', 'alertar', 'accion'))
                 ->render();

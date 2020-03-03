@@ -19,15 +19,19 @@
                 {{--onSubmit="return alertaCampoRequerido()"--}}>
             {!! csrf_field() !!}
 
-            <div class="form-row my-0 py-0 mx-1 px-1">
-        {{--@includeif('include.fechas', ['tipoFecha' => 'de la firma '])--}}
-        <div style="font-size:0.75rem">
+        {{--<div class="form-row justify-content-center">
+        @includeif('include.fechas', ['tipoFecha' => 'de la firma '])
+        </div>--}}
+            <div class="form-row justify-content-center" style="font-size:0.75rem">
             {{-- print_r($deseos) --}}
             @includeif('include.filtro', ['filtro' => 'deseo', 'filtros' => 'deseos',
                                             'tamFont' => 1.0])
-        </div>
-        @includeWhen(Auth::user()->is_admin, 'include.asesor', ['berater' => 'asesor'])   {{-- Obligatorio pasar la variable 'berater' --}}
-        @include('include.botonMostrar')
+            </div>
+            <div class="form-row justify-content-center">
+            @includeWhen(Auth::user()->is_admin, 'include.asesor', ['berater' => 'asesor'])   {{-- Obligatorio pasar la variable 'berater' --}}
+            </div>
+            <div class="form-row justify-content-center">
+            @include('include.botonMostrar')
             </div>
         </form>
     </div>

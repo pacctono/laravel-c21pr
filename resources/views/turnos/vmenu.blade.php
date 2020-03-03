@@ -1,5 +1,5 @@
 <div class="row no-gutters">
-<div class="col-2 no-gutters">
+<div class="col-{{ $nCol }} no-gutters">
   <div class="card mt-0 mb-1 py-0 mx-0 py-0">
     <h4 class="card-header my-0 py-0 mx-0 py-0">Crear turno</h4>
     <div class="card-body my-0 py-0 mx-0 py-0">
@@ -32,14 +32,14 @@
         <form method="POST" class="form" action="{{ route('calendario.post') }}">
             {!! csrf_field() !!}
 
-          <div class="form-row my-0 py-0 mx-1 px-1">
+          <div class="form-row justify-content-center">
           @includeWhen(Auth::user()->is_admin, 'include.asesor', ['berater' => 'asesor'])   {{-- Obligatorio pasar la variable 'berater' --}}
           </div>
-          <div class="form-row my-0 py-0 mx-1 px-1">
+          <div class="form-row justify-content-center">
           @include('include.botonMostrar')
           </div>
         </form>
     </div>
   </div>
 </div>
-<div class="col-10 no-gutters">
+<div class="col-{{ 12-$nCol }} no-gutters">

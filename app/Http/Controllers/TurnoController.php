@@ -199,8 +199,8 @@ class TurnoController extends Controller
                         'firstDay' => 1,			// El primer dia de la semana es el lunes.
                         'hiddenDays' => [0],		// No se muestra el domingo.
                         'fixedWeekCount' => false,	// Numero de semana variable, dependiendo del mes.
-                        'weekNumbers' => true,		// Muestra el numero de la semana, con respecto el año.
-                        'aspectRatio' => 2.5,		// Mientras mas grande menos altura.
+                        'weekNumbers' => false,		// Muestra el numero de la semana, con respecto el año.
+                        'aspectRatio' => 2.0,		// Mientras mas grande menos altura.
                    ]);
         if (Auth::user()->is_admin)
             $calendar = $calendar->setCallbacks([ //set fullcalendar callback options (will not be JSON encoded)

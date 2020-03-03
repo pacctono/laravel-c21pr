@@ -41,9 +41,23 @@
     });
 
     @if ('crear' == $vista)
+    $("#deseo").change(function(ev) {
+      var deseo = $(this).val();
+      var descr = $("option:selected", this).text();  // opcion seleccionada en el 'this' ambito.
+      //var descr = $(this).children("option:selected").text();  // FUNCIONA. Toma 'option:selected' de todos los hijos diretos.
+      var precio = $("select#precio").val();
+      //alert('Deseo:' + deseo + '-' + descr + ' (' + precio + ').');
+      //alert(descrAlquilar);
+      //alert(descrComprar);
+      $("select#precio").empty();
+      if ((1 == deseo) || (2 == deseo)) $("select#precio").html(descrComprar);
+      else if ((3 == deseo) || (4 == deseo)) $("select#precio").html(descrAlquilar);
+    });
     $("#resultado_id").change(function(ev) {
       var resultado = $(this).val();
       if (('' == resultado) || (4 > parseInt(resultado)) || (7 < parseInt(resultado))) {
+        $("#fecha_evento").prop('disabled', true);
+        $("#hora_evento").prop('disabled', true);
         return;
       }
       var tipo;
@@ -51,6 +65,8 @@
       else tipo = 'cita';
       alert("Como resultado de este contacto inicial, usted debe realizar una '" + tipo +
         "', suministre la fecha y hora de la '" + tipo + "'");
+      $("#fecha_evento").prop('disabled', false);
+      $("#hora_evento").prop('disabled', false);
       $("#fecha_evento").focus();
     });
     $("#fecha_evento").change(function(ev) {
@@ -70,18 +86,6 @@
           $("#hora_evento").focus();
         }
       }
-    });
-    $("#deseo").change(function(ev) {
-      var deseo = $(this).val();
-      var descr = $("option:selected", this).text();  // opcion seleccionada en el 'this' ambito.
-      //var descr = $(this).children("option:selected").text();  // FUNCIONA. Toma 'option:selected' de todos los hijos diretos.
-      var precio = $("select#precio").val();
-      //alert('Deseo:' + deseo + '-' + descr + ' (' + precio + ').');
-      //alert(descrAlquilar);
-      //alert(descrComprar);
-      $("select#precio").empty();
-      if ((1 == deseo) || (2 == deseo)) $("select#precio").html(descrComprar);
-      else if ((3 == deseo) || (4 == deseo)) $("select#precio").html(descrAlquilar);
     });
     @endif ('crear' == $vista)
 

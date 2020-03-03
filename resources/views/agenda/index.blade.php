@@ -18,7 +18,7 @@
 @endif (isset($alertar))
 
 @includeWhen((!$movil and (!isset($accion) or ('html' == $accion))),
-                'agenda.vmenu')
+                'agenda.vmenu', ['nCol' => 2])
 
 {{--@if ((!$movil) and (!isset($accion) or ('html' == $accion)))
     {{ $agendas->links() }}

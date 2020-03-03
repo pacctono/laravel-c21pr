@@ -32,6 +32,7 @@
     <script>alert("No fue enviado el correo al asesor. Probablemente, problemas con Internet! Revise su conexión");</script>
 @endif (0 < $alertar)
 @endif (isset($alertar))
+
 @if ($users->isNotEmpty())
     <table
     @if (!isset($accion) or ('html' == $accion))
@@ -43,11 +44,10 @@
         <thead class="thead-dark">
         <tr
         @if (isset($accion) and ('html' != $accion))
-            class="encabezado
+            class="encabezado"
         @else (isset($accion) and ('html' != $accion))
-            class="
+            class="my-0 py-0"
         @endif (isset($accion) and ('html' != $accion))
-                my-0 py-0"
         >
         @if (!$movil)
             <th class="my-0 py-0" scope="col">id</th>
@@ -210,7 +210,6 @@
                     </a>
                     <a href="{{ route('users.updateActivo', $user) }}" id="{{ $user->id }}"
                             class="btn btn-link desAct my-0 py-0 mx-0 px-0"
-{{-- onClick="seguroDesActivar('desActivar_{{ $user->id}}', '{{ $user->name }}', {{ ($user->activo)?'true':'false' }})"--}}
                     @if ($user->activo)
                             title="Desactivar al asesor {{ $user->name }}">
                         <span class="oi oi-thumb-down my-0 py-0 mx-1 px-0"></span>
@@ -309,26 +308,6 @@
                 ev.preventDefault();
             }
         });
-        /*$('a.aviso').click(function(ev) {
-            ev.preventDefault();
-            var id = $(this).attr('id').substring(5);        // 'avisoid'
-            var numAvisos = document.getElementById('numAvisos'+id).value;
-            var fecha, descripcion, mensaje='', accion;
-            for (i=0; i<numAvisos; i++) {
-                tipo = document.getElementById('tipo'+id+'_'+i).value;
-                fecha = document.getElementById('fecha'+id+'_'+i).value;
-                descripcion = document.getElementById('descripcion'+id+'_'+i).value;
-                if ('C' == tipo) mensaje += descripcion + '. ' + fecha;
-                else if ('T' == tipo) {
-                    descripcion = descripcion.replace(/M-/, 'Mañana a ');
-                    descripcion = descripcion.replace(/T-/, 'Tarde a ');
-                    mensaje += descripcion;
-                }
-                mensaje += '.';
-                if (i < (numAvisos-1)) mensaje += '\n';
-            }
-            alert(mensaje);
-        });*/
         $("a.aviso").click(function(ev) {
             ev.preventDefault();
             var user_id = $(this).attr('id').substring(5);        // 'avisoid'
@@ -340,21 +319,6 @@
                     }});
         });
     });
-function seguroDesActivar(sId, nombre, activo) {
-    var id = document.getElementById(sId);
-    var accion;
-
-    if (activo)
-        accion = confirm('Desea desactivar al asesor ' + nombre);
-    else
-        accion = confirm('Desea activar al asesor ' + nombre);
-    if (!accion) {
-        alert('Falso'+sId+id);
-        id.addEventListener("click", function(event){
-            event.preventDefault()
-        });
-    } else alert('Verdadero');
-}
 function estaSeguro(id) {
     var nroContactos         = document.getElementById('contactos.'+id).value;
     var nroContactosBorrados = document.getElementById('contactosBorrados.'+id).value;

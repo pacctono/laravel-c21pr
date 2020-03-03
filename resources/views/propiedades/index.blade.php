@@ -22,7 +22,7 @@
 @endif (0 < $alertar)
 @endif (isset($alertar))
 
-@includeWhen((!$movil and (!isset($accion) or ('html' == $accion))), 'propiedades.vmenu')
+@includeWhen((!$movil and (!isset($accion) or ('html' == $accion))), 'propiedades.vmenu', ['nCol' => 2])
 
     @if ($propiedades->isNotEmpty())
 {{--@if ($paginar)

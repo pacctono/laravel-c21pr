@@ -10,7 +10,7 @@
 @section('content')
 
 @includeWhen(((!$movil and (!isset($accion) or ('html' == $accion))) and
-                            (Auth::user()->is_admin)), 'turnos.vmenu')
+                            (Auth::user()->is_admin)), 'turnos.vmenu', ['nCol' => 2])
 
     <div class="panel-body" id="calendario">
       {!! $calendar->calendar() !!}

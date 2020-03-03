@@ -1,27 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-    {{-- <div class="d-flex justify-content-between align-items-end m-1 p-0">
-        @if (!isset($accion) or ('html' == $accion))
-        @if ($movil)
-        <h4 class="m-0 p-0">{{ substr($title, 11) }}</h4>
-        @else
-        <h3 class="m-0 p-0">{{ $title }}</h3>
-        @endif
-        @else (!isset($accion) or ('html' == $accion))
-        <h1 style="text-align:center">{{ $title }}</h1>
-        @endif (!isset($accion) or ('html' == $accion))
 
-        @if (!isset($accion) or ('html' == $accion))
-            <a href="{{ route('clientes.create') }}" class="btn btn-primary m-0 p-1">
-            @if ($movil)
-                Crear
-            @else
-                Crear Cliente
-            @endif
-            </a>
-        @endif (!isset($accion) or ('html' == $accion))
-    </div>--}}
 @if (isset($accion) and ('html' != $accion))
     <div>
         <h4 style="text-align:center">
@@ -30,39 +10,10 @@
     </div>
 @endif (isset($accion) and ('html' != $accion))
 
-@if ((!$movil) and (!isset($accion) or ('html' == $accion)))
-<div class="row no-gutters">
-<div class="col-2 no-gutters" style="font-size:0.65rem">
-  <div class="card mt-0 mb-1 p-0 mx-0">
-    <h4 class="card-header m-0 p-0">Clientes</h4>
-    <div class="card-body m-0 p-0">
-        <a href="{{ route('clientes.create') }}" class="btn btn-primary my-0 py-0 mx-2">
-        @if ($movil)
-            Crear
-        @else
-            Crear Cliente Inicial
-        @endif
-        </a>
-    </div>
-  </div>
-  <div class="card mt-1 mb-0 mx-0 p-0">
-    <h3 class="card-header m-0 p-0">Filtrar listado</h3>
-    <div class="card-body m-0 p-0">
-        <form method="POST" class="form-horizontal" action="{{ route('clientes.post') }}"
-                {{--onSubmit="return alertaCampoRequerido()"--}}>
-            {!! csrf_field() !!}
+@includeWhen((!$movil and (!isset($accion) or ('html' == $accion))),
+                'clientes.vmenu', ['nCol' => 2])
 
-            <div class="form-row my-0 py-0 mx-1 px-1">
-        @includeWhen(Auth::user()->is_admin, 'include.asesor', ['berater' => 'asesor'])   {{-- Obligatorio pasar la variable 'berater' --}}
-        @include('include.botonMostrar')
-            </div>
-        </form>
-    </div>
-  </div>
-</div>
-<div class="col-10 no-gutters">
-@endif ((!$movil) and (!isset($accion) or ('html' == $accion)))
-    @if ($clientes->isNotEmpty())
+@if ($clientes->isNotEmpty())
 {{--@if ($paginar)
     {{ $clientes->links() }}
 @endif ($paginar)--}}
@@ -82,21 +33,21 @@
             class="m-0 p-0"
         @endif (isset($accion) and ('html' != $accion))
         >
-            <th class="my-1 mx-0 p-0" scope="col">
+            <th class="m-0 p-0" scope="col">
                 <a class=@if('html'==$accion) "btn btn-link m-0 p-0" href=
                     @else "enlaceDesabilitado" name=
                     @endif "{{ route('clientes.orden', 'cedula') }}">
                     Cedula
                 </a>
             </th>
-            <th class="my-1 mx-0 p-0" scope="col">
+            <th class="m-0 p-0" scope="col">
                 <a class=@if('html'==$accion) "btn btn-link m-0 p-0" href=
                     @else "enlaceDesabilitado" name=
                     @endif "{{ route('clientes.orden', 'rif') }}">
                     Rif
                 </a>
             </th>
-            <th class="my-1 mx-0 p-0" scope="col">
+            <th class="m-0 p-0" scope="col">
                 <a class=@if('html'==$accion) "btn btn-link m-0 p-0" href=
                     @else "enlaceDesabilitado" name=
                     @endif "{{ route('clientes.orden', 'name') }}">
@@ -104,28 +55,28 @@
                 </a>
             </th>
         @if (!$movil)
-            <th class="my-1 mx-0 p-0" scope="col">
+            <th class="m-0 p-0" scope="col">
                 <a class=@if('html'==$accion) "btn btn-link m-0 p-0" href=
                     @else "enlaceDesabilitado" name=
                     @endif "{{ route('clientes.orden', 'tipo') }}">
                     Tipo
                 </a>
             </th>
-            <th class="my-1 mx-0 p-0" scope="col">
+            <th class="m-0 p-0" scope="col">
                 <a class=@if('html'==$accion) "btn btn-link m-0 p-0" href=
                     @else "enlaceDesabilitado" name=
                     @endif "{{ route('clientes.orden', 'telefono') }}">
                     Telefono
                 </a>
             </th>
-            <th class="my-1 mx-0 p-0" scope="col">
+            <th class="m-0 p-0" scope="col">
                 <a class=@if('html'==$accion) "btn btn-link m-0 p-0" href=
                     @else "enlaceDesabilitado" name=
                     @endif "{{ route('clientes.orden', 'email') }}">
                     Correo
                 </a>
             </th>
-            <th class="my-1 mx-0 p-0" scope="col">
+            <th class="m-0 p-0" scope="col">
                 <a class=@if('html'==$accion) "btn btn-link m-0 p-0" href=
                     @else "enlaceDesabilitado" name=
                     @endif "{{ route('clientes.orden', 'fecha_nacimiento') }}">
@@ -133,7 +84,7 @@
                 </a>
             </th>
             @if (Auth::user()->is_admin)
-            <th class="my-1 mx-0 p-0" scope="col">
+            <th class="m-0 p-0" scope="col">
                 <a class=@if('html'==$accion) "btn btn-link m-0 p-0" href=
                     @else "enlaceDesabilitado" name=
                     @endif "{{ route('clientes.orden', 'user_id') }}">
@@ -142,7 +93,7 @@
             </th>
             @endif
         @if (!isset($accion) or ('html' == $accion))
-            <th class="my-1 mx-0 p-0" scope="col">Acciones</th>
+            <th class="m-0 p-0" scope="col">Acciones</th>
         @endif (!isset($accion) or ('html' == $accion))
         @endif (!$movil)
         </tr>
@@ -156,7 +107,7 @@
             table-info
         @endif
         m-0 p-0">
-            <td class="text-right my-1 mx-0 p-0">
+            <td class="text-right m-0 py-0 pl-0 pr-1">
             @if ($movil)
                 <a href="{{ route('clientes.show', $cliente) }}"
                    class="btn btn-link m-0 p-0" style="text-decoration:none">
@@ -166,13 +117,13 @@
                 {{ $cliente->cedula_f }}
             @endif ($movil)
             </td>
-            <td class="text-right my-1 mx-0 p-0">{{ $cliente->rif_f }}</td>
-            <td class="my-1 mx-0 p-0">{{ $cliente->name }}</td>
+            <td class="text-right m-0 py-0 pl-0 pr-1">{{ $cliente->rif_f }}</td>
+            <td class="m-0 py-0 pl-1 pr-0">{{ $cliente->name }}</td>
         @if (!$movil)
-            <td class="my-1 mx-0 p-0">
+            <td class="m-0 py-0 pl-1 pr-0">
                 {{ substr($cliente->tipo_alfa, 0, 7) }}
             </td>
-            <td class="text-right my-1 mx-0 p-0">
+            <td class="text-right m-0 py-0 pl-0 pr-1">
                 {{ $cliente->telefono_f }}
                 @if ($cliente->otro_telefono)
                     @if ($cliente->telefono_f)
@@ -181,15 +132,15 @@
                     {{ $cliente->otro_telefono }}
                 @endif ($cliente->otro_telefono)
             </td>
-            <td class="my-1 mx-0 p-0">{{ $cliente->email }}</td>
-            <td class="text-center my-1 mx-0 p-0">
+            <td class="m-0 py-0 pl-1 pr-0">{{ $cliente->email }}</td>
+            <td class="text-center m-0 p-0">
                 {{ $cliente->fec_nac }}
             </td>
             @if (Auth::user()->is_admin)
-            <td class="my-1 mx-0 p-0">{{ $cliente->user->name }}</td>
+            <td class="m-0 py-0 pl-1 pr-0">{{ $cliente->user->name }}</td>
             @endif
         @if (!isset($accion) or ('html' == $accion))
-            <td class="d-flex align-items-end my-1 mx-0 p-0">
+            <td class="d-flex align-items-end m-0 py-0 px-1">
                 <a href="{{ route('clientes.show', $cliente) }}" class="btn btn-link m-0 p-0"
                         title="Mostrar los datos de este cliente ({{ $cliente->name }}).">
                     <span class="oi oi-eye m-0 p-0"></span>
@@ -236,10 +187,8 @@
     <p>No hay clientes registrados.</p>
 @endif ($clientes->isNotEmpty())
 
-@if ((!$movil) and (!isset($accion) or ('html' == $accion)))
-</div><!--div class="col-10"-->
-</div><!--div class="row"-->
-@endif ((!$movil) and (!isset($accion) or ('html' == $accion)))
+@includeWhen((!$movil and (!isset($accion) or ('html' == $accion))),
+                'clientes.vmenuCierre')
 
 @endsection
 

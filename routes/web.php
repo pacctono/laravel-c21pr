@@ -192,6 +192,9 @@ Route::post('/propiedades/filtro', 'PropiedadController@index')
 Route::get('/propiedades/grabar', 'PropiedadController@grabarArchivo')
     ->name('propiedades.grabar');
 
+Route::get('/propiedades/ajax/', 'PropiedadController@ajPropiedades')
+    ->name('ajpropiedades');
+
 Route::pattern('propiedades', '[0-9]+');               // Para no crear conflictos con el resource propiedad
 Route::resource('propiedades', 'PropiedadController')
     ->parameters(['propiedades' => 'propiedad']);

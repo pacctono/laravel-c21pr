@@ -49,13 +49,18 @@ class Turno extends Model
         return $this->turno->format('d/m/Y');
     }
 
+    public function getTipoTurAttribute()
+    {
+        if (is_null($this->turno)) return '';    // No tiene sentido, pero.........
+        return (('08' == $this->turno->format('H'))?'M':'T');
+    }
+
     public function getFecTurAttribute()
     {
         if (is_null($this->turno)) return '';    // No tiene sentido, pero.........
         if (is_null($this->llegada))
             return ('08' == $this->turno->format('H'))?'Mañana':'Tarde';
-        return (('08' == $this->turno->format('H'))?'M':'T') . '-' .
-                    $this->llegada;
+        return $this->getTipoTurAttribute() . '-' . $this->llegada;
     }
 
     public function getTurnoDiaSemanaAttribute()

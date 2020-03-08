@@ -218,8 +218,8 @@ class PropiedadController extends Controller
         $cols = General::columnas('propiedads');
         $arrEstatus = $cols['estatus']['opcion'];
         $negociaciones = $cols['negociacion']['opcion'];
-        $anosc = Propiedad::select(DB::raw("distinct YEAR(created_at) AS anoc"))->get();
         unset($cols);
+        $anosc = Propiedad::select(DB::raw("distinct YEAR(created_at) AS anoc"))->get();
         session(['fecha_desde' => $fecha_desde, 'fecha_hasta' => $fecha_hasta,    // Asignar valores en sesión.
                     'anoc' => $anoc, 'codigo' => $codigo, 'negociacion' => $negociacion,
                     'estatus' => $estatus, 'desde' => $desde, 'hasta' => $hasta,
@@ -340,7 +340,11 @@ class PropiedadController extends Controller
         $data = request()->validate([   // Si ocurre error, laravel nos envia al url anterior.
             'codigo' => ['required', 'digits_between:6,8'],
             'fecha_reserva' => ['sometimes', 'nullable', 'date'],
+            'forma_pago_reserva' => '',
+            'factura_reserva' => '',
             'fecha_firma' => ['sometimes', 'nullable', 'date'],
+            'forma_pago_firma' => '',
+            'factura_firma' => '',
             'negociacion' => 'required',
             'nombre' => 'required',
             'exclusividad' => '',
@@ -485,7 +489,11 @@ class PropiedadController extends Controller
         Propiedad::create([
             'codigo' => $data['codigo'],
             'fecha_reserva' => $data['fecha_reserva'],
+            'forma_pago_reserva' => (isset($data['forma_pago_reserva'])?$data['forma_pago_reserva']:null),
+            'factura_reserva' => (isset($data['factura_reserva'])?$data['factura_reserva']:null),
             'fecha_firma' => $data['fecha_firma'],
+            'forma_pago_firma' => (isset($data['forma_pago_firma'])?$data['forma_pago_firma']:null),
+            'factura_firma' => (isset($data['factura_firma'])?$data['factura_firma']:null),
             'negociacion' => $data['negociacion'],
             'nombre' => $data['nombre'],
             'exclusividad' => (isset($data['exclusividad']) and
@@ -685,7 +693,11 @@ class PropiedadController extends Controller
         //print_r($request);
         $data = request()->validate([   // Si ocurre error, laravel nos envia al url anterior.
             'fecha_reserva' => ['sometimes', 'nullable', 'date'],
+            'forma_pago_reserva' => '',
+            'factura_reserva' => '',
             'fecha_firma' => ['sometimes', 'nullable', 'date'],
+            'forma_pago_firma' => '',
+            'factura_firma' => '',
             'fecha_firma_ant' => '',
             'negociacion' => 'required',
             'nombre' => 'required',
@@ -885,4 +897,42 @@ class PropiedadController extends Controller
                                 ['propiedad' => $propiedad, 'correo' => $correo]);
         else return $correo;
     }   // Final del metodo correoReporteCierre.
+
+    public function ajPropiedades()
+    {
+        $arrTmp = Propiedad::where('estatus', '!=', 'S')
+                        ->get(['id', 'codigo', 'negociacion', 'nombre', 'user_id', 'estatus', 'created_at'])
+                        ->all();
+        $users  = User::get(['id', 'name']);
+        $cols = General::columnas('propiedads');
+        $estatus = $cols['estatus']['opcion'];
+        $negociaciones = $cols['negociacion']['opcion'];
+        unset($cols);
+
+        $asesores = [];
+        foreach ($users as $v) {
+            if (1 == $v->id) $asesores[1] = 'Administrador';
+            else $asesores[$v->id] = $v->name;
+        }
+
+        $aPropiedades = [];
+        $aCodigos = [];
+        foreach ($arrTmp as $v) {
+            if ('' != $v->id) $aPropiedades[$v->id] = [
+                    'nb' => $v->nombre,
+                    'ng' => $v->negociacion,
+                    'uid' => $v->user_id,
+                    'st' => $v->estatus,
+                    'fc' => $v->created_at->format('d/m/Y'),
+                    'ho' => $v->created_at->format('h:i a')
+                ];
+            if ('' != $v->codigo) $aCodigos[$v->codigo] = [
+                    'id' => $v->id
+                ];
+        }
+
+        return array(json_encode($asesores), json_encode($aPropiedades),
+                    json_encode($estatus), json_encode($negociaciones),
+                    json_encode($aCodigos));
+    }
 }

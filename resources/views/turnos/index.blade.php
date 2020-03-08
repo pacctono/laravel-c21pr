@@ -104,7 +104,7 @@
   </thead>
   <tbody>
   @foreach ($turnos as $turno)
-    <tr class="
+    <tr class="my-0 py-0
     @if ('C' == $turno->tarde)
         table-warning" title="No se conecto en su turno
     @elseif (('m' == $turno->tarde) or ('t' == $turno->tarde))
@@ -114,7 +114,7 @@
     @else
         table-info
     @endif
-    my-0 py-0">
+    ">
       <td class="my-0 py-0">
         {{ $diaSemana[$turno->turno->dayOfWeek] }}
         {{ $turno->turno_fecha }}

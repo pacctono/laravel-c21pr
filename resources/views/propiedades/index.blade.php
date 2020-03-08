@@ -183,7 +183,12 @@
 Reporte en casa nacional: {{ $propiedad->reporte_casa_nacional_ven }}
 Estatus en sistema C21: {{ $propiedad->estatus_c21_alfa.(($propiedad->pagado_casa_nacional)?' y PAGADO A CASA NACIONAL':'') }}
 {{ (($propiedad->factura_AyS)?'Factura A & S: '.$propiedad->factura_AyS.'.':'') }}">
+        @if (Auth::user()->is_admin)
+                <input type="text" class="form-control form-control-sm m-0 p-0" disabled minlength="6"
+                        name="codigo" id="codigo" value="{{ old('codigo', $propiedad->codigo) }}">
+        @else (Auth::user()->is_admin)
                 <span class="float-right m-0 p-0">{{ $propiedad->codigo }}</span>
+        @endif (Auth::user()->is_admin)
         @else (!isset($accion) or ('html' == $accion))
             <td>
                 {{ $propiedad->codigo }}

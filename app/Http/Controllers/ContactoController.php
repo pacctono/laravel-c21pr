@@ -268,11 +268,13 @@ class ContactoController extends Controller
         if ((isset($data['email'])) and ('' != $data['email']) and (!is_null($data['email'])))
             $data['veces_email'] = Contacto::ofVeces($data['email'], 'email') + 1;
         else $data['veces_email'] = 1;
-        if (!(is_null($data['fecha_evento']))) {
+        if ((isset($data['fecha_evento'])) and ('' != $data['fecha_evento'])) { // Los campos desactivados no pasan la variable.
 // El tipo 'time' decuelve la hora militar (formato de 24 horas) por eso 'H:i' no incluye am/pm.
-            $data['fecha_evento'] = Carbon::createFromFormat('Y-m-d H:i', $data['fecha_evento'] . ' ' .
+            if (isset($data['hora_evento']))   // Los campos desactivados no pasan la variable.
+                $data['fecha_evento'] = Carbon::createFromFormat('Y-m-d H:i', $data['fecha_evento'] . ' ' .
                                                             ($data['hora_evento']??'12:00'));
-        }
+            else $data['hora_evento'] = null;
+        } else $data['fecha_evento'] = null;
 
         $contacto = Contacto::create([          // Devuelve el modelo.
             'cedula' => $data['cedula'],
@@ -291,7 +293,7 @@ class ContactoController extends Controller
             'precio_id' => $data['precio_id'],
             'origen_id' => $data['origen_id'],
             'resultado_id' => $data['resultado_id'],
-            'fecha_evento' => $data['fecha_evento'],
+            'fecha_evento' => isset($data['fecha_evento'])?$data['fecha_evento']:null,  // No es necesario 'isset', solo por seguridad.
             'observaciones' => $data['observaciones']
         ]);
 

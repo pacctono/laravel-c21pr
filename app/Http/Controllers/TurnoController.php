@@ -182,35 +182,74 @@ class TurnoController extends Controller
         $eventos = [];
         if($data->count()) {
             foreach ($data as $key => $value) {
+                $start = new \DateTime($value->turno . ' +30 minutes');     // '\' carpeta de la clase.
+                $end   = clone $start;
+                if ('M' == $value->tipo_tur) $end->add(new \DateInterval('PT4H'));       // Periodo usando ('PT') hora, minuto o segundo. Solo 'P' si es dia, mes o año.
+                else $end->add(new \DateInterval('PT5H'));       // Periodo usando ('PT') hora, minuto o segundo. Solo 'P' si es dia, mes o año.
+                if ($start <= now()) $color = 'yellow';
+                else $color = 'blue';
                 $eventos[] = Calendar::event(
-                    $value->user->name,
-                    false,
-                    new \DateTime($value->turno),
-                    new \DateTime($value->turno.' +4 hour')
+                    $value->user->name, // Titulo
+                    false,              // Todo el dia
+                    $start,             // Comienzo
+                    $end,               // Final
+                    null,               // id
+                    [
+                        'color' => $color,
+                    ]
                 );
             }
         }
+        if (Auth::user()->is_admin)
+            $header = [
+                        'left' => 'prev,next today',
+                         'center' => 'title',
+                         'right' => 'month,agendaWeek,agendaDay,listMonth'
+                    ];
+        else
+            $header = [
+                        'left' => 'prev,next today',
+                         'center' => 'title',
+                         'right' => 'month,listMonth,miBoton'
+                    ];
         $calendar = Calendar::addEvents($eventos)->setOptions([
-                        'header' => [
-                            'left' => 'prev,next today',
-                            'center' => 'title',
-                            'right' => 'month,agendaWeek,agendaDay,listMonth',
+                        'header' => $header,
+                        'customButtons' => [
+                            'miBoton' => [
+                                'text' => 'Mis Turnos',
+                                "click" => "function() { alert('Mi boton personal'); }",
+                            ],
                         ],
                         'firstDay' => 1,			// El primer dia de la semana es el lunes.
                         'hiddenDays' => [0],		// No se muestra el domingo.
                         'fixedWeekCount' => false,	// Numero de semana variable, dependiendo del mes.
                         'weekNumbers' => false,		// Muestra el numero de la semana, con respecto el año.
                         'aspectRatio' => 2.0,		// Mientras mas grande menos altura.
+                        'businessHours' => [
+                            [
+                                'dow' => [ 1, 2, 3, 4, 5 ],
+                                'start' => '07:00',
+                                'end' => '20:00'
+                            ],
+                            [
+                                'dow' => [ 6 ],
+                                'start' => '07:00',
+                                'end' => '14:00'
+                            ]
+                        ]
                    ]);
         if (Auth::user()->is_admin)
             $calendar = $calendar->setCallbacks([ //set fullcalendar callback options (will not be JSON encoded)
                         'eventClick' => 'function(ev, jq, vista) {
                                         const milisDia = 1000*60*60*24;
+                                        const comienzo = ev.start;
                                         const ahora = new Date();
                                         const hoy   = new Date(ahora.getFullYear(),
                                                             ahora.getMonth(), ahora.getDate());
-                                        const fec   = ev.start.toDate();
-                                        if (fec <= hoy) {
+                                        //const fec   = comienzo.toDate();  // Convierte <moment> a Javascript.
+                                        const fecha = new Date(comienzo.year(),
+                                                            comienzo.month(), comienzo.date());
+                                        if (fecha <= hoy) {
                                             alert("No puede modificar fechas antes o iguales a \'hoy\'.");
                                             return;
                                         }
@@ -219,8 +258,8 @@ class TurnoController extends Controller
                                         else sumarDias = 1 - hoy.getDay();
                                         const plunes = new Date(ahora.getFullYear(), ahora.getMonth(),
                                                             ahora.getDate() + sumarDias);
-                                        const fecha = new Date(fec.getFullYear(), fec.getMonth(),
-                                                            fec.getDate());
+                                        /*const fecha = new Date(fec.getFullYear(), fec.getMonth(),
+                                                            fec.getDate());*/
                                         const dtiempo = fecha.getTime() - plunes.getTime();
                                         const dias  = dtiempo/milisDia;
                                         const semana = parseInt(dias/7);
@@ -517,21 +556,36 @@ class TurnoController extends Controller
         $data = Turno::where('turno', '>=', $primerDia)->get();
         if($data->count()) {
             foreach ($data as $key => $value) {
+                $start = new \DateTime($value->turno . ' +30 minutes');     // '\' carpeta de la clase.
+                $end   = clone $start;
+                if ('M' == $value->tipo_tur) $end->add(new \DateInterval('PT4H'));       // Periodo usando ('PT') hora, minuto o segundo. Solo 'P' si es dia, mes o año.
+                else $end->add(new \DateInterval('PT5H'));       // Periodo usando ('PT') hora, minuto o segundo. Solo 'P' si es dia, mes o año.
+                if ($start <= now()) $color = 'yellow';
+                else $color = 'blue';
                 $eventos[] = Calendar::event(
                     $value->user->name,
                     false,
-                    new \DateTime($value->turno),
-                    new \DateTime($value->turno.' +4 hour')
+                    $start,
+                    $end,
+                    null,               // id
+                    [
+                        'color' => $color,
+                    ]
                 );
             }
         }
         $calendar = Calendar::addEvents($eventos)->setOptions([
 //                        'header' => false,
                         'header' => [
-                            'left' => 'prev,next today',
+                            'left' => false,
                             'center' => 'title',
-                            'right' => 'month,agendaWeek,agendaDay,listMonth',
+                            'right' => false,
                         ],
+                        'editable' => true,        // El evento no puede ser modificado.
+                        'eventDurationEditable' => false,   // La duracion del evento puede ser modificado.
+                        //'eventStartEditable' => false,  // El comienzo del evento puede ser modificado.
+                        'droppable' => true,    // Determines if external jQuery UI draggables can be dropped onto the calendar.
+                        //'eventResourceEditable' => true,    // El evento puede ser arrastrado entre recursos.
                         'firstDay' => 1,			// El primer dia de la semana es el lunes.
                         'hiddenDays' => [0],		// No se muestra el domingo.
                         'fixedWeekCount' => false,	// Numero de semana variable, dependiendo del mes.
@@ -544,11 +598,14 @@ class TurnoController extends Controller
             $calendar = $calendar->setCallbacks([ //set fullcalendar callback options (will not be JSON encoded)
                         'eventClick' => 'function(ev, jq, vista) {
                                         const milisDia = 1000*60*60*24;
+                                        const comienzo = ev.start;
                                         const ahora = new Date();
                                         const hoy   = new Date(ahora.getFullYear(),
                                                             ahora.getMonth(), ahora.getDate());
-                                        const fec   = ev.start.toDate();
-                                        if (fec <= hoy) {
+                                        //const fec   = comienzo.toDate();  // Convierte <moment> a Javascript.
+                                        const fecha = new Date(comienzo.year(),
+                                                            comienzo.month(), comienzo.date());
+                                        if (fecha <= hoy) {
                                             alert("No puede modificar fechas antes o iguales a \'hoy\'.");
                                             return;
                                         }
@@ -557,8 +614,8 @@ class TurnoController extends Controller
                                         else sumarDias = 1 - hoy.getDay();
                                         const plunes = new Date(ahora.getFullYear(), ahora.getMonth(),
                                                             ahora.getDate() + sumarDias);
-                                        const fecha = new Date(fec.getFullYear(), fec.getMonth(),
-                                                            fec.getDate());
+                                        /*const fecha = new Date(fec.getFullYear(), fec.getMonth(),
+                                                            fec.getDate());*/
                                         const dtiempo = fecha.getTime() - plunes.getTime();
                                         const dias  = dtiempo/milisDia;
                                         const semana = parseInt(dias/7);

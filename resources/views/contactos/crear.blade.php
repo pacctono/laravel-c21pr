@@ -154,11 +154,11 @@
             <input class="form-control" type="date" name="fecha_evento" id="fecha_evento"
                     min="{{ now()->format('d/m/Y') }}" max="{{ now()->addWeeks(4)->format('d/m/Y') }}"
                     title="Fecha en caso del Resultado sea llamarle o se haya concretado una cita."
-                    value="{{ old('fecha_evento') }}" disabled>
+                    value="{{ old('fecha_evento') }}" disabled><!-- Los campos desabilitados no pasan la variable -->
             <label class="control-label sr-only" for="hora_evento">Hora</label>
             <input class="form-control" type="time" name="hora_evento" id="hora_evento"
                     title="Si se concreta una cita o 'llamarle', suministre la hora aproximada."
-                    value="{{ old('hora_evento') }}" disabled>
+                    value="{{ old('hora_evento') }}" disabled><!-- Los campos desabilitados no pasan la variable -->
           </div>
         </div>
 

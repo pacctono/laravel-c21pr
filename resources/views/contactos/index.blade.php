@@ -1,29 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-    {{--<div class="d-flex justify-content-between align-items-end mb-1">
-        @if (!isset($accion) or ('html' == $accion))
-        @if ($movil)
-        <h4 class="m-0 p-0">{{ substr($title, 11) }}</h4>
-        @else
-        <h3 class="m-0 p-0">{{ $title }}</h3>
-        @endif
-        @else (!isset($accion) or ('html' == $accion))
-        <h3 style="text-align:center">{{ $title }}</h3>
-        @endif (!isset($accion) or ('html' == $accion))
 
-        @if (!isset($accion) or ('html' == $accion))
-        <!--p-->
-            <a href="{{ route('contactos.create') }}" class="btn btn-primary m-0 p-0">
-            @if ($movil)
-                Crear
-            @else
-                Crear Contacto Inicial
-            @endif
-            </a>
-        <!--/p-->
-        @endif (!isset($accion) or ('html' == $accion))
-    </div>--}}
 @if (isset($accion) and ('html' != $accion))
     <div>
         <h4 style="text-align:center">
@@ -37,7 +15,7 @@
     <script>alert('El correo fue enviado al asesor');</script>
 @elseif (0 > $alertar)
     <script>alert("No fue enviado el correo con la 'Oferta de Servcio' al contacto inicial. Probablemente, problemas con Internet! Revise su conexión");</script>
-@endif (0 < $alertar)
+@endif (1 == $alertar)
 @endif (isset($accion) and ('html' != $accion))
 
 @includeWhen((!$movil and (!isset($accion) or ('html' == $accion))),

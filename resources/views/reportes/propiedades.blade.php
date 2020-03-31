@@ -94,19 +94,7 @@
         </thead>
         <tbody>
         @foreach ($propiedades as $propiedad)
-        <tr class="
-        @if ('I' == $propiedad->estatus)
-            table-active
-        @elseif ('P' == $propiedad->estatus)
-            table-warning
-        @elseif (('S' == $propiedad->estatus) || ($propiedad->user_borro || $propiedad->deleted_at))
-            table-danger
-        @elseif (0 == ($loop->index % 2))
-            table-primary
-        @else
-            table-info
-        @endif
-        m-0 p-0">
+        <tr class="{{ $propiedad->colorEstatus($propiedad->estatus) }} m-0 p-0">
             @if ($movil)
             <td class="m-0 p-0">
                 <a href="{{ route('propiedades.muestra', [$propiedad, $rutRetorno]) }}"

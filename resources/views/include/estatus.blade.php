@@ -7,7 +7,11 @@
         @if (old('estatus', $estatus) == $opcion)
             selected
         @endif
-	    style="font-size:0.50rem">
+	    style="font-size:0.50rem"
+        @if (isset($colores[$opcion]))
+            class="{{ $colores[$opcion] }}"	{{-- $colores es definido en PropiedadController --}}
+        @endif
+            >
 		{{ substr($muestra, 0, 35) }}
             </option>
         @endforeach
@@ -16,18 +20,9 @@
             @if (old('estatus', $estatus) == 'V')
                 selected
             @endif
-            >
+            class="{{ $colores['V'] }}">	{{-- $colores es definido en PropiedadController --}}
 		Ventas (Pagos pendientes y cerrado)
             </option>
         @endif (isset($venta) and $venta)
-        @if (isset($vencimiento) and $vencimiento)
-	    <option value="X"
-            @if (old('estatus', $estatus) == 'X')
-                selected
-            @endif
-            >
-		Vencidas (Mas de 90 dias creadas)
-            </option>
-        @endif (isset($vencimiento) and $vencimiento)
         </select>
     </div>

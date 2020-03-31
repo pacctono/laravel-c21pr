@@ -82,7 +82,8 @@ Route::get('/clientes/vClientes/', 'VistaClienteController@vClientes')
 Route::get('/turnos', 'TurnoController@index')
     ->name('turnos');
 
-Route::get('/turnos/calendario', 'TurnoController@calendario')
+Route::get('/turnos/calendario/{miCalendario?}', 'TurnoController@calendario')
+    ->where('miCalendario', '[01]?')
     ->name('turnos.calendario');
 
 Route::post('/turnos/calendario/filtro', 'TurnoController@calendario')
@@ -195,6 +196,11 @@ Route::get('/propiedades/grabar', 'PropiedadController@grabarArchivo')
 Route::get('/propiedades/ajax/', 'PropiedadController@ajPropiedades')
     ->name('ajpropiedades');
 
+Route::get('/propiedades/actCodigo/{propiedad}/{codigo}', 'PropiedadController@updateCodigo')
+    ->where('propiedad', '[0-9]+')
+    ->where('codigo', '[0-9]+')
+    ->name('propiedades.updateCodigo');
+
 Route::pattern('propiedades', '[0-9]+');               // Para no crear conflictos con el resource propiedad
 Route::resource('propiedades', 'PropiedadController')
     ->parameters(['propiedades' => 'propiedad']);
@@ -207,6 +213,39 @@ Route::get('/propiedades/correo/{propiedad}/{ruta?}', 'PropiedadController@corre
     ->where('propiedad', '[0-9]+')
     ->where('ruta', '[012]')
     ->name('propiedad.correo');
+
+Route::get('/avisos/{orden?}/{accion?}', 'AvisoController@index')
+// Cualquier nombre que comience con letra, luego letra, numero o '_'; excepto 'nuevo'. Otras palabras, usar '|'.
+    ->where('orden', '[a-zA-Z]+[a-zA-Z0-9_]+(?<!nuevo|crear)')
+    ->where('accion', 'ver|descargar')
+    ->name('avisos');
+
+Route::get('/avisos/filtro', 'AvisoController@index');     // Para paginación con filtro.
+Route::post('/avisos/filtro', 'AvisoController@index')
+    ->name('avisos.post');
+
+Route::get('/avisos/nuevo', 'AvisoController@create')
+    ->name('avisos.crear')
+    ->middleware('admin');
+
+Route::get('/avisos/{aviso}', 'AvisoController@show')
+    ->where('aviso', '[0-9]+')
+    ->name('avisos.show');
+
+Route::post('/avisos', 'AvisoController@store')
+    ->name('avisos.store');
+
+Route::get('/avisos/{aviso}/editar', 'AvisoController@edit')
+    ->where('aviso', '[0-9]+')
+    ->name('avisos.editar');
+
+Route::put('/avisos/{aviso}/{rutaRetorno?}', 'AvisoController@update')
+    ->where('aviso', '[0-9]+')
+    ->name('avisos.update');
+
+Route::delete('/avisos/{aviso}', 'AvisoController@destroy')
+    ->name('avisos.destroy')
+    ->middleware('admin');
 
 Route::get('/reportes/tipo/{tipo}/accion/{accion?}', 'ReporteController@index')
     ->name('reportes');
@@ -229,11 +268,17 @@ Route::get('/reportes/propiedadesUser/{id}/{orden}', 'ReporteController@propieda
 Route::get('/reportes/propiedadesCaracteristica/{id}/{orden}', 'ReporteController@propiedadesX')
     ->name('reporte.propiedadesCaracteristica');
 
+Route::get('/reportes/propiedadesFormaPago/{id}/{orden}', 'ReporteController@propiedadesX')
+    ->name('reporte.propiedadesFormaPago');
+
 Route::get('/reportes/contactosDeseo/{id}/{orden}', 'ReporteController@contactosX')
     ->name('reporte.contactosDeseo');
 
 Route::get('/reportes/contactosOrigen/{id}/{orden}', 'ReporteController@contactosX')
     ->name('reporte.contactosOrigen');
+
+Route::get('/reportes/contactosPrice/{id}/{orden}', 'ReporteController@contactosX')
+    ->name('reporte.contactosPrice');
 
 Route::get('/reportes/contactosPrecio/{id}/{orden}', 'ReporteController@contactosX')
     ->name('reporte.contactosPrecio');
@@ -311,6 +356,58 @@ Route::delete('/deseos/{deseo}', 'DeseoController@destroy')
     ->name('deseo.destroy')
     ->middleware('admin');
 
+Route::get('/feriados/{orden?}/{accion?}', 'FeriadoController@index')
+// Cualquier nombre que comience con letra, luego letra, numero o '_'; excepto 'nuevo'. Otras palabras, usar '|'.
+    ->where('orden', '[a-zA-Z]+[a-zA-Z0-9_]+(?<!nuevo|crear)')
+    ->where('accion', 'ver|descargar')
+    ->name('feriado');
+
+Route::get('/feriados/nuevo', 'FeriadoController@create')
+    ->name('feriado.crear')
+    ->middleware('admin');
+
+Route::get('/feriados/{feriado}', 'FeriadoController@show')
+    ->where('feriado', '[0-9]+')
+    ->name('feriado.show');
+
+Route::post('/feriados', 'FeriadoController@store');
+
+Route::get('/feriados/{feriado}/editar', 'FeriadoController@edit')
+    ->where('feriado', '[0-9]+')
+    ->name('feriado.edit');
+
+Route::put('/feriados/{feriado}', 'FeriadoController@update');
+
+Route::delete('/feriados/{feriado}', 'FeriadoController@destroy')
+    ->name('feriado.destroy')
+    ->middleware('admin');
+
+Route::get('/forma_pagos/{orden?}/{accion?}', 'FormaPagoController@index')
+// Cualquier nombre que comience con letra, luego letra, numero o '_'; excepto 'nuevo'. Otras palabras, usar '|'.
+    ->where('orden', '[a-zA-Z]+[a-zA-Z0-9_]+(?<!nuevo|crear)')
+    ->where('accion', 'ver|descargar')
+    ->name('forma_pago');
+
+Route::get('/forma_pagos/nuevo', 'FormaPagoController@create')
+    ->name('forma_pago.crear')
+    ->middleware('admin');
+
+Route::get('/forma_pagos/{forma_pago}', 'FormaPagoController@show')
+    ->where('forma_pago', '[0-9]+')
+    ->name('forma_pago.show');
+
+Route::post('/forma_pagos', 'FormaPagoController@store');
+
+Route::get('/forma_pagos/{forma_pago}/editar', 'FormaPagoController@edit')
+    ->where('forma_pago', '[0-9]+')
+    ->name('forma_pago.edit');
+
+Route::put('/forma_pagos/{forma_pago}', 'FormaPagoController@update');
+
+Route::delete('/forma_pagos/{forma_pago}', 'FormaPagoController@destroy')
+    ->name('forma_pago.destroy')
+    ->middleware('admin');
+
 Route::get('/origenes/nuevo', 'OrigenController@create')
     ->name('origen.crear')
     ->middleware('admin');
@@ -335,6 +432,32 @@ Route::put('/origenes/{origen}', 'OrigenController@update');
 
 Route::delete('/origenes/{origen}', 'OrigenController@destroy')
     ->name('origen.destroy')
+    ->middleware('admin');
+
+Route::get('/prices/nuevo', 'PriceController@create')
+    ->name('price.crear')
+    ->middleware('admin');
+
+Route::get('/prices/{orden?}/{accion?}', 'PriceController@index')
+// Cualquier nombre que comience con letra, luego letra, numero o '_'; excepto 'nuevo'. Otras palabras, usar '|'.
+    ->where('orden', '[a-zA-Z]+[a-zA-Z0-9_]+(?<!nuevo|crear)')
+    ->where('accion', 'ver|descargar')
+    ->name('price');
+
+Route::get('/prices/{price}', 'PriceController@show')
+    ->where('price', '[0-9]+')
+    ->name('price.show');
+
+Route::post('/prices', 'PriceController@store');
+
+Route::get('/prices/{price}/editar', 'PriceController@edit')
+    ->where('price', '[0-9]+')
+    ->name('price.edit');
+
+Route::put('/prices/{price}', 'PriceController@update');
+
+Route::delete('/prices/{price}', 'PriceController@destroy')
+    ->name('price.destroy')
     ->middleware('admin');
 
 Route::get('/precios/nuevo', 'PrecioController@create')

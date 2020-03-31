@@ -24,9 +24,9 @@
         </span></p>
         <p>Dirección de la cita: <span class="alert-info">{{ $cita->direccion??'No suministrado.' }}
         </span></p>
-        @if (now() < $cita->fecha_cita)
+        @if (now('America/Caracas') < $cita->fecha_cita)
         <p><span class="alert-info">La cita, todavía no ha podido ser concretada.</span></p>
-        @else (now() > $cita->fecha_cita)
+        @else (now('America/Caracas') > $cita->fecha_cita)
         <p>La cita fue realizada: <span class="alert-info">
             {{ $cita->cita_dia_semana }}
             {{ $cita->cita_con_hora }}
@@ -34,7 +34,7 @@
         <p>Comentarios de la cita realizada: <span class="alert-info">
             {{ $cita->comentarios }}
         </span></p>
-        @endif (now() > $cita->fecha_cita)
+        @endif (now('America/Caracas') > $cita->fecha_cita)
         <p>
             <a href="{{ $rutaPrevia??route('agenda') }}" class="btn btn-link">
                 Regresar a la agenda

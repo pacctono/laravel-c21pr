@@ -68,6 +68,8 @@
       <th class="m-0 py-0 px-1" scope="col">
       @if (('Conexion' == $muestra) ||
            ('Lados' == $muestra) ||
+           ('NoConTurno' == $muestra) ||
+           ('TardeTurno' == $muestra) ||
            ('Comision' == $muestra))
         Asesor
       @elseif (('Negociaciones' == $muestra) ||
@@ -89,6 +91,10 @@
         Lados
       @elseif ('ComMes' == $muestra)
         Comision
+      @elseif ('NoConTurno' == $muestra)
+        Sin conectarse
+      @elseif ('TardeTurno' == $muestra)
+        Tarde
       @else
         Atendidos
       @endif
@@ -96,6 +102,8 @@
       <th class="m-0 py-0 px-1" scope="col">
       @if (('Conexion' == $muestra) ||
            ('Lados' == $muestra) ||
+           ('NoConTurno' == $muestra) ||
+           ('TardeTurno' == $muestra) ||
            ('Comision' == $muestra))
         Asesor
       @elseif (('Negociaciones' == $muestra) ||
@@ -117,6 +125,10 @@
         Lados
       @elseif ('ComMes' == $muestra)
         Comision
+      @elseif ('NoConTurno' == $muestra)
+        Sin conectarse
+      @elseif ('TardeTurno' == $muestra)
+        Tarde
       @else
         Atendidos
       @endif

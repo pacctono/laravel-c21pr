@@ -18,13 +18,13 @@
           @endforeach
         </select>
     </div>
-    <div>
+    <!--div>
       <a class="my-0 py-0" href="{{ route('turnos') }}">
         <h4 class="btn btn-link my-0 py-0">
           Mostrar listado
         </h4>
       </a>
-    </div>
+    </div-->
   </div>
   <div class="card mt-1 mb-0 py-0 mx-0 py-0">
     <h4 class="card-header my-0 py-0 mx-0 py-0">Filtrar listado</h4>

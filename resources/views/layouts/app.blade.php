@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="es">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -18,10 +18,13 @@
     <!--link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/open-iconic/1.1.1/font/css/open-iconic-bootstrap.css" integrity="sha256-CNwnGWPO03a1kOlAsGaH5g8P3dFaqFqqGFV/1nkX5OU=" crossorigin="anonymous" /-->
     <link rel="stylesheet" href="{{ asset('open-iconic-master/font/css/open-iconic-bootstrap.css') }}">
   @endif (!strpos($view_name, 'calendario'))
+    <link href="{{ asset('css/all.css') }}" rel="stylesheet"><!-- fontawesome {{ $view_name }} -->
     <!-- Custom styles for this template -->
     <link href="{{ asset('css/style.css') }}" rel="stylesheet"><!-- permite comenzar debajo de la barra 'header' del menu -->
     <link href="{{ asset('css/c21pr.css') }}" rel="stylesheet">
     <script src="{{ asset('js/app.js') }}"></script><!-- jQuery -->
+    <script src="{{ asset('js/bootbox.js') }}"></script><!-- bootbox -->
+    <script src="{{ asset('js/bootbox.locales.js') }}"></script><!-- bootbox -->
 
   @yield('jshead')
 @else (!isset($accion) or ('html' == $accion))
@@ -99,7 +102,9 @@
               @if (Auth::user()->is_admin)
               @foreach (array('Origen' => 'Contactos X origen', 'Lados' => 'Lados X asesor',
                               'Comision' => 'Comision X Asesor', 'Negociaciones' => 'Negociaciones X mes',
-                              'LadMes' => 'Lados X mes', 'ComMes' => 'Comision X mes')
+                              'LadMes' => 'Lados X mes', 'ComMes' => 'Comision X mes',
+                              'NoConTurno' => 'No se conecto en su turno',
+                              'TardeTurno' => 'Llego tarde en su turno')
                     as $vMEst => $muestraMEst)
                 <li><a class="dropdown-item" href="{{ route('reportes', $vMEst) }}">
                   {{ $muestraMEst }}
@@ -118,8 +123,8 @@
                   Conciliaci&oacute;n
                 </a></li>
                 <!--li><a class="dropdown-item" href="/clientes"-->
-                <li><a class="dropdown-item" href="{{ route('clientes.index') }}">
-                  Clientes
+                <li><a class="dropdown-item" href="{{ route('avisos') }}">
+                  Avisos
                 </a></li>
               </ul>
             </li>
@@ -144,11 +149,11 @@
                   Grabar propiedades
                 </a></li>
               @foreach (array('caracteristica' => 'Caracteristica', 'deseo' => 'Deseo',
-                              'origen' => 'Origen', 'precio' => 'Precio',
+                              'feriado' => 'Dias feriados', 'forma_pago' => 'Forma de pago',
+                              'origen' => 'Origen', 'price' => 'Precio',
                               'resultado' => 'Resultado', 'tipo' => 'Tipo de propiedad',
                               'ciudad' => 'Ciudad', 'municipio' => 'Municipio',
-                              'estado' => 'Estado', 'zona' => 'Zona',
-                              'texto' => 'Texto',
+                              'estado' => 'Estado', 'zona' => 'Zona', 'texto' => 'Texto',
                              )
                     as $vMTab => $muestraMTab)
                 <li><a class="dropdown-item" href="{{ route($vMTab) }}">

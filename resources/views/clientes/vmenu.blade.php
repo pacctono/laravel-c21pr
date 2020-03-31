@@ -7,7 +7,7 @@
         @if ($movil)
             Crear
         @else
-            Crear Cliente Inicial
+            Crear Cliente
         @endif
         </a>
     </div>

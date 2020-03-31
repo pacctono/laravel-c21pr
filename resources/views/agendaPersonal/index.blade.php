@@ -45,14 +45,14 @@
           <label class="control-label" for="fecha_desde">
             Desde:</label>
           <input class="form-control form-control-sm" type="date" name="fecha_desde"
-                  id="fecha_desde" min="{{ now() }}" max="{{ now() }}"
+                  id="fecha_desde" min="{{ now('America/Caracas') }}" max="{{ now('America/Caracas') }}"
                   value="{{ old('fecha_desde', $fecha_desde) }}">
         </div>
         <div class="form-group form-inline my-1 py-0 mx-0 px-0">
           <label class="control-label" for="fecha_hasta">
             Hasta</label>
           <input class="form-control form-control-sm" type="date" name="fecha_hasta"
-                  id="fecha_hasta" min="{{ now() }}" max="{{ now() }}"
+                  id="fecha_hasta" min="{{ now('America/Caracas') }}" max="{{ now('America/Caracas') }}"
                   value="{{ old('fecha_hasta', $fecha_hasta) }}">
         </div>
       @if (Auth::user()->is_admin)

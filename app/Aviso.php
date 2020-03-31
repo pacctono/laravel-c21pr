@@ -49,10 +49,29 @@ class Aviso extends Model
         return $this->belongsTo(User::class, 'user_borro'); // Si llave foranea, diferente a esperada, usamos 2do parametro.
     }
 
+    public function getFechaAvisoBdAttribute()
+    {
+        if (is_null($this->fecha)) return '';    // No tiene sentido, pero.........
+        return $this->fecha->format('Y-m-d');
+    }
+
+    public function getHoraAvisoAttribute()
+    {
+        if (is_null($this->fecha)) return '';    // No tiene sentido, pero.........
+        return $this->fecha->format('H:i');
+    }
+
     public function getFecAttribute()
     {
-        if (null == $this->fecha) return '';
-        return $this->fecha->format('d/m/Y H:i (h:i a)');
+        if (is_null($this->fecha)) return '';    // No tiene sentido, pero.........
+        return substr(Fecha::$diaSemana[$this->fecha->dayOfWeek], 0, 3) . ', ' .
+                $this->fecha->format('d/m/Y');
+    }
+
+    public function getDescAttribute()
+    {
+        if (is_null($this->descripcion)) return '';    // No tiene sentido, pero.........
+        return preg_replace('&<[bem/]{1,3}>&', '', $this->descripcion);
     }
 
     public function getCreadoAttribute()

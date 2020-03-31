@@ -17,7 +17,15 @@ class CreatePropiedadsTable extends Migration
             $table->increments('id');
             $table->string('codigo', 8);
             $table->date('fecha_reserva')->nullable();
+            $table->unsignedInteger('forma_pago_reserva_id')->nullable();
+            $table->foreign('forma_pago_reserva_id')->references('id')->on('forma_pagos');
+            $table->string('factura_reserva', 100)->nullable()
+                ->comment('Factura de pago de la reserva');
             $table->date('fecha_firma')->nullable();
+            $table->unsignedInteger('forma_pago_firma_id')->nullable();
+            $table->foreign('forma_pago_firma_id')->references('id')->on('forma_pagos');
+            $table->string('factura_firma', 100)->nullable()
+                ->comment('Factura de pago en la firma');
             $table->enum('negociacion', ['V', 'A'])->comment('[V]enta,[A]lquiler');
             $table->string('nombre', 160);
             $table->boolean('exclusividad')->default(true)

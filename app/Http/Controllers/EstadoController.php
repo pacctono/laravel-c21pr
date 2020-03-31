@@ -87,7 +87,7 @@ class EstadoController extends Controller
      */
     public function store(Request $request)
     {
-        $data = request()->validate([   // Si ocurre error, laravel nos envia al url anterior.
+        $data = $request->validate([   // Si ocurre error, laravel nos envia al url anterior.
             'descripcion' => 'required',
         ], [
             'descripcion.required' => 'El campo descripcion es obligatorio',
@@ -140,7 +140,7 @@ class EstadoController extends Controller
      */
     public function update(Request $request, Estado $estado)
     {
-        $data = request()->validate([   // Si ocurre error, laravel nos envia al url anterior.
+        $data = $request->validate([   // Si ocurre error, laravel nos envia al url anterior.
             'descripcion' => 'required',
         ], [
             'descripcion.required' => 'El campo descripcion es obligatorio',

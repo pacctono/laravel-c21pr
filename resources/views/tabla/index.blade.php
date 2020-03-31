@@ -21,7 +21,7 @@
 @endif ((!$movil) and (!isset($accion) or ('html' == $accion)))
     <table
     @if (!isset($accion) or ('html' == $accion))
-        class="table table-striped table-hover table-bordered my-0 py-0"
+        class="table table-striped table-hover table-bordered m-0 p-0"
     @else (!isset($accion) or ('html' == $accion))
         class="center"
     @endif (!isset($accion) or ('html' == $accion))
@@ -29,7 +29,9 @@
         <thead class="thead-dark">
         <tr
         @if (isset($accion) and ('html' != $accion))
-            class="encabezado my-0 py-0"
+            class="encabezado"
+        @else
+            class="m-0 p-0"
         @endif ('html' != $accion)
         >
         @if ((!$movil) and ('texto' != $elemento))
@@ -38,6 +40,10 @@
         @endif (!isset($accion) or ('html' == $accion))
             <th class="my-0 py-0" scope="col">id</th>
         @endif ((!$movil) and ('texto' != $elemento))
+        @if ('feriado' == $elemento)
+            <th class="my-0 py-0" scope="col">Fecha</th>
+            <th class="my-0 py-0" scope="col">Tipo</th>
+        @endif ('feriado' == $elemento)
             <th class="my-0 py-0" scope="col">Descripcion</th>
         @if ('texto' == $elemento)
             <th class="my-0 py-0" scope="col">Enlace</th>
@@ -63,10 +69,18 @@
         @endif (!isset($accion) or ('html' == $accion))
             <td class="my-0 py-0">{{ $arrInd->id }}</td>
         @endif ((!$movil) and ('texto' != $elemento))
+        @if ('feriado' == $elemento)
+            <td class="my-0 py-0" scope="col">
+                {{ $arrInd->fecha_dia_semana }}, {{ $arrInd->fecha_en }}
+            </td>
+            <td class="my-0 py-0" scope="col">
+                {{ $arrInd->tipo }}
+            </td>
+        @endif ('feriado' == $elemento)
             <td class="my-0 py-0">
             @if ($enlace and (!isset($accion) or ('html' == $accion)) and (0 < $arrInd->$enlace->count()))
                 <a href="{{ route('reporte.'.$enlace.ucfirst($elemento), [$arrInd->id, 'id']) }}"
-                    class="btn btn-link"i title="{{ $arrInd->$enlace->count() . ' ' .$enlace }}">
+                    class="btn btn-link m-0 p-0" title="{{ $arrInd->$enlace->count() . ' ' .$enlace }}">
                     {{ $arrInd->descripcion }}
                 </a>
             @else ($enlace){{-- $enlace:contactos|propiedades|False --}}
@@ -82,12 +96,12 @@
             </td>
         @endif ('texto' != $elemento)
         @if (!$movil and (!isset($accion) or ('html' == $accion)))
-            <td class="d-flex align-items-end my-0 py-0">
-                <a href="{{ route($rutEditar, $arrInd) }}" class="btn btn-link"
-                    onclick="return seguroEditar({{ $arrInd->id }}, '{{ $elemento }}', '{{ $arrInd->descripcion }}')">
-                    <span class="oi oi-pencil"></span>
-                </a>
+            <td class="d-flex align-items-end m-0 p-0">
             @if ($enlace){{-- $enlace:contactos|propiedades|False --}}
+                <a href="{{ route($rutEditar, $arrInd) }}" class="btn btn-link m-0 p-0"
+                    onclick="return seguroEditar({{ $arrInd->id }}, '{{ $elemento }}', '{{ $arrInd->descripcion }}')">
+                    <span class="oi oi-pencil m-0 py-0 px-1"></span>
+                </a>
                 <form action="{{ route($rutBorrar, $arrInd) }}" method="POST"
                         id="forma.{{ $arrInd->id }}" name="forma.{{ $arrInd->id }}"
                         onSubmit="return seguroBorrar({{ $arrInd->id }}, '{{ $elemento }}', '{{ $arrInd->descripcion }}')">
@@ -96,25 +110,27 @@
 
                     <input type="hidden" name="{{ $enlace }}" id="{{ $enlace }}.{{ $arrInd->id }}"
                             value="{{ $arrInd->$enlace->count()-$arrInd->$metBorradas($arrInd->id)->count() }}">
-                    <input type="hidden" name="{{ $enlace }}Borradas"
-                            id="{{ $enlace }}Borradas.{{ $arrInd->id }}"
+                    <input type="hidden" name="{{ $metBorradas }}"
+                            id="{{ $metBorradas }}.{{ $arrInd->id }}"
                             value="{{ $arrInd->$metBorradas($arrInd->id)->count() }}">
-                    <button class="btn btn-link"><span class="oi oi-trash"></span></button>
+                    <button class="btn btn-link m-0 p-0"><span class="oi oi-trash m-0 py-0 px-1"></span></button>
                 </form>
                 @if (('tipo' == $elemento) and (0 < $arrInd->contactos->count()))
                 <a href="{{ route('reporte.contactos'.ucfirst($elemento), [$arrInd->id, 'id']) }}"
-                    class="btn btn-link" title="{{ $arrInd->contactos->count() . ' contactos' }}">
-                    <span class="oi oi-people"></span>
+                    class="btn btn-link m-0 p-0" title="{{ $arrInd->contactos->count() . ' contactos' }}">
+                    <span class="oi oi-people m-0 py-0 px-1"></span>
                 </a>
                 @endif ('tipo' == $elemento)
             @else ($enlace)
                 <a href="{{ route($rutEditar, $arrInd) }}" class="btn btn-link">
-                    <span class="oi oi-pencil"></span>
+                    <span class="oi oi-pencil m-0 py-0 px-1"></span>
                 </a>
-                <a href="" class="btn btn-link"
+            @if ('texto' == $elemento)
+                <a href="" class="btn btn-link m-0 p-0"
                     title="Cargar al servidor el archivo de la imagen{{ $arrInd->id-1 }}.jpg">
-                    <span class="oi oi-data-transfer-upload"></span>
+                    <span class="oi oi-data-transfer-upload m-0 py-0 px-1"></span>
                 </a>
+            @endif ('texto' == $elemento)
             @endif ($enlace)
             </td>
         @endif (!$movil and (!isset($accion) or ('html' == $accion)))
@@ -138,7 +154,7 @@
 <script>
 function seguroBorrar(id, ele, desc) {
     var nroEnlaces         = document.getElementById('{{ $enlace }}.'+id).value;
-    var nroEnlacesBorradas = document.getElementById('{{ $enlace }}Borradas.'+id).value;
+    var nroEnlacesBorradas = document.getElementById('{{ $metBorradas }}.'+id).value;
 
     if (0 < nroEnlaces) {
         alert('Este ' + ele + ": '" + desc + "', ha sido asignado a <" + nroEnlaces +
@@ -156,7 +172,7 @@ function seguroBorrar(id, ele, desc) {
 }
 function seguroEditar(id, ele, desc) {
     var nroEnlaces         = document.getElementById('{{ $enlace }}.'+id).value;
-    var nroEnlacesBorradas = document.getElementById('{{ $enlace }}Borradas.'+id).value;
+    var nroEnlacesBorradas = document.getElementById('{{ $metBorradas }}.'+id).value;
 
     if ((0 < nroEnlaces) || (0 < nroEnlacesBorradas)) {
         return confirm('Realmente, desea cambiar la descripción del ' + ele + ": '" + desc +

@@ -177,7 +177,7 @@ class AgendaPersonalController extends Controller
     public function store(Request $request)
     {
         //dd($request);
-        $data = request()->validate([   // Si ocurre error, laravel nos envia al url anterior.
+        $data = $request->validate([   // Si ocurre error, laravel nos envia al url anterior.
             'fecha_cita' => ['date'],
             'hora_cita'  => ['date_format:H:i'],
             'descripcion' => 'required',
@@ -330,7 +330,7 @@ class AgendaPersonalController extends Controller
     public function update(Request $request, AgendaPersonal $cita)
     {
         //dd($request, $cita);
-        $data = request()->validate([   // Si ocurre error, laravel nos envia al url anterior.
+        $data = $request->validate([   // Si ocurre error, laravel nos envia al url anterior.
             'fecha_cita' => ['date'],
             'hora_cita'  => ['date_format:H:i:s'],
             'descripcion' => 'required',

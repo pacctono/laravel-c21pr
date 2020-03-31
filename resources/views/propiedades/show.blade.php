@@ -9,7 +9,8 @@
     <script>alert("No fue enviado el correo con el 'Reporte de Cierre' de esta propiedad. Probablemente, problemas con Internet! Revise su conexión");</script>
 @endif ('S' == $alertar)
 @endif (isset($alertar))
-    <h4 class="card-header">Propiedad:
+    <h4 class="card-header m-0 p-0 {{ $propiedad->estatus_color }}">
+        Propiedad:
         [{{ $propiedad->id}}]{{ $propiedad->codigo }} 
         {{ substr($propiedad->nombre, 0, 30) }}
         {{ $propiedad->negociacion_alfa }}.
@@ -18,10 +19,16 @@
             ([{{ $propiedad->user_id }}] {{ substr($propiedad->user->name, 0, 20) }})
         @endif
     </h4>
-    <div class="card-body">
+    <div class="card-body my-0 mx-2 py-0 px-2">
     	<div class="row my-0 py-0">
             <div class="mx-1 px-2">
                 Estatus del Inmueble:<span class="alert-info">{{ $propiedad->estatus_alfa }}</span>
+            </div>
+            <div class="mx-1 px-2">
+                Exclusividad:<span class="alert-info">{{ ($propiedad->exclusividad)?'Si':'No' }}</span>
+            </div>
+            <div class="mx-1 px-2">
+                Fecha inicial:<span class="alert-info">{{ $propiedad->fec_ini }}</span>
             </div>
         </div>
 
@@ -30,7 +37,26 @@
                 Fecha de Reserva:<span class="alert-info">{{ $propiedad->fec_res }}</span>
             </div>
             <div class="mx-1 px-2">
+                Forma de pago:<span class="alert-info">
+                    {{ $propiedad->forma_pago_reserva->descripcion }}
+                </span>
+            </div>
+            <div class="mx-1 px-2">
+                Factura:<span class="alert-info">{{ $propiedad->factura_reserva }}</span>
+            </div>
+        </div>
+
+    	<div class="row my-0 py-0 bg-suave">
+            <div class="mx-1 px-2">
                 Fecha de la firma:<span class="alert-info">{{ $propiedad->fec_fir }}</span>
+            </div>
+            <div class="mx-1 px-2">
+                Forma de pago:<span class="alert-info">
+                    {{ $propiedad->forma_pago_firma->descripcion }}
+                </span>
+            </div>
+            <div class="mx-1 px-2">
+                Factura:<span class="alert-info">{{ $propiedad->factura_firma }}</span>
             </div>
         </div>
 
@@ -213,29 +239,6 @@
 
         <div class="row my-0 py-0 bg-suave">
             <div class="mx-1 px-2">
-                Asesor captador: <span class="alert-info">
-                    {{ ('1' == $propiedad->asesor_captador_id)?
-                                ($propiedad->asesor_captador??'?'):
-                                $propiedad->captador->name }}</span>
-                    [{{ $propiedad->porc_captador_prbr_p }}]
-                <span class="alert-info">{{ ($propiedad->captador_prbr_ven) }}</span>
-            </div>
-            <div class="mx-1 px-2">
-                Asesor cerrador: <span class="alert-info">
-                    {{ ('1' == $propiedad->asesor_cerrador_id)?
-                                ($propiedad->asesor_cerrador??'?'):
-                                $propiedad->cerrador->name }}</span>
-                    [{{ $propiedad->porc_cerrador_prbr_p }}]
-                <span class="alert-info">{{ ($propiedad->cerrador_prbr_ven) }}</span>
-            </div>
-        </div>
-
-        <div class="row my-0 py-0">
-            <div class="mx-1 px-2">
-                GERENTE:[{{ $propiedad->porc_gerente_p }}]<span class="alert-info">
-                    {{ $propiedad->gerente_ven }}</span>
-            </div>
-            <div class="mx-1 px-2">
                 Bonificaciones:<span class="alert-info">{{ $propiedad->bonificaciones_ven }}</span>
             </div>
             <div class="mx-1 px-2">
@@ -245,20 +248,6 @@
             <div class="mx-1 px-2">
                 Ingreso neto a oficina:<span class="alert-info">
                     {{ $propiedad->ingreso_neto_oficina_ven }}</span>
-            </div>
-        </div>
-
-        <div class="row my-0 py-0 bg-suave">
-            <div class="mx-1 px-2">
-                Recibo No.:<span class="alert-info">
-                    {{ ($propiedad->numero_recibo)?$propiedad->numero_recibo:'?' }}</span>
-            </div>
-            <div class="mx-1 px-2">
-                Pago Gerente:<span class="alert-info">{{ $propiedad->pago_gerente }}</span>
-            </div>
-            <div class="mx-1 px-2">
-                Fact.:<span class="alert-info">
-                    {{ ($propiedad->factura_gerente)?$propiedad->factura_gerente:'?' }}</span>
             </div>
         </div>
 
@@ -272,13 +261,118 @@
             </div>
         </div>
 
+        <div class="row my-0 py-0 bg-suave">
+            <div class="mx-1 px-2">
+                Asesor captador: <span class="alert-info">
+                    {{ ('1' == $propiedad->asesor_captador_id)?
+                                ($propiedad->asesor_captador??'?'):
+                                $propiedad->captador->name }}</span>
+                    [{{ $propiedad->porc_captador_prbr_p }}]
+                <span class="alert-info">{{ ($propiedad->captador_prbr_ven) }}</span>
+            </div>
+            <div class="mx-1 px-2">
+                Fecha pago:<span class="alert-info">{{ $propiedad->fec_cap }}</span>
+            </div>
+            <div class="mx-1 px-2">
+                Forma de pago:<span class="alert-info">
+                    {{ $propiedad->forma_pago_captador->descripcion }}
+                </span>
+            </div>
+        </div>
+
+        <div class="row my-0 py-0">
+            <div class="mx-1 px-2">
+                Factura:<span class="alert-info">{{ $propiedad->factura_captador }}</span>
+            </div>
+        </div>
+
+        <div class="row my-0 py-0 bg-suave">
+            <div class="mx-1 px-2">
+                Asesor cerrador: <span class="alert-info">
+                    {{ ('1' == $propiedad->asesor_cerrador_id)?
+                                ($propiedad->asesor_cerrador??'?'):
+                                $propiedad->cerrador->name }}</span>
+                    [{{ $propiedad->porc_cerrador_prbr_p }}]
+                <span class="alert-info">{{ ($propiedad->cerrador_prbr_ven) }}</span>
+            </div>
+            <div class="mx-1 px-2">
+                Fecha pago:<span class="alert-info">{{ $propiedad->fec_cer }}</span>
+            </div>
+            <div class="mx-1 px-2">
+                Forma de pago:<span class="alert-info">
+                    {{ $propiedad->forma_pago_cerrador->descripcion }}
+                </span>
+            </div>
+        </div>
+
+        <div class="row my-0 py-0">
+            <div class="mx-1 px-2">
+                Factura:<span class="alert-info">{{ $propiedad->factura_cerrador }}</span>
+            </div>
+        </div>
+
+        <div class="row my-0 py-0 bg-suave">
+            <div class="mx-1 px-2">
+                Gerente:[{{ $propiedad->porc_gerente_p }}]<span class="alert-info">
+                    {{ $propiedad->gerente_ven }}</span>
+            </div>
+            <div class="mx-1 px-2">
+                Fecha pago:<span class="alert-info">{{ $propiedad->fec_ger }}</span>
+            </div>
+            <div class="mx-1 px-2">
+                Forma de pago:<span class="alert-info">
+                    {{ $propiedad->forma_pago_gerente->descripcion }}
+                </span>
+            </div>
+        </div>
+
+        <div class="row my-0 py-0">
+            <div class="mx-1 px-2">
+                Factura:
+                <span class="alert-info">
+                    {{ $propiedad->factura_gerente }}
+                </span>
+            </div>
+        </div>
+
     @if (1 == $propiedad->lados)
         <div class="row my-0 py-0 bg-suave">
             <div class="mx-1 px-2">
                 Pago Otra oficina:<span class="alert-info">{{ $propiedad->pago_otra_oficina }}</span>
             </div>
+            <div class="mx-1 px-2">
+                Fecha pago:<span class="alert-info">{{ $propiedad->fec_otr }}</span>
+            </div>
+            <div class="mx-1 px-2">
+                Forma de pago:<span class="alert-info">
+                    {{ $propiedad->forma_pago_otra_oficina->descripcion }}
+                </span>
+            </div>
+        </div>
+
+        <div class="row my-0 py-0">
+            <div class="mx-1 px-2">
+                Factura:
+                <span class="alert-info">
+                    {{ $propiedad->factura_otra_oficina }}
+                </span>
+            </div>
         </div>
     @endif
+
+        <div class="row my-0 py-0 bg-suave">
+            <div class="mx-1 px-2">
+                Recibo No.:<span class="alert-info">
+                    {{ ($propiedad->numero_recibo)?$propiedad->numero_recibo:'?' }}</span>
+            </div>
+            <div class="mx-1 px-2">
+                Pago Gerente:<span class="alert-info">{{ $propiedad->pago_gerente }}</span>
+            </div>
+            <!--div class="mx-1 px-2">
+                Fact.:<span class="alert-info">
+                    {{ ($propiedad->factura_gerente)?$propiedad->factura_gerente:'?' }}</span>
+            </div-->
+        </div>
 
         <div class="row my-0 py-0">
             <div class="mx-1 px-2">

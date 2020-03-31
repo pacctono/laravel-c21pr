@@ -215,7 +215,7 @@ class ContactoController extends Controller
     public function store(Request $request)
     {
         //dd($request);
-        $data = request()->validate([   // Si ocurre error, laravel nos envia al url anterior.
+        $data = $request->validate([   // Si ocurre error, laravel nos envia al url anterior.
             'cedula' => ['sometimes', 'nullable', 'digits_between:6,8'],
             'name' => 'required',
             'ddn' => '',
@@ -396,7 +396,7 @@ class ContactoController extends Controller
      */
     public function update(Request $request, Contacto $contacto)
     {
-        $data = request()->validate([   // Si ocurre error, laravel nos envia al url anterior.
+        $data = $request->validate([   // Si ocurre error, laravel nos envia al url anterior.
             'cedula' => ['sometimes', 'nullable', 'digits_between:7,8'],
             'name' => 'required',
             'ddn' => '',

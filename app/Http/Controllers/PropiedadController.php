@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Propiedad;
 use App\User;
 use App\Price;
+use App\FormaPago;
 use App\Tipo;
 use App\Ciudad;
 use App\Caracteristica;
@@ -28,6 +29,25 @@ class PropiedadController extends Controller
     protected $tipo = 'Propiedad';
     protected $tipoPlural = 'Propiedades';
     protected $lineasXPagina = General::LINEASXPAGINA;
+    protected $colores = Propiedad::COLORES;
+    protected function colores()
+    {
+        $colores = $this->colores;
+        foreach ($colores as $k => $v) {
+            $colores[$k] = 'text-' . $v;
+            if ('W' == $k) $colores[$k] .= ' bg-dark';
+        }
+        return $colores;
+    }
+    protected function repetidas() {    // Podria generar una sola query, pero asi uso nuevos metodos.
+        $propiedades = Propiedad::where('estatus', '!=', 'S')->get();
+        $ids = $propiedades->unique('codigo')->modelKeys(); // id's con los 'codigos' no repetidos.
+        $repetidas = Propiedad::where('estatus', '!=', 'S')->whereNotIn('id', $ids)
+                                ->get(['codigo'])->all();
+        $cdsrep = array_column($repetidas, 'codigo');
+        return Propiedad::where('estatus', '!=', 'S')->whereIn('codigo', $cdsrep)
+                                ->get(['id', 'codigo', 'nombre']);
+    }
     /**
      * Display a listing of the resource.
      *
@@ -46,10 +66,12 @@ class PropiedadController extends Controller
         if (1 >= count($dato)) $paginar = True; // Inicialmente, el arreglo '$dato' esta vacio.
         else $paginar = False;
 // Todo se inicializa, cuando se selecciona 'Propiedades' desde el menu horizontal principal.
+        $propRepetidas = collect([]);
         if (('GET' == request()->method()) and ('' == $orden) and (0 == count($dato))) {
             session(['fecha_desde' => '', 'fecha_hasta' => '', 'anoc' => '',
                     'negociacion' => '', 'codigo' => '', 'estatus' => '', 'desde' => '',
                     'hasta' => '', 'asesor' => '0', 'captador' => '0', 'cerrador' => '0']);
+            if (Auth::user()->is_admin) $propRepetidas = $this->repetidas();
         }
 /*
  * Manejo de las variables de la forma superior. $dato (fecha_desde, fecha_hasta, estatus,
@@ -114,10 +136,10 @@ class PropiedadController extends Controller
             }
         }
         $sentido = 'asc';
-        if ('' == $orden or is_null($orden)) {
+        if ('' == $orden or is_null($orden))
             $orden = 'id';
-            $sentido = 'desc';
-        }
+        if ('id' == $orden) $sentido = 'desc';
+
         if (Auth::user()->is_admin) {
 //            $users   = User::get(['id', 'name']);     // Todos los usuarios (asesores).
             $users   = User::where('activo', True)->get(['id', 'name']);     // Todos los usuarios (asesores), excepto los no activos.
@@ -125,34 +147,35 @@ class PropiedadController extends Controller
             $propiedades = Propiedad::where('id', '>', 0);   // condición dummy, solo para continuar armando la consulta.
 //            $asesor = 0;
             $title = 'Listado de ' . $title;
+// Las proximas lineas estan desde el principio porque se podia buscar por 'captador' y 'cerrador', por separado.
+            if (0 < $captador) {        // Se selecciono un asesor captador o esta conectado.
+                if ($captador != $cerrador)     // Se selecciono un asesor cerrador o esta conectado.
+                    $propiedades = $propiedades->where('asesor_captador_id', $captador);
+                else
+                    $propiedades = $propiedades->where(
+                                        function ($query) use ($captador, $cerrador) {
+                                            $query->where('asesor_captador_id', $captador)
+                                                ->orWhere('asesor_cerrador_id', $cerrador);
+                                    });
+            }
+            if (0 < $cerrador) {      // Se selecciono un asesor cerrador o esta conectado.
+                if ($cerrador != $captador)
+                    $propiedades = $propiedades->where('asesor_cerrador_id', $cerrador);
+            }
+// Hasta aqui las lineas.
         } else {
             $user   = User::find(Auth::user()->id);
             $title .= ' de ' . $user->name . ' (incluye [A]ctivas)';
-            $asesor = $user->id;
+            $asesor = Auth::user()->id;
             $propiedades = Propiedad::where(
                                     function ($query) use ($asesor) {
-                                $query->where('user_id', $asesor)
+                                $query->where('estatus', 'A')
                                         ->orWhere('asesor_captador_id', $asesor)
-                                        ->orWhere('asesor_cerrador_id', $asesor)
-                                        ->orWhere('estatus', 'A');
+                                        ->orWhere('asesor_cerrador_id', $asesor);
                                 })
                             ->whereNull('user_borro');
         }
 
-        if (0 < $captador) {        // Se selecciono un asesor captador o esta conectado.
-            if ($captador != $cerrador)     // Se selecciono un asesor cerrador o esta conectado.
-                $propiedades = $propiedades->where('asesor_captador_id', $captador);
-            else
-                $propiedades = $propiedades->where(
-                                    function ($query) use ($captador, $cerrador) {
-                                        $query->where('asesor_captador_id', $captador)
-                                            ->orWhere('asesor_cerrador_id', $cerrador);
-                                });
-        }
-        if (0 < $cerrador) {      // Se selecciono un asesor cerrador o esta conectado.
-            if ($cerrador != $captador)
-                $propiedades = $propiedades->where('asesor_cerrador_id', $cerrador);
-        }
         if ('' != $anoc) {       // Se selecciono un anoc.
             $propiedades = $propiedades->where(DB::raw("YEAR(created_at)"), $anoc);
         }
@@ -164,11 +187,6 @@ class PropiedadController extends Controller
         }
         if ('' != $estatus) {       // Se selecciono un estatus.
             if ('V' == $estatus) $propiedades = $propiedades->whereIn('estatus', ['P', 'C']);
-            elseif ('X' == $estatus) {
-                $propiedades = $propiedades
-                                ->where('created_at', '<', (new Carbon(now()))->subDays(90))
-                                ->where('estatus', 'A');
-            }
             else $propiedades = $propiedades->where('estatus', $estatus);
         }
         /*$precios = Price::get();    // Todos los precios, incluye 'descripcion' y 'descripcion_alquiler'.
@@ -230,6 +248,7 @@ class PropiedadController extends Controller
                 $tCerradorPrbrSel, $tLadosCap, $tLadosCer,
                 $tPvrCaptadorPrbrSel + $tPvrCerradorPrbrSel);*/
 //        return view((($movil)?'celular.indexPropiedades':'propiedades.index'),
+        $colores = $this->colores();
         if ('html' == $accion)
             return view('propiedades.index',
                     compact('title', 'users', 'propiedades', 'movil',
@@ -240,11 +259,12 @@ class PropiedadController extends Controller
                     'tCaptadorPrbr', 'tGerente', 'tCerradorPrbr', 'tBonificaciones',
                     'tComisionBancaria', 'tPrecioVentaReal', 'tPuntos',
                     'tCaptadorPrbrSel', 'tCerradorPrbrSel', 'tLadosCap', 'tLadosCer',
-                    'tPvrCaptadorPrbrSel', 'tPvrCerradorPrbrSel',
-                    'ruta', 'fecha_desde', 'fecha_hasta', 'arrEstatus', 'negociaciones',
-                    'anosc', 'anoc', 'codigo', 'desde', 'hasta',
-                    'asesor', 'captador', 'cerrador', 'tPuntosCaptador', 'tPuntosCerrador',
-                    'estatus', 'negociacion', 'orden', 'paginar', 'alertar', 'accion'));
+                    'tPvrCaptadorPrbrSel', 'tPvrCerradorPrbrSel', 'fecha_desde',
+                    'fecha_hasta', 'arrEstatus', 'negociaciones', 'anosc', 'anoc',
+                    'codigo', 'desde', 'hasta', 'asesor', 'captador', 'cerrador',
+                    'tPuntosCaptador', 'tPuntosCerrador', 'estatus', 'negociacion',
+                    'ruta', 'orden', 'paginar', 'alertar', 'colores', 'accion',
+                    'propRepetidas'));
         $html = view('propiedades.index',
                     compact('title', 'users', 'propiedades', 'movil',
                     'filas', 'tPrecio', 'tCompartidoConIva', 'tLados',
@@ -254,11 +274,11 @@ class PropiedadController extends Controller
                     'tCaptadorPrbr', 'tGerente', 'tCerradorPrbr', 'tBonificaciones',
                     'tComisionBancaria', 'tPrecioVentaReal', 'tPuntos',
                     'tCaptadorPrbrSel', 'tCerradorPrbrSel', 'tLadosCap', 'tLadosCer',
-                    'tPvrCaptadorPrbrSel', 'tPvrCerradorPrbrSel',
-                    'ruta', 'fecha_desde', 'fecha_hasta', 'arrEstatus', 'negociaciones',
-                    'anosc', 'anoc', 'codigo', 'desde', 'hasta',
-                    'asesor', 'captador', 'cerrador', 'tPuntosCaptador', 'tPuntosCerrador',
-                    'estatus', 'negociacion', 'orden', 'paginar', 'alertar', 'accion'))
+                    'tPvrCaptadorPrbrSel', 'tPvrCerradorPrbrSel', 'fecha_desde',
+                    'fecha_hasta', 'arrEstatus', 'negociaciones', 'anosc', 'anoc',
+                    'codigo', 'desde', 'hasta', 'asesor', 'captador', 'cerrador',
+                    'tPuntosCaptador', 'tPuntosCerrador', 'estatus', 'negociacion',
+                    'ruta', 'orden', 'paginar', 'alertar', 'colores', 'accion'))
                 ->render();
         General::generarPdf($html, 'propiedades', $accion);
     }       // Final del metodo index.
@@ -294,7 +314,8 @@ class PropiedadController extends Controller
             return redirect('login');
         }
 
-        $users = User::get(['id', 'name']);     // Todos los usuarios (asesores).
+        //$users = User::get(['id', 'name']);     // Todos los usuarios (asesores).
+        $users = User::where('activo', True)->get(['id', 'name']);     // Todos los usuarios (asesores), excepto los no activos.
 //        dd($users[0]['name']);
         $users[0]['name'] = 'Asesor otra oficina';
 
@@ -310,6 +331,7 @@ class PropiedadController extends Controller
         $tipoCXDef = $colsC['tipo']['xdef'];
         unset($colsC);
         if (!Auth::user()->is_admin) unset($tiposC['F']);
+        $forma_pagos = FormaPago::all();
         $tipos = Tipo::all();
         $ciudades = Ciudad::all();
         $caracteristicas = Caracteristica::all();
@@ -322,10 +344,11 @@ class PropiedadController extends Controller
         $ddns = Venezueladdn::distinct()->get(['ddn'])->all();
         array_unshift($clientes, $otroCliente);         // Agrega al inicio el cliente 'Otro'. Sacado del arreglo, anteriormente.
 //        return view((($movil)?'celular.createPropiedades':'propiedades.crear'),
+        $colores = $this->colores();
         return view('propiedades.crear',
-                    compact('title', 'users', 'tipos', 'ciudades', 'caracteristicas',
-                    'municipios', 'estados', 'clientes', 'ddns', 'cols', 'tiposC',
-                    'tipoCXDef', 'exito'));
+                    compact('title', 'users', 'forma_pagos', 'tipos', 'ciudades',
+                        'caracteristicas', 'municipios', 'estados', 'clientes',
+                        'ddns', 'cols', 'tiposC', 'tipoCXDef', 'colores', 'exito'));
     }
 
     /**
@@ -337,17 +360,20 @@ class PropiedadController extends Controller
     public function store(Request $request)
     {
         //dd($request->path(), $request->fullUrl(), $request->url(), $request->root());   //"propiedades", "http://c21pr.vb/propiedades", "http://c21pr.vb/propiedades", "http://c21pr.vb"
-        $data = request()->validate([   // Si ocurre error, laravel nos envia al url anterior.
+        //dd(request()->all());
+        //dd($request);
+        $data = $request->validate([   // Si ocurre error, laravel nos envia al url anterior.
             'codigo' => ['required', 'digits_between:6,8'],
             'fecha_reserva' => ['sometimes', 'nullable', 'date'],
-            'forma_pago_reserva' => '',
+            'forma_pago_reserva_id' => '',
             'factura_reserva' => '',
             'fecha_firma' => ['sometimes', 'nullable', 'date'],
-            'forma_pago_firma' => '',
+            'forma_pago_firma_id' => '',
             'factura_firma' => '',
             'negociacion' => 'required',
             'nombre' => 'required',
             'exclusividad' => '',
+            'fecha_inicial' => ['required', 'date'],
             'tipo_id' => '',
             'metraje' => '',
             'habitaciones' => '',
@@ -366,17 +392,17 @@ class PropiedadController extends Controller
             'estatus' => 'required',
             'moneda' => 'required',
             'precio' => 'required',
-            'comision' => ['required', 'min:0.00', 'max:50.00'],
-            'iva' => ['required', 'min:0.00', 'max:50.00'],
-            'lados' => ['in:1,2'],
-            'porc_franquicia' => ['required', 'min:0.00', 'max:50.00'],
+            'comision' => ['required', 'numeric', 'min:0.00', 'max:50.00'],
+            'iva' => ['required', 'numeric', 'min:0.00', 'max:50.00'],
+            'lados' => ['numeric', 'in:1,2'],
+            'porc_franquicia' => ['required', 'numeric', 'min:0.00', 'max:50.00'],
             'reportado_casa_nacional' => 'required',
-            'porc_regalia' => ['required', 'min:0.00', 'max:50.00'],
-            'porc_compartido' => ['required', 'min:0.00', 'max:90.00'],
-            'porc_captador_prbr' => ['required', 'min:0.00', 'max:50.00'],
-            'porc_gerente' => ['required', 'min:0.00', 'max:50.00'],
-            'porc_cerrador_prbr' => ['required', 'min:0.00', 'max:50.00'],
-            'porc_bonificacion' => ['required', 'min:0.00', 'max:50.00'],
+            'porc_regalia' => ['required', 'numeric', 'min:0.00', 'max:80.00'],
+            'porc_compartido' => ['required', 'numeric', 'min:0.00', 'max:90.00'],
+            'porc_captador_prbr' => ['required', 'numeric', 'min:0.00', 'max:50.00'],
+            'porc_gerente' => ['required', 'numeric', 'min:0.00', 'max:50.00'],
+            'porc_cerrador_prbr' => ['required', 'numeric', 'min:0.00', 'max:50.00'],
+            'porc_bonificacion' => ['required', 'numeric', 'min:0.00', 'max:50.00'],
             'comision_bancaria' => '',
             'numero_recibo' => '',
             'asesor_captador_id' => 'required',
@@ -421,6 +447,8 @@ class PropiedadController extends Controller
             'fecha_firma.date' => 'La <fecha de la firma> debe ser una fecha valida.',
             'negociacion.required' => 'El campo <negociacion> es obligatorio',
             'nombre.required' => 'El campo <nombre> DE LA PROPIEDAD es obligatorio',
+            'fecha_inicial.required' => 'El campo <fecha inicial> DE LA PROPIEDAD es obligatorio',
+            'fecha_inicial.date' => 'La <fecha inicial> debe ser una fecha valida.',
             'moneda.required' => 'El campo <moneda> es obligatorio',
             'precio.required' => 'El campo <precio> es obligatorio',
             'comision.required' => 'El campo <comision> es obligatorio',
@@ -486,18 +514,37 @@ class PropiedadController extends Controller
         }
 
         $cols = General::columnas('propiedads');
+        //dd($cols, array_keys($cols));
+        foreach(array_keys($cols) as $columna) {
+            if (!(isset($data[$columna])) or ('' == trim($data[$columna])))
+                $data[$columna] = null;
+        }
+        /*if (!(isset($data['forma_pago_reserva_id'])) or ('' == $data['forma_pago_reserva_id']))
+            $data['forma_pago_reserva_id'] = null;
+        if (!(isset($data['forma_pago_firma_id'])) or ('' == $data['forma_pago_firma_id']))
+            $data['forma_pago_firma_id'] = null;
+        if (!(isset($data['forma_pago_gerente_id'])) or ('' == $data['forma_pago_gerente_id']))
+            $data['forma_pago_gerente_id'] = null;
+        if (!(isset($data['forma_pago_captador_id'])) or ('' == $data['forma_pago_captador_id']))
+            $data['forma_pago_captador_id'] = null;
+        if (!(isset($data['forma_pago_cerrador_id'])) or ('' == $data['forma_pago_cerrador_id']))
+            $data['forma_pago_cerrador_id'] = null;
+        if (!(isset($data['forma_pago_otra_oficina_id'])) or ('' == $data['forma_pago_otra_oficina_id']))
+            $data['forma_pago_otra_oficina_id'] = null;*/
+        //dd($data);
         Propiedad::create([
             'codigo' => $data['codigo'],
             'fecha_reserva' => $data['fecha_reserva'],
-            'forma_pago_reserva' => (isset($data['forma_pago_reserva'])?$data['forma_pago_reserva']:null),
+            'forma_pago_reserva_id' => $data['forma_pago_reserva_id'],
             'factura_reserva' => (isset($data['factura_reserva'])?$data['factura_reserva']:null),
             'fecha_firma' => $data['fecha_firma'],
-            'forma_pago_firma' => (isset($data['forma_pago_firma'])?$data['forma_pago_firma']:null),
+            'forma_pago_firma_id' => $data['forma_pago_firma_id'],
             'factura_firma' => (isset($data['factura_firma'])?$data['factura_firma']:null),
             'negociacion' => $data['negociacion'],
             'nombre' => $data['nombre'],
             'exclusividad' => (isset($data['exclusividad']) and
                                         ('on' == $data['exclusividad'])),
+            'fecha_inicial' => $data['fecha_inicial'],
             'tipo_id' => (isset($data['tipo_id'])?$data['tipo_id']:$cols['tipo_id']['xdef']),
             'metraje' => (isset($data['metraje'])?$data['metraje']:null),
             'habitaciones' => (isset($data['habitaciones'])?$data['habitaciones']:null),
@@ -536,19 +583,19 @@ class PropiedadController extends Controller
             'asesor_cerrador_id' => $data['asesor_cerrador_id'],
             'asesor_cerrador' => (isset($data['asesor_cerrador'])?$data['asesor_cerrador']:null),
             'pago_gerente' => (isset($data['pago_gerente'])?$data['pago_gerente']:null),
-            'forma_pago_gerente_id' => (isset($data['forma_pago_gerente_id'])?$data['forma_pago_gerente_id']:null),
+            'forma_pago_gerente_id' => $data['forma_pago_gerente_id'],
             'fecha_pago_gerente' => (isset($data['fecha_pago_gerente'])?$data['fecha_pago_gerente']:null),
             'factura_gerente' => (isset($data['factura_gerente'])?$data['factura_gerente']:null),
             'pago_asesores' => (isset($data['pago_asesores'])?$data['pago_asesores']:null),
-            'forma_pago_captador_id' => (isset($data['forma_pago_captador_id'])?$data['forma_pago_captador_id']:null),
+            'forma_pago_captador_id' => $data['forma_pago_captador_id'],
             'fecha_pago_captador' => (isset($data['fecha_pago_captador'])?$data['fecha_pago_captador']:null),
             'factura_captador' => (isset($data['factura_captador'])?$data['factura_captador']:null),
-            'forma_pago_cerrador_id' => (isset($data['forma_pago_cerrador_id'])?$data['forma_pago_cerrador_id']:null),
+            'forma_pago_cerrador_id' => $data['forma_pago_cerrador_id'],
             'fecha_pago_cerrador' => (isset($data['fecha_pago_cerrador'])?$data['fecha_pago_cerrador']:null),
             'factura_cerrador' => (isset($data['factura_cerrador'])?$data['factura_cerrador']:null),
             'factura_asesores' => (isset($data['factura_asesores'])?$data['factura_asesores']:null),
             'pago_otra_oficina' => (isset($data['pago_otra_oficina'])?$data['pago_otra_oficina']:null),
-            'forma_pago_otra_oficina_id' => (isset($data['forma_pago_otra_oficina_id'])?$data['forma_pago_otra_oficina_id']:null),
+            'forma_pago_otra_oficina_id' => $data['forma_pago_otra_oficina_id'],
             'fecha_pago_otra_oficina' => (isset($data['fecha_pago_otra_oficina'])?$data['fecha_pago_otra_oficina']:null),
             'factura_otra_oficina' => (isset($data['factura_otra_oficina'])?$data['factura_otra_oficina']:null),
             'pagado_casa_nacional' => (isset($data['pagado_casa_nacional']) and
@@ -611,6 +658,7 @@ class PropiedadController extends Controller
         //dd($alertar, $rutRetorno, $rutaPrevia, redirect()->getUrlGenerator());    // No consegui nada que pueda ayudar.
         $agente = new Agent();
         $movil  = $agente->isMobile() and true;             // Fuerzo booleana. No funciona al usar el metodo directamente.
+        $forma_pagos = FormaPago::all();
         $tipos = Tipo::all();
         $ciudades = Ciudad::all();
         $caracteristicas = Caracteristica::all();
@@ -625,8 +673,8 @@ class PropiedadController extends Controller
 //            return view((($movil)?'celular.showPropiedad':'propiedades.show'),
             return view('propiedades.show',
                         compact('propiedad', 'rutRetorno', 'nroPagina', 'col_id', 'movil',
-                                'orden', 'tipos', 'ciudades', 'caracteristicas', 'municipios',
-                                'estados', 'clientes', 'alertar'));
+                                'orden', 'forma_pagos', 'tipos', 'ciudades', 'caracteristicas',
+                                'municipios', 'estados', 'clientes', 'alertar'));
         } else {
             return redirect()->back();
         }
@@ -656,8 +704,10 @@ class PropiedadController extends Controller
 
         $cols = General::columnas('propiedads');
         $title = 'Editar ' . $this->tipo;
-        $users = User::get(['id', 'name']);     // Todos los usuarios (asesores).
+        //$users = User::get(['id', 'name']);     // Todos los usuarios (asesores).
+        $users = User::where('activo', True)->get(['id', 'name']);     // Todos los usuarios (asesores), excepto los no activos.
         $users[0]['name'] = 'Asesor otra oficina';
+        $forma_pagos = FormaPago::all();
         $tipos = Tipo::all();
         $caracteristicas = Caracteristica::all();
         $ciudades = Ciudad::all();
@@ -673,10 +723,12 @@ class PropiedadController extends Controller
             $agente = new Agent();
             $movil  = $agente->isMobile() and true;             // Fuerzo booleana. No funciona al usar el metodo directamente.
 //            return view((($movil)?'celular.editPropiedades':'propiedades.editar'),
+            $colores = $this->colores();
             return view('propiedades.editar',
 //                        ['propiedad' => $propiedad, 'users' => $users, 'cols' => $cols, 'title' => $title]);
-                    compact('propiedad', 'title', 'users', 'tipos', 'ciudades', 'caracteristicas',
-                            'municipios', 'estados', 'clientes', 'cols', 'orden', 'nroPagina'));
+                    compact('propiedad', 'title', 'users', 'forma_pagos', 'tipos', 'ciudades',
+                            'caracteristicas', 'municipios', 'estados', 'clientes', 'cols',
+                            'orden', 'colores', 'nroPagina'));
         }
         return redirect('/propiedades');
     }
@@ -691,17 +743,18 @@ class PropiedadController extends Controller
     public function update(Request $request, Propiedad $propiedad)
     {
         //print_r($request);
-        $data = request()->validate([   // Si ocurre error, laravel nos envia al url anterior.
+        $data = $request->validate([   // Si ocurre error, laravel nos envia al url anterior.
             'fecha_reserva' => ['sometimes', 'nullable', 'date'],
-            'forma_pago_reserva' => '',
+            'forma_pago_reserva_id' => '',
             'factura_reserva' => '',
             'fecha_firma' => ['sometimes', 'nullable', 'date'],
-            'forma_pago_firma' => '',
+            'forma_pago_firma_id' => '',
             'factura_firma' => '',
             'fecha_firma_ant' => '',
             'negociacion' => 'required',
             'nombre' => 'required',
             'exclusividad' => '',
+            'fecha_inicial' => ['required', 'date'],
             'tipo_id' => '',
             'metraje' => '',
             'habitaciones' => '',
@@ -720,17 +773,17 @@ class PropiedadController extends Controller
             'estatus' => 'required',
             'moneda' => 'required',
             'precio' => 'required',
-            'comision' => ['required', 'min:0.00', 'max:50.00'],
-            'iva' => ['required', 'min:0.00', 'max:50.00'],
-            'lados' => ['in:1,2'],
-            'porc_franquicia' => ['required', 'min:0.00', 'max:50.00'],
+            'comision' => ['required', 'numeric', 'min:0.00', 'max:50.00'],
+            'iva' => ['required', 'numeric', 'min:0.00', 'max:50.00'],
+            'lados' => ['numeric', 'in:1,2'],
+            'porc_franquicia' => ['required', 'numeric', 'min:0.00', 'max:50.00'],
             'reportado_casa_nacional' => 'required',
-            'porc_regalia' => ['required', 'min:0.00', 'max:50.00'],
-            'porc_compartido' => ['required', 'min:0.00', 'max:90.00'],
-            'porc_captador_prbr' => ['required', 'min:0.00', 'max:50.00'],
-            'porc_gerente' => ['required', 'min:0.00', 'max:50.00'],
-            'porc_cerrador_prbr' => ['required', 'min:0.00', 'max:50.00'],
-            'porc_bonificacion' => ['required', 'min:0.00', 'max:50.00'],
+            'porc_regalia' => ['required', 'numeric', 'min:0.00', 'max:80.00'],
+            'porc_compartido' => ['required', 'numeric', 'min:0.00', 'max:90.00'],
+            'porc_captador_prbr' => ['required', 'numeric', 'min:0.00', 'max:50.00'],
+            'porc_gerente' => ['required', 'numeric', 'min:0.00', 'max:50.00'],
+            'porc_cerrador_prbr' => ['required', 'numeric', 'min:0.00', 'max:50.00'],
+            'porc_bonificacion' => ['required', 'numeric', 'min:0.00', 'max:50.00'],
             'comision_bancaria' => '',
             'numero_recibo' => '',
             'asesor_captador_id' => 'required',
@@ -762,6 +815,8 @@ class PropiedadController extends Controller
             'fecha_firma.date' => 'La <fecha de la firma> debe ser una fecha valida.',
             'negociacion.required' => 'El campo <negociacion> es obligatorio',
             'nombre.required' => 'El campo <nombre> DE LA PROPIEDAD es obligatorio',
+            'fecha_inicial.required' => 'El campo <fecha inicial> DE LA PROPIEDAD es obligatorio',
+            'fecha_inicial.date' => 'La <fecha inicial> debe ser una fecha valida.',
             'estatus' => 'El campo <estatus> es obligatorio',
             'moneda.required' => 'El campo <moneda> es obligatorio',
             'precio.required' => 'El campo <precio> es obligatorio',
@@ -827,6 +882,23 @@ class PropiedadController extends Controller
         }
         return redirect()->route('propiedades.show',
                                 ['propiedad' => $propiedad, 'correo' => $correo]);
+    }
+
+    public function updateCodigo(Propiedad $propiedad, $codigo)
+    {
+        $codigoAnterior = $propiedad->codigo;
+        $data['codigo'] = $codigo;
+        $propiedad->update($data);
+
+        Bitacora::create([
+            'user_id' => Auth::user()->id,
+            'tx_modelo' => 'Propiedad',
+            'tx_data' => 'Id:'.$propiedad->id.' ('.$propiedad->nombre."), Codigo anterior:$codigoAnterior, nuevo:$codigo",
+            'tx_tipo' => 'A',
+	        'tx_host' => $_SERVER['REMOTE_ADDR']
+        ]);
+
+        return redirect()->route('propiedades.index');
     }
 
     /**
@@ -901,7 +973,10 @@ class PropiedadController extends Controller
     public function ajPropiedades()
     {
         $arrTmp = Propiedad::where('estatus', '!=', 'S')
-                        ->get(['id', 'codigo', 'negociacion', 'nombre', 'user_id', 'estatus', 'created_at'])
+                        ->get(['id', 'codigo', 'negociacion', 'nombre', 'fecha_inicial',
+                            'descripcion', 'asesor_captador_id', 'asesor_cerrador_id',
+                            'asesor_captador', 'asesor_cerrador', 'user_id', 'estatus',
+                            'comentarios', 'created_at'])
                         ->all();
         $users  = User::get(['id', 'name']);
         $cols = General::columnas('propiedads');
@@ -921,8 +996,13 @@ class PropiedadController extends Controller
             if ('' != $v->id) $aPropiedades[$v->id] = [
                     'nb' => $v->nombre,
                     'ng' => $v->negociacion,
+                    'fi' => $v->fecha_inicial->format('d/m/Y'),
                     'uid' => $v->user_id,
                     'st' => $v->estatus,
+                    'acp' => (1 < $v->asesor_captador_id)?$v->asesor_captador_id:$v->asesor_captador??1,
+                    'acr' => (1 < $v->asesor_cerrador_id)?$v->asesor_cerrador_id:$v->asesor_cerrador??1,
+                    'dsc' => $v->descripcion??'',
+                    'com' => $v->comentarios??'',
                     'fc' => $v->created_at->format('d/m/Y'),
                     'ho' => $v->created_at->format('h:i a')
                 ];

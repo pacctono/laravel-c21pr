@@ -89,7 +89,7 @@ class General {
         $valores = DB::select("SELECT COLUMN_NAME, COLUMN_DEFAULT, IS_NULLABLE,
                                         DATA_TYPE, COLUMN_TYPE, COLUMN_COMMENT
                                FROM   INFORMATION_SCHEMA.COLUMNS
-                               WHERE  TABLE_NAME = '$tabla'");
+                               WHERE  TABLE_SCHEMA = 'c21pr' AND TABLE_NAME = '$tabla'");
         $cols = Array();
         foreach($valores as $fila) {
             if ('enum' == $fila->DATA_TYPE) {

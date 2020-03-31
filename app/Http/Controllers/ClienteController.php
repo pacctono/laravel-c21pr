@@ -28,7 +28,6 @@ class ClienteController extends Controller
         if (!(Auth::check())) {
             return redirect('login');
         }
-        $diaSemana = Fecha::$diaSemana;
 
         $title = 'Listado de ' . $this->tipoPlural;
         $ruta = request()->path();
@@ -54,12 +53,6 @@ class ClienteController extends Controller
             else $asesor = 0;
         }
 
-// En caso de volver luego de haber enviado un correo, ver el metodo 'emailcita', en AgendaController.
-        $alertar = 0;
-        if ('alert' == $orden) {
-            $orden = '';
-            $alertar = 1;
-        }        
         $sentido = 'asc';
         if ('' == $orden or is_null($orden)) {
             $orden = 'id';
@@ -88,11 +81,11 @@ class ClienteController extends Controller
 
         if ('html' == $accion)
             return view('clientes.index',
-                        compact('title', 'clientes', 'ruta', 'diaSemana', 'alertar',
-                            'users', 'asesor', 'paginar', 'orden', 'movil', 'accion'));
+                        compact('title', 'clientes', 'ruta', 'users', 'asesor',
+                                'paginar', 'orden', 'movil', 'accion'));
         $html = view('clientes.index',
-                    compact('title', 'clientes', 'ruta', 'diaSemana', 'alertar',
-                            'users', 'asesor', 'paginar', 'orden', 'movil', 'accion'))
+                    compact('title', 'clientes', 'ruta', 'users', 'asesor',
+                            'paginar', 'orden', 'movil', 'accion'))
                 ->render();
         General::generarPdf($html, 'clientes', $accion);
     }
@@ -160,7 +153,7 @@ class ClienteController extends Controller
     public function store(Request $request)
     {
         //dd($request);
-        $data = request()->validate([   // Si ocurre error, laravel nos envia al url anterior.
+        $data = $request->validate([   // Si ocurre error, laravel nos envia al url anterior.
             'cedula' => '',
             'rif' => '',
             'name' => 'required',
@@ -281,7 +274,7 @@ class ClienteController extends Controller
      */
     public function update(Request $request, Cliente $cliente)
     {
-        $data = request()->validate([   // Si ocurre error, laravel nos envia al url anterior.
+        $data = $request->validate([   // Si ocurre error, laravel nos envia al url anterior.
             'cedula' => '',
             'rif' => '',
             'name' => 'required',

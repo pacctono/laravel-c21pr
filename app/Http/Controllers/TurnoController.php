@@ -156,7 +156,7 @@ class TurnoController extends Controller
         General::generarPdf($html, 'turnos', $accion);
     }
 
-    public function calendario()
+    public function calendario($miCalendario=0)
     {
         if (!(Auth::check())) {
             return redirect('login');
@@ -171,9 +171,22 @@ class TurnoController extends Controller
         $asesor = session('asesor', '0');
 
         $turnos = Turno::where('id', '>', 0);   // condición dummy, solo para continuar armando la consulta.
+
         if (Auth::user()->is_admin) {
             $users  = User::where('activo', True)->where('socio', False)->get();
+            $texto  = '';
+            $miCal  = 0;
         } else {
+            if ($miCalendario) {
+                $asesor = Auth::user()->id;
+                $texto  = 'Todos los Turnos';
+                $miCal  = 0;
+            }
+            else {
+                $asesor = 0;           // No pareciera necesario, pero, al diablo.
+                $texto  = 'Mis Turnos';
+                $miCal  = 1;
+            }
             $users  = '';
         }
         if (0 < $asesor) $turnos = $turnos->where('user_id', $asesor);
@@ -181,44 +194,64 @@ class TurnoController extends Controller
         $data = $turnos->get();
         $eventos = [];
         if($data->count()) {
-            foreach ($data as $key => $value) {
-                $start = new \DateTime($value->turno . ' +30 minutes');     // '\' carpeta de la clase.
+            foreach ($data as $key => $turno) {
+                $start = new \DateTime($turno->turno . ' +30 minutes');     // '\' carpeta de la clase.
                 $end   = clone $start;
-                if ('M' == $value->tipo_tur) $end->add(new \DateInterval('PT4H'));       // Periodo usando ('PT') hora, minuto o segundo. Solo 'P' si es dia, mes o año.
+                if ('M' == $turno->tipo_tur) $end->add(new \DateInterval('PT4H'));       // Periodo usando ('PT') hora, minuto o segundo. Solo 'P' si es dia, mes o año.
                 else $end->add(new \DateInterval('PT5H'));       // Periodo usando ('PT') hora, minuto o segundo. Solo 'P' si es dia, mes o año.
-                if ($start <= now()) $color = 'yellow';
-                else $color = 'blue';
+                if ($start <= now()) {
+                    if ('C' == $turno->tarde) $color = 'red';
+                    elseif (('m' == $turno->tarde) or ('t' == $turno->tarde)) $color = 'orange';
+                    else $color = 'blue';
+                }
+                else $color = 'yellow';
+                if ('' == $turno->tarde) $descripcion = '';
+                else $descripcion = $turno->descripcion;
                 $eventos[] = Calendar::event(
-                    $value->user->name, // Titulo
+                    $turno->user->name, // Titulo
                     false,              // Todo el dia
                     $start,             // Comienzo
                     $end,               // Final
                     null,               // id
                     [
                         'color' => $color,
+                        'descripcion' => $descripcion
                     ]
                 );
             }
         }
-        if (Auth::user()->is_admin)
+        if (Auth::user()->is_admin) {
             $header = [
                         'left' => 'prev,next today',
                          'center' => 'title',
-                         'right' => 'month,agendaWeek,agendaDay,listMonth'
+                         'right' => 'month,agendaWeek,agendaDay,listMonth,proximos'
                     ];
-        else
+            $lstTurnos = False;
+            $proximos = [
+                        'text' => "Proximos Turnos (PDF)",
+                        "click" => "function() { location.href = '/turnos'; }",
+                    ];
+        } else {
             $header = [
                         'left' => 'prev,next today',
                          'center' => 'title',
-                         'right' => 'month,listMonth,miBoton'
+                         'right' => 'month,listMonth,turnos,proximos'
                     ];
+            $lstTurnos = [
+                        'text' => $texto,
+                        "click" => "function() { location.href = '/turnos/calendario/".
+                                                                $miCal."'; }",
+                    ];
+            $proximos = [
+                        'text' => "Mis Proximos Turnos (PDF)",
+                        "click" => "function() { location.href = '/turnos'; }",
+                    ];
+        }
         $calendar = Calendar::addEvents($eventos)->setOptions([
                         'header' => $header,
                         'customButtons' => [
-                            'miBoton' => [
-                                'text' => 'Mis Turnos',
-                                "click" => "function() { alert('Mi boton personal'); }",
-                            ],
+                            'turnos' => $lstTurnos,
+                            'proximos' => $proximos,
                         ],
                         'firstDay' => 1,			// El primer dia de la semana es el lunes.
                         'hiddenDays' => [0],		// No se muestra el domingo.
@@ -266,6 +299,9 @@ class TurnoController extends Controller
                                         //alert(`Diferencia entre primer lunes(${plunes}) y fecha evento(${fecha}) de evento:${dias}`);
                                         //alert(`Semana:${semana}`);
                                         location.href = `/turnos/crear/${semana}`;
+                        }',
+                        'eventMouseOver' => 'function(ev, jq, vista) {
+                                        alert(`Raton arriba`);
                         }',
                    ]);
 
@@ -442,7 +478,7 @@ class TurnoController extends Controller
 
     public function store(Request $request)
     {
-        $fechas = request()->validate([             // $fechas = request()->all();
+        $fechas = $request->validate([             // $fechas = request()->all();
             'u0' => ['required'],
             'f0' => '',
             'u1' => ['required'],
@@ -547,23 +583,27 @@ class TurnoController extends Controller
                     ->orderBy('id')         // Puede estar demas, pero, me aseguro el orden correcto.
                     ->get()->all();         // Turnos a editar.
 //        dd($turnos);
-        $turno = $turnos[0];                // Datos del turno del primer dia.
+        $lunes = $turnos[0];                // Datos del turno del primer dia.
 
         $eventos = [];
-        $primerDia = (new Carbon($turno->turno->format('Y-m-01')))->startOfDay();
-/*        $ultimoDia = (new Carbon($turno->turno->format('Y-m-t')))->endOfDay();
+        $primerDia = (new Carbon($lunes->turno->format('Y-m-01')))->startOfDay();
+/*        $ultimoDia = (new Carbon($lunes->turno->format('Y-m-t')))->endOfDay();
         $data = Turno::whereBetween('turno', [$primerDia, $ultimoDia])->get();*/
         $data = Turno::where('turno', '>=', $primerDia)->get();
         if($data->count()) {
-            foreach ($data as $key => $value) {
-                $start = new \DateTime($value->turno . ' +30 minutes');     // '\' carpeta de la clase.
+            foreach ($data as $key => $turno) {
+                $start = new \DateTime($turno->turno . ' +30 minutes');     // '\' carpeta de la clase.
                 $end   = clone $start;
-                if ('M' == $value->tipo_tur) $end->add(new \DateInterval('PT4H'));       // Periodo usando ('PT') hora, minuto o segundo. Solo 'P' si es dia, mes o año.
+                if ('M' == $turno->tipo_tur) $end->add(new \DateInterval('PT4H'));       // Periodo usando ('PT') hora, minuto o segundo. Solo 'P' si es dia, mes o año.
                 else $end->add(new \DateInterval('PT5H'));       // Periodo usando ('PT') hora, minuto o segundo. Solo 'P' si es dia, mes o año.
-                if ($start <= now()) $color = 'yellow';
-                else $color = 'blue';
+                if ($start <= now()) {
+                    if ('C' == $turno->tarde) $color = 'red';
+                    elseif (('m' == $turno->tarde) or ('t' == $turno->tarde)) $color = 'orange';
+                    else $color = 'blue';
+                }
+                else $color = 'yellow';
                 $eventos[] = Calendar::event(
-                    $value->user->name,
+                    $turno->user->name,
                     false,
                     $start,
                     $end,
@@ -590,7 +630,7 @@ class TurnoController extends Controller
                         'hiddenDays' => [0],		// No se muestra el domingo.
                         'fixedWeekCount' => false,	// Numero de semana variable, dependiendo del mes.
                         'weekNumbers' => true,		// Muestra el numero de la semana, con respecto el año.
-                        'defaultDate' => $turno->turno->format('Y-m-d'),	// Fecha del mes a mostrar.
+                        'defaultDate' => $lunes->turno->format('Y-m-d'),	// Fecha del mes a mostrar.
                         'columnHeader' => false,	// esconde los titulos de los dias de la semana.
                         'aspectRatio' => 3,		    // Mientras mas grande menos altura.
                    ]);
@@ -630,7 +670,7 @@ class TurnoController extends Controller
 
     public function update(Request $request, Turno $turno)
     {
-        $fechas = request()->validate([             // $fechas = request()->all();
+        $fechas = $request->validate([             // $fechas = request()->all();
             'u0' => ['required'],
             'f0' => '',
             'u1' => ['required'],
@@ -775,9 +815,9 @@ class TurnoController extends Controller
 
     public static function actualizarAviso()
     {
-        $hoy = Fecha::hoy();
+        $ayer = Fecha::ayer();
         $manana = Fecha::manana();
-        $turnos = Turno::whereBetween('turno', [$hoy, $manana])
+        $turnos = Turno::whereBetween('turno', [$ayer, $manana])
                         ->whereNull('llegada')
     ->whereNotIn('id', [DB::raw("SELECT turno_id FROM avisos WHERE turno_id IS NOT NULL")])
                         ->get();
@@ -787,7 +827,8 @@ class TurnoController extends Controller
                 'turno_id' => $turno->id,
                 'tipo' => 'C',
                 'fecha' => $turno->turno,
-                'descripcion' => 'No se conecto en su turno de la ' . $turno->fec_tur,
+                //'descripcion' => 'No se conecto en su turno de la ' . $turno->fec_tur,
+                'descripcion' => $turno->descripcion,
                 'user_creo' => $turno->user_creo
             ]);
         }

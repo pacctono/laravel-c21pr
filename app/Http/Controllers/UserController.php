@@ -127,7 +127,7 @@ class UserController extends Controller
     public function store()
     {
 //        $data = request()->all();   // all() ---> only(campos requeridos separados por ,)
-        $data = request()->validate([   // Si ocurre error, laravel nos envia al url anterior.
+        $data = $request->validate([   // Si ocurre error, laravel nos envia al url anterior.
             'cedula' => ['sometimes', 'nullable', 'digits_between:6,8'],
             'name' => 'required',
             'ddn' => '',
@@ -199,9 +199,9 @@ class UserController extends Controller
         return view('users.editar', ['user' => $user, 'title' => $title, 'ddns' => $ddns]);
     }
 
-    public function update(User $user)
+    public function update(Request $request, User $user)
     {
-        $data = request()->validate([   // Si ocurre error, laravel nos envia al url anterior.
+        $data = $request->validate([   // Si ocurre error, laravel nos envia al url anterior.
             'cedula' => ['sometimes', 'nullable', 'digits_between:7,8'],
             'name' => 'required',
             'ddn' => '',
@@ -319,23 +319,30 @@ class UserController extends Controller
         $avisos = Aviso::where('user_id', $user->id)->get();
 	//dd($user, $avisos);
         if (0 < count($avisos)) {
-            $inicio = '<table>';
-            //$mensaje = $inicio;
-            $mensaje = '';
-            $final   = '</table>';
+            //$inicio = '<table><tr><th>Descripcion</th><th>Fecha</th></tr>';
+            $mensaje = '<ul>';
+            //$mensaje = '';
+            $final   = '</ul>';
             //$mensaje = '<html><head><title>Avisos</title></head><body><table>';
             //$final   = '</table></body>';
         } else {
             $mensaje = '';
             $final   = '';
         }
+        //$buscar = array('M-', 'T-');
+        //$remplazar = array('Mañana a las ', 'Tarde a las ');
         foreach ($avisos as $aviso) {
-            //$mensaje .= "<tr><td>{$aviso->tipo}</td><td>{$aviso->fec}</td><td>{$aviso->descripcion}</td></tr>";
+            if ('C' == $aviso->tipo)
+                $mensaje .= "<li class='text-danger'>{$aviso->descripcion}</li>";
+            else {
+                //$descripcion = str_replace($buscar, $remplazar, $aviso->descripcion);
+                $mensaje .= "<li class='text-warning'>{$aviso->descripcion}</li>";
+            }
             //$mensaje .= "<tr><td>{$aviso->descripcion}</td></tr>";
-            $mensaje .= "{$aviso->descripcion}\n";
+            //$mensaje .= "{$aviso->descripcion}<br>";
         }
-        //return $mensaje . $final;
-        return $mensaje;
+        return $mensaje . $final;
+        //return $mensaje;
     }
 
     public static function correoCumpleano()

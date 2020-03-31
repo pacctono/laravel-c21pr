@@ -87,7 +87,7 @@ class TipoController extends Controller
      */
     public function store(Request $request)
     {
-        $data = request()->validate([   // Si ocurre error, laravel nos envia al url anterior.
+        $data = $request->validate([   // Si ocurre error, laravel nos envia al url anterior.
             'descripcion' => 'required',
         ], [
             'descripcion.required' => 'El campo descripcion es obligatorio',
@@ -139,7 +139,7 @@ class TipoController extends Controller
      */
     public function update(Request $request, Tipo $tipo)
     {
-        $data = request()->validate([   // Si ocurre error, laravel nos envia al url anterior.
+        $data = $request->validate([   // Si ocurre error, laravel nos envia al url anterior.
             'descripcion' => 'required',
         ], [
             'descripcion.required' => 'El campo descripcion es obligatorio',

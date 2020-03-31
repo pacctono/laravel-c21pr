@@ -77,7 +77,7 @@
                     </label>
                     <input type="date" class="form-control m-0 py-0 px-1"
                             name="fecha_nacimiento" id="fecha_nacimiento"
-                            max="{{ now()->format('Y-m-d') }}"
+                            max="{{ now('America/Caracas')->format('Y-m-d') }}"
                             value="{{ old('fecha_nacimiento') }}">
                 </div>
             </div>
@@ -113,7 +113,7 @@
                     </label>
                     <input type="date" class="form-control m-0 py-0 px-1"
                             name="fecha_ingreso" id="fecha_ingreso" min="2015-06-01"
-                            max="{{ now()->format('Y-m-d') }}"
+                            max="{{ now('America/Caracas')->format('Y-m-d') }}"
                             value="{{ old('fecha_ingreso') }}">
                 </div>
             </div>

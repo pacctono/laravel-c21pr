@@ -18,6 +18,7 @@ class Kernel extends ConsoleKernel
         'App\Console\Commands\CitasManana',
         'App\Console\Commands\TurnosSemanaPasada',
         'App\Console\Commands\ActualizarAvisosTurnoNoConectado',
+        'App\Console\Commands\VencerPropiedad',
     ];
 
     /**
@@ -75,6 +76,12 @@ class Kernel extends ConsoleKernel
                     ->timezone('America/Caracas')   // Definido en la funcion anterior +5.8.
                     ->hourly()
                     ->between('18:30', '23:30')
+                    ;
+
+        $schedule->command('vencer:propiedad')
+                    ->timezone('America/Caracas')   // Definido en la funcion anterior +5.8.
+                    ->hourly()
+                    ->between('19:35', '21:35')
                     ;
     }
 

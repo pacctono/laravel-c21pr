@@ -164,7 +164,7 @@
                     </button>
                 </form>
                     @if ((4 <= $contacto->resultado_id) and (7 >= $contacto->resultado_id) and
-                         (!is_null($contacto->fecha_evento)) and ($contacto->fecha_evento > now()))
+                         (!is_null($contacto->fecha_evento)) and ($contacto->fecha_evento > now('America/Caracas')))
                     <a href="{{ route('agenda.correoCita', $contacto) }}"
                             class="btn btn-link m-0 p-0"
                             title="Enviar correo a '{{ $contacto->user->name }}', sobre cita con este contacto inicial">

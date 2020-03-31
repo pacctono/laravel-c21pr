@@ -106,20 +106,22 @@ class Turno extends Model
         }
     }
 
-    public function getObservacionAttribute()
+    public function getDescripcionAttribute()
     {
+        $fecha = $this->getTurnoDiaSemanaAttribute() . ', ' . $this->getTurnoFechaAttribute();
+    
         switch($this->getTardeAttribute()) {
             case '':
                 $mensaje = 'Puntual en su turno';
                 break;
             case 'C':
-                $mensaje = 'No se conecto';
+                $mensaje = "No se conecto en su turno de la <b>Mañana</b> el <em>{$fecha}</em>";
                 break;
             case 'm':
-                $mensaje = 'Llego tarde a su turno de la mañana';
+                $mensaje = "Llego tarde el <em>{$fecha}</em> en la <b>Mañana</b> a las <em>{$this->llegada}";
                 break;
             case 't':
-                $mensaje = 'Llego tarde a su turno de la tarde';
+                $mensaje = "Llego tarde el <em>{$fecha}</em> en la <b>Tarde</b> a las <em>{$this->llegada}";
                 break;
             default:
                 $mensaje = 'Mensaje inesperado';

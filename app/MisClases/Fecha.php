@@ -21,15 +21,15 @@ class Fecha
     ];
 
     public static function hoy(){
-        return Carbon::today(self::$ZONA);
+        return Carbon::today(self::$ZONA)->startOfDay();
     }
 
     public static function ayer(){
-        return Carbon::yesterday(self::$ZONA);
+        return Carbon::yesterday(self::$ZONA)->startOfDay();
     }
 
     public static function manana(){
-        return Carbon::tomorrow(self::$ZONA);
+        return Carbon::tomorrow(self::$ZONA)->startOfDay();
     }
 
     public static function primerLunesDePrimeraSemana() {

@@ -8,6 +8,16 @@ class FormaPago extends Model
 {
     protected $fillable = ['descripcion'];
 
+    public function propiedadesReserva()    // forma_pago_reserva_id
+    {
+        return $this->hasMany(Propiedad::class, 'forma_pago_reserva_id'); // Si llave foranea, diferente a esperada, usamos 2do parametro.
+    }
+
+    public function propiedadesFirma()    // forma_pago_firma_id
+    {
+        return $this->hasMany(Propiedad::class, 'forma_pago_firma_id'); // Si llave foranea, diferente a esperada, usamos 2do parametro.
+    }
+
     public function propiedadesGerente()    // forma_pago_gerente_id
     {
         return $this->hasMany(Propiedad::class, 'forma_pago_gerente_id'); // Si llave foranea, diferente a esperada, usamos 2do parametro.
@@ -30,7 +40,11 @@ class FormaPago extends Model
 
     public static function propiedadesBorradas($id)
     {
-        $queryGerente = self::find($id)->propiedadesGerente->where('user_borro', '!=', null);
+        $queryReserva = self::find($id)->propiedadesReserva->where('user_borro', '!=', null);
+        $queryFirma = self::find($id)->propiedadesFirma->where('user_borro', '!=', null)
+                                        ->union($queryReserva);
+        $queryGerente = self::find($id)->propiedadesGerente->where('user_borro', '!=', null)
+                                        ->union($queryFirma);
         $queryCaptador = self::find($id)->propiedadesCaptador->where('user_borro', '!=', null)
                                         ->union($queryGerente);
         $queryCerrador = self::find($id)->propiedadesCerrador->where('user_borro', '!=', null)
@@ -39,8 +53,16 @@ class FormaPago extends Model
                                         ->union($queryCerrador);
     }
 
-    public static function propiedadesXFormaPago($fecha_desde, $fecha_hasta)
+    public static function propiedadesXFormaPago($fecha_desde='2019-01-01', $fecha_hasta='2099-12-31')
     {
+        $queryReserva = self::withCount(['propiedadesReserva as atendidos' => function ($query)
+                                        use ($fecha_desde, $fecha_hasta) {  // 'use' permite heredar variables del scope del padre, donde el closure es definido.
+                            $query->whereBetween('created_at', [$fecha_desde, $fecha_hasta]);
+                        }]);
+        $queryFirma = self::withCount(['propiedadesFirma as atendidos' => function ($query)
+                                        use ($fecha_desde, $fecha_hasta) {  // 'use' permite heredar variables del scope del padre, donde el closure es definido.
+                            $query->whereBetween('created_at', [$fecha_desde, $fecha_hasta]);
+                        }]);
         $queryGerente = self::withCount(['propiedadesGerente as atendidos' => function ($query)
                                         use ($fecha_desde, $fecha_hasta) {  // 'use' permite heredar variables del scope del padre, donde el closure es definido.
                             $query->whereBetween('created_at', [$fecha_desde, $fecha_hasta]);
@@ -48,14 +70,29 @@ class FormaPago extends Model
         $queryCaptador = self::withCount(['propiedadesCaptador as atendidos' => function ($query)
                                         use ($fecha_desde, $fecha_hasta) {  // 'use' permite heredar variables del scope del padre, donde el closure es definido.
                             $query->whereBetween('created_at', [$fecha_desde, $fecha_hasta]);
-                        }])->union($queryGerente);
+                        }]);
         $queryCerrador = self::withCount(['propiedadesCerrador as atendidos' => function ($query)
                                         use ($fecha_desde, $fecha_hasta) {  // 'use' permite heredar variables del scope del padre, donde el closure es definido.
                             $query->whereBetween('created_at', [$fecha_desde, $fecha_hasta]);
-                        }])->union($queryCaptador);
-        return self::withCount(['propiedadesOtraOficina as atendidos' => function ($query)
+                        }]);
+        $queryOtraOficina = self::withCount(['propiedadesOtraOficina as atendidos' => function ($query)
                                         use ($fecha_desde, $fecha_hasta) {  // 'use' permite heredar variables del scope del padre, donde el closure es definido.
                             $query->whereBetween('created_at', [$fecha_desde, $fecha_hasta]);
-                        }])->union($queryCerrador);
+                        }]);
+        return $queryReserva->union($queryFirma)->union($queryGerente)->union($queryCaptador)->union($queryCerrador)->union($queryOtraOficina);
+    }
+
+    public function getPropiedadesAttribute()
+    {
+        return $this->propiedades();
+    }
+    public function propiedades()    // forma_pago_reserva_id
+    {
+        return Propiedad::where('forma_pago_reserva_id', $this->id)
+                        ->whereOr('forma_pago_firma_id', $this->id)
+                        ->whereOr('forma_pago_gerente_id', $this->id)
+                        ->whereOr('forma_pago_captador_id', $this->id)
+                        ->whereOr('forma_pago_cerrador_id', $this->id)
+                        ->whereOr('forma_pago_otra_oficina_id', $this->id)->get();
     }
 }

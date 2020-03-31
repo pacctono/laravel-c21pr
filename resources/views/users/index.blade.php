@@ -208,7 +208,7 @@
                             title="Editar los datos personales de {{ $user->name }}">
                         <span class="oi oi-pencil my-0 py-0 mx-1 px-0"></span>
                     </a>
-                    <a href="{{ route('users.updateActivo', $user) }}" id="{{ $user->id }}"
+                    <a href="" id="{{ $user->id }}"
                             class="btn btn-link desAct my-0 py-0 mx-0 px-0"
                     @if ($user->activo)
                             title="Desactivar al asesor {{ $user->name }}">
@@ -293,50 +293,8 @@
 
 @if (!isset($accion) or ('html' == $accion))
 @section('js')
-<script>
-    $(document).ready(function() {
-        $('a.desAct').click(function(ev) {
-            var id = $(this).attr('id');        // Tambien $(ev.target).attr('id')
-            var nombre = document.getElementById('nombre'+id).value;
-            var activo = document.getElementById('activo'+id).value;
-            var accion;
-            if ('A' == activo)
-                accion = confirm('Desea desactivar al asesor ' + nombre);
-            else
-                accion = confirm('Desea activar al asesor ' + nombre);
-            if (!accion) {
-                ev.preventDefault();
-            }
-        });
-        $("a.aviso").click(function(ev) {
-            ev.preventDefault();
-            var user_id = $(this).attr('id').substring(5);        // 'avisoid'
-            // Funciona y devuelve una tabla. Ahora, hay que buscarla donde desplegarla.
-            // el id: 'div'+user_id fue comenatdo arriba, intencionalmente.
-            $.ajax({url: "/avisos/asesor/"+user_id, success: function(resultado) {
-                        //$("#div"+user_id).html(resultado);
-                        alert(resultado);   // Mientras se resuelve donde desplegar la tabla.
-                    }});
-        });
-    });
-function estaSeguro(id) {
-    var nroContactos         = document.getElementById('contactos.'+id).value;
-    var nroContactosBorrados = document.getElementById('contactosBorrados.'+id).value;
 
-    if (0 < nroContactos) {
-        alert('Este asesor ha creado ' + nroContactos +
-                            ' contactos iniciales, por lo tanto, no puede borrar sus datos.');
-        return false;
-    }
-    if (0 < nroContactosBorrados) {
-        return confirm('Este asesor tiene ' + nroContactosBorrados +
-                            " 'Contactos Iniciales borrados', " +
-                            'esta seguro de querer borrar sus datos de la base de datos?');
-    }
-    return confirm('Realmente, desea borrar los datos de este asesor de la base de datos?')
-//  submit();
-}
-</script>
+@includeIf("users.jqmenu", ['vista' => 'index'])
 
 @endsection
 @endif (!isset($accion) or ('html' == $accion))

@@ -17,7 +17,7 @@
 @endif (0 < $alertar)
 @endif (isset($alertar))
 
-@if ((!$movil) and (!isset($accion) or ('html' == $accion)))
+@if ((!$movil) and (!isset($accion) or ('html' == $accion)) and (Auth::user()->is_admin))
 <div class="row no-gutters">
 <div class="col-3 no-gutters">
   <div class="card mt-0 mb-1 py-0 mx-0 py-0">
@@ -106,9 +106,9 @@
   @foreach ($turnos as $turno)
     <tr class="my-0 py-0
     @if ('C' == $turno->tarde)
-        table-warning" title="No se conecto en su turno
+        table-danger" data-toggle="tooltip" data-html="true" title="{{ $turno->descripcion }}
     @elseif (('m' == $turno->tarde) or ('t' == $turno->tarde))
-        table-danger" title="Llego tarde a su turno
+        table-warning" data-toggle="tooltip" data-html="true" title="{{ $turno->descripcion }}
     @elseif (0 == ($loop->iteration % 2))
         table-primary
     @else
@@ -188,92 +188,6 @@
 
 @section('js')
 
-<script>
-@if ($movil)
-function alertaFechaRequerida() {
-  var fecha_desde = document.getElementById('fecha_desde').value;
-  var fecha_hasta = document.getElementById('fecha_hasta').value;
-  var asesor      = document.getElementById('asesor').value;
+@includeIf("turnos.jqmenu", ['vista' => 'index'])
 
-  if ('0' != asesor) {
-    return true;
-  }
-  if ('' == fecha_desde) {
-    alert("Usted tiene que suministrar la fecha 'Desde'");
-    return false;
-  }
-  if ('' == fecha_hasta) {
-    alert("Usted tiene que suministrar la fecha 'Hasta'");
-    return false;
-  }
-  return true;
-}
-@else
-  $(document).ready(function(){
-    $("a.editarTurno").click(function(ev) {
-      ev.preventDefault();
-      var id  = $(this).attr('id');        // Tambien $(ev.target).attr('id')
-      var sel = document.getElementById('sa'+id);
-      var nombre = sel.options[sel.selectedIndex].text;
-      var accion;
-      accion = confirm('Desea cambiar al asesor ' + nombre + ' del turno.');
-      if (accion) {
-        //alert('sa'+id);
-        $('#sa'+id).prop('disabled', false);
-      }
-    })
-    $("select.asesor").change(function(ev) {
-      var idSel = $(this).attr('id');        // Tambien $(ev.target).attr('id')
-      var sel = document.getElementById(idSel); // No es necesario. Pude usar $this.
-      var idAseNvo = sel.value;
-      var arrIds = idSel.split('-');
-      var idAseAct = arrIds[1];
-      var nombre = sel.options[sel.selectedIndex].text;
-// Debe funcionar, tambien.      var nombre = $("#" + idSel + " option:selected").text();
-// Debe funcionar, tambien.      var nombre = $("#" + idSel).find("option:selected").text();
-// Debe funcionar, tambien.      var nombre = $(this).find("option:selected").text();
-      var idTurno = sel.name;     // Tambien podria sel idSel.split('-')[0].substr(2)
-      var accion;
-      //alert(idAseNvo+'|'+idAseAct+'|'+nombre+'|'+idTurno);
-      if (idAseNvo != idAseAct) {
-        accion = confirm('Desea colocar al asesor ' + nombre + ' en ese turno.');
-        if (accion) {
-          //alert('Se procedera a cambiar al asesor de este turno. Ir a:' + location.href);
-          nvoUrl = '/turnos/editar/' + idTurno + '/' + idAseNvo;
-          location.href = nvoUrl;
-        } else {
-          sel.value = idAseAct;
-          $('#'+idSel).prop('disabled', true);  // $('#'+idSel) === $(this)
-        }
-      }
-    })
-  })
-function alertaFechaRequerida() {
-  var periodo    = document.getElementsByName('periodo');
-  var fecha_desde = document.getElementById('fecha_desde').value;
-  var fecha_hasta = document.getElementById('fecha_hasta').value;
-  var asesor      = document.getElementById('asesor').value;
-  var valorPeriodo;
-
-  for (var i=0, len=periodo.length; i<len; i++) {
-    if (periodo[i].checked) {
-      valorPeriodo = periodo[i].value;
-      break;
-    }
-  }
-  if (('intervalo' != valorPeriodo) || ('0' != asesor)) {
-    return true;
-  }
-  if ('' == fecha_desde) {
-    alert("Usted ha seleccionado 'Intervalo' y tiene que suministrar la fecha 'Desde'");
-    return false;
-  }
-  if ('' == fecha_hasta) {
-    alert("Usted ha seleccionado 'Intervalo' y tiene que suministrar la fecha 'Hasta'");
-    return false;
-  }
-  return true;
-}
-@endif
-</script>
 @endsection

@@ -381,6 +381,21 @@ class User extends Authenticatable
         return $this->hasMany(Aviso::class); // Si llave foranea, diferente a esperada, usamos 2do parametro.
     }
 
+    public function avisosNoConectados()    // avisos sin conectarse, en su turno, de este asesor.
+    {
+        return $this->hasMany(Aviso::class)->where('tipo', 'C'); // Si llave foranea, diferente a esperada, usamos 2do parametro.
+    }
+
+    public function avisosTarde()       // avisos con llegada tarde, en su turno, de este asesor.
+    {
+        return $this->hasMany(Aviso::class)->whereIn('tipo', ['M', 'T']); // Si llave foranea, diferente a esperada, usamos 2do parametro.
+    }
+
+    public function avisosCreados()    // user_creo
+    {
+        return $this->hasMany(Aviso::class, 'user_creo'); // Si llave foranea, diferente a esperada, usamos 2do parametro.
+    }
+
     public function avisosBorrados()
     {
         return $this->hasMany(Aviso::class, 'user_borro'); // Si llave foranea, diferente a esperada, usamos 2do parametro.
@@ -389,6 +404,39 @@ class User extends Authenticatable
     public function avisosActualizados()
     {
         return $this->hasMany(Aviso::class, 'user_actualizo'); // Si llave foranea, diferente a esperada, usamos 2do parametro.
+    }
+
+    public static function avisosXAsesor($fecha_desde=null, $fecha_hasta=null)  // # de avisos por asesor.
+    {
+        $fecha_desde = $fecha_desde??date('Y-01-01');
+        $fecha_hasta = $fecha_hasta??date('Y-12-31');
+        return self::where('is_admin', False)->where('activo', true)
+                    ->withCount(['avisos as atendidos' => function ($query)
+                                        use ($fecha_desde, $fecha_hasta) {  // 'use' permite heredar variables del scope del padre, donde el closure es definido.
+                            $query->whereBetween('created_at', [$fecha_desde, $fecha_hasta]);
+                    }]);
+    }
+
+    public static function noConectadosXAsesor($fecha_desde=null, $fecha_hasta=null)  // # de no conexiones por asesor en su turno.
+    {
+        $fecha_desde = $fecha_desde??date('Y-01-01');
+        $fecha_hasta = $fecha_hasta??date('Y-12-31');
+        return self::where('is_admin', False)->where('activo', true)
+                    ->withCount(['avisosNoConectados as atendidos' => function ($query)
+                                        use ($fecha_desde, $fecha_hasta) {  // 'use' permite heredar variables del scope del padre, donde el closure es definido.
+                            $query->whereBetween('created_at', [$fecha_desde, $fecha_hasta]);
+                    }]);
+    }
+
+    public static function tardeXAsesor($fecha_desde=null, $fecha_hasta=null)  // # de llegadas tarde por asesor en su turno.
+    {
+        $fecha_desde = $fecha_desde??date('Y-01-01');
+        $fecha_hasta = $fecha_hasta??date('Y-12-31');
+        return self::where('is_admin', False)->where('activo', true)
+                    ->withCount(['avisosTarde as atendidos' => function ($query)
+                                        use ($fecha_desde, $fecha_hasta) {  // 'use' permite heredar variables del scope del padre, donde el closure es definido.
+                            $query->whereBetween('created_at', [$fecha_desde, $fecha_hasta]);
+                    }]);
     }
 
     public static function cumpleanos($fecha=null, $fecha_hasta=null) {

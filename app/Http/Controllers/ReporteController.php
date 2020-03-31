@@ -61,7 +61,7 @@ class ReporteController extends Controller
                 $fecha_hasta = null;
             }
             //dd('1', $muestra, $fecha, $fecha_desde, $fecha_hasta, $asesor);
-        } elseif ('Conexion' == $muestra) {
+        } elseif (('Conexion' == $muestra) or ('NoConTurno' == $muestra) or ('TardeTurno' == $muestra)) {
             $fecha_desde = (new Carbon(Bitacora::min('created_at', $ZONA)))->startOfDay();
             $fecha_hasta = (new Carbon(Bitacora::max('created_at', $ZONA)))->endOfDay();
         } elseif ('Cumpleanos' == $muestra) {
@@ -90,6 +90,10 @@ class ReporteController extends Controller
 
         if ('Conexion' == $muestra)
             $subTitulo1 = 'Conexiones por ';
+        elseif ('NoConTurno' == $muestra)
+            $subTitulo1 = 'No conectados en su turno por ';
+        elseif ('TardeTurno' == $muestra)
+            $subTitulo1 = 'Llegadas tarde en su turno por ';
         elseif ('Cumpleanos' == $muestra)
             $subTitulo1 = '';
         elseif (('Lados' == $muestra) or
@@ -104,7 +108,9 @@ class ReporteController extends Controller
         if (('Asesor' == $muestra) or
             ('Conexion' == $muestra) or
             ('Comision' == $muestra) or
-            ('Lados' == $muestra))
+            ('Lados' == $muestra) or
+            ('NoConTurno' == $muestra) or
+            ('TardeTurno' == $muestra))
             $subTitulo2 = 'Asesor ';
         elseif ('Fecha' == $muestra) {
             if (0 < $asesor) $subTitulo2 = ' de ' . User::find($asesor)->name . ' ';
@@ -158,6 +164,12 @@ class ReporteController extends Controller
                 break;
             case 'ComMes':
                 $elemsRep = Propiedad::comisionXMes($fecha, $fecha_desde, $fecha_hasta, $asesor);
+                break;
+            case 'NoConTurno':
+                $elemsRep = User::noConectadosXAsesor($fecha_desde, $fecha_hasta);
+                break;
+            case 'TardeTurno':
+                $elemsRep = User::TardeXAsesor($fecha_desde, $fecha_hasta);
                 break;
             default:        // 'Fecha'
                 dd(request()->method(), session('muestra', 'muestra sin asignar'), session('asesor', 'asesor sin asignar'));
@@ -554,7 +566,8 @@ class ReporteController extends Controller
         if (('' == $orden) or is_null($orden)) {
             $orden = 'id';
         }
-	    $tipoId = $tipo . '_id';
+        if ('price' == $tipo) $tipoId = 'precio_id';
+        else $tipoId = $tipo . '_id';
         $contactos = Contacto::where($tipoId, $id)->orderBy($orden)->paginate($this->lineasXPagina);
 
 	    $rutRetorno = 'reporte.contactos' . substr($modelo, 4);
@@ -583,11 +596,19 @@ class ReporteController extends Controller
             $title .= 'con ' . $tipo . ': ' . $modelo::findOrFail($id)->descripcion;
         else $title .= ' del asesor: ' . User::findOrFail($id)->name;
 
-        if ('' == $orden or is_null($orden)) {
-            $orden = 'id';
-        }
-	    $tipoId = $tipo . '_id';
-        $propiedades = Propiedad::where($tipoId, $id)->orderBy($orden);
+        $sentido = 'asc';
+        if ('' == $orden or is_null($orden)) $orden = 'id';
+        if ('id' == $orden) $sentido = 'desc';
+        if (0 === strpos($orden, 'fecha')) $sentido = 'desc';
+
+        $tipoId = $tipo . '_id';
+        if ('user' != $tipo) $propiedades = Propiedad::where($tipoId, $id)->orderBy($orden, $sentido);
+        //else $propiedades = Propiedad::where('asesor_captador_id', $id)->orWhere('asesor_cerrador_id', $id);
+        else $propiedades = Propiedad::where(function ($query) use ($id) {
+                                        $query->where('asesor_captador_id', $id)
+                                            ->orWhere('asesor_cerrador_id', $id);
+                            });
+        $propiedades = $propiedades->orderBy($orden, $sentido);
 
 	    $rutRetorno = 'reporte.propiedades' . substr($modelo, 4);
         $agente = new Agent();
@@ -600,7 +621,7 @@ class ReporteController extends Controller
                 $tCaptadorPrbrSel, $tCerradorPrbrSel, $tLadosCap, $tLadosCer,
                 $tPvrCaptadorPrbrSel, $tPvrCerradorPrbrSel,
                 $tPuntosCaptador, $tPuntosCerrador) =
-                Propiedad::totales($propiedades);
+                Propiedad::totales($propiedades, true, ('user'==$tipo)?$id:0, ('user'==$tipo)?$id:0);
         $propiedades = $propiedades->paginate($this->lineasXPagina);
         //session(['orden' => $orden]);
         return view('reportes.propiedades', compact('title', 'propiedades',

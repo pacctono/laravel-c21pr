@@ -10,7 +10,7 @@ class Price extends Model
 
     public function contactos()    // contacto_id
     {
-        return $this->hasMany(Contacto::class); // Si llave foranea, diferente a esperada, usamos 2do parametro.
+        return $this->hasMany(Contacto::class, 'precio_id'); // Si llave foranea, diferente a esperada, usamos 2do parametro.
     }
 
     public function getDescripcionAttribute()

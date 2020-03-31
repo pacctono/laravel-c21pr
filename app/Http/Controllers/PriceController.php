@@ -46,7 +46,7 @@ class PriceController extends Controller
         $movil  = $agente->isMobile() and true;             // Fuerzo booleana. No funciona al usar el metodo directamente.
 
         if ('' == $orden or is_null($orden)) {
-            $orden = 'id';
+            $orden = 'menor';
         }
         if ($movil or ('html' != $accion)) $arreglo = Price::orderBy($orden)->get();
 	else $arreglo = Price::orderBy($orden)->paginate($this->lineasXPagina);
@@ -73,10 +73,11 @@ class PriceController extends Controller
     {
         $tipo = $this->tipo;
         $elemento = $this->ruta;
+        $singular = substr($tipo, 0, -1);
         $title = 'Crear ' . substr($tipo, 0, -1);
         $url  = '/' . strtolower($tipo);
 
-        return view($this->vistaCrear, compact('title', 'tipo', 'elemento', 'url'));
+        return view($this->vistaCrear, compact('title', 'tipo', 'elemento', 'singular', 'url'));
     }
 
     /**
@@ -87,12 +88,14 @@ class PriceController extends Controller
      */
     public function store(Request $request)
     {
-        $data = request()->validate([   // Si ocurre error, laravel nos envia al url anterior.
-            'menor' => 'required',
-            'mayor' => 'required',
+        $data = $request->validate([   // Si ocurre error, laravel nos envia al url anterior.
+            'menor' => ['required', 'numeric'],
+            'mayor' => ['required', 'numeric'],
         ], [
             'menor.required' => "El campo 'menor' es obligatorio",
+            'menor.numeric' => "El campo 'menor' tiene que ser numerico",
             'mayor.required' => "El campo 'mayor' es obligatorio",
+            'mayor.numeric' => "El campo 'mayor' tiene que ser numerico",
         ]);
 
         Price::create([
@@ -106,10 +109,10 @@ class PriceController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  \App\Price  $precio
+     * @param  \App\Price  $price
      * @return \Illuminate\Http\Response
      */
-    public function show(Price $precio)
+    public function show(Price $price)
     {
         //
     }
@@ -117,18 +120,18 @@ class PriceController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Price  $precio
+     * @param  \App\Price  $price
      * @return \Illuminate\Http\Response
      */
-    public function edit(Price $precio)
+    public function edit(Price $price)
     {
         $tipo = $this->tipo;
         $plural = strtolower($tipo);
         $singular = substr($tipo, 0, -1);
         $title = 'Editar ' . $singular;
         $ruta = $this->ruta;
-        $objModelo = $precio;
-        $rutActualizar = '/' . strtolower($tipo) . '/' . $precio->id;
+        $objModelo = $price;
+        $rutActualizar = '/' . strtolower($tipo) . '/' . $price->id;
 
         return view($this->vistaEditar, compact('objModelo', 'title', 'ruta', 'rutActualizar',
                                         'singular', 'plural'));
@@ -138,12 +141,12 @@ class PriceController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Price  $precio
+     * @param  \App\Price  $price
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Price $precio)
+    public function update(Request $request, Price $price)
     {
-        $data = request()->validate([   // Si ocurre error, laravel nos envia al url anterior.
+        $data = $request->validate([   // Si ocurre error, laravel nos envia al url anterior.
             'menor' => 'required',
             'mayor' => 'required',
         ], [
@@ -151,7 +154,7 @@ class PriceController extends Controller
             'mayor.required' => "El campo 'mayor' es obligatorio",
         ]);
         //dd($data);
-        $precio->update($data);
+        $price->update($data);
 
         return redirect()->route($this->ruta);
     }
@@ -159,23 +162,23 @@ class PriceController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Price  $precio
+     * @param  \App\Price  $price
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Price $precio)
+    public function destroy(Price $price)
     {
-        if (0 < ($precio->contactos->count()-$precio->contactosBorrados($precio->id)->count())) {
+        if (0 < ($price->contactos->count()-$price->contactosBorrados($price->id)->count())) {
             return redirect()->route($this->ruta);  // Existen contactos asignados a este usuario.
         }
-        if (0 < $precio->contactosBorrados($precio->id)->count()) {    // Existen contactos borrados (logico).
-            $contactos = $precio->contactos;         // Todos los contactos con este precio, estan borrados.
+        if (0 < $price->contactosBorrados($price->id)->count()) {    // Existen contactos borrados (logico).
+            $contactos = $price->contactos;         // Todos los contactos con este precio, estan borrados.
             foreach ($contactos as $contacto) {     // Ciclo para borrar fisicamente los contactos.
                 $contacto->delete();
             }
         }
         $usuario = Auth::user()->id;
-        $datos = 'id:'.$precio->id.', descripcion:'.$precio->menor.', '.$precio->mayor;
-        $precio->delete();
+        $datos = 'id:'.$price->id.', descripcion:'.$price->menor.', '.$price->mayor;
+        $price->delete();
 
         Bitacora::create([
             'user_id' => $usuario,

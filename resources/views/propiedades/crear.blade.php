@@ -8,10 +8,10 @@
     @include('include.errorData')
 
     <form method="POST" class="form align-items-end-horizontal" id="formulario"
-        action="{{ url('propiedades') }}" onSubmit="return fnSometerForma()">
+        action="{{ url('propiedades') }}">
         {!! csrf_field() !!}
 
-        <div class="form-row m-0 p-0 bg-suave">
+        <div class="form-row my-1 mx-0 p-0 bg-suave">
             <div class="form-group form-inline m-0 py-0 px-1">
                 <label class="control-label" for="codigo">*C&oacute;digo</label>
                 <input type="text" class="form-control form-control-sm" size="8" maxlength="8"
@@ -26,6 +26,9 @@
                   @if (old('estatus', $cols['estatus']['xdef']) == $opcion)
                     selected
                   @endif
+                  @if (isset($colores))
+                    class="{{ $colores[$opcion] }}"
+                  @endif (isset($colores))
                     >{{$muestra}}</option>
                 @endforeach
                 </select>
@@ -52,26 +55,89 @@
                     {{ old('exclusividad',
                         $cols['exclusividad']['xdef']) ? "checked" : "" }}>
             </div>
+            <div class="form-group form-inline m-0 py-0 px-1">
+                <label class="control-label" for="fecha_inicial">*Fecha inicial</label>
+                <input type="date" class="form-control form-control-sm" name="fecha_inicial"
+                    @if (!Auth::user()->is_admin)   {{-- No es administrador --}}
+                        min="{{ now('America/Caracas')->subWeeks(4)->format('Y-m-d') }}"
+                        max="{{ now('America/Caracas')->addWeeks(4)->format('Y-m-d') }}"
+                    @endif (!Auth::user()->is_admin)   {{-- No es administrador --}}
+                        id="fecha_inicial"
+                        value="{{ old('fecha_inicial', now('America/Caracas')->format('Y-m-d')) }}">
+            </div>
         </div>
 
-        <div class="form-row m-0 p-0">
+        <div class="form-row my-1 mx-0 p-0">
             <div class="form-group form-inline m-0 py-0 px-1">
                 <label class="control-label" for="fecha_reserva">Fecha de reserva</label>
                 <input type="date" class="form-control form-control-sm" name="fecha_reserva"
-                        id="fecha_reserva" min="{{ now()->format('d/m/Y') }}"
-                        max="{{ now()->addWeeks(4)->format('d/m/Y') }}"
-                        value="{{ old('fecha_reserva') }}">
+                    @if (!Auth::user()->is_admin)   {{-- No es administrador --}}
+                        min="{{ now('America/Caracas')->format('Y-m-d') }}"
+                        max="{{ now('America/Caracas')->addWeeks(4)->format('Y-m-d') }}"
+                    @endif (!Auth::user()->is_admin)   {{-- No es administrador --}}
+                        {{--data-toggle="tooltip" title="Fecha de la reserva"--}}
+                        id="fecha_reserva" value="{{ old('fecha_reserva') }}">
             </div>
             <div class="form-group form-inline m-0 py-0 px-1">
-                <label class="control-label" for="fecha_firma">Fecha de la firma</label>
-                <input type="date" class="form-control form-control-sm" name="fecha_firma"
-                    id="fecha_firma" min="{{ now()->addWeeks(-4)->format('d/m/Y') }}"
-                    max="{{ now()->addWeeks(4)->format('d/m/Y') }}"
-                    value="{{ old('fecha_firma') }}">
+                <label class="control-label" for="forma_pago_reserva_id">Forma de pago</label>
+                <select class="form-control form-control-sm" name="forma_pago_reserva_id" id="forma_pago_reserva_id"
+                        data-toggle="tooltip" title="Forma de pago de la reserva">
+                    <option value="">Forma de pago?</option>
+                @foreach ($forma_pagos as $forma_pago)
+                    <option value="{{ $forma_pago->id }}"
+                  @if (old('forma_pago_reserva_id') == $forma_pago->id)
+                    selected
+                  @endif
+                    >{{ $forma_pago->descripcion }}</option>
+                @endforeach
+                </select>
+            </div>
+            <div class="form-group form-inline m-0 py-0 px-1">
+                <label class="control-label" for="factura_reserva">Factura</label>
+                <input type="text" class="form-control form-control-sm"
+                    size="60" maxlength="100" name="factura_reserva" id="factura_reserva"
+                    placeholder="factura de pago de la reserva"
+                    {{--data-toggle="tooltip" title="Factura de pago de la reserva"--}}
+                    value="{{ old('factura_reserva') }}">
             </div>
         </div>
 
-        <div class="form-row m-0 p-0 bg-suave">
+        <div class="form-row my-1 mx-0 p-0 bg-suave">
+            <div class="form-group form-inline m-0 py-0 px-1">
+                <label class="control-label" for="fecha_firma">Fecha de la firma</label>
+                <input type="date" class="form-control form-control-sm" name="fecha_firma"
+                    @if (!Auth::user()->is_admin)   {{-- No es administrador --}}
+                        min="{{ now('America/Caracas')->format('Y-m-d') }}"
+                        max="{{ now('America/Caracas')->addWeeks(4)->format('Y-m-d') }}"
+                    @endif (!Auth::user()->is_admin)   {{-- No es administrador --}}
+                        {{--data-toggle="tooltip" title="Fecha de la firma"--}}
+                        id="fecha_firma" value="{{ old('fecha_firma') }}">
+            </div>
+            <div class="form-group form-inline m-0 py-0 px-1">
+                <label class="control-label" for="forma_pago_firma">Forma de pago</label>
+                <select class="form-control form-control-sm" name="forma_pago_firma_id" id="forma_pago_firma_id"
+                        data-toggle="tooltip" title="Forma de pago de la firma">
+                    <option value="">Forma de pago?</option>
+                @foreach ($forma_pagos as $forma_pago)
+                    <option value="{{ $forma_pago->id }}"
+                  @if (old('forma_pago_firma_id') == $forma_pago->id)
+                    selected
+                  @endif
+                    >{{ $forma_pago->descripcion }}</option>
+                @endforeach
+                </select>
+            </div>
+            <div class="form-group form-inline m-0 py-0 px-1">
+                <label class="control-label" for="factura_firma">Factura</label>
+                <input type="text" class="form-control form-control-sm"
+                    size="60" maxlength="100" name="factura_firma" id="factura_firma"
+                    placeholder="factura de pago a la firma"
+                    {{--data-toggle="tooltip" title="Factura de pago a la firma"--}}
+                    value="{{ old('factura_firma') }}">
+            </div>
+        </div>
+
+        <div class="form-row my-1 mx-0 p-0">
             <div class="form-group form-inline m-0 py-0 px-1">
                 <label class="control-label" for="nombre">*Nombre</label>
                 <input type="text" class="form-control form-control-sm" size="80" maxlength="150"
@@ -81,8 +147,8 @@
             </div>
         </div>
 
-        @if (!Auth::user()->is_admin)
-        <div class="form-row m-0 p-0">
+        @if (!Auth::user()->is_admin)   {{-- Si no es un administrador (un asesor normal) --}}
+        <div class="form-row my-1 mx-0 p-0 bg-suave">
             <div class="form-group form-inline m-0 py-0 px-1">
                 <label class="control-label" for="asesor_captador_id">
                     *Asesor captador</label>
@@ -99,14 +165,14 @@
             <div class="form-group form-inline m-0 py-0 px-1">
                 <label class="control-label" for="asesor_captador">
                     +Nombre asesor captador otra oficina</label>
-                <input type="text" class="form-control form-control-sm" size="60" maxlength="100"
-                    name="asesor_captador" id="asesor_captador"
+                <input type="text" class="form-control form-control-sm nombreAsesor"
+                    size="60" maxlength="100" name="asesor_captador" id="asesor_captador"
                     placeholder="Nombre captador otra oficina"
                     value="{{ old('asesor_captador') }}">
             </div>
         </div>
 
-        <div class="form-row m-0 p-0 bg-suave">
+        <div class="form-row my-1 mx-0 p-0">
             <div class="form-group form-inline m-0 py-0 px-1">
                 <label class="control-label" for="asesor_cerrador_id">
                     *Asesor cerrador</label>
@@ -123,15 +189,15 @@
             <div class="form-group form-inline m-0 py-0 px-1">
                 <label class="control-label" for="asesor_cerrador">
                     +Nombre asesor cerrador otra oficina</label>
-                <input type="text" class="form-control form-control-sm" size="60" maxlength="100"
-                    name="asesor_cerrador" id="asesor_cerrador"
+                <input type="text" class="form-control form-control-sm nombreAsesor"
+                    size="60" maxlength="100" name="asesor_cerrador" id="asesor_cerrador"
                     placeholder="Nombre cerrador otra oficina"
                     value="{{ old('asesor_cerrador') }}">
             </div>
         </div>
         @endif (!Auth::user()->is_admin)
 
-        <div class="form-row m-0 p-0">
+        <div class="form-row my-1 mx-0 p-0 bg-suave">
             <div class="form-group form-inline m-0 py-0 px-1">
                 <label class="control-label" for="precio">*Precio</label>
                 <input class="form-control form-control-sm" size="2" maxlength="2" required
@@ -155,12 +221,12 @@
             <div class="form-group form-inline m-0 py-0 px-1">
                 <label class="control-label" for="iva">*IVA</label>
                 <input type="float" class="form-control form-control-sm" size="5" maxlength="5"
-                    required name="iva" id="iva" min="0.000" max="99.99"
+                    required name="iva" id="iva" min="0.000" max="50.000"
                     value="{{ old('iva', $cols['iva']['xdef']) }}">%
             </div>
             <div class="form-group form-inline m-0 py-0 px-1">
                 <label class="control-label" for="lados">Lados</label>
-                <input type="number" class="form-control form-control-sm" size="1" maxlength="1"
+                <input type="number" class="form-control form-control-sm" size="3"
                     required name="lados" id="lados" min="1" max="2"
                     value="{{ old('lados', $cols['lados']['xdef']) }}">
             </div>
@@ -223,7 +289,7 @@
             <div class="form-group form-inline m-0 py-0 px-1">
                 <label class="control-label" for="anoc">A&ntilde;o de construccion</label>
                 <input type="integer" class="form-control form-control-sm" size="4" maxlength="4"
-                    name="anoc" id="anoc" min="1900" max="{{ now()->format('Y') }}"
+                    name="anoc" id="anoc" min="1900" max="{{ now('America/Caracas')->format('Y') }}"
                     value="{{ old('anoc', $cols['anoc']['xdef']) }}">
             </div>
             <div class="form-group form-inline m-0 py-0 px-1">
@@ -378,7 +444,7 @@
             <div class="form-group form-inline mx-1 px-1 nuevo">
                 <label class="control-label" for="fecha_nacimiento">Fec. nacimiento</label>
                 <input type="date" class="form-control form-control-sm" name="fecha_nacimiento" 
-                        id="fecha_nacimiento" max="{{ now()->format('Y-m-d') }}"
+                        id="fecha_nacimiento" max="{{ now('America/Caracas')->format('Y-m-d') }}"
                         value="{{ old('fecha_nacimiento') }}">
             </div>
         </div>
@@ -496,14 +562,47 @@
             <div class="form-group form-inline m-0 py-0 px-1">
                 <label class="control-label" for="asesor_captador">
                     +Asesor</label>
-                <input type="text" class="form-control form-control-sm" size="40" maxlength="100"
-                    name="asesor_captador" id="asesor_captador"
+                <input type="text" class="form-control form-control-sm nombreAsesor"
+                    size="40" maxlength="100" name="asesor_captador" id="asesor_captador"
                     placeholder="Nombre captador otra oficina"
                     value="{{ old('asesor_captador') }}">
             </div>
         </div>
 
-        <div class="form-row m-0 p-0">
+        <div class="form-row my-1 mx-0 p-0">
+            <div class="form-group form-inline m-0 py-0 px-1">
+                <label class="control-label" for="fecha_captador">Fecha de pago</label>
+                <input type="date" class="form-control form-control-sm" name="fecha_captador"
+                        {{--min="{{ now('America/Caracas')->format('Y-m-d') }}"
+                        max="{{ now('America/Caracas')->addWeeks(4)->format('Y-m-d') }}"--}}
+                        data-toggle="tooltip" title="Fecha de pago al Asesor captador"
+                        id="fecha_captador" value="{{ old('fecha_captador') }}">
+            </div>
+            <div class="form-group form-inline m-0 py-0 px-1">
+                <label class="control-label" for="forma_pago_captador_id">Forma de pago</label>
+                <select class="form-control form-control-sm" name="forma_pago_captador_id" id="forma_pago_captador_id"
+                    data-toggle="tooltip" title="Forma de pago al Asesor captador">
+                    <option value="">Forma de pago?</option>
+                @foreach ($forma_pagos as $forma_pago)
+                    <option value="{{ $forma_pago->id }}"
+                  @if (old('forma_pago_captador_id') == $forma_pago->id)
+                    selected
+                  @endif
+                    >{{ $forma_pago->descripcion }}</option>
+                @endforeach
+                </select>
+            </div>
+            <div class="form-group form-inline m-0 py-0 px-1">
+                <label class="control-label" for="factura_captador">Factura</label>
+                <input type="text" class="form-control form-control-sm"
+                    size="60" maxlength="100" name="factura_captador" id="factura_captador"
+                    placeholder="factura de pago al asesor captador"
+                    {{--data-toggle="tooltip" title="Factura de pago al asesor captador"--}}
+                    value="{{ old('factura_captador') }}">
+            </div>
+        </div>
+
+        <div class="form-row m-0 p-0 bg-suave">
             <div class="form-group form-inline m-0 py-0 px-1">
                 <label class="control-label" for="porc_cerrador_prbr">
                     *Porcentaje cerrador PRBR</label>
@@ -527,10 +626,43 @@
             <div class="form-group form-inline m-0 py-0 px-1">
                 <label class="control-label" for="asesor_cerrador">
                     +Asesor</label>
-                <input type="text" class="form-control form-control-sm" size="40" maxlength="100"
-                    name="asesor_cerrador" id="asesor_cerrador"
+                <input type="text" class="form-control form-control-sm nombreAsesor"
+                    size="40" maxlength="100" name="asesor_cerrador" id="asesor_cerrador"
                     placeholder="Nombre cerrador otra oficina"
                     value="{{ old('asesor_cerrador') }}">
+            </div>
+        </div>
+
+        <div class="form-row my-1 mx-0 p-0">
+            <div class="form-group form-inline m-0 py-0 px-1">
+                <label class="control-label" for="fecha_cerrador">Fecha de pago</label>
+                <input type="date" class="form-control form-control-sm" name="fecha_cerrador"
+                        {{--min="{{ now('America/Caracas')->format('Y-m-d') }}"
+                        max="{{ now('America/Caracas')->addWeeks(4)->format('Y-m-d') }}"--}}
+                        data-toggle="tooltip" title="Fecha de pago al Asesor cerrador"
+                        id="fecha_cerrador" value="{{ old('fecha_cerrador') }}">
+            </div>
+            <div class="form-group form-inline m-0 py-0 px-1">
+                <label class="control-label" for="forma_pago_cerrador_id">Forma de pago</label>
+                <select class="form-control form-control-sm" name="forma_pago_cerrador_id" id="forma_pago_cerrador_id"
+                    data-toggle="tooltip" title="Forma de pago al Asesor cerrador">
+                    <option value="">Forma de pago?</option>
+                @foreach ($forma_pagos as $forma_pago)
+                    <option value="{{ $forma_pago->id }}"
+                  @if (old('forma_pago_cerrador_id') == $forma_pago->id)
+                    selected
+                  @endif
+                    >{{ $forma_pago->descripcion }}</option>
+                @endforeach
+                </select>
+            </div>
+            <div class="form-group form-inline m-0 py-0 px-1">
+                <label class="control-label" for="factura_cerrador">Factura</label>
+                <input type="text" class="form-control form-control-sm"
+                    size="60" maxlength="100" name="factura_cerrador" id="factura_cerrador"
+                    placeholder="factura de pago al asesor cerrador"
+                    {{--data-toggle="tooltip" title="Factura de pago al asesor cerrador"--}}
+                    value="{{ old('factura_cerrador') }}">
             </div>
         </div>
 
@@ -542,16 +674,49 @@
                     name="pago_gerente" id="pago_gerente"
                     placeholder="Como se realizo pago a gerente" value="{{ old('pago_gerente') }}">
             </div>
-            <div class="form-group form-inline m-0 py-0 px-1">
+            {{--<div class="form-group form-inline m-0 py-0 px-1">
                 <label class="control-label" for="factura_gerente">
                     Factura gerente</label>
                 <input type="text" class="form-control form-control-sm" size="40" maxlength="100"
                     name="factura_gerente" id="factura_gerente"
                     placeholder="Factura gerente" value="{{ old('factura_gerente') }}">
+            </div>--}}
+        </div>
+
+        <div class="form-row my-1 mx-0 p-0">
+            <div class="form-group form-inline m-0 py-0 px-1">
+                <label class="control-label" for="fecha_gerente">Fecha de pago</label>
+                <input type="date" class="form-control form-control-sm" name="fecha_gerente"
+                        {{--min="{{ now('America/Caracas')->format('Y-m-d') }}"
+                        max="{{ now('America/Caracas')->addWeeks(4)->format('Y-m-d') }}"--}}
+                        data-toggle="tooltip" title="Fecha de pago al gerente"
+                        id="fecha_gerente" value="{{ old('fecha_gerente') }}">
+            </div>
+            <div class="form-group form-inline m-0 py-0 px-1">
+                <label class="control-label" for="forma_pago_gerente_id">Forma de pago</label>
+                <select class="form-control form-control-sm" name="forma_pago_gerente_id" id="forma_pago_gerente_id"
+                    data-toggle="tooltip" title="Forma de pago al gerente">
+                    <option value="">Forma de pago?</option>
+                @foreach ($forma_pagos as $forma_pago)
+                    <option value="{{ $forma_pago->id }}"
+                  @if (old('forma_pago_gerente_id') == $forma_pago->id)
+                    selected
+                  @endif
+                    >{{ $forma_pago->descripcion }}</option>
+                @endforeach
+                </select>
+            </div>
+            <div class="form-group form-inline m-0 py-0 px-1">
+                <label class="control-label" for="factura_gerente">Factura</label>
+                <input type="text" class="form-control form-control-sm"
+                    size="60" maxlength="100" name="factura_gerente" id="factura_gerente"
+                    placeholder="factura de pago al gerente"
+                    {{--data-toggle="tooltip" title="Factura de pago al gerente"--}}
+                    value="{{ old('factura_gerente') }}">
             </div>
         </div>
 
-        <div class="form-row m-0 p-0">
+        <div class="form-row m-0 p-0 bg-danger">
             <div class="form-group form-inline m-0 py-0 px-1">
                 <label class="control-label" for="pago_asesores">
                     Pago asesores</label>
@@ -564,7 +729,7 @@
             <div class="form-group form-inline m-0 py-0 px-1">
                 <label class="control-label" for="factura_asesores">
                     Factura asesores</label>
-                <input type="text" class="form-control form-control-sm" size="40" maxlength="100"
+                <input type="text" class="form-control form-control-sm" size="100" maxlength="100"
                     name="factura_asesores" id="factura_asesores"
                     placeholder="Factura asesores" value="{{ old('factura_asesores') }}">
             </div>
@@ -578,6 +743,40 @@
                     name="pago_otra_oficina" id="pago_otra_oficina"
                     placeholder="Como se realizo el pago a otra oficina"
                     value="{{ old('pago_otra_oficina') }}">
+            </div>
+        </div>
+
+        <div class="form-row my-1 mx-0 p-0">
+            <div class="form-group form-inline m-0 py-0 px-1">
+                <label class="control-label" for="fecha_otra_oficina">Fecha de pago</label>
+                <input type="date" class="form-control form-control-sm" name="fecha_otra_oficina"
+                        {{--min="{{ now('America/Caracas')->format('Y-m-d') }}"
+                        max="{{ now('America/Caracas')->addWeeks(4)->format('Y-m-d') }}"--}}
+                        data-toggle="tooltip" title="Fecha de pago a la otra oficina"
+                        id="fecha_otra_oficina" value="{{ old('fecha_otra_oficina') }}">
+            </div>
+            <div class="form-group form-inline m-0 py-0 px-1">
+                <label class="control-label" for="forma_pago_otra_oficina_id">Forma de pago</label>
+                <select class="form-control form-control-sm" name="forma_pago_otra_oficina_id"
+                    id="forma_pago_otra_oficina_id"
+                    data-toggle="tooltip" title="Forma de pago a la otra oficina">
+                    <option value="">Forma de pago?</option>
+                @foreach ($forma_pagos as $forma_pago)
+                    <option value="{{ $forma_pago->id }}"
+                  @if (old('forma_pago_otra_oficina_id') == $forma_pago->id)
+                    selected
+                  @endif
+                    >{{ $forma_pago->descripcion }}</option>
+                @endforeach
+                </select>
+            </div>
+            <div class="form-group form-inline m-0 py-0 px-1">
+                <label class="control-label" for="factura_otra_oficina">Factura</label>
+                <input type="text" class="form-control form-control-sm"
+                    size="60" maxlength="100" name="factura_otra_oficina" id="factura_otra_oficina"
+                    placeholder="factura de pago a la otra_oficina"
+                    {{--data-toggle="tooltip" title="Factura del pago a la otra oficina"--}}
+                    value="{{ old('factura_otra_oficina') }}">
             </div>
         </div>
 
@@ -635,7 +834,7 @@
             </div>
         </div>
         </fieldset>
-        @else
+        @else (Auth::user()->is_admin)
             <input type="hidden" name="porc_franquicia" value="{{ $cols['porc_franquicia']['xdef'] }}">
             <input type="hidden" name="reportado_casa_nacional" value="{{ $cols['reportado_casa_nacional']['xdef'] }}">
             <input type="hidden" name="porc_regalia" value="{{ $cols['porc_regalia']['xdef'] }}">
@@ -644,7 +843,7 @@
             <input type="hidden" name="porc_captador_prbr" value="{{ $cols['porc_captador_prbr']['xdef'] }}">
             <input type="hidden" name="porc_cerrador_prbr" value="{{ $cols['porc_cerrador_prbr']['xdef'] }}">
             <input type="hidden" name="porc_bonificacion" value="{{ $cols['porc_bonificacion']['xdef'] }}">
-        @endif
+        @endif (Auth::user()->is_admin)
 
         <div class="form-row m-0 p-0">
             <div class="form-group form-inline m-0 py-0 px-1">
@@ -663,6 +862,6 @@
 
 @section('js')
 
-@includeIf("propiedades.revisar", ['vista' => 'crear'])
+@includeIf("propiedades.revisar")
 
 @endsection

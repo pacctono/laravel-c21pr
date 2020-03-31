@@ -58,7 +58,7 @@ class LoginController extends Controller
         if ($user->is_admin) {  // Los administradores no participan en los turnos.
             return redirect($this->redirectTo);
         }
-        $alertar = 0;
+        $alertar = 0;           // No se sabe si esta llegando puntual o no.
         $hoy = Fecha::hoy();
         $manana = Fecha::manana();
         $turnos = Turno::where('user_id', $user->id)
@@ -76,11 +76,11 @@ class LoginController extends Controller
             $horaTardeTardeDesde  = new Carbon($ahora->format('Y-m-d 13:00'), $ZONA);
             $horaTardeTardeHasta  = new Carbon($ahora->format('Y-m-d 18:00'), $ZONA);   // No se usa.
 // Crea $tarde ('tm': es tarde en la mañana, 'bm': dentro de la hora en la mañana y 'tt').            
-            $tarde = 'bm';
-            if ($horaTardeTardeDesde < $ahora) $tarde = 'tt';
-            elseif ($horaTarde < $ahora) $tarde = 'bt';
+            $tarde = 'bm';                                      // Bien (puntual) en la mañana.
+            if ($horaTardeTardeDesde < $ahora) $tarde = 'tt';   // Tarde en la tarde.
+            elseif ($horaTarde < $ahora) $tarde = 'bt';         // Bien (puntual) en la tarde.
             elseif (($horaTardeMananaDesde < $ahora) and ($horaTardeTardeDesde > $ahora))
-                $tarde = 'tm';
+                $tarde = 'tm';                                  // Tarde en la mañana.
             $llegada = $ahora->format('H:i');
             $data['llegada'] = $llegada;
             //dd($ahora, $horaTardeMananaDesde, $horaTardeTardeDesde, $nroTurnosHoy, $tarde);
@@ -91,7 +91,10 @@ class LoginController extends Controller
                 if ('08' == $horaTurno) {
                     if ('tm' == $tarde) $alertar = -2;   // tm:tarde en la ma#ana
                     elseif ('bm' == $tarde) $alertar = 1;   // Cumplio con su turno.
-                    else $loginTurno = False;   // Se conecto en la tarde. Despues de terminar el turno de la mañana.
+                    else {
+                        $alertar = 0;   // No es necesario, pero, al diablo por si acaso.
+                        $loginTurno = False;   // Se conecto en la tarde. Despues de terminar el turno de la mañana.
+                    }
                 } elseif (('bm' == $tarde) or ('tm' == $tarde)) {   // Turno tarde y se conecta en la mañana.
                     $alertar = 0;       // No es necesario, pero, al diablo por si acaso.
                     $loginTurno = False;
@@ -117,14 +120,14 @@ class LoginController extends Controller
                 } else $loginTurno = False;*/
             }
             if ($loginTurno) $turno->update($data);
-            if (0 < $alertar) {
+            if (0 > $alertar) {
                 $fecha = Fecha::$diaSemana[$turno->turno->dayOfWeek] . ', ' . $turno->turno_fecha;
                 Aviso::create([
                     'user_id' => $user->id,
                     'turno_id' => $turno->id,
                     'tipo' => 'T',
                     'fecha' => $ahora,
-                    'descripcion' => 'Llego tarde el ' . $fecha . ' en la ' . $turno->fec_tur,
+                    'descripcion' => $turno->descripcion,
                     'user_creo' => $user->id
                 ]);
             }

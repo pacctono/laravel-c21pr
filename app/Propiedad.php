@@ -15,23 +15,26 @@ class Propiedad extends Model
     use SoftDeletes;
 
     protected $fillable = [
-        'codigo', 'fecha_reserva', 'fecha_firma', 'negociacion', 'nombre',
-        'exclusividad', 'tipo_id', 'metraje', 'habitaciones', 'banos',
+        'codigo', 'fecha_reserva', 'forma_pago_reserva_id', 'factura_reserva',
+        'fecha_firma', 'forma_pago_firma_id', 'factura_firma', 'negociacion', 'nombre',
+        'exclusividad', 'fecha_inicial', 'tipo_id', 'metraje', 'habitaciones', 'banos',
         'niveles', 'puestos', 'anoc', 'caracteristica_id', 'descripcion',
         'direccion', 'ciudad_id', 'codigo_postal', 'municipio_id', 'estado_id',
         'cliente_id', 'estatus', 'user_id', 'moneda', 'precio', 'comision',
-        'iva', 'lados', 'porc_franquicia', 'porc_comision',
-        'reportado_casa_nacional', 'porc_regalia', 'porc_captador_prbr',
-        'captador_prbr', 'porc_gerente', 'porc_cerrador_pbr', 'cerrador_pbr',
-        'porc_bonificacion', 'comision_bancaria', 'numero_recibo',
-        'asesor_captador_id', 'asesor_captador', 'asesor_cerrador_id',
-        'asesor_cerrador', 'pago_gerente', 'factura_gerente', 'pago_asesores',
-        'factura_asesores', 'pagado_casa_nacional', 'estatus_sistema_c21',
-        'reporte_casa_nacional', 'comentarios', 'factura_AyS',
+        'iva', 'lados', 'porc_franquicia', 'reportado_casa_nacional', 'porc_regalia',
+        'porc_compartido', 'porc_captador_prbr', 'porc_gerente', 'porc_cerrador_pbr',
+        'porc_bonificacion', 'comision_bancaria', 'numero_recibo', 'asesor_captador_id',
+        'asesor_captador', 'asesor_cerrador_id', 'asesor_cerrador', 'pago_gerente',
+        'forma_pago_gerente_id', 'fecha_pago_gerente', 'factura_gerente', 'pago_asesores',
+        'forma_pago_captador_id', 'fecha_pago_captador', 'factura_captador',
+        'forma_pago_cerrador_id', 'fecha_pago_cerrador', 'factura_cerrador',
+        'factura_asesores', 'pago_otra_oficina', 'forma_pago_otra_oficina_id',
+        'fecha_pago_otra_oficina', 'factura_otra_oficina', 'pagado_casa_nacional',
+        'estatus_sistema_c21', 'reporte_casa_nacional', 'comentarios', 'factura_AyS',
         'user_actualizo', 'user_borro'
     ];
     protected $dates = [        // Mutan a una instancia de Carbon.
-        'fecha_reserva', 'fecha_firma',
+        'fecha_reserva', 'fecha_firma', 'fecha_inicial',
         'deleted_at', 'created_at', 'updated_at'
     ];
     protected $casts = [
@@ -54,33 +57,26 @@ class Propiedad extends Model
         'captador', 'cerrador'
     ];
     protected $appends = [
-        'fecRes', 'fecFir',
-        'negoc', 'exclu', 'habits', 'descr', 'direc',
-        'codPos', 'pcFrq', 'pcReCaNa',
-        'pcRega', 'pcCom', 'pcCap',
-        'pcGer', 'pcCer', 'pcBonif',
-        'comBanc', 'nroRec',
-        'asCapId', 'asCap', 'asCerId',
-        'asCer', 'pagGer', 'factGer', 'pagAses',
-        'factAse', 'pagOtOf', 'PagCaNa',
-        'estaC21', 'repCaNa', 'comens', 'factAyS',
-        'resSIva', 'resCIva', 'comCIva', 'comSIva',
-        'frqSIva', 'frqCIva', 'frqPaRe',
-        'regalia', 'sanaf5pc',
-        'ofBrRe', 'baHoSoc', 'baPaHon', 'bonific',
-        'capPrbr', 'cerPrbr', 'gerente', 'ingNeOf',
-        'pvrCap', 'pvrCer', 'prVeRe',
-        'ptsCap', 'ptsCer', 'puntos',
-/*        'reserva_sin_iva', 'reserva_con_iva',
-        'compartido_con_iva', 'compartido_sin_iva',
-        'franquicia_reservado_sin_iva', 'franquicia_reservado_con_iva',
-        'franquicia_pagar_reportada', 'regalia', 'sanaf5_por_ciento',
-        'oficina_bruto_real',
-        'base_honorarios_socios', 'base_para_honorarios',
-        'bonificaciones', 'captador_prbr', 'cerrador_prbr',
-        'gerente', 'ingreso_neto_oficina',
-        'pvr_captador_prbr', 'pvr_cerrador_prbr', 'precio_venta_real',
-        'puntos_captador', 'puntos_cerrador', 'puntos',*/
+        'fecRes', 'fecFir', 'fecIni',                   // Fechas reserva, firma e incial.
+        'negoc', 'exclu', 'habits', 'descr', 'direc',   // negociacion, exclusividad, habitaciones, descripcion y direccion.
+        'codPos', 'pcFrq', 'pcReCaNa',                  // codigo postal, porcentajes franquicia y reportado casa nacional.
+        'pcRega', 'pcCom', 'pcCap',                     // porcentajes regalia, comisio y captador.
+        'pcGer', 'pcCer', 'pcBonif',                    // porcentajes gerente, cerrador y bonificacion.
+        'comBanc', 'nroRec',                            // comision banco y numero de recibo.
+        'asCapId', 'asCap', 'asCerId',                  // asesor captador id, asesor captador y asesor cerrador id.
+        'asCer', 'pagGer', 'factGer', 'pagAses',        // asesor cerrador, pago gerente (a eliminar), factura gerente, pago asesores (a eliminar)
+        'factAse', 'pagOtOf', 'PagCaNa',                // factura asesores (a eliminar), pago otra oficina (a eliminar), Pago casa nacional.
+        'estaC21', 'repCaNa', 'comens', 'factAyS',      // estatus C21, reportado casa nacional, comentarios, factura A&S.
+        'resSIva', 'resCIva', 'comCIva', 'comSIva',     // reserva sin IVA, reserva con IVA, compartido con IVA, compartido sin IVA.
+        'frqSIva', 'frqCIva', 'frqPaRe',                // franquicia sin IVA, franquicia con IVA, franquicia pagado reportado.
+        'regalia', 'sanaf5pc',                          // regalia, sanaf 5 por ciento.
+        'ofBrRe', 'baHoSoc', 'baPaHon', 'bonific',      // Oficina bruto real, base honorario socios, base pagar honorarios, bodificacion.
+        'capPrbr', 'cerPrbr', 'gerente', 'ingNeOf',     // monto captador, cerrador, gerente, ingreso neto oficina.
+        'pvrCap', 'pvrCer', 'prVeRe',                   // precios de venta real captador, cerrador y precio de venta real de la propiedad.
+        'ptsCap', 'ptsCer', 'puntos',                   // puntos captador, cerrador y de la oficina.
+        'fecGer', 'fpGer', 'fecCap', 'fpCap',           // Factura pago gerente, forma de pago gerente, fecha pago y forma de pago captador.
+        'factCap', 'fecCer', 'fpCer', 'factCer',        // Factura pago cerrador, fecha, forma y factura pago cerrador.
+        'fecOtr', 'fpOtr', 'factOtr',                   // Fecha, forma y factura pago otra oficina.
         'borrado', 'creado', 'actualizado',
     ];
 
@@ -93,6 +89,15 @@ class Propiedad extends Model
     public $monedaB = true;
     public $espDosP = true;
     public $dosPunB = true;
+    public const COLORES = [
+                            'A' => 'success',
+                            'I' => 'warning',
+                            'P' => 'primary',
+                            'C' => 'info',
+                            'S' => 'danger',
+                            'W' => 'light',
+                            'V' => 'info'
+                        ]; 
 
     public function user()    // user_id
     {
@@ -142,6 +147,36 @@ class Propiedad extends Model
     public function estado()    // estado_id
     {
         return $this->belongsTo(Estado::class); // Si llave foranea, diferente a esperada, usamos 2do parametro.
+    }
+
+    public function forma_pago_reserva()    // forma_pago_reserva_id
+    {
+        return $this->belongsTo(FormaPago::class, 'forma_pago_reserva_id')->withDefault(['descripcion' => '']);
+    }
+
+    public function forma_pago_firma()    // forma_pago_firma_id
+    {
+        return $this->belongsTo(FormaPago::class, 'forma_pago_firma_id')->withDefault(['descripcion' => '']);
+    }
+
+    public function forma_pago_gerente()    // forma_pago_gerente_id
+    {
+        return $this->belongsTo(FormaPago::class, 'forma_pago_gerente_id')->withDefault(['descripcion' => '']);
+    }
+
+    public function forma_pago_captador()    // forma_pago_captador_id
+    {
+        return $this->belongsTo(FormaPago::class, 'forma_pago_captador_id')->withDefault(['descripcion' => '']);
+    }
+
+    public function forma_pago_cerrador()    // forma_pago_cerrador_id
+    {
+        return $this->belongsTo(FormaPago::class, 'forma_pago_cerrador_id')->withDefault(['descripcion' => '']);
+    }
+
+    public function forma_pago_otra_oficina()    // forma_pago_otra_oficina_id
+    {
+        return $this->belongsTo(FormaPago::class, 'forma_pago_otra_oficina_id')->withDefault(['descripcion' => '']);
     }
 
     public function cliente()    // cliente_id
@@ -275,6 +310,86 @@ class Propiedad extends Model
         return $this->fecha_firma->timezone(Fecha::$ZONA)->format('d/m/Y h:i a');
     }
 
+    public function getFechaInicialBdAttribute() {
+        return General::fechaBd($this->fecha_inicial);
+    }
+
+    public function getFecIniAttribute() {
+        return General::fechaEn($this->fecha_inicial);
+    }
+
+    public function getInicialDiaSemanaAttribute() {
+        return General::fechaDiaSemana($this->fecha_inicial);
+    }
+
+    public function getInicialConHoraAttribute() {
+        return General::fechaConHora($this->fecha_inicial);
+    }
+
+    public function getFechaPagoGerenteBdAttribute() {
+        return General::fechaBd($this->fecha_pago_gerente);
+    }
+
+    public function getFecGerAttribute() {
+        return General::fechaEn($this->fecha_pago_gerente);
+    }
+
+    public function getPagoGerenteDiaSemanaAttribute() {
+        return General::fechaDiaSemana($this->fecha_pago_gerente);
+    }
+
+    public function getPagoGerenteConHoraAttribute() {
+        return General::fechaConHora($this->fecha_pago_gerente);
+    }
+
+    public function getFechaPagoCaptadorBdAttribute() {
+        return General::fechaBd($this->fecha_pago_captador);
+    }
+
+    public function getFecCapAttribute() {
+        return General::fechaEn($this->fecha_pago_captador);
+    }
+
+    public function getPagoCaptadorDiaSemanaAttribute() {
+        return General::fechaDiaSemana($this->fecha_pago_captador);
+    }
+
+    public function getPagoCaptadorConHoraAttribute() {
+        return General::fechaConHora($this->fecha_pago_captador);
+    }
+
+    public function getFechaPagoCerradorBdAttribute() {
+        return General::fechaBd($this->fecha_pago_cerrador);
+    }
+
+    public function getFecCerAttribute() {
+        return General::fechaEn($this->fecha_pago_cerrador);
+    }
+
+    public function getPagoCerradorDiaSemanaAttribute() {
+        return General::fechaDiaSemana($this->fecha_pago_cerrador);
+    }
+
+    public function getPagoCerradorConHoraAttribute() {
+        return General::fechaConHora($this->fecha_pago_cerrador);
+    }
+
+    public function getFechaPagoOtraOficinaBdAttribute() {
+        return General::fechaBd($this->fecha_pago_otra_oficina);
+    }
+
+    public function getFecOtrAttribute() {
+        return General::fechaEn($this->fecha_pago_otra_oficina);
+    }
+
+    public function getPagoOtraOficinaDiaSemanaAttribute() {
+        return General::fechaDiaSemana($this->fecha_pago_otra_oficina);
+    }
+
+    public function getPagoOtraOficinaConHoraAttribute() {
+        return General::fechaConHora($this->fecha_pago_otra_oficina);
+    }
+
     public function getNegociacionAlfaAttribute()
     {
         if ('V' == $this->negociacion) return 'Venta';
@@ -284,12 +399,24 @@ class Propiedad extends Model
 
     public function getEstatusAlfaAttribute()
     {
-        if ('A' == $this->estatus) return 'Activo';
-        elseif ('I' == $this->estatus) return 'Inmueble pendiente';
-	    elseif ('P' == $this->estatus) return 'Pagos pendientes';
-	    elseif ('C' == $this->estatus) return 'Inmueble cerrado y pagos realizados';
-	    elseif ('S' == $this->estatus) return 'Negociacion caida';
-	    else return 'Nulo';
+        $cols = General::columnas('propiedads');
+        $arrEstatus = $cols['estatus']['opcion'];
+        if (isset($cols['estatus']['opcion'][$this->estatus]))
+            return $cols['estatus']['opcion'][$this->estatus];
+        else return 'Nulo';
+    }
+
+    public function colorEstatus($estatus, $antes='table', $borrado=False)
+    {
+        if ($borrado) return 'bg-danger';
+        elseif (array_key_exists($estatus, self::COLORES))
+            return $antes . '-' . self::COLORES[$estatus];
+        else return 'bg-suave';                         // No deberia suceder
+    }
+
+    public function getEstatusColorAttribute()
+    {
+        return $this->colorEstatus($this->estatus, 'bg', ($this->user_borro || $this->deleted_at));
     }
 
     public static function numeroVen($valor, $dec=2)
@@ -995,6 +1122,13 @@ class Propiedad extends Model
         if (null == $this->deleted_at) return '';
         return $this->deleted_at->timezone(Fecha::$ZONA)->format('d/m/Y h:i a');
     }
+
+    public static function vencerPropiedad()
+    {
+        Propiedad::where('fecha_inicial', '<', (new Carbon(now()))->subDays(90))
+                ->where('estatus', 'A')
+                ->update(['estatus' => 'W']);
+    }
 // Las proximas funciones seran utilizadas para la conversion en json y toArray.
     public function getNegocAttribute() {
         return $this->negociacion;
@@ -1145,5 +1279,26 @@ class Propiedad extends Model
     }
     public function getPtsCerAttribute() {
         return $this->getPuntosCerradorAttribute();
+    }
+    public function getFpGerAttribute() {
+        return $this->forma_pago_gerente_id;
+    }
+    public function getFpCapAttribute() {
+        return $this->forma_pago_captador_id;
+    }
+    public function getFactCapAttribute() {
+        return $this->factura_captador;
+    }
+    public function getFpCerAttribute() {
+        return $this->forma_pago_cerrador_id;
+    }
+    public function getFactCerAttribute() {
+        return $this->factura_cerrador;
+    }
+    public function getFpOtrAttribute() {
+        return $this->forma_pago_otra_oficina_id;
+    }
+    public function getFactOtrAttribute() {
+        return $this->factura_otra_oficina;
     }
 }

@@ -75,6 +75,8 @@
       @if (('Conexion' == $muestra) ||
            ('Cumpleanos' == $muestra) ||
            ('Lados' == $muestra) ||
+           ('NoConTurno' == $muestra) ||
+           ('TardeTurno' == $muestra) ||
            ('Comision' == $muestra))
         Asesor
       @elseif (('Negociaciones' == $muestra) ||
@@ -99,6 +101,10 @@
         Lados
       @elseif ('ComMes' == $muestra)
         Comision
+      @elseif ('NoConTurno' == $muestra)
+        Sin conectarse
+      @elseif ('TardeTurno' == $muestra)
+        Tarde
       @else
         Atendidos
       @endif

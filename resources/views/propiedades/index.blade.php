@@ -14,14 +14,6 @@
     </div>
 @endif (isset($accion) and ('html' != $accion))
 
-@if (isset($alertar))
-@if (0 < $alertar)
-    <script>alert("Le fue enviado el correo con el 'Reporte de Cierre' de la propiedad.");</script>
-@elseif (0 > $alertar)
-    <script>alert("No fue enviado el correo con el 'Reporte de Cierre' de la propiedad. Probablemente, problemas con Internet! Revise su conexión");</script>
-@endif (0 < $alertar)
-@endif (isset($alertar))
-
 @includeWhen((!$movil and (!isset($accion) or ('html' == $accion))), 'propiedades.vmenu', ['nCol' => 2])
 
     @if ($propiedades->isNotEmpty())
@@ -44,7 +36,7 @@
             class="m-0 p-0"
         @endif ((isset($accion) and ('html' != $accion)))
         >
-            <th class="m-0 p-0" scope="col">
+            <th class="m-0 p-0" scope="col" style="width:7%;">
             @if (!isset($accion) or ('html' == $accion))
                 <a href="{{ route('propiedades.orden', 'codigo') }}"
                         class="btn btn-link m-0 p-0" style="font-size:0.75rem">
@@ -55,7 +47,7 @@
             @endif (!isset($accion) or ('html' == $accion))
             </th>
         @if (!$movil)
-            <th class="m-0 p-0" scope="col" title="Fecha de reserva">
+            <th class="m-0 p-0" scope="col" data-toggle="tooltip" title="Fecha de reserva">
             @if (!isset($accion) or ('html' == $accion))
                 <a href="{{ route('propiedades.orden', 'fecha_reserva') }}"
                         class="btn btn-link m-0 p-0" style="font-size:0.75rem">
@@ -68,7 +60,7 @@
                 <br>
         @else ((Auth::user()->is_admin) and (!isset($accion) or ('html' == $accion)))--}}
             </th>
-            <th class="m-0 p-0" scope="col" title="Fecha de la firma">
+            <th class="m-0 p-0" scope="col" data-toggle="tooltip" title="Fecha de la firma">
         {{--@endif ((Auth::user()->is_admin) and (!isset($accion) or ('html' == $accion)))--}}
             @if (!isset($accion) or ('html' == $accion))
                 <a href="{{ route('propiedades.orden', 'fecha_firma') }}"
@@ -79,7 +71,7 @@
                 Firma
             @endif (!isset($accion) or ('html' == $accion))
             </th>
-            <th class="m-0 p-0" scope="col" title="Tipo de negociaci&oacute;n">
+            <th class="m-0 p-0" scope="col" data-toggle="tooltip" title="Tipo de negociaci&oacute;n">
             @if (!isset($accion) or ('html' == $accion))
                 <a href="{{ route('propiedades.orden', 'negociacion') }}"
                         class="btn btn-link m-0 p-0" style="font-size:0.75rem">
@@ -110,7 +102,7 @@
                 Precio
             @endif (!isset($accion) or ('html' == $accion))
             </th>
-            <th class="m-0 p-0" scope="col" title="Lados">
+            <th class="m-0 p-0" scope="col" data-toggle="tooltip" title="Lados">
             @if (!isset($accion) or ('html' == $accion))
                 <a href="{{ route('propiedades.orden', 'lados') }}"
                         class="btn btn-link m-0 p-0" style="font-size:0.75rem">
@@ -122,28 +114,34 @@
             </th>
         @if ((!$movil) and (!isset($accion) or ('html' == $accion)))
         @if (Auth::user()->is_admin)
-            <th class="m-0 p-0" scope="col" title="Franquicia">
+            <th class="m-0 p-0" scope="col" data-toggle="tooltip" title="Franquicia">
                 Franquic
             </th>
             <th class="m-0 p-0" scope="col">
                 {{--Regalia<br>--}}
                 SANAF-5%
             </th>
-            <th class="m-0 p-0" scope="col">
+            <th class="m-0 p-0" scope="col" data-toggle="tooltip" title="Neto de la oficina">
                 {{--Montos<br>
                 Base--}}
                 Neto Of
             </th>
             {{--<th class="m-0 p-0" scope="col" title="Pago asesor captador, gerente y cerrador.">
-                Comis
+                Comisi&oacute;n
             </th>--}}
         @else (Auth::user()->is_admin)
-            <th class="m-0 p-0" scope="col" title="Porcentaje de comision cobrado al inmueble">%Com</th>
-            {{--<th class="m-0 p-0" scope="col" title="Porcentaje de IVA cobrado al inmueble">%IVA</th> Cuatro columnas eliminadas a solicitud de Alirio.
-            <th class="m-0 p-0" scope="col" title="Precio de venta real">PrVeRe</th>
-            <th class="m-0 p-0" scope="col" title="Pago asesor captador y/o cerrador, y bonificaciones.">Comisi&oacute;n</th>
-            <th class="m-0 p-0" scope="col" title="Puntos por esta propiedad">Puntos</th>--}}
+            <th class="m-0 p-0" scope="col" data-toggle="tooltip" title="Porcentaje de comision cobrado al inmueble">%Com</th>
         @endif (Auth::user()->is_admin)
+        @if (isset($estatus) and ('V' == $estatus))
+        @if (!Auth::user()->is_admin)   {{-- No es administrador. --}}
+            <th class="m-0 p-0" scope="col" title="Porcentaje de IVA cobrado al inmueble">%IVA</th>
+            {{--<th class="m-0 p-0" scope="col" title="Precio de venta real">PrVeRe</th>--}}
+        @endif (!Auth::user()->is_admin)   {{-- No es administrador. --}}
+            <th class="m-0 p-0" scope="col" title="Pago asesor captador y/o cerrador, y bonificaciones.">Comisi&oacute;n</th>
+        @if (!Auth::user()->socio)  {{-- El usuario, ahora, es cualquiera; pero, no socio. --}}
+            <th class="m-0 p-0" scope="col" title="Puntos por esta propiedad">Puntos</th>
+        @endif (!Auth::user()->socio)  {{-- El usuario, ahora, es cualquiera; pero, no socio. --}}
+        @endif (isset($estatus) and ('V' == $estatus))
             <th class="m-0 p-0" scope="col">Acciones</th>
         @endif ((!$movil) and (!isset($accion) or ('html' == $accion)))
         </tr>
@@ -151,26 +149,12 @@
         <tbody>
 
         @foreach ($propiedades as $propiedad)
-        <tr class="
-        @if ('A' == $propiedad->estatus)
-            table-success
-        @elseif ('I' == $propiedad->estatus)
-            table-active
-        @elseif ('P' == $propiedad->estatus)
-            table-warning
-        @elseif (('S' == $propiedad->estatus) || ($propiedad->user_borro || $propiedad->deleted_at))
-            table-danger
-        @elseif (0 == ($loop->index % 2))
-            table-primary
-        @else
-            table-info
-        @endif
-        m-0 p-0">
+        <tr class="{{ $propiedad->colorEstatus($propiedad->estatus) }} m-0 p-0">
         @if ($movil)
             <td class="m-0 p-0">
             @if (!isset($accion) or ('html' == $accion))
                 <a href="{{ route('propiedades.show', $propiedad) }}" class="btn btn-link m-0 p-0">
-                    <span class="float-right m-0 p-0">{{ $propiedad->codigo }}</span>
+                    <span class="text-right m-0 p-0">{{ $propiedad->codigo }}</span>
                 </a>
             @else (!isset($accion) or ('html' == $accion))
                 {{ $propiedad->codigo }}
@@ -179,15 +163,19 @@
             <td class="m-0 p-0">
         @else ($movil)
         @if (!isset($accion) or ('html' == $accion))
-            <td class="m-0 p-0" title="{{ $propiedad->id }}) {{ (($propiedad->user_borro || $propiedad->deleted_at)?'Borrado':$propiedad->estatus_alfa) }}
-Reporte en casa nacional: {{ $propiedad->reporte_casa_nacional_ven }}
-Estatus en sistema C21: {{ $propiedad->estatus_c21_alfa.(($propiedad->pagado_casa_nacional)?' y PAGADO A CASA NACIONAL':'') }}
-{{ (($propiedad->factura_AyS)?'Factura A & S: '.$propiedad->factura_AyS.'.':'') }}">
+            <td class="text-right m-0 p-0 codigo" data-toggle="tooltip" data-html="true"
+                    title="<u>{{ $propiedad->id }}</u>) <b>{{ (($propiedad->user_borro || $propiedad->deleted_at)?'Borrado':$propiedad->estatus_alfa) }}</b>
         @if (Auth::user()->is_admin)
-                <input type="text" class="form-control form-control-sm m-0 p-0" disabled minlength="6"
-                        name="codigo" id="codigo" value="{{ old('codigo', $propiedad->codigo) }}">
+<br>Reporte en casa nacional: <b>{{ $propiedad->reporte_casa_nacional_ven }}</b>
+<br>Estatus en sistema C21: <b>{{ $propiedad->estatus_c21_alfa.(($propiedad->pagado_casa_nacional)?' y PAGADO A CASA NACIONAL':'') }}</b>
+<em>{{ (($propiedad->factura_AyS)?'Factura A & S: '.$propiedad->factura_AyS.'.':'') }}</em>">
+                <input type="text" class="form-control form-control-sm m-0 p-0 codigo"
+                        disabled minlength="6" tabindex="-1" name="codigo"
+                        id="{{ $propiedad->id }}-codigo"
+                        value="{{ old('entcodigo', $propiedad->codigo) }}">
         @else (Auth::user()->is_admin)
-                <span class="float-right m-0 p-0">{{ $propiedad->codigo }}</span>
+            ">
+                <span class="text-right m-0 p-0">{{ $propiedad->codigo }}</span>
         @endif (Auth::user()->is_admin)
         @else (!isset($accion) or ('html' == $accion))
             <td>
@@ -195,49 +183,51 @@ Estatus en sistema C21: {{ $propiedad->estatus_c21_alfa.(($propiedad->pagado_cas
         @endif (!isset($accion) or ('html' == $accion))
             </td>
 
-            <td class="m-0 py-0 px-1">
-                <span class="float-right m-0 p-0" title="Fecha de reserva">
+            <td class="text-right m-0 py-0 px-1">
+                <span class="text-right m-0 p-0" id="{{ $propiedad->id }}-fecres">
                     {{ $propiedad->fec_res }}</span>
-        {{--@if ((Auth::user()->is_admin) and (!isset($accion) or ('html' == $accion)))
-                <br>
-        @else (Auth::user()->is_admin)--}}
             </td>
-            <td class="m-0 py-0 px-1">
-        {{--@endif ((Auth::user()->is_admin) and (!isset($accion) or ('html' == $accion)))--}}
-                <span class="float-right m-0 p-0" title="Fecha de la firma">
+            <td class="text-right m-0 py-0 px-1">
+                <span class="text-right m-0 p-0" id="{{ $propiedad->id }}-fecfir">
                     {{ $propiedad->fec_fir }}</span>
             </td>
 
-            <td class="m-0 p-0" title="{{ $propiedad->negociacion_alfa }}">
-                <span class="m-0 p-0">{{ $propiedad->negociacion }}</span></td>
+            <td class="text-center m-0 p-0">
+                <span class="m-0 p-0" id="{{ $propiedad->id }}-nego">
+                    {{ $propiedad->negociacion }}
+                </span>
+            </td>
 
+            <td text-left class="m-0 p-0 nombre"
         @if ((Auth::user()->is_admin) and (!isset($accion) or ('html' == $accion)))
-            <td class="m-0 p-0" title="{{ $propiedad->comentarios }}">
-        @else (Auth::user()->is_admin)
-            <td class="m-0 p-0">
+                    id="nombre-{{ $propiedad->id }}"
+                    {{--data-toggle="tooltip" title="{{ $propiedad->comentarios }}"--}}
         @endif ((Auth::user()->is_admin) and (!isset($accion) or ('html' == $accion)))
+            >
         @endif ($movil)
-            {{ $propiedad->nombre }}</td>
+            {{ $propiedad->nombre }}
+            </td>
 
-        <?php $propiedad->asesor = Auth::user()->id;  // Usuario conectado. ?>
+        <?php $propiedad->asesor = Auth::user()->id;  // Usuario conectado. No se para que es esto, pero lo agregua hace mucho tiempo. ?>
         <?php $propiedad->mMoZero = false;  // Si el monto es 0, mostrar 'espacio vacio'. ?>
         <?php $propiedad->espMonB = false;  // Eliminar espacio entre simbolo de la moneda y el monto. ?>
 
         @if ($movil)
-            <td class="m-0 p-0">
+            <td class="text-right m-0 p-0"><!-- columna de precio -->
         @else ($movil)
         @if ((Auth::user()->is_admin) and (!isset($accion) or ('html' == $accion)))
-            <td class="m-0 p-0" title="Comisi&oacute;n: {{ $propiedad->comision_p }}
- Reserva s/IVA(I):{{ $propiedad->reserva_sin_iva_ven }};
-                  IVA:{{ $propiedad->iva_p }};
- Reserva c/IVA(K):{{ $propiedad->reserva_con_iva_ven }};
- Precio de venta real: {{ $propiedad->precio_venta_real_ven }}">
+            <td class="text-right m-0 p-0 precio" data-toggle="tooltip" data-html="true"
+                    titulo="Comisi&oacute;n: <b>{{ $propiedad->comision_p }}</b>
+                        <br>Reserva s/IVA(I):<b>{{ $propiedad->reserva_sin_iva_ven }}</b>;
+                        <br>IVA:<b>{{ $propiedad->iva_p }}</b>;
+                        <br>Reserva c/IVA(K):<b>{{ $propiedad->reserva_con_iva_ven }}</b>;
+                        <br>Precio de venta real: <b>{{ $propiedad->precio_venta_real_ven }}</b>">
         @else (Auth::user()->is_admin)
-            <td class="m-0 p-0">
+            <td class="text-right m-0 p-0">
         @endif ((Auth::user()->is_admin) and (!isset($accion) or ('html' == $accion)))
         @endif ($movil)
             @if (!isset($accion) or ('html' == $accion))
-                <span class="float-right m-0 p-0">
+                <span class="text-right m-0 p-0" id="{{ $propiedad->id }}-precio">
                     {{ $propiedad->precio_ven }}
                 </span>
             @else (!isset($accion) or ('html' == $accion))
@@ -250,35 +240,39 @@ Estatus en sistema C21: {{ $propiedad->estatus_c21_alfa.(($propiedad->pagado_cas
                 <span title="Comisi&oacute;n((H)">
                     Com:{{ $propiedad->comision_p }}
                 </span><br>
-                <span class="float-right" title="IVA(J)">
+                <span class="text-right" title="IVA(J)">
                     IVA:{{ $propiedad->iva_p }}
                 </span><br>
-                <span class="float-right" title="Precio de venta real">
+                <span class="text-right" title="Precio de venta real">
                     {{ $propiedad->precio_venta_real_ven }}
                 </span>
             @endif ((Auth::user()->is_admin) and (!isset($accion) or ('html' == $accion)))--}}
             </td>
         @if ($movil)
-            <td class="m-0 p-0">
+            <td class="text-center m-0 p-0"><!-- columna de lados -->
             @if (!isset($accion) or ('html' == $accion))
                 <a href="{{ route('propiedades.edit', $propiedad) }}" class="btn btn-link m-0 p-0">
-                    <span class="float-right m-0 p-0">{{ $propiedad->lados }}</span>
+                    <span class="m-0 p-0" id="{{ $propiedad->id }}-lados">
+                        {{ $propiedad->lados }}
+                    </span>
                 </a>
             @else (!isset($accion) or ('html' == $accion))
                 {{ $propiedad->lados }}
             @endif (!isset($accion) or ('html' == $accion))
         @else ($movil)
             @if ((Auth::user()->is_admin) and (!isset($accion) or ('html' == $accion)))
-            <td class="m-0 p-0"
-                title="Compartido con otra oficina
-                  s/IVA(M):{{ $propiedad->compartido_sin_iva_ven }};
- Reserva s/IVA(I):{{ $propiedad->reserva_sin_iva_ven }}
- Reserva c/IVA(K):{{ $propiedad->reserva_con_iva_ven }}">
+            <td class="text-center m-0 p-0 lados" data-toggle="tooltip" data-html="true"
+                titulo="<u>Compartido con otra oficina</u>
+                    <br>s/IVA(M):<b>{{ $propiedad->compartido_sin_iva_ven }}</b>;
+                    <br>Reserva s/IVA(I):<b>{{ $propiedad->reserva_sin_iva_ven }}</b>
+                    <br>Reserva c/IVA(K):<b>{{ $propiedad->reserva_con_iva_ven }}</b>">
             @else ((Auth::user()->is_admin) and (!isset($accion) or ('html' == $accion)))
-            <td class="m-0 p-0">
+            <td class="text-center m-0 p-0">
             @endif ((Auth::user()->is_admin) and (!isset($accion) or ('html' == $accion)))
             @if (!isset($accion) or ('html' == $accion))
-                <span class="float-right m-0 p-0"> {{ $propiedad->lados }}</span>
+                <span class="text-center m-0 p-0" id="{{ $propiedad->id }}-lados">
+                    {{ $propiedad->lados }}
+                </span>
             @else (!isset($accion) or ('html' == $accion))
                 {{ $propiedad->lados }}
             @endif (!isset($accion) or ('html' == $accion))
@@ -287,150 +281,171 @@ Estatus en sistema C21: {{ $propiedad->estatus_c21_alfa.(($propiedad->pagado_cas
 
         @if ((!$movil) and (!isset($accion) or ('html' == $accion)))
             @if (!(Auth::user()->is_admin)){{-- No es administrador --}}
-                <td class="m-0 p-0"><span class="float-right m-0 p-0">
+                <td class="text-right m-0 p-0"><span class="text-right m-0 p-0">
                     {{ $propiedad->comision_p }}</span>
                 </td>
-                {{--<td class="m-0 p-0"><span class="float-right m-0 p-0"> Dos columnas eliminadas a solicitud de Alirio.
+            @if (isset($estatus) and ('V' == $estatus))
+                <td class="text-right m-0 p-0"><span class="text-right m-0 p-0">
                     {{ $propiedad->iva_p }}</span>
                 </td>
-                <td class="m-0 p-0"><span class="float-right m-0 p-0" title="Precio de venta real">
+            @endif (isset($estatus) and ('V' == $estatus))
+                {{--<td class="m-0 p-0"><span class="text-right m-0 p-0" title="Precio de venta real">
                     {{ $propiedad->precio_venta_real_ven }}</span>
                 </td>--}}
 
-            @else (Auth::user()->is_admin)
-            <td class="m-0 p-0" title="Franquicia de reserva sin IVA(O) ({{ $propiedad->porc_franquicia_p }}):{{ $propiedad->franquicia_reservado_sin_iva_ven }};
-Franquicia de reserva con IVA(P) ({{ $propiedad->porc_franquicia_p }}):{{ $propiedad->franquicia_reservado_con_iva_ven }};
-Franquicia a pagar reportada(Q) ({{ $propiedad->reportado_casa_nacional_p }}):{{ $propiedad->franquicia_pagar_reportada_ven }};
-Compartido con IVA(L):{{ $propiedad->compartido_con_iva_ven }}">
-                {{--<span class="float-right" title="Franquicia de reserva sin IVA(O) ({{ $propiedad->porc_franquicia_p }})">
+            @else (!Auth::user()->is_admin){{-- A partir de aqui solo se imprimira a los administradores. --}}
+            <td class="text-right m-0 p-0 franquicia" data-toggle="tooltip" data-html="true"
+                    titulo="Franquicia de reserva sin IVA(O) 
+                            (<em>{{ $propiedad->porc_franquicia_p }}</em>):
+                            <b>{{ $propiedad->franquicia_reservado_sin_iva_ven }}</b>;
+                        <br>Franquicia de reserva con IVA(P) 
+                            (<em>{{ $propiedad->porc_franquicia_p }}</em>):
+                            <b>{{ $propiedad->franquicia_reservado_con_iva_ven }}</b>;
+                        <br>Franquicia a pagar reportada(Q) 
+                            (<em>{{ $propiedad->reportado_casa_nacional_p }}</em>):
+                            <b>{{ $propiedad->franquicia_pagar_reportada_ven }}</b>;
+                        <br>Compartido con IVA(L):<b>{{ $propiedad->compartido_con_iva_ven }}</b>">
+                {{--<span class="text-right" title="Franquicia de reserva sin IVA(O) ({{ $propiedad->porc_franquicia_p }})">
                     {{ $propiedad->franquicia_reservado_sin_iva_ven }} 
                 </span><br>
-                <span class="float-right" title="Franquicia de reserva con IVA(P) ({{ $propiedad->porc_franquicia_p }})">
+                <span class="text-right" title="Franquicia de reserva con IVA(P) ({{ $propiedad->porc_franquicia_p }})">
                     {{ $propiedad->franquicia_reservado_con_iva_ven }}
                 </span><br>
-                <span class="float-right" title="Franquicia a pagar reportada(Q) ({{ $propiedad->reportado_casa_nacional_p }})">
+                <span class="text-right" title="Franquicia a pagar reportada(Q) ({{ $propiedad->reportado_casa_nacional_p }})">
                     {{ $propiedad->franquicia_pagar_reportada_ven }}
                 </span><br>
-                <span class="float-right" title="Compartido con IVA(L)">
+                <span class="text-right" title="Compartido con IVA(L)">
                     {{ $propiedad->compartido_con_iva_ven }}
                 </span>--}}
-                <span class="float-right m-0 p-0">
+                <span class="text-right m-0 p-0">
                     {{ $propiedad->franquicia_pagar_reportada_ven }}
                 </span>
             </td>
 
-            <td class="m-0 p-0" title="Porcentaje de REGALIA(S) ({{ $propiedad->porc_regalia_p }}):{{ $propiedad->regalia_ven }};
-Porcentaje reportado a casa nacional(R):{{ $propiedad->reportado_casa_nacional_p }}">
-                {{--<span class="float-right" title="Porcentaje de REGALIA(S):{{ $propiedad->porc_regalia_p }}">
+            <td class="text-right m-0 p-0 sanaf" data-toggle="tooltip" data-html="true"
+                    titulo="Porcentaje de REGALIA(S) 
+                            (<em>{{ $propiedad->porc_regalia_p }}</em>):
+                            <b>{{ $propiedad->regalia_ven }}</b>;
+                        <br>Porcentaje reportado a casa nacional(R):
+                        <b>{{ $propiedad->reportado_casa_nacional_p }}</b>">
+                {{--<span class="text-right" title="Porcentaje de REGALIA(S):{{ $propiedad->porc_regalia_p }}">
                     {{ $propiedad->regalia_ven }}
                 </span><br>
-                <span class="float-right" title="SANAF 5 Porciento(T)">
+                <span class="text-right" title="SANAF 5 Porciento(T)">
                     {{ $propiedad->sanaf_5_por_ciento_ven }}
                 </span><br>
                 <span title="Porcentaje reportado a casa nacional(R)">
                     RCN:{{ $propiedad->reportado_casa_nacional_p }}
                 </span>--}}
-                <span class="float-right m-0 p-0">
+                <span class="text-right m-0 p-0">
                     {{ $propiedad->sanaf_5_por_ciento_ven }}
                 </span>
             </td>
 
-            <td class="m-0 p-0" title="Oficina bruto real(U):{{ $propiedad->oficina_bruto_real_ven }};
-                Base para honorarios socios(V):{{ $propiedad->base_honorarios_socios_ven }};
-                Base para honorarios(W):{{ $propiedad->base_para_honorarios_ven }};
-{{ ($propiedad->numero_recibo)?('Recibo No.: '.$propiedad->numero_recibo):'' }}">
-                {{--<span class="float-right" title="Oficina bruto real(U)">
+            <td class="text-right m-0 p-0 neto" data-toggle="tooltip" data-html="true"
+                    titulo="Oficina bruto real(U):
+                            <b>{{ $propiedad->oficina_bruto_real_ven }}</b>;
+                        <br>Base para honorarios socios(V):
+                            <b>{{ $propiedad->base_honorarios_socios_ven }}</b>;
+                        <br>Base para honorarios(W):
+                            <b>{{ $propiedad->base_para_honorarios_ven }}</b>
+                            {{ ($propiedad->numero_recibo)?('<b>Recibo No.: '.$propiedad->numero_recibo.'</b>'):'' }}">
+                {{--<span class="text-right" title="Oficina bruto real(U)">
                     {{ $propiedad->oficina_bruto_real_ven }}
                 </span><br>
-                <span class="float-right" title="Base para honorarios socios(V)">
+                <span class="text-right" title="Base para honorarios socios(V)">
                     {{ $propiedad->base_honorarios_socios_ven }}
                 </span><br>
-                <span class="float-right" title="Base para honorarios(W)">
+                <span class="text-right" title="Base para honorarios(W)">
                     {{ $propiedad->base_para_honorarios_ven }}
                 </span><br>
-                <span class="float-right" title="Ingreso neto a oficina(AC)
+                <span class="text-right" title="Ingreso neto a oficina(AC)
 {{ ($propiedad->numero_recibo)?('Recibo No.: '.$propiedad->numero_recibo):'' }}">
                     {{ $propiedad->ingreso_neto_oficina_ven }}
                 </span>--}}
-                <span class="float-right m-0 p-0">
+                <span class="text-right m-0 p-0">
                     {{ $propiedad->ingreso_neto_oficina_ven }}
                 </span>
             </td>
-            @endif (!(Auth::user()->is_admin))
+            @endif (!(Auth::user()->is_admin)){{-- Hasta aqui solo se imprimira a los administradores. Producto de un 'else' --}}
 
-            {{--@if (!Auth::user()->is_admin)   // No es administrador }}
-            <td class="m-0 p-0"><!-- Comision del asesor. Deberia ser como captador, cerrador o ambas. -->
-                <span class="float-right m-0 p-0"
+        @if (isset($estatus) and ('V' == $estatus)){{-- Solo cuando el estatus es 'Ventas': 'P' y 'C' --}}
+            <td class="text-right m-0 p-0"><!-- Comision del asesor. Deberia ser como captador, cerrador o ambas. -->
+        @if (!Auth::user()->is_admin)   {{-- No es administrador --}}
+                <span class="text-right m-0 p-0"
             @if ($propiedad->asesor_captador_id == Auth::user()->id)
                 title="Captador PRBR(X)
                 @if ($propiedad->asesor_cerrador_id == Auth::user()->id)
-                    Cerrador PRBR(Z)">
+                    y Cerrador PRBR(Z)">
                     {{ $propiedad->captador_prbr + $propiedad->cerrador_prbr }}
                 @else
                     ">
                     {{ $propiedad->captador_prbr_ven }}
                 @endif ($propiedad->asesor_cerrador_id == Auth::user()->id)
-            @else
+            @else   {{-- No es el asesor captador. --}}
                 @if ($propiedad->asesor_cerrador_id == Auth::user()->id)
                     title="Cerrador PRBR(Z)">
                     {{ $propiedad->cerrador_prbr_ven }}
-                @else
+                @else   {{-- Tampoco es el asesor cerrador. Esto NUNCA deberia ocurrir. --}}
                     >&nbsp;
                 @endif ($propiedad->asesor_cerrador_id == Auth::user()->id)
             @endif ($propiedad->asesor_captador_id == Auth::user()->id)
-                </span>--}}
-            {{--@if (Auth::user()->is_admin)
-                <span class="float-right" title="Gerente(Y)">
+                </span>
+        @else (!Auth::user()->is_admin)   {{-- A partir de aqui solo es administrador --}}
+                <span class="text-right" title="Gerente(Y)">
                     {{ $propiedad->gerente_ven }}
                 </span>
                 <br>
-            @endif--}}
-            {{--@if ((Auth::user()->is_admin) or ($propiedad->asesor_captador_id == Auth::user()->id))
-                <span class="float-right" title="Captador PRBR(X){{ $propiedad->nombre_captador }}">
+                <span class="text-right" title="Captador PRBR(X){{ $propiedad->nombre_captador }}">{{-- En nombre_captador se agregan ':' --}}
                     {{ $propiedad->captador_prbr_ven }}
                 </span>
-            @endif
-            @if ((Auth::user()->is_admin) or ($propiedad->asesor_cerrador_id == Auth::user()->id))
                 <br>
-                <span class="float-right" title="Cerrador PRBR(Z){{ $propiedad->nombre_cerrador }}">
+                <span class="text-right" title="Cerrador PRBR(Z){{ $propiedad->nombre_cerrador }}">{{-- En nombre_cerrador se agregan ':' --}}
                     {{ $propiedad->cerrador_prbr_ven }}
                 </span>
-            @endif ((Auth::user()->is_admin) or ($propiedad->asesor_cerrador_id == Auth::user()->id))
-            {{--@if ((Auth::user()->is_admin) or
-                 ($propiedad->asesor_captador_id == Auth::user()->id) or
-                 ($propiedad->asesor_cerrador_id == Auth::user()->id))
-                @if ($propiedad->bonificaciones_ven)
-                    <br>
-                    <span class="float-right" title="Bonificaciones">
-                        {{ $propiedad->bonificaciones_ven }}
-                    </span>
-                @endif
-            @endif--}}
-            {{--</td>
-            @endif (!Auth::user()->is_admin)    // No es administrador }}
-            @if (!Auth::user()->is_admin)       // El usuario no es administrador }}
-            <td class="m-0 p-0"><span class="float-right m-0 p-0">
+        @endif (!Auth::user()->is_admin)   {{-- Hasta aqui solo es administrador --}}
+        @if ((Auth::user()->is_admin) or
+                ($propiedad->asesor_captador_id == Auth::user()->id) or
+                ($propiedad->asesor_cerrador_id == Auth::user()->id))
+            @if ($propiedad->bonificaciones_ven)
+                <br>
+                <span class="text-right" title="Bonificaciones">
+                    {{ $propiedad->bonificaciones_ven }}
+                </span>
+            @endif
+        @endif ((Auth::user()->is_admin) or ...)
+            </td><!-- Final de la columna de comisiones -->
+        @if (!Auth::user()->is_admin)       {{-- El usuario no es administrador --}}
+            <td class="text-right m-0 p-0"><span class="text-right m-0 p-0">
                 {{ (($propiedad->asesor_captador_id == Auth::user()->id)?$propiedad->puntos_captador:0.00) +
                    (($propiedad->asesor_cerrador_id == Auth::user()->id)?$propiedad->puntos_cerrador:0.00) }}
                 </span>
             </td>
-            @endif (!Auth::user()->is_admin)    // El usuario no es administrador --}}
+        @elseif (!Auth::user()->socio)  {{-- El usuario, ahora, es administrador; pero, no socio. --}}
+            <td class="text-right m-0 p-0"><span class="text-right m-0 p-0">
+                {{ $propiedad->puntos_captador }}</span>
+                <br><span class="text-right m-0 p-0">{{ $propiedad->puntos_cerrador }}
+                </span>
+            </td>
+        @endif (!Auth::user()->is_admin)    {{-- El usuario es administrador --}}
+        @endif (isset($estatus) and ('V' == $estatus)){{-- Hasta aqui ventas de un asesor. --}}
 
         {{-- @if (!isset($accion) or ('html' == $accion)) --}}
             <td class="d-flex align-items-end m-0 p-0">
                 <a href="{{ route('propiedades.show', $propiedad) }}" class="btn btn-link m-0 p-0" 
-                        title="Mostrar los datos de esta propiedad ({{ $propiedad->nombre }}).">
+                        data-toggle="tooltip" data-html="true" title="Mostrar los datos de esta propiedad (<u>{{ $propiedad->nombre }}</u>).">
                     <span class="oi oi-eye m-0 p-0"></span>
                 </a>
                 @if (!($propiedad->user_borro || $propiedad->deleted_at))
                 @if (Auth::user()->is_admin)
                 <a href="{{ route('propiedades.edit', $propiedad) }}" class="btn btn-link m-0 p-0"
-                        title="Editar los datos de esta propiedad ({{ $propiedad->nombre }}).">
+                        data-toggle="tooltip" data-html="true" title="Editar los datos de esta propiedad (<u>{{ $propiedad->nombre }}</u>).">
                     <span class="oi oi-pencil m-0 p-0"></span>
                 </a>
-                @elseif (!(('P' == $propiedad->estatus) || ('C' == $propiedad->estatus) || ('S' == $propiedad->estatus)))
+                @elseif (!(('P' == $propiedad->estatus) || ('C' == $propiedad->estatus) || ('S' == $propiedad->estatus)) and
+                        ($propiedad->user->id == Auth::user()->id))
                 <a href="{{ route('propiedades.edit', $propiedad) }}" class="btn btn-link m-0 p-0"
-                        title="Editar los datos de esta propiedad ({{ $propiedad->nombre }}).">
+                        data-toggle="tooltip" data-html="true" title="Editar los datos de esta propiedad (<u>{{ $propiedad->nombre }}</u>).">
                     <span class="oi oi-pencil m-0 p-0"></span>
                 </a>
                 @endif (Auth::user()->is_admin)
@@ -439,7 +454,7 @@ Porcentaje reportado a casa nacional(R):{{ $propiedad->reportado_casa_nacional_p
                 @if ((('P' == $propiedad->estatus) || ('C' == $propiedad->estatus)) &&
                      (isset($propiedad->fecha_reserva) && isset($propiedad->fecha_firma)))
                     <a href="{{ route('propiedad.correo', [$propiedad->id, 1]) }}" class="btn btn-link m-0 p-0"
-                            title="Enviar correo de 'Reporte de Cierre' a '{{ (1 == $propiedad->user->id)?'Administrador':$propiedad->user->name }}' sobre esta propiedad ({{ $propiedad->codigo }}, {{ $propiedad->nombre }}).">
+                            data-toggle="tooltip" data-html="true" title="Enviar correo de 'Reporte de Cierre' a '<b>{{ (1 == $propiedad->user->id)?'Administrador':$propiedad->user->name }}</b>' sobre esta propiedad (<u>{{ $propiedad->codigo }}, {{ $propiedad->nombre }}</u>).">
                         <span class="oi oi-envelope-closed m-0 p-0"></span>
                     </a>
                 @endif (('P' == $propiedad->estatus) || ('C' == $propiedad->estatus))
@@ -450,12 +465,18 @@ Porcentaje reportado a casa nacional(R):{{ $propiedad->reportado_casa_nacional_p
                         onSubmit="return confirm('Realmente, desea borrar (borrado lógico) los datos de esta propiedad de la base de datos?')">
                     {{ csrf_field() }}
                     {{ method_field('DELETE') }}
-                    <button class="btn btn-link m-0 p-0" title="Borrar (lógico) propiedad.">
-                        <span class="oi oi-trash m-0 p-0" title="Borrar {{ $propiedad->nombre }}">
+                    <button class="btn btn-link m-0 p-0">
+                        <span class="oi oi-trash m-0 p-0" data-toggle="tooltip" data-html="true" title="Borrar (lógico) <b>{{ $propiedad->nombre }}</b>">
                         </span>
                     </button>
                 </form>
                 @endif ((Auth::user()->is_admin) && !($propiedad->user_borro || $propiedad->deleted_at) && ...)
+                @if (Auth::user()->is_admin)
+                <a href="#" class="btn btn-link m-0 p-0 editarCodigo" id="{{ $propiedad->id }}"
+                    data-toggle="tooltip" data-html="true" title="Cambiar el codigo MLS <b>{{ $propiedad->codigo }}</b> de esta propiedad (<u>{{ $propiedad->nombre}}</u>).">
+                <span class="oi oi-brush m-0 p-0"></span>
+                </a>
+                @endif (Auth::user()->is_admin)
             </td>
         {{-- @endif (!isset($accion) or ('html' == $accion)) --}}
         @endif ((!$movil) and (!isset($accion) or ('html' == $accion)))
@@ -481,25 +502,13 @@ Porcentaje reportado a casa nacional(R):{{ $propiedad->reportado_casa_nacional_p
 
 @endsection
 
+{{-- @includeWhen((!$movil and (!isset($accion) or ('html' == $accion))),
+                'include.modalAlertar')
+@includeWhen((!$movil and (!isset($accion) or ('html' == $accion))),
+                'include.modalConfirmar')--}}
+
 @section('js')
 
-<script>
-function alertaCampoRequerido() {
-  var fecha_desde = document.getElementById('fecha_desde').value;
-  var fecha_hasta = document.getElementById('fecha_hasta').value;
-  var estatus = document.getElementById('estatus').value;
-  var asesor  = document.getElementById('asesor').value;
-  var captador = document.getElementById('captador').value;
-  var cerrador = document.getElementById('cerrador').value;
-
-  if (('' == fecha_desde) && ('' == estatus) && (0 == asesor) &&
-        (0 == captador) && (0 == cerrador)) {
-    alert("Usted debe suministrar la fecha de reserva 'Desde' o el 'estatus' o " +
-            "el 'asesor' o el 'captador' o el 'cerrador'");
-    return false;
-  }
-  return true;
-}
-</script>
+@includeIf("propiedades.jqmenu", ['vista' => 'index'])
 
 @endsection

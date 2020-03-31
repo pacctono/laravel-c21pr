@@ -1,30 +1,30 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="card">
-    <h4 class="card-header">{{ $title }}</h4>
-    <div class="card-body">
+<div class="card m-0 p-0">
+    <h4 class="card-header m-0 p-1">{{ $title }}</h4>
+    <div class="card-body m-0 p-0">
     @include('include.exitoCrear')
     @include('include.errorData')
 
-        <form method="POST" class="form align-items-end-horizontal" id="formulario"
-                action="{{ route('agendaPersonal.store') }}">
+    <form method="POST" class="form align-items-end-horizontal"
+        id="formulario" action="{{ route('agendaPersonal.store') }}">
         {!! csrf_field() !!}
 
-        <div class="form-row my-0 py-0">
-            <div class="form-group form-inline mx-1 px-2">
+        <div class="form-row my-1 mx-0 p-0">
+            <div class="form-group form-inline my-0 mx-2 py-0 px-1">
                 <label class="control-label" for="fecha_cita">*Fecha</label>
-                <input class="form-control" type="date" name="fecha_cita" id="fecha_cita"
-                        required min="{{ now()->format('Y-m-d') }}"
-                        max="{{ now()->addWeeks(4)->format('Y-m-d') }}"
+                <input class="form-control form-control-sm" type="date" name="fecha_cita" id="fecha_cita"
+                        required min="{{ now('America/Caracas')->format('Y-m-d') }}"
+                        max="{{ now('America/Caracas')->addWeeks(4)->format('Y-m-d') }}"
                         title="Fecha en la cual se concreto la cita, mayor o igual a hoy"
                         value="{{ old('fecha_cita') }}">
                 <label class="control-label" for="hora_cita">*Hora</label>
-                <input class="form-control" type="time" name="hora_cita" id="hora_cita"
+                <input class="form-control form-control-sm" type="time" name="hora_cita" id="hora_cita"
                         title="Hora en la cual se concreto la cita"
                         required value="{{ old('hora_cita') }}">
             </div>
-            <div class="form-group form-inline mx-1 px-2">
+            <div class="form-group form-inline my-0 mx-2 py-0 px-1">
                 <label>Seleccione</label>
                 <select class="form-control form-control-sm" id="seleccion"
                         title="Seleccione para definir el nombre de la persona de la cita">
@@ -37,7 +37,7 @@
                     <option value="N" title="El nombre de la cita sera suministrada">Nombre</option>
                 </select>
             </div>
-            <div class="form-group form-inline mx-1 px-2 nombres contactos">
+            <div class="form-group form-inline my-0 mx-2 py-0 px-1 nombres contactos">
                 <label for="contacto_id">Contacto</label>
                 <select class="form-control form-control-sm" name="contacto_id" id="contacto_id">
                     <option value="0">Lista de contactos</option>
@@ -50,7 +50,7 @@
                 @endforeach
                 </select>
             </div>
-            <div class="form-group form-inline mx-1 px-2 nombres clientes">
+            <div class="form-group form-inline my-0 mx-2 py-0 px-1 nombres clientes">
                 <label for="cliente_id">Cliente</label>
                 <select class="form-control form-control-sm" name="cliente_id" id="cliente_id">
                     <option value="0">Lista de clientes</option>
@@ -63,7 +63,7 @@
                 @endforeach
                 </select>
             </div>
-            <div class="form-group form-inline mx-1 px-2 nombres inputNombre">
+            <div class="form-group form-inline my-0 mx-2 py-0 px-1 nombres inputNombre">
                 <label class="control-label" for="name">Nombre</label>
                 <input type="text" class="form-control form-control-sm" size="50"
                         maxlength="150" name="name" id="name"
@@ -73,18 +73,18 @@
             </div>
         </div>
 
-        <div class="form-group d-flex align-items-end mx-1 px-2">
-            <label class="control-label" for="descripcion" id="etiqDescripcion">
-                *Descripci&oacute;n</label>
-            <textarea class="form-control form-control-sm" rows="2"
-                        required name="descripcion" id="descripcion"
-                        placeholder="Descripcion que se puedan sobre esta cita, etc.">
-                {{ old('descripcion') }}
-            </textarea>
+        <div class="form-row bg-suave my-1 mx-0 p-0">
+            <div class="form-group form-inline my-0 mx-2 py-0 px-1">
+                <label class="control-label" for="descripcion" id="etiqDescripcion">
+                    *Descripci&oacute;n</label>
+                <textarea class="form-control form-control-sm" rows="4"
+                        cols="125" required name="descripcion" id="descripcion"
+                        placeholder="Descripcion que se puedan sobre esta cita, etc.">{{ old('descripcion') }}</textarea>
+            </div>
         </div>
 
-        <div class="form-row my-0 py-0">
-            <div class="form-group form-inline mx-1 px-2">
+        <div class="form-row my-1 mx-0 p-0">
+            <div class="form-group form-inline my-0 mx-2 py-0 px-1">
                 <label for="telefono">Tel&eacute;fono&nbsp;</label>
                 0<select class="form-control form-control-sm" name="ddn" id="ddn">
                     <option value="">ddn</option>
@@ -100,7 +100,7 @@
                         maxlength="7" minlength="7" name="telefono" id="telefono"
                         value="{{ old('telefono') }}">
             </div>
-            <div class="form-group form-inline mx-1 px-2">
+            <div class="form-group form-inline my-0 mx-2 py-0 px-1">
                 <label class="control-label" for="email">Correo electr&oacute;nico</label>
                 <input class="form-control form-control-sm" type="email"
                         size="50" maxlength="160" name="email" id="email"
@@ -110,29 +110,34 @@
             </div>
         </div>
 
-        <div class="form-group d-flex align-items-end mx-1 px-2">
-            <label class="control-label" for="direccion" id="etiqDireccion">
-                Direcci&oacute;n</label>
-            <textarea class="form-control form-control-sm" rows="2" name="direccion" id="direccion"
-                        placeholder="Calle, Casa, Apto, Edificio, Barrio, etc.">
-                {{ old('direccion') }}
-            </textarea>
+        <div class="form-row bg-suave my-1 mx-0 p-0">
+            <div class="form-group form-inline my-0 mx-2 py-0 px-1">
+                <label class="control-label" for="direccion" id="etiqDireccion">
+                    Direcci&oacute;n</label>
+                <textarea class="form-control form-control-sm" rows="2"
+                        cols="100" name="direccion" id="direccion"
+                        placeholder="Calle, Casa, Apto, Edificio, Barrio, etc.">{{ old('direccion') }}</textarea>
+            </div>
         </div>
 
-        <div class="form-group d-flex align-items-end mx-1 px-2">
-            <label class="control-label" for="comentarios" id="etiqComentarios">
-                Comentarios</label>
-            <textarea class="form-control form-control-sm" rows="2"
-                        name="comentarios" id="comentarios"
-                        placeholder="Comentarios sobre la cita, despues de haber sido realizada">
-                {{ old('comentarios') }}
-            </textarea>
+        <div class="form-row my-1 mx-0 p-0">
+            <div class="form-group form-inline my-0 mx-2 py-0 px-1">
+                <label class="control-label" for="comentarios" id="etiqComentarios">
+                    Comentarios</label>
+                <textarea class="form-control form-control-sm" rows="4"
+                            cols=125" name="comentarios" id="comentarios"
+                            placeholder="Comentarios sobre la cita, despues de haber sido realizada">{{ old('comentarios') }}</textarea>
+            </div>
         </div>
 
-        <div class="row">
-            <div class="form-group d-flex">
-                <button type="submit" class="btn btn-success">Agregar cita personal</button>
-                <a href="{{ route('agenda') }}" class="btn btn-link">Regresar a la agenda</a>
+        <div class="form-row my-1 mx-1 p-0">
+            <div class="form-group form-inline m-0 py-0 px-1">
+                <button type="submit" class="btn btn-success m-0 py-0 px-1">
+                    Agregar cita personal
+                </button>
+                <a href="{{ route('agenda') }}" class="btn btn-link">
+                    Regresar a la agenda
+                </a>
             </div>
         </div>
         </form>

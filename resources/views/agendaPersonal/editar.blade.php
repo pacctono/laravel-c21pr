@@ -21,8 +21,8 @@
             <div class="form-group form-inline mx-1 px-2">
                 <label class="control-label" for="fecha_cita">*Fecha</label>
                 <input class="form-control" type="date" name="fecha_cita" id="fecha_cita"
-                        required min="{{ now()->format('Y-m-d') }}"
-                        max="{{ now()->addWeeks(4)->format('Y-m-d') }}"
+                        required min="{{ now('America/Caracas')->format('Y-m-d') }}"
+                        max="{{ now('America/Caracas')->addWeeks(4)->format('Y-m-d') }}"
                         title="Fecha en la cual se programo la cita, mayor o igual a hoy"
                         value="{{ old('fecha_cita', $cita->fecha_cita_bd) }}">
                 <label class="control-label" for="hora_cita">*Hora</label>
@@ -128,8 +128,8 @@
             <div class="form-group form-inline mx-1 px-2">
                 <label class="control-label" for="fecha_evento">*Fecha</label>
                 <input class="form-control" type="date" name="fecha_evento" id="fecha_evento"
-                        required min="{{ now()->format('Y-m-d') }}"
-                        max="{{ now()->addWeeks(4)->format('Y-m-d') }}"
+                        required min="{{ now('America/Caracas')->format('Y-m-d') }}"
+                        max="{{ now('America/Caracas')->addWeeks(4)->format('Y-m-d') }}"
                         title="Fecha en la cual se realizo la cita, mayor o igual a hoy"
                         value="{{ old('fecha_evento', $cita->fecha_evento_bd) }}">
                 <label class="control-label" for="hora_evento">*Hora</label>

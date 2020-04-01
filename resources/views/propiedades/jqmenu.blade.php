@@ -1,7 +1,8 @@
 <script>
     $(function () {
         //$('[data-toggle="tooltip"]').tooltip('enable')
-        $("td.codigo").tooltip('enable')
+        $("a.mostrarTooltip").tooltip('enable')
+        $("span.mostrarTooltip").tooltip('enable')
     })
     @includeIf('include.alertar')
     @includeIf('include.confirmar')
@@ -62,12 +63,13 @@
                             `<em>Comentarios:</em> <u>${com}</u>.`;
             alertar(texto, titulo);
         });
-        $("td.precio,td.lados,td.franquicia,td.sanaf,td.neto").click(function(ev) {
-            var $t = $(this);
+        $("td.codigo, td.precio,td.lados,td.franquicia,td.sanaf,td.neto").click(function(ev) {
+            let $t = $(this);
             if (undefined === $t.attr('title')) {
                 $t.attr('title', $t.attr('titulo'));
                 $t.removeAttr('titulo');
                 $t.tooltip('enable');           // Trate  $("td.precio").tooltip('enable'), al principio y no funciono.
+                $t.tooltip('show');           // Trate  $("td.precio").tooltip('enable'), al principio y no funciono.
             } else {
                 $t.attr('titulo', $t.attr('title'));
                 $t.removeAttr('title');

@@ -208,7 +208,7 @@ class PropiedadController extends Controller
                             });
         } else {
             $propiedades = $propiedades->where(function ($query) use ($fecha_desde, $fecha_hasta) {
-                                $query->where('fecha_firma', '<=', now(Fecha::$ZONA))
+                                $query->whereDate('fecha_firma', '<=', now(Fecha::$ZONA)->format('Y-m-d'))
                                     ->orWhereNull('fecha_firma');
                             });
         }
@@ -921,8 +921,7 @@ class PropiedadController extends Controller
         }
 
         $data['user_borro'] = Auth::user()->id;
-        //$data['borrado_at'] = Carbon::now();
-        //$data['borrado_at'] = new Carbon();
+        $propiedad->update($data);
 
         //dd($data);
         $datos = 'id:'.$propiedad->id.', codigo:'.$propiedad->codigo.', nombre:'.$propiedad->nombre;
@@ -933,7 +932,7 @@ class PropiedadController extends Controller
             'tx_modelo' => 'Propiedad',
             'tx_data' => $datos,
             'tx_tipo' => 'B',
-	    'tx_host' => $_SERVER['REMOTE_ADDR']
+	        'tx_host' => $_SERVER['REMOTE_ADDR']
         ]);
 
         return redirect()->route('propiedades.index');

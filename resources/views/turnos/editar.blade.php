@@ -22,7 +22,10 @@
             <tr class="my-1 mx-0 p-0">
                 <th class="my-0 py-0" scope="col">Turno</th>
                 @for ($d = 0; $d < 6; $d++)
-                    <th class="my-0 py-0" scope="col">{{ $diaSemana[$d] }}</th>
+                    <th class="my-0 py-0" scope="col">
+                        {{ $diaSemana[$d] }}
+                        {{ $turno->turno->addDays($d)->format('d/m/y') }}
+                    </th>
                     {{--@if ('Miercoles' == $diaSemana[$d])
                         @break;
                     @endif--}}
@@ -102,54 +105,7 @@
             </tr>
             </tbody>
 
-            {{--<thead class="thead-dark">
-            <tr class="my-0 py-1">
-                {{--<th class="my-0 py-0" scope="col">Turno</th>--}}
-                {{--@for ($d = 3; $d < 6; $d++)
-                    <th class="my-0 py-0" scope="col">{{ $diaSemana[$d] }}</th>
-                @endfor
-            </tr>
-            </thead>
-            <tbody>
-            <tr class="my-0 py-1">
-                {{--<th class="my-0 py-0" scope="col">Mañana</th>--}}
-                {{--@for ($d = 3; $d < 6; $d++)     {{-- Jueves, viernes y sabado, mañana --}}
-                    {{--<td class="my-0 py-0">
-                        <select required name="u{{ 3+$d }}" id="u{{ 3+$d }}">
-                            <option value="">mañana {{ $diaSemana[$d] }}</option>
-                            @foreach ($users as $user)
-                            @if (old("u{3+$d}", $turnos[3+$d]->user_id) == $user->id)
-                            <option value="{{ $user->id }}" selected>{{ $user->name }}</option>
-                            @else
-                            <option value="{{ $user->id }}">{{ $user->name }}</option>
-                            @endif
-                            @endforeach
-                        </select>
-                        <input type="hidden" name="f{{ 3+$d }}" value="{{ $dia[$d] }} 08">
-                    </td>
-                @endfor
-            </tr>
-            <tr class="my-0 py-1">
-                {{--<th class="my-0 py-0" scope="col">Tarde</th>--}}
-                {{--@for ($d = 3; $d < 6; $d++)     {{-- Jueves y viernes, tarde --}}
-                {{--@if ('Sabado' != $diaSemana[$d])
-                    <td class="my-0 py-0">
-                        <select required name="u{{ 6+$d }}" id="u{{ 6+$d }}">
-                            <option value="">tarde {{ $diaSemana[$d] }}</option>
-                            @foreach ($users as $user)
-                            @if (old("u{6+$d}", $turnos[6+$d]->user_id) == $user->id)
-                            <option value="{{ $user->id }}" selected>{{ $user->name }}</option>
-                            @else
-                            <option value="{{ $user->id }}">{{ $user->name }}</option>
-                            @endif
-                            @endforeach
-                        </select>
-                        <input type="hidden" name="f{{ 6+$d }}" value="{{ $dia[$d] }} 12">
-                    </td>
-                @endif
-                @endfor
-            </tr>--}}
-            <tr class="my-0 py-1">
+            <tr class="my-0 py-0">
                 <td class="my-0 py-0" colspan="3">
                     <button type="submit" class="btn btn-primary my-0 py-0" id="actualizar-turnos">
                         Actualizar Turno

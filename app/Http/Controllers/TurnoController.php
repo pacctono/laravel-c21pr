@@ -25,13 +25,19 @@ class TurnoController extends Controller
     protected $lineasXPagina = 20/*General::LINEASXPAGINA*/;
 
     protected function crearSemanas() {
+        $ultSemanaCreada = True;
+        $ultimaSemana    = null;
         for ($d = 0; $d < 11; $d++) {
             $lunes = Fecha::primerLunesDePrimeraSemana()->addWeeks($d);   // Proximos once lunes.
-            $turnoExiste = Turno::where('turno', $lunes->format('Y-m-d') . ' 08:00:00')
-                                ->get()->isEmpty();
-            $semanas[$d] = array($lunes, $turnoExiste);
+            $turno = Turno::whereDate('turno', $lunes->format('Y-m-d'))
+                            ->whereTime('turno', '08:00:00')
+                            ->get();
+            $noExiste = $turno->isEmpty();    // False: Existe; True: No existe (isEmpty).
+            $semanas[$d] = array($lunes, $noExiste);
+            if ($ultSemanaCreada = ($ultSemanaCreada and !$noExiste))
+                if ($lunes > now(Fecha::$ZONA)) $ultimaSemana = $turno;
         }
-        return $semanas;
+        return [$semanas, $ultimaSemana->first()];
     }
     protected static function turnoNuevo($semana, $index, $hora, $nroId) {
         return [
@@ -61,7 +67,7 @@ class TurnoController extends Controller
         }
 
         $diaSemana = Fecha::$diaSemana;
-        $semanas = $this->crearSemanas();      // Proximos once lunes.
+        list ($semanas, $ultimaSemanaCreada) = $this->crearSemanas();   // $semanas es arreglo de arreglos con [0] la fecha de los proximos once lunes y [1] bool: semana no creada.
 /*        for ($d = 0; $d < 11; $d++) {
             $semanas[$d] = Fecha::primerLunesDePrimeraSemana()
                                     ->addWeeks($d);            // Proximos once lunes.
@@ -112,7 +118,7 @@ class TurnoController extends Controller
             $turnos = Turno::where('id', '>', 0);   // condición dummy, solo para continuar armando la consulta.
         } else {
             $asesor = Auth::user()->id;
-            $user   = User::find($asesor);
+            $user   = User::findOrFail($asesor);
             $title .= ' de ' . $user->name;
             $turnos = $user->turnos();
         }
@@ -127,7 +133,7 @@ class TurnoController extends Controller
             $turnos = $turnos->whereBetween('turno',
                                 [$fecha_desde, $fecha_hasta.' 23:59:59']);  // Cualquier hora antes de medianoche.
         } else {
-            $turnos = $turnos->where('turno', '>=', now(Fecha::$ZONA));
+            $turnos = $turnos->whereDate('turno', '>=', now(Fecha::$ZONA)->format('Y-m-d'));
         }
 //        dd($periodo, $fecha_desde, $fecha_hasta);
         $turnos = $turnos->orderBy($orden);   // Ordenar los items de los turnos.
@@ -147,11 +153,13 @@ class TurnoController extends Controller
                     'fecha_hasta' => $fecha_hasta, 'asesor' => $asesor]);
         if ('html' == $accion)
             return view('turnos.index', compact('title', 'users', 'turnos',
-                    'ruta', 'diaSemana', 'semanas', 'rPeriodo', 'fecha_desde',
-                    'fecha_hasta', 'asesor', 'alertar', 'orden', 'movil', 'accion'));
+                    'ruta', 'diaSemana', 'semanas', 'ultimaSemanaCreada', 'rPeriodo',
+                    'fecha_desde', 'fecha_hasta', 'asesor', 'alertar', 'orden',
+                    'movil', 'accion'));
         $html = view('turnos.index', compact('title', 'users', 'turnos',
-                    'ruta', 'diaSemana', 'semanas', 'rPeriodo', 'fecha_desde',
-                    'fecha_hasta', 'asesor', 'alertar', 'orden', 'movil', 'accion'))
+                    'ruta', 'diaSemana', 'semanas', 'ultimaSemanaCreada', 'rPeriodo',
+                    'fecha_desde', 'fecha_hasta', 'asesor', 'alertar', 'orden',
+                    'movil', 'accion'))
                 ->render();
         General::generarPdf($html, 'turnos', $accion);
     }
@@ -306,7 +314,7 @@ class TurnoController extends Controller
                    ]);
 
         $diaSemana = Fecha::$diaSemana;
-        $semanas = $this->crearSemanas();      // Proximos once lunes.
+        list ($semanas, $ultimaSemanaCreada) = $this->crearSemanas();   // $semanas es arreglo de arreglos con [0] la fecha de los proximos once lunes y [1] bool: semana no creada.
 /*        for ($d = 0; $d < 11; $d++) {
             $semanas[$d] = Fecha::primerLunesDePrimeraSemana()
                                     ->addWeeks($d);            // Proximos once lunes.
@@ -315,7 +323,8 @@ class TurnoController extends Controller
         $agente = new Agent();
         $movil  = $agente->isMobile() and true;             // Fuerzo booleana. No funciona al usar el metodo directamente.
         return view('turnos.calendario',
-                compact('calendar', 'users', 'asesor', 'diaSemana', 'semanas', 'movil'));
+                compact('calendar', 'users', 'asesor', 'diaSemana', 'ultimaSemanaCreada',
+                        'semanas', 'movil'));
 
     }
 
@@ -333,9 +342,10 @@ class TurnoController extends Controller
         }
 
         $fecha = Fecha::primerLunesDePrimeraSemana()->addWeeks($semana);
-        $turnoExiste = Turno::where('turno', $fecha->format('Y-m-d') . ' 08:00:00')->get();
+        $turnoCrear = Turno::whereDate('turno', $fecha->format('Y-m-d'))
+                            ->whereTime('turno', '08:00:00')->get();
 // Revisa si el turno no existe y si existe, que tenga asignado un asesor (!= 0).
-        if ($turnoExiste->isNotEmpty() and (0 < $turnoExiste->first()->user_id)) {
+        if ($turnoCrear->isNotEmpty() and (0 < $turnoCrear->first()->user_id)) {
             return redirect()->route('turnos.editar', $semana);
         }
 
@@ -446,15 +456,15 @@ class TurnoController extends Controller
             }
             //dd("min: $min", "max: $max", 'ids:', $ids, 'idSabado:', $idSabado, 'nuevosTurnos:', $nuevosTurnos, 'idAsesores: ', $idAsesores);
             foreach ($nuevosTurnos as $turno) {
-                $turnoExiste = Turno::where('turno', $turno['turno'])->get();
-                if ($turnoExiste->isEmpty()) {
+                $turnoEditar = Turno::where('turno', $turno['turno'])->get();
+                if ($turnoEditar->isEmpty()) {
                     Turno::create([
                         'turno'     => $turno['turno'],
                         'user_id'   => $turno['user_id'],
                         'user_creo' => Auth::user()->id,
                     ]);
                 } else {
-                    $turnoExiste->update($turno);
+                    $turnoEditar->update($turno);
                 }
             }
             return redirect()->route('turnos.editar', $semana);
@@ -466,14 +476,14 @@ class TurnoController extends Controller
             $dia[$d] = $fecha->addDays($d)->format('Y-m-d');    // Fecha de cada dia.
         }
 // Crea el arreglo '$semanas' con la fecha del lunes de cada una de las proximas once semanas.
-        $semanas = $this->crearSemanas();      // Proximos once lunes.
+        list ($semanas, $ultimaSemanaCreada) = $this->crearSemanas();   // $semanas es arreglo de arreglos con [0] la fecha de los proximos once lunes y [1] bool: semana no creada.
 /*        for ($d = 0; $d < 11; $d++) {
             $semanaInicial = Fecha::primerLunesDePrimeraSemana();
             $semanas[$d] = $semanaInicial->addWeeks($d);            // Proximos once lunes.
         }*/
 
         return view('turnos.crear', compact('title', 'diaSemana', 'dia', 'users',
-                    'semanas', 'semana'));
+                                            'ultimaSemanaCreada', 'semanas', 'semana'));
     }
 
     public function store(Request $request)
@@ -551,10 +561,11 @@ class TurnoController extends Controller
         }
 
         $fecha = Fecha::primerLunesDePrimeraSemana()->addWeeks($semana);
-        $turnoExiste = Turno::where('turno', $fecha->format('Y-m-d') . ' 08:00:00')
-                                ->get();
-        if (($turnoExiste->isEmpty()) or
-            ($turnoExiste->isNotEmpty() and (0 == $turnoExiste->first()->user_id))) {
+        $turnoEditar = Turno::whereDate('turno', $fecha->format('Y-m-d'))
+                            ->whereTime('turno', '08:00:00')
+                            ->get();
+        if (($turnoEditar->isEmpty()) or
+            ($turnoEditar->isNotEmpty() and (0 == $turnoEditar->first()->user_id))) {
             return redirect()->route('turnos.crear', $semana);
         }
 
@@ -565,17 +576,13 @@ class TurnoController extends Controller
 
         for ($d = 0; $d < 6; $d++) {
             $fecha = Fecha::primerLunesDePrimeraSemana()->addWeeks($semana);
-            $dia[$d] = $fecha->addDays($d)->format('Y-m-d');    // Fecha de cada dia.
+            $dia[$d] = $fecha->addDays($d)->format('Y-m-d');    // Fecha de cada dia de la semana a editar.
         }
 
         $users = User::where('activo', True)->where('socio', False)
                         ->get(['id', 'name']);     // Todos los usuarios (asesores) activos.
 
-        $semanas = $this->crearSemanas();      // Proximos once lunes.
-/*        for ($d = 0; $d < 11; $d++) {
-            $semanaInicial = Fecha::primerLunesDePrimeraSemana();
-            $semanas[$d] = $semanaInicial->addWeeks($d);            // Proximos once lunes.
-        }*/
+        list ($semanas, $ultimaSemanaCreada) = $this->crearSemanas();   // $semanas es arreglo de arreglos con [0] la fecha de los proximos once lunes y [1] bool: semana no creada.
 
         $fecha1 = Fecha::primerLunesDePrimeraSemana()->addWeeks($semana);   // Lunes
         $fecha2 = Fecha::primerLunesDePrimeraSemana()->addWeeks($semana)->addDays(6);                              // Domingo
@@ -583,19 +590,17 @@ class TurnoController extends Controller
                     ->orderBy('id')         // Puede estar demas, pero, me aseguro el orden correcto.
                     ->get()->all();         // Turnos a editar.
 //        dd($turnos);
-        $lunes = $turnos[0];                // Datos del turno del primer dia.
+        $lunes = $turnos[0];                // Datos del turno del primer dia de la semana a editar.
 
         $eventos = [];
         $primerDia = (new Carbon($lunes->turno->format('Y-m-01')))->startOfDay();
-/*        $ultimoDia = (new Carbon($lunes->turno->format('Y-m-t')))->endOfDay();
-        $data = Turno::whereBetween('turno', [$primerDia, $ultimoDia])->get();*/
-        $data = Turno::where('turno', '>=', $primerDia)->get();
-        if($data->count()) {
-            foreach ($data as $key => $turno) {
+        $dataMes = Turno::where('turno', '>=', $primerDia)->get();
+        if($dataMes->count()) {
+            foreach ($dataMes as $key => $turno) {
                 $start = new \DateTime($turno->turno . ' +30 minutes');     // '\' carpeta de la clase.
                 $end   = clone $start;
-                if ('M' == $turno->tipo_tur) $end->add(new \DateInterval('PT4H'));       // Periodo usando ('PT') hora, minuto o segundo. Solo 'P' si es dia, mes o año.
-                else $end->add(new \DateInterval('PT5H'));       // Periodo usando ('PT') hora, minuto o segundo. Solo 'P' si es dia, mes o año.
+                if ('M' == $turno->tipo_tur) $end->add(new \DateInterval('PT4H'));       // Agrega 4 horas. Periodo usando ('PT') hora, minuto o segundo. Solo 'P' si es dia, mes o año.
+                else $end->add(new \DateInterval('PT5H'));       // Agrega 5 horas. Periodo usando ('PT') hora, minuto o segundo. Solo 'P' si es dia, mes o año.
                 if ($start <= now()) {
                     if ('C' == $turno->tarde) $color = 'red';
                     elseif (('m' == $turno->tarde) or ('t' == $turno->tarde)) $color = 'orange';
@@ -663,9 +668,11 @@ class TurnoController extends Controller
                         }',
                    ]);
 
+        $turno = $lunes;    // Fecha del lunes de la semana a editar.
+        //dd($turnos, $lunes, $turno);
         return view('turnos.editar',
                     compact('title', 'diaSemana', 'dia', 'users', 'semanas', 'semana',
-                            'turnos', 'turno', 'calendar'));
+                            'turnos', 'turno', 'ultimaSemanaCreada', 'calendar'));
     }
 
     public function update(Request $request, Turno $turno)
@@ -711,7 +718,7 @@ class TurnoController extends Controller
         
         $id = $turno->id;
         for ($i = 0; $i < 11; $i++) {
-            $turno = Turno::find($id+$i);
+            $turno = Turno::findOrFail($id+$i);
 //            $data['turno'] = new Carbon($fechas['f'.$i] . ':00:00');
             $data['user_id'] = $fechas['u'.$i];
             if ($data['user_id'] != $turno->user_id) {
@@ -724,7 +731,8 @@ class TurnoController extends Controller
 
         $semana = $fechas['semana'];
         if ('' == $semana or is_null($semana)) {
-            return redirect()->route('turnos');
+            //return redirect()->route('turnos');
+            return redirect()->back();
         } else {
             return redirect()->route('turnos.crear', $semana);
         }
@@ -737,7 +745,7 @@ class TurnoController extends Controller
         //dd($turno, $data, $id);
         $turno->update($data);
         //dd($turno);
-        $nombre = Turno::find($turno->id)->user->name;  // Recupera el turno desde la bd.
+        $nombre = Turno::findOrFail($turno->id)->user->name;  // Recupera el turno desde la bd.
 
         Bitacora::create([
             'user_id' => Auth::user()->id,
@@ -748,11 +756,40 @@ class TurnoController extends Controller
 	    'tx_host' => $_SERVER['REMOTE_ADDR']
         ]);
 
-        return redirect()->route('turnos');
+        //return redirect()->route('turnos');
+        return redirect()->back();
     }
 
-    public function destroy(User $turno)
+    public function destroy(Turno $turno)
     {
+        if (!(Auth::check())) {
+            return redirect('login');
+        }
+
+        if ((!(Auth::user()->is_admin)) or (!(is_null($turno->user_borro)))) {
+            return redirect()->back();
+        }
+
+        $datos = 'id:' . $turno->id . ', turno:' . $turno->turno . '.'; // Para bitacoras.
+
+        $id = $turno->id;
+        for ($i = 0; $i < 11; $i++) {
+            $turno = Turno::findOrFail($id+$i);
+            $data['user_borro'] = Auth::user()->id;
+            $data['turno'] = $turno->turno->addHours(1);   // Evita duplicidad de indice unico en 'turno'.
+            $turno->update($data);
+            $turno->delete();
+        }
+
+        Bitacora::create([
+            'user_id' => Auth::user()->id,
+            'tx_modelo' => 'Turno',
+            'tx_data' => $datos,
+            'tx_tipo' => 'B',
+	        'tx_host' => $_SERVER['REMOTE_ADDR']
+        ]);
+
+        return redirect()->back();
     }
 
     public function correoTurnos()
@@ -775,7 +812,7 @@ class TurnoController extends Controller
             else return $correo;
         }
 
-        //return new TurnosAsesor(User::find(2));  // Vista preliminar del correo, en el navegador.
+        //return new TurnosAsesor(User::findOrFail(2));  // Vista preliminar del correo, en el navegador.
         $usersIds = Turno::select(DB::raw("distinct user_id")) // Devuelve arreglo de Turno.
                             ->where('turno', '>', now())    // Laravel asume 'UTC' para todas las columnas 'date' de la BdD.
 //                            ->where('turno', '>', now(Fecha::$ZONA))
@@ -784,7 +821,7 @@ class TurnoController extends Controller
             return redirect()->route('turnos', ['correo' => $correo]);
         }
         foreach ($usersIds as $userId) {
-            $user = User::findOrFail($userId)->first(); // No entiendo porque find me devuelve un arreglo.
+            $user = User::findOrFail($userId)->first(); // find solo me devuelve un arreglo.
             //dd($user);
             $turnos = $user->turnos
                             ->where('turno', '>', now());   // Laravel asume 'UTC' para todas las columnas 'date' de la BdD.
@@ -819,7 +856,7 @@ class TurnoController extends Controller
         $manana = Fecha::manana();
         $turnos = Turno::whereBetween('turno', [$ayer, $manana])
                         ->whereNull('llegada')
-    ->whereNotIn('id', [DB::raw("SELECT turno_id FROM avisos WHERE turno_id IS NOT NULL")])
+                        ->whereNotIn('id', [DB::raw("SELECT turno_id FROM avisos WHERE turno_id IS NOT NULL")])
                         ->get();
         foreach ($turnos as $turno) {
             Aviso::create([

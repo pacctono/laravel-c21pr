@@ -34,8 +34,8 @@ class PropiedadController extends Controller
     {
         $colores = $this->colores;
         foreach ($colores as $k => $v) {
-            $colores[$k] = 'text-' . $v;
-            if ('W' == $k) $colores[$k] .= ' bg-dark';
+            if ('W' == $k) $colores[$k] = 'text-dark';
+            else $colores[$k] = 'text-' . $v;
         }
         return $colores;
     }
@@ -884,16 +884,16 @@ class PropiedadController extends Controller
                                 ['propiedad' => $propiedad, 'correo' => $correo]);
     }
 
-    public function updateCodigo(Propiedad $propiedad, $codigo)
+    public function actualizar(Propiedad $propiedad, $columna, $valor)
     {
-        $codigoAnterior = $propiedad->codigo;
-        $data['codigo'] = $codigo;
+        $valorAnterior = $propiedad->$columna;
+        $data[$columna] = $valor;
         $propiedad->update($data);
 
         Bitacora::create([
             'user_id' => Auth::user()->id,
             'tx_modelo' => 'Propiedad',
-            'tx_data' => 'Id:'.$propiedad->id.' ('.$propiedad->nombre."), Codigo anterior:$codigoAnterior, nuevo:$codigo",
+            'tx_data' => "Id:{$propiedad->id} ({$propiedad->nombre}), {$columna} anterior:$valorAnterior, nuevo:$valor",
             'tx_tipo' => 'A',
 	        'tx_host' => $_SERVER['REMOTE_ADDR']
         ]);
@@ -970,7 +970,7 @@ class PropiedadController extends Controller
         else return $correo;
     }   // Final del metodo correoReporteCierre.
 
-    public function ajPropiedades()
+    public function ajaxPropiedades()
     {
         $arrTmp = Propiedad::where('estatus', '!=', 'S')
                         ->get(['id', 'codigo', 'negociacion', 'nombre', 'fecha_inicial',
@@ -994,6 +994,7 @@ class PropiedadController extends Controller
         $aCodigos = [];
         foreach ($arrTmp as $v) {
             if ('' != $v->id) $aPropiedades[$v->id] = [
+                    'cd' => $v->codigo,
                     'nb' => $v->nombre,
                     'ng' => $v->negociacion,
                     'fi' => $v->fecha_inicial->format('d/m/Y'),

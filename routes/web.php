@@ -193,13 +193,12 @@ Route::post('/propiedades/filtro', 'PropiedadController@index')
 Route::get('/propiedades/grabar', 'PropiedadController@grabarArchivo')
     ->name('propiedades.grabar');
 
-Route::get('/propiedades/ajax/', 'PropiedadController@ajPropiedades')
-    ->name('ajpropiedades');
+Route::get('/propiedades/ajax/', 'PropiedadController@ajaxPropiedades')
+    ->name('ajaxpropiedades');
 
-Route::get('/propiedades/actCodigo/{propiedad}/{codigo}', 'PropiedadController@updateCodigo')
+Route::get('/propiedades/actualizar/{propiedad}/{columna}/{codigo}', 'PropiedadController@actualizar')
     ->where('propiedad', '[0-9]+')
-    ->where('codigo', '[0-9]+')
-    ->name('propiedades.updateCodigo');
+    ->name('propiedades.actualizar');
 
 Route::pattern('propiedades', '[0-9]+');               // Para no crear conflictos con el resource propiedad
 Route::resource('propiedades', 'PropiedadController')
@@ -386,26 +385,26 @@ Route::get('/forma_pagos/{orden?}/{accion?}', 'FormaPagoController@index')
 // Cualquier nombre que comience con letra, luego letra, numero o '_'; excepto 'nuevo'. Otras palabras, usar '|'.
     ->where('orden', '[a-zA-Z]+[a-zA-Z0-9_]+(?<!nuevo|crear)')
     ->where('accion', 'ver|descargar')
-    ->name('forma_pago');
+    ->name('formaPago');
 
 Route::get('/forma_pagos/nuevo', 'FormaPagoController@create')
-    ->name('forma_pago.crear')
+    ->name('formaPago.crear')
     ->middleware('admin');
 
 Route::get('/forma_pagos/{forma_pago}', 'FormaPagoController@show')
     ->where('forma_pago', '[0-9]+')
-    ->name('forma_pago.show');
+    ->name('formaPago.show');
 
 Route::post('/forma_pagos', 'FormaPagoController@store');
 
 Route::get('/forma_pagos/{forma_pago}/editar', 'FormaPagoController@edit')
     ->where('forma_pago', '[0-9]+')
-    ->name('forma_pago.edit');
+    ->name('formaPago.edit');
 
 Route::put('/forma_pagos/{forma_pago}', 'FormaPagoController@update');
 
 Route::delete('/forma_pagos/{forma_pago}', 'FormaPagoController@destroy')
-    ->name('forma_pago.destroy')
+    ->name('formaPago.destroy')
     ->middleware('admin');
 
 Route::get('/origenes/nuevo', 'OrigenController@create')

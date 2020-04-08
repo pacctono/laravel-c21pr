@@ -589,8 +589,11 @@ class ReporteController extends Controller
         }
 
         $ruta = request()->path();
-        $tipo = strtolower(substr($ruta, 20, strpos($ruta, '/', 20)-20));   // Los primeros 20 caracteres de $ruta: 'reportes/propiedades'.
-	    $modelo = 'App\\' . ucfirst($tipo);
+        $tipo = lcfirst(substr($ruta, 20, strpos($ruta, '/', 20)-20));   // Los primeros 20 caracteres de $ruta: 'reportes/propiedades'.
+        //$tipo = strtolower(substr($ruta, 20, strpos($ruta, '/', 20)-20));   // Los primeros 20 caracteres de $ruta: 'reportes/propiedades'.
+        //$modelo = 'App\\' . (('formapago' != $tipo)?ucfirst($tipo):'FormaPago');
+        //str_replace('_', '', ucwords($input, '_'));    // snake to camel.
+        $modelo = 'App\\' . ucwords($tipo);
         $title = $this->titProp;
         if ('user' != $tipo)
             $title .= 'con ' . $tipo . ': ' . $modelo::findOrFail($id)->descripcion;
@@ -602,12 +605,21 @@ class ReporteController extends Controller
         if (0 === strpos($orden, 'fecha')) $sentido = 'desc';
 
         $tipoId = $tipo . '_id';
-        if ('user' != $tipo) $propiedades = Propiedad::where($tipoId, $id)->orderBy($orden, $sentido);
-        //else $propiedades = Propiedad::where('asesor_captador_id', $id)->orWhere('asesor_cerrador_id', $id);
-        else $propiedades = Propiedad::where(function ($query) use ($id) {
+        //if ('user' == $tipo) $propiedades = Propiedad::where('asesor_captador_id', $id)->orWhere('asesor_cerrador_id', $id);
+        if ('user' == $tipo) $propiedades = Propiedad::where(function ($query) use ($id) {
                                         $query->where('asesor_captador_id', $id)
                                             ->orWhere('asesor_cerrador_id', $id);
-                            });
+                                    });
+        elseif ('formaPago' == $tipo)
+            $propiedades = Propiedad::where(function ($query) use ($id) {
+                                    $query->where('forma_pago_reserva_id', $id)
+                                        ->orWhere('forma_pago_firma_id', $id)
+                                        ->orWhere('forma_pago_gerente_id', $id)
+                                        ->orWhere('forma_pago_captador_id', $id)
+                                        ->orWhere('forma_pago_cerrador_id', $id)
+                                        ->orWhere('forma_pago_otra_oficina_id', $id);
+                                });
+        else $propiedades = Propiedad::where($tipoId, $id);
         $propiedades = $propiedades->orderBy($orden, $sentido);
 
 	    $rutRetorno = 'reporte.propiedades' . substr($modelo, 4);

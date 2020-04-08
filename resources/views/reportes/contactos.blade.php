@@ -46,8 +46,14 @@
         </thead>
         <tbody>
         @foreach ($contactos as $vcliente)
-        <tr class="m-0 py-1 px-0">
-            <td class="m-0 py-0 px-1">
+        <tr class="
+        @if (0 == ($loop->iteration % 2))
+            table-primary
+        @else
+            table-info
+        @endif
+        m-0 p-0">
+            <td class="m-0 p-0">
             @if ($movil)
                 <a href="{{ route('contactos.muestra', [$vcliente, $rutRetorno]) }}" class="btn btn-link">
                     {{ $vcliente->name }}

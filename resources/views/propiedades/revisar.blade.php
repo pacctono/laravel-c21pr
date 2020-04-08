@@ -1,4 +1,10 @@
 <script>
+    function agregarTexto(texto, jerror, textoNuevo) {
+        if (0 < jerror) texto += '<br>';
+        jerror++;
+        texto += `${jerror}) ${textoNuevo}`;
+        return [jerror, texto];
+    }
     $(function () {
         $('[data-toggle="tooltip"]').tooltip('enable')
     })
@@ -181,42 +187,39 @@
             const vfirma   = firma.val();
             let texto      = '', jerror = 0;
             if (('' == vreserva) && ('' != vfirma)) {
-                jerror++;
-                texto += `${jerror}) Una propiedad no puede tener ` +
+                [jerror, texto] = agregarTexto(texto, jerror, 
+                    `Una propiedad no puede tener ` +
                     `<u>fecha de la firma</u>: ${vfirma} y vacia la ` +
-                    `<u>fecha de reserva</u>`;
+                    `<u>fecha de reserva</u>`);
                 //reserva.focus();
             }
             const status  = $("#estatus");
             const vestatus = status.val();
             if (('' != vreserva) && (('A' == vestatus) ||
                                                       ('S' == vestatus))) {
-                jerror++;
-                if (0 < jerror) texto += '<br>';
-                texto += `${jerror}) Una propiedad no puede tener ` +
+                [jerror, texto] = agregarTexto(texto, jerror, 
+                    `Una propiedad no puede tener ` +
                     `<u>fecha de reserva</u>: ${vreserva} y el <u>estatus</u> ` +
-                    `<b>${estatus[vestatus]}</b>`;
+                    `<b>${estatus[vestatus]}</b>`);
                 //status.focus();
             }
             if (('' != vfirma) && (('A' == vestatus) ||
                         ('I' == vestatus) || ('S' == vestatus))) {
-                jerror++;
-                if (0 < jerror) texto += '<br>';
-                texto += `${jerror}) Una propiedad no puede tener ` +
+                [jerror, texto] = agregarTexto(texto, jerror, 
+                    `Una propiedad no puede tener ` +
                     `<u>fecha de la firma</u>: ${vfirma} y el <u>estatus</u> ` +
-                    `<b>${estatus[vestatus]}</b>`;
+                    `<b>${estatus[vestatus]}</b>`);
                 //status.focus();
             }
             const vcaptador = $("#asesor_captador_id").val();   // Si es 1; el captador es de otra oficina.
             const ncaptador = $("#asesor_captador").val();      // Solo se usa, cuando es otra oficina (vcaptador=1):
             if ('1' == vcaptador) {
                 if ('' == ncaptador) {
-                    jerror++;
-                    if (0 < jerror) texto += '<br>';
-                    texto += `${jerror}) No puede crear esta propiedad; la cual, ` +
+                    [jerror, texto] = agregarTexto(texto, jerror, 
+                        `No puede crear esta propiedad; la cual, ` +
                         `se ha identificado como <u>otra oficina</u>, sin agregar ` +
                         `el nombre de la oficina CAPTADORA (y, opcionalmente, ` +
-                        `el nombre del asesor CAPTADOR) y ha dejado el campo vacio.`;
+                        `el nombre del asesor CAPTADOR) y ha dejado el campo vacio.`);
                     //captador.focus();
                 }
             }
@@ -225,14 +228,13 @@
             const ncerrador = $("#asesor_cerrador").val();      // Solo se usa, cuando es otra oficina (vcerrador=1):
             if ((('P' == vestatus) || ('C' == vestatus)) && ('1' == vcerrador)) {   // vestatus se define unas lineas arriba.
                 if ('' == ncerrador) {
-                    jerror++;
-                    if (0 < jerror) texto += '<br>';
-                    texto += `${jerror}) No puede crear esta propiedad; la cual, ` +
+                    [jerror, texto] = agregarTexto(texto, jerror, 
+                        `No puede crear esta propiedad; la cual, ` +
                         `se ha identificado como <u>otra oficina</u> y ademas, ` +
                         `coloco el <u>estatus</u> en <b>${estatus[vestatus]}</b>, ` +
                         `sin agregar el nombre de la oficina CERRADORA ` +
                         `(y, opcionalmente, el nombre del asesor CERRADOR) y ha ` +
-                        `dejado el campo vacio.`;
+                        `dejado el campo vacio.`);
                     //captador.focus();
                 }
             }
@@ -246,13 +248,12 @@
                 ng = negociaciones[ap.ng];
             }
             if (ac && ap && st && ng) {
-                jerror++;
-                if (0 < jerror) texto += '<br>';
-                texto += `${jerror}) Este codigo: <b>${codigo}</b> fue asignado a ` +
+                [jerror, texto] = agregarTexto(texto, jerror, 
+                    `Este codigo: <b>${codigo}</b> fue asignado a ` +
                     `una propiedad creada por <b>${asesores[ap.uid]}</b> el ` +
                     `<b>${ap.fc}</b> a las <b>${ap.ho}</b>; con nombre: ` +
                     `<b>${ap.nb}</b> y actualmente, tiene el estatus: <b>${st}</b>, ` +
-                    `como una negociacion de <b>${ng}</b>.`;
+                    `como una negociacion de <b>${ng}</b>.`);
                 /*if (!resp) {
                     ev.preventDefault();
                     $(this).focus();
@@ -264,10 +265,9 @@
             const vname    = nname.val();
             if ('X' == vcliente) {
                 if ('' === vname) {
-                    jerror++;
-                    if (0 < jerror) texto += '<br>';
-                    texto += `${jerror}) Usted seleccciono un <u>Nuevo...</u> ` +
-                        `cliente; pero, no suministro su <em>nombre</em>!`;
+                    [jerror, texto] = agregarTexto(texto, jerror, 
+                        `Usted seleccciono un <u>Nuevo...</u> ` +
+                        `cliente; pero, no suministro su <em>nombre</em>!`);
                     //nname.focus();
                 }
             }

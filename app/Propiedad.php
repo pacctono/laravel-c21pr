@@ -59,6 +59,7 @@ class Propiedad extends Model
     protected $appends = [
         'fecRes', 'fecFir', 'fecIni',                   // Fechas reserva, firma e incial.
         'negoc', 'exclu', 'habits', 'descr', 'direc',   // negociacion, exclusividad, habitaciones, descripcion y direccion.
+        'fpRes', 'fpFir', 'fpGer', 'fpCap', 'fpcer', 'fpOtr',   // Formas de pago Reserva, Firma, Gerente, Captador, Cerrador, Otra Oficina
         'codPos', 'pcFrq', 'pcReCaNa',                  // codigo postal, porcentajes franquicia y reportado casa nacional.
         'pcRega', 'pcCom', 'pcCap',                     // porcentajes regalia, comisio y captador.
         'pcGer', 'pcCer', 'pcBonif',                    // porcentajes gerente, cerrador y bonificacion.
@@ -393,7 +394,7 @@ class Propiedad extends Model
     public function getNegociacionAlfaAttribute()
     {
         if ('V' == $this->negociacion) return 'Venta';
-	    elseif ('A' == $this->negociacion) return 'Alqui';
+	    elseif ('A' == $this->negociacion) return 'Alquiler';
 	    else return 'Nulo';
     }
 
@@ -408,10 +409,10 @@ class Propiedad extends Model
 
     public function colorEstatus($estatus, $antes='table', $borrado=False)
     {
-        if ($borrado) return 'bg-danger';
+        if ($borrado) return $antes.'-danger';
         elseif (array_key_exists($estatus, self::COLORES))
             return $antes . '-' . self::COLORES[$estatus];
-        else return 'bg-suave';                         // No deberia suceder
+        else return $antes.'-suave';                         // No deberia suceder
     }
 
     public function getEstatusColorAttribute()
@@ -858,6 +859,61 @@ class Propiedad extends Model
 	    else return 'Nulo';
     }
 
+    public function getObservacionAttribute()
+    {
+        $estatus = $this->estatus;
+        $reserva = $this->fecha_reserva;
+        $firma   = $this->fecha_firma;
+        $captador = $this->asesor_captador_id;
+        $cerrador = $this->asesor_cerrador_id;
+        $otcaptador = $this->asesor_captador;
+        $otcerrador = $this->asesor_cerrador;
+        $prop = 'Propiedad ';
+        if (('P' == $estatus) or ('C' == $estatus))
+            $venta = $prop . (('V' == $this->negociacion)?'vendida':'alquilada');
+        else $venta = False;
+        if ($venta) {
+            if (is_null($reserva))
+                $obs = $venta . ' sin <u>fecha de reserva</u>';
+            if (is_null($firma)) {
+                if (isset($obs)) $obs .= ', ni la <u>fecha de la firma</u>?';
+                else $obs = $venta . ' sin la <u>fecha de la firma</u>?';
+            } else if (isset($obs)) $obs .= '?';
+            if ((1 == $captador) and (is_null($otcaptador) or ('' == $otcaptador))) {
+                if (isset($obs)) $obs .= '<br>';
+                else $obs = $venta . ' ';
+                $obs .= 'no tiene asignado el <u>asesor captador</u>?';
+            }
+            if ((1 == $cerrador) and (is_null($otcerrador) or ('' == $otcerrador))) {
+                if (isset($obs)) $obs .= '<br>';
+                else $obs = $venta . ' ';
+                $obs .= 'no tiene asignado el <u>asesor cerrador</u>';
+            }
+        } else if ('A' == $estatus) {
+            $prop .= '<u>Activa</u>';
+            if (!is_null($reserva))
+                $obs = $prop . ' con <u>fecha de reserva</u>';
+            if (!is_null($firma)) {
+                if (isset($obs)) $obs .= 'y <u>fecha de la firma</u>?';
+                else $obs = $prop . ' con <u>fecha de la firma</u>?';
+            } else if (isset($obs)) $obs .= '?';
+        } else if ('I' == $estatus) {
+            $prop = '<u>Inmueble pendiente</u>';
+            if (is_null($reserva))
+                $obs = $prop . ' sin <u>fecha de reserva</u>';
+            if (!is_null($firma)) {
+                if (isset($obs)) $obs .= 'y con <u>fecha de la firma</u>?';
+                else $obs = $prop . ' con <u>fecha de la firma</u>?';
+            } else if (isset($obs)) $obs .= '?';
+            if ((1 == $captador) and (is_null($otcaptador) or ('' == $otcaptador))) {
+                if (isset($obs)) $obs .= '<br>';
+                else $obs = $prop . ' ';
+                $obs = 'no tiene asignado el <u>asesor captador</u>';
+            }
+        }
+        return $obs??False;
+    }
+
     public static function sumaXAsesor($idAsesor, $tipoAsesor, $fecha='fecha_firma',
                                         $fecha_desde=null, $fecha_hasta=null)
     {
@@ -1279,6 +1335,12 @@ class Propiedad extends Model
     }
     public function getPtsCerAttribute() {
         return $this->getPuntosCerradorAttribute();
+    }
+    public function getFpResAttribute() {
+        return $this->forma_pago_reserva_id;
+    }
+    public function getFpFirAttribute() {
+        return $this->forma_pago_firma_id;
     }
     public function getFpGerAttribute() {
         return $this->forma_pago_gerente_id;

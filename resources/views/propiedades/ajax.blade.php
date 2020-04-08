@@ -1,6 +1,6 @@
         var asesores, aPropiedades, estatus, negociaciones, aCodigos;
 
-        $.ajax({url: "/propiedades/ajax",       // @ajPropiedades
+        $.ajax({url: "/propiedades/ajax",       // @ajaxPropiedades
             success: function(resultado) {
                     asesores  = $.parseJSON(resultado[0]);
                     aPropiedades = $.parseJSON(resultado[1]);

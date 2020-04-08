@@ -88,11 +88,14 @@ class FormaPago extends Model
     }
     public function propiedades()    // forma_pago_reserva_id
     {
-        return Propiedad::where('forma_pago_reserva_id', $this->id)
-                        ->whereOr('forma_pago_firma_id', $this->id)
-                        ->whereOr('forma_pago_gerente_id', $this->id)
-                        ->whereOr('forma_pago_captador_id', $this->id)
-                        ->whereOr('forma_pago_cerrador_id', $this->id)
-                        ->whereOr('forma_pago_otra_oficina_id', $this->id)->get();
+        $id = $this->id;
+        return Propiedad::where(function ($query) use ($id) {
+                    $query->where('forma_pago_reserva_id', $id)
+                        ->orWhere('forma_pago_firma_id', $id)
+                        ->orWhere('forma_pago_gerente_id', $id)
+                        ->orWhere('forma_pago_captador_id', $id)
+                        ->orWhere('forma_pago_cerrador_id', $id)
+                        ->orWhere('forma_pago_otra_oficina_id', $id);
+                })->get();
     }
 }

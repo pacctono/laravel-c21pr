@@ -17,7 +17,7 @@ class FormaPagoController extends Controller
      * @return \Illuminate\Http\Response
      */
     protected $tipo = 'Forma_Pagos';
-    protected $ruta = 'forma_pago';
+    protected $ruta = 'formaPago';
     protected $enlace = 'propiedades';
     protected $vistaCrear  = 'tabla.crear';
     protected $vistaIndice = 'tabla.index';
@@ -77,7 +77,8 @@ class FormaPagoController extends Controller
         $title = 'Crear ' . substr($tipo, 0, -1);
         $url  = '/' . strtolower($tipo);
 
-        return view($this->vistaCrear, compact('title', 'tipo', 'elemento', 'url'));     // Quite $elemento (=forma_pago), no entiendo que hace aqui.
+        return view($this->vistaCrear, compact('title', 'tipo', 'elemento', 'url',
+                                                'plural', 'singular'));     // Quite $elemento (=forma_pago), no entiendo que hace aqui.
     }
 
     /**
@@ -160,10 +161,10 @@ class FormaPagoController extends Controller
      */
     public function destroy(FormaPago $forma_pago)
     {
-        if (0 < ($forma_pago->propiedades->count()-$forma_pago->propiedadesBorrados($forma_pago->id)->count())) {
+        if (0 < ($forma_pago->propiedades->count()-$forma_pago->propiedadesBorradas($forma_pago->id)->count())) {
             return redirect()->route($this->ruta);  // Existen propiedades asignados a este usuario.
         }
-        if (0 < $forma_pago->propiedadesBorrados($forma_pago->id)->count()) {    // Existen propiedades borrados (logico).
+        if (0 < $forma_pago->propiedadesBorradas($forma_pago->id)->count()) {    // Existen propiedades borrados (logico).
             $propiedades = $forma_pago->propiedades;         // Todos los propiedades con este forma_pago, estan borrados.
             foreach ($propiedades as $propiedad) {     // Ciclo para borrar fisicamente los propiedades.
                 $propiedad->delete();

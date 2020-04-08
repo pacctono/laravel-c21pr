@@ -47,6 +47,14 @@
             @endif (!isset($accion) or ('html' == $accion))
             </th>
         @if (!$movil)
+            @if (Auth::user()->is_admin and (!isset($estatus) or ('V' != $estatus)))
+            <th class="text-center m-0 p-0" scope="col" data-toggle="tooltip" title="Estatus">
+                E
+            </th>
+            <th class="text-center m-0 p-0" scope="col" data-toggle="tooltip" title="Observacion">
+                O
+            </th>
+            @endif (Auth::user()->is_admin and (isset($estatus) and ('V' == $estatus)))
             <th class="m-0 p-0" scope="col" data-toggle="tooltip" title="Fecha de reserva">
             @if (!isset($accion) or ('html' == $accion))
                 <a href="{{ route('propiedades.orden', 'fecha_reserva') }}"
@@ -163,37 +171,70 @@
             <td class="m-0 p-0">
         @else ($movil)
         @if (!isset($accion) or ('html' == $accion))
-            <td class="text-right m-0 p-0 codigo ratonAyuda" data-toggle="tooltip" data-html="true"
+            <td class="text-right m-0 p-0 codigo
+        @if (Auth::user()->is_admin)
+                        ratonApuntador" data-toggle="tooltip" data-html="true"
+                    id="{{ $propiedad->id }}-{{ $propiedad->codigo }}"
+                    title="Cambiaar el c&oacute;digo MLS de esta propiedad.
+        @else (Auth::user()->is_admin)
+                        ratonAyuda" data-toggle="tooltip" data-html="true"
                     titulo="<u>{{ $propiedad->id }}</u>)
                             <b>{{ (($propiedad->user_borro || $propiedad->deleted_at)?'Borrado':$propiedad->estatus_alfa) }}</b>
-       @if (Auth::user()->is_admin)
+        {{--@if (Auth::user()->is_admin)
                         <br>Reporte en casa nacional: <b>{{ $propiedad->reporte_casa_nacional_ven }}</b>
                         <br>Estatus en sistema C21:
                             <b>{{ $propiedad->estatus_c21_alfa.(($propiedad->pagado_casa_nacional)?' y PAGADO A CASA NACIONAL':'') }}</b>
                         {{ (($propiedad->factura_AyS)?'<br><em>Factura A & S: '.$propiedad->factura_AyS.'.</em>':'') }}"
                     {{--data-trigger="click"--}}
-            >
-               <input type="text" class="form-control form-control-sm m-0 p-0 codigo"
+            {{-->
+               <input type="text" class="form-control form-control-sm $propiedad->colorEstatus($propiedad->estatus, 'bg') m-0 p-0 codigo"
                         disabled minlength="6" tabindex="-1" name="codigo"
                         id="{{ $propiedad->id }}-codigo"
                         value="{{ old('entcodigo', $propiedad->codigo) }}">
-        @else (Auth::user()->is_admin)
+        @else (Auth::user()->is_admin)--}}
+        @endif (Auth::user()->is_admin)
             ">
                 <span class="text-right m-0 p-0">{{ $propiedad->codigo }}</span>
-        @endif (Auth::user()->is_admin)
         @else (!isset($accion) or ('html' == $accion))
             <td>
                 {{ $propiedad->codigo }}
         @endif (!isset($accion) or ('html' == $accion))
             </td>
 
-            <td class="text-right m-0 py-0 px-1">
-                <span class="text-right m-0 p-0" id="{{ $propiedad->id }}-fecres">
-                    {{ $propiedad->fec_res }}</span>
+            @if (Auth::user()->is_admin and (!isset($estatus) or ('V' != $estatus)))
+            <td class="text-center m-0 p-0 estatus ratonApuntador" data-toggle="tooltip"
+                    title="Cambiar estatus, bajo su propia responsabilidad."
+                    id="{{ $propiedad->id }}-{{ $propiedad->estatus }}">
+                {{ $propiedad->estatus }}
             </td>
-            <td class="text-right m-0 py-0 px-1">
-                <span class="text-right m-0 p-0" id="{{ $propiedad->id }}-fecfir">
-                    {{ $propiedad->fec_fir }}</span>
+            <td class="text-center m-0 p-0
+                @if ($propiedad->observacion)
+                    observacion ratonAyuda" data-toggle="tooltip" data-html="true"
+                    titulo="{{ $propiedad->observacion }}">
+                <span class="oi oi-bug m-0 p-0"></span>
+                @else ($propiedad->observacion)
+                ">&nbsp;
+                @endif ($propiedad->observacion)
+            </td>
+            @endif (Auth::user()->is_admin and (isset($estatus) and ('V' == $estatus)))
+
+            <td class="text-right m-0 py-0 px-1
+            @if (Auth::user()->is_admin and (!isset($accion) or ('html' == $accion)))
+                    reserva ratonApuntador" data-toggle="tooltip"
+                    title="Cambiar fecha de reserva, bajo su propia responsabilidad."
+                    id="{{ $propiedad->id }}.{{ $propiedad->fecha_reserva_bd }}
+            @endif (Auth::user()->is_admin and (!isset($accion) or ('html' == $accion)))
+            ">
+                {{ $propiedad->fec_res }}
+            </td>
+            <td class="text-right m-0 py-0 px-1
+            @if (Auth::user()->is_admin and (!isset($accion) or ('html' == $accion)))
+                    firma ratonApuntador" data-toggle="tooltip"
+                    title="Cambiar fecha de firma, bajo su propia responsabilidad."
+                    id="{{ $propiedad->id }}.{{ $propiedad->fecha_firma_bd }}
+            @endif (Auth::user()->is_admin and (!isset($accion) or ('html' == $accion)))
+            ">
+                {{ $propiedad->fec_fir }}
             </td>
 
             <td class="text-center m-0 p-0">
@@ -480,13 +521,13 @@
                     </button>
                 </form>
                 @endif ((Auth::user()->is_admin) && !($propiedad->user_borro || $propiedad->deleted_at) && ...)
-                @if (Auth::user()->is_admin)
+                {{--@if (Auth::user()->is_admin)
                 <a href="#" class="btn btn-link m-0 p-0 editarCodigo mostrarTooltip" id="{{ $propiedad->id }}"
                     data-toggle="tooltip" data-html="true"
                     title="Cambiar el codigo MLS <b>{{ $propiedad->codigo }}</b> de esta propiedad (<u>{{ $propiedad->nombre}}</u>).">
                 <span class="oi oi-brush m-0 p-0"></span>
                 </a>
-                @endif (Auth::user()->is_admin)
+                @endif (Auth::user()->is_admin)--}}
             </td>
         {{-- @endif (!isset($accion) or ('html' == $accion)) --}}
         @endif ((!$movil) and (!isset($accion) or ('html' == $accion)))

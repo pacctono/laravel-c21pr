@@ -3,14 +3,19 @@
         //$('[data-toggle="tooltip"]').tooltip('enable')
         $("a.mostrarTooltip").tooltip('enable')
         $("span.mostrarTooltip").tooltip('enable')
-    })
+    });
+    $.fn.renombrar = function(nombAtrNuevo, nombAtrActual) {
+        let $t = $(this);
+        $t.attr(nombAtrNuevo, $t.attr(nombAtrActual));
+        $t.removeAttr(nombAtrActual);
+    }
     @includeIf('include.alertar')
     @includeIf('include.confirmar')
     $(document).ready(function() {
     @includeWhen((Auth::user()->is_admin) and (!$movil) and
                  (!isset($accion) or ('html' == $accion)), 'propiedades.ajax')
 
-    @if (($propRepetidas->isNotEmpty()) and (Auth::user()->is_admin))
+    @if ((Auth::user()->is_admin) and isset($propRepetidas) and ($propRepetidas->isNotEmpty()))
         var valCodigo, linea = '';
         @foreach ($propRepetidas as $pr)
         @if (0 == $loop->index)
@@ -25,7 +30,7 @@
         alertar(linea + pie, 'Existen propiedades REPETIDAS', 'large', function() {
                                                         $('#vmCodigo').val(valCodigo);
                                                     });
-    @endif ($propRepetidas->isNotEmpty())
+    @endif ((Auth::user()->is_admin) and isset($propRepetidas) and ($propRepetidas->isNotEmpty()))
 
     @if (!$movil and (!isset($accion) or ('html' == $accion)) and isset($alertar))
     @if (0 < $alertar)
@@ -35,6 +40,111 @@
     @endif (0 < $alertar)
     @endif (!$movil and (!isset($accion) or ('html' == $accion)))
 
+    @if (Auth::user()->is_admin)
+        $("td.codigo").click(function(ev) {
+            const that = $(this);
+            const id = that.attr('id').split('-')[0]; // 'id' de la propiedad.
+            const codigo = that.attr('id').split('-')[1];   // 'codigo' de la propiedad.
+            const ap = aPropiedades[id];
+            bootbox.prompt({
+                size: 'small',
+                title: `Cambiar el codigo de (${ap.cd}) ${ap.nb}.`,
+                inputType: 'text',
+                value: codigo,
+                callback: function(res) {
+                    if (res) {
+                        if (res == codigo) return;
+                        let codNuevo = res;
+                        var ac = aCodigos[codNuevo];
+                        if (ac) {
+                            if (undefined == ac.id) {
+                                alert(`Algo extraño paso. Reportelo. Esto no deberia ocurrir, id:${ac.id}`);
+                                return;
+                            }
+                            var ap = aPropiedades[ac.id];
+                            if (ap) {
+                                var st = estatus[ap.st];
+                                var ng = negociaciones[ap.ng];
+                            }
+                        }
+                        if (ac && ap && st && ng) {
+                            alertar(`Otra propiedad con este mismo codigo: <b>${codNuevo}</b>, ` +
+                                    `fue creada por <u>${asesores[ap.uid]}</u> ` +
+                                    `el <u>${ap.fc}</u> a las <u>${ap.ho}</u>; con nombre: ` +
+                                    `<u>${ap.nb}</u> y actualmente, tiene el estatus: ` +
+                                    `<u>${st}</u> como una negociacion de <u>${ng}</u>.`);
+                            return;
+                        }
+                        nvoUrl = `/propiedades/actualizar/${id}/codigo/${codNuevo}`;
+                        location.href = nvoUrl;
+                    }
+                }
+            });
+        });
+        $("td.estatus").click(function(ev) {
+            const that = $(this);
+            const id = that.attr('id').split('-')[0]; // 'id' de la propiedad.
+            const status = that.attr('id').split('-')[1]; // 'estatus' de la propiedad.
+            let aEstatus = [], i = 0;
+            for (let k in estatus) {
+                aEstatus[i++] = {
+                    text: estatus[k],
+                    value: k
+                }
+            }
+            const ap = aPropiedades[id];
+            bootbox.prompt({
+                size: 'small',
+                title: `Cambiar estatus (${estatus[status]}) de (${ap.cd}) ${ap.nb}.`,
+                inputType: 'select',
+                value: status,
+                inputOptions: aEstatus,
+                callback: function(res) {
+                    if (res) {
+                        nvoUrl = `/propiedades/actualizar/${id}/estatus/${res}`;
+                        location.href = nvoUrl;
+                    }
+                }
+            });
+        });
+        $("td.reserva").click(function(ev) {
+            const that = $(this);
+            const id = that.attr('id').split('.')[0]; // 'id' de la propiedad.
+            const reserva = that.attr('id').split('.')[1].trim(); // 'fecha_reserva' de la propiedad.
+            const creserva = ('' != reserva)?`(${reserva}) `:'';
+            const ap = aPropiedades[id];
+            bootbox.prompt({
+                size: 'small',
+                title: `Cambiar la fecha de reserva ${creserva}de (${ap.cd}) ${ap.nb}.`,
+                inputType: 'date',
+                value: reserva,
+                callback: function(res) {
+                    if (res) {
+                        nvoUrl = `/propiedades/actualizar/${id}/fecha_reserva/${res}`;
+                        location.href = nvoUrl;
+                    }
+                }
+            });
+        });
+        $("td.firma").click(function(ev) {
+            const that = $(this);
+            const id = that.attr('id').split('.')[0]; // 'id' de la propiedad.
+            const firma = that.attr('id').split('.')[1].trim(); // 'fecha_firma' de la propiedad.
+            const cfirma = ('' != firma)?`(${firma}) `:'';
+            const ap = aPropiedades[id];
+            bootbox.prompt({
+                size: 'small',
+                title: `Cambiar la fecha de la firma ${cfirma}de (${ap.cd}) ${ap.nb}.`,
+                inputType: 'date',
+                value: firma,
+                callback: function(res) {
+                    if (res) {
+                        nvoUrl = `/propiedades/actualizar/${id}/fecha_firma/${res}`;
+                        location.href = nvoUrl;
+                    }
+                }
+            });
+        });
         $("td.nombre").click(function(ev) {
             const id = $(this).attr('id').substring(7);
             const cd = $("#"+id+"-codigo").val();
@@ -63,21 +173,28 @@
                             `<em>Comentarios:</em> <u>${com}</u>.`;
             alertar(texto, titulo);
         });
-        $("td.codigo, td.precio,td.lados,td.franquicia,td.sanaf,td.neto").click(function(ev) {
+    @endif (Auth::user()->is_admin)
+    @if (Auth::user()->is_admin)
+        $("td.observacion,td.precio,td.lados,td.franquicia,td.sanaf,td.neto").click(function(ev) {
+    @else (Auth::user()->is_admin)
+        $("td.codigo").click(function(ev) {
+    @endif (Auth::user()->is_admin)
             let $t = $(this);
             if (undefined === $t.attr('title')) {
-                $t.attr('title', $t.attr('titulo'));
-                $t.removeAttr('titulo');
+                //$t.attr('title', $t.attr('titulo'));
+                //$t.removeAttr('titulo');
+                $t.renombrar('title', 'titulo');    // Mi propia funcion 'renombrar'. Definida al principio de este archivo.
                 $t.tooltip('enable');           // Trate  $("td.precio").tooltip('enable'), al principio y no funciono.
                 $t.tooltip('show');           // Trate  $("td.precio").tooltip('enable'), al principio y no funciono.
             } else {
-                $t.attr('titulo', $t.attr('title'));
-                $t.removeAttr('title');
+                //$t.attr('titulo', $t.attr('title'));
+                //$t.removeAttr('title');
+                $t.renombrar('titulo', 'title');    // Mi propia funcion 'renombrar'. Definida al principio de este archivo.
                 $t.tooltip('disable');          // Trate $("td.precio").tooltip('enable'), al principio y no funciono.
             }
         });
 
-        var codigo;
+        {{--var codigo;
         $("a.editarCodigo").click(function(ev) {
             ev.preventDefault();
             $("input.codigo").prop('disabled', true);
@@ -90,6 +207,7 @@
                 if (accion) {
                     entrada.parent().tooltip('disable');
                     entrada.prop('disabled', false);
+                    //entrada.css("background-color", "white");
                     entrada.focus();            // No funciona.
                     //that.get(0).focus();      // No funciona.
                     //elemento.focus();         // TAMPOCO FUNCIONA.
@@ -107,9 +225,9 @@
             var ac = aCodigos[codNuevo];
             let id;
             if (ac) {
-                if ('undefined' == ac.id) {
+                if (undefined == ac.id) {
                     alert(`Algo extraño paso. Reportelo. Esto no deberia ocurrir, id:${ac.id}`);
-                    $(this).prop('disabled', true);
+                    that.prop('disabled', true);
                     return;
                 }
                 var ap = aPropiedades[ac.id];
@@ -136,9 +254,9 @@
             }
             confirmar(texto, 'large', function(accion) {
                 if (accion) {
-                    that.parent().tooltip('enable');    // Estas dos lineas deben ser eliminadas al ir al servidor
-                    that.prop('disabled', true);        // a realizar 'update'. Pero, debo dejarlas con ajax.
-                    nvoUrl = `/propiedades/actCodigo/${id}/${codNuevo}`;
+                    that.parent().tooltip('enable');    // Estas dos lineas deberian ser eliminadas al ir al servidor
+                    that.prop('disabled', true);        // a realizar 'update'. Pero, debo dejarlas para el futuro con ajax.
+                    nvoUrl = `/propiedades/actualizar/${id}/codigo/${codNuevo}`;
                     location.href = nvoUrl;
                 } else {
                     that.val(codigo);                   // Coloca el valor original.
@@ -150,7 +268,7 @@
                     //$('#'+id).get(0).focus(); // TAMPOCO FUNCIONA.
                 }
             });
-        });
+        });--}}
         $("#formulario").submit(function(ev) {
             const fecha_desde = $('#fecha_desde').val();
             const fecha_hasta = $('#fecha_hasta').val();

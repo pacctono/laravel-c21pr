@@ -149,7 +149,7 @@
                   Grabar propiedades
                 </a></li>
               @foreach (array('caracteristica' => 'Caracteristica', 'deseo' => 'Deseo',
-                              'feriado' => 'Dias feriados', 'forma_pago' => 'Forma de pago',
+                              'feriado' => 'Dias feriados', 'formaPago' => 'Forma de pago',
                               'origen' => 'Origen', 'price' => 'Precio',
                               'resultado' => 'Resultado', 'tipo' => 'Tipo de propiedad',
                               'ciudad' => 'Ciudad', 'municipio' => 'Municipio',

@@ -442,13 +442,16 @@ class User extends Authenticatable
     public static function cumpleanos($fecha=null, $fecha_hasta=null) {
         if(null == $fecha) $fecha = now(Fecha::$ZONA);
 //        dd($fecha);
-        $fecha_desde = new Carbon($fecha, Fecha::$ZONA);
+        $fecha_desde = new Carbon($fecha);
         if(null == $fecha_hasta) $fecha_hasta = (new Carbon($fecha, Fecha::$ZONA))->addDays(30);
 //        dd($fecha, $fecha_desde, $fecha_hasta);
-        return self::whereBetween(DB::raw("DATE_ADD(fecha_nacimiento,
+/*        return self::whereBetween(DB::raw("DATE_ADD(fecha_nacimiento,
                                         INTERVAL YEAR(now())-YEAR(fecha_nacimiento) +
                                         IF(DAYOFYEAR(now()) > DAYOFYEAR(fecha_nacimiento),1,0)
                                         YEAR)"), [$fecha_desde, $fecha_hasta])
+                                        ->orderBy(DB::raw("DAYOFYEAR(fecha_nacimiento)"));*/
+        return self::whereBetween(DB::raw("DATE(CONCAT(YEAR(now()), '-', MONTH(fecha_nacimiento), '-',
+                                        DAY(fecha_nacimiento)))"), [$fecha_desde, $fecha_hasta])
                                         ->orderBy(DB::raw("DAYOFYEAR(fecha_nacimiento)"));
 //                            ->get();
     }

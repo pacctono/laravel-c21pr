@@ -3,10 +3,10 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="description" content="">
-    <meta name="author" content="">
+    <meta name="description" content="Century 21 Puente Real">
+    <meta name="author" content="Pablo Caraballo">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <link rel="icon" href="favicon.ico">
+    <link rel="icon" href="{{ asset('favicon.ico') }}">
 
     <title>{{ config('app.name', 'Laravel') }}</title>
 
@@ -216,8 +216,13 @@
 @if (!isset($accion) or ('html' == $accion))
     <footer class="footer">
       <div class="container">
-        <span class="text-muted">
-          Piso 1, Centro Comercial Costanera Plaza I, Barcelona, 0281-416.0885.&copy; Copyright 2019-{{ date('Y') }}
+        <span class="text-white bg-dark"><!-- text-muted: texto color gris -->
+          Av. Costanera, Centro Comercial Costanera Plaza I, Piso 1, Local P1-02, Nueva Barcelona, frente al CC Camino Real
+          <i class="fa fa-phone-alt"></i>0281-416.0885
+          <a hre="mailto:c21puentereal@gmail.com" class="btn btn-link m-0 p-0 enlaceFooter"
+              data-toggle="tooltip" title="Enviar correo a Puente Real">
+            <i class="fa fa-at"></i></a>.
+          &copy; Copyright 2019-{{ date('Y') }}
         </span>
       </div>
     </footer>
@@ -230,5 +235,12 @@
     <!--script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script-->
     <!--script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script-->
     <!--script src="{{ asset('js/app.js') }}"></script-->
+
+    <script>
+      $(function () {
+          $("a.enlaceFooter").tooltip('enable')
+      });
+    </script>
+
   </body>
 </html>

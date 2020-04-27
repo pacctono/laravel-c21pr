@@ -1015,4 +1015,24 @@ class PropiedadController extends Controller
                     json_encode($estatus), json_encode($negociaciones),
                     json_encode($aCodigos));
     }
+
+    public function cargarimagen(Request $request)
+    //public function cargarimagen()    // Tendria que usar request() en vez de $request.
+    {
+        //dd($request->all());
+        $request->validate([
+            //'image' => '',
+            'imagen' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            //'id' => '',
+            //'codigo' => '',
+        ]);
+        //dd($request->all());
+        $nombreImagenOriginal = $request->imagen->getClientOriginalName();
+        $nombreImagen = $request->codigo . '-' . $request->id . '.' . $request->imagen->getClientOriginalExtension();
+        $request->imagen->move(public_path('imgprop'), $nombreImagen);
+
+        return response()
+                    ->json(['success' => "La imagen '$nombreImagenOriginal' se ha cargado satisfactoriamente.",
+                            'nombreImagen' => $nombreImagen]);
+    }
 }

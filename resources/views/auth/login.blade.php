@@ -5,15 +5,15 @@
     <div class="row justify-content-center">
         <div class="col-md-8">
             <div class="card">
-                <div class="card-header">{{ __('Login') }}</div>
+                <div class="card-header colorFondo1">{{ __('Login') }}</div>
 
                 <div class="card-body"
-                    style="background-image:url('img/fachada0.jpg');width:710px;height:250px;border:0;">
+                    style="background-image:url('img/fachada0.jpg');border:0;">
                     <form method="POST" action="{{ route('login') }}">
                         @csrf
 
                         <div class="form-group row">
-                            <label for="email" class="col-sm-4 col-form-label text-md-right">
+                            <label for="email" class="col-sm-4 col-form-label text-md-right text-light">
                                 {{ __('Dirección de correo') }}
                             </label>
 
@@ -31,7 +31,7 @@
                         </div>
 
                         <div class="form-group row">
-                            <label for="password" class="col-md-4 col-form-label text-md-right">
+                            <label for="password" class="col-md-4 col-form-label text-md-right text-light">
                                 {{ __('Contraseñá') }}
                             </label>
 
@@ -51,7 +51,7 @@
                         <div class="form-group row">
                             <div class="col-md-6 offset-md-4">
                                 <div class="checkbox">
-                                    <label>
+                                    <label class="text-light">
                                         <input type="checkbox"
                                             name="remember" {{ old('remember') ? 'checked' : '' }}>
                                             {{ __('Recuerdame') }}

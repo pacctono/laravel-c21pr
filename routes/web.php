@@ -17,6 +17,8 @@ Route::get('/', function () {
 
 Auth::routes();
 
+Route::get('logout', '\App\Http\Controllers\Auth\LoginController@logout');
+
 Route::get('/home/{alertar?}', 'HomeController@index')
     ->where('alertar', '(-[1-3])|[0-1]')       // Permite -3, -2, -1, -0, 0, 1, 2, 3
     ->name('home');
@@ -199,6 +201,9 @@ Route::get('/propiedades/ajax/', 'PropiedadController@ajaxPropiedades')
 Route::get('/propiedades/actualizar/{propiedad}/{columna}/{codigo}', 'PropiedadController@actualizar')
     ->where('propiedad', '[0-9]+')
     ->name('propiedades.actualizar');
+
+Route::post('/propiedades/cargarimagen/', 'PropiedadController@cargarimagen')
+    ->name('carga.imagen.propiedad');
 
 Route::pattern('propiedades', '[0-9]+');               // Para no crear conflictos con el resource propiedad
 Route::resource('propiedades', 'PropiedadController')
@@ -688,8 +693,8 @@ Route::get('/avisos/asesor/{user}', 'UserController@avisos')
     ->where('user', '[0-9]+')
     ->name('users.avisos');
 
-Route::get('pdf','PdfController@getIndex');
-Route::get('pdf/generar','PdfController@getGenerar');
+Route::get('pdf', 'PdfController@getIndex');
+Route::get('pdf/generar', 'PdfController@getGenerar');
 
 Route::get('/correo', function() {
 //    $turnos = \App\Turno::whereBetween('turno', ['2019-12-02 00:00:00', '2019-12-08 23:59:59'])
@@ -703,6 +708,11 @@ Route::get('/correo', function() {
 //    return new \App\Mail\TurnosErradosSemanaPasada($turnos);
 //    return new \App\Mail\TurnosAsesor($user, $turnos);
     return new \App\Mail\ReporteCierre($propiedad);
+});
+
+Route::get('/pruebavue', function () {
+    //return view('welcome');
+    return view('vue');
 });
 
 //Route::get('/clientes/filtrar/{filtro}', 'ClienteController@filtro')

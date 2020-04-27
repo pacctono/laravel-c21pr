@@ -79,7 +79,7 @@
                 <div class="title m-b-md">
                     <img src="{{ (asset('img/c21pr3.jpg')) }}"
                         alt="Conectado a la web de Century21 Puente Real"
-                        width="1040" height="600"
+                        width="600" {{--height="600"--}}
                     >
                 </div>
             </div>

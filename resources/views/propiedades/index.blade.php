@@ -194,7 +194,7 @@
         @else (Auth::user()->is_admin)--}}
         @endif (Auth::user()->is_admin)
             ">
-                <span class="text-right m-0 p-0">{{ $propiedad->codigo }}</span>
+                <span id="{{ $propiedad->id }}-codigo" class="text-right m-0 p-0">{{ $propiedad->codigo }}</span>
         @else (!isset($accion) or ('html' == $accion))
             <td>
                 {{ $propiedad->codigo }}
@@ -485,7 +485,7 @@
                         data-toggle="tooltip" data-html="true" title="Mostrar los datos de esta propiedad (<u>{{ $propiedad->nombre }}</u>).">
                     <span class="oi oi-eye m-0 p-0"></span>
                 </a>
-                @if (!($propiedad->user_borro || $propiedad->deleted_at))
+            @if (!($propiedad->user_borro || $propiedad->deleted_at))
                 @if (Auth::user()->is_admin)
                 <a href="{{ route('propiedades.edit', $propiedad) }}" class="btn btn-link m-0 p-0 mostrarTooltip"
                         data-toggle="tooltip" data-html="true" title="Editar los datos de esta propiedad (<u>{{ $propiedad->nombre }}</u>).">
@@ -494,20 +494,34 @@
                 @elseif (!(('P' == $propiedad->estatus) || ('C' == $propiedad->estatus) || ('S' == $propiedad->estatus)) and
                         ($propiedad->user->id == Auth::user()->id))
                 <a href="{{ route('propiedades.edit', $propiedad) }}" class="btn btn-link m-0 p-0 mostrarTooltip"
-                        data-toggle="tooltip" data-html="true" title="Editar los datos de esta propiedad (<u>{{ $propiedad->nombre }}</u>).">
+                        data-toggle="tooltip" data-html="true"
+                        title="Editar los datos de esta propiedad (<u>{{ $propiedad->nombre }}</u>).">
                     <span class="oi oi-pencil m-0 p-0"></span>
                 </a>
                 @endif (Auth::user()->is_admin)
-                @endif (!($propiedad->user_borro || $propiedad->deleted_at))
+            @endif (!($propiedad->user_borro || $propiedad->deleted_at))
 
-                @if ((('P' == $propiedad->estatus) || ('C' == $propiedad->estatus)) &&
+            @if ((('P' == $propiedad->estatus) || ('C' == $propiedad->estatus)) &&
                      (isset($propiedad->fecha_reserva) && isset($propiedad->fecha_firma)))
-                    <a href="{{ route('propiedad.correo', [$propiedad->id, 1]) }}" class="btn btn-link m-0 p-0 mostrarTooltip"
-                            data-toggle="tooltip" data-html="true" title="Enviar correo de 'Reporte de Cierre' a '<b>{{ (1 == $propiedad->user->id)?'Administrador':$propiedad->user->name }}</b>' sobre esta propiedad (<u>{{ $propiedad->codigo }}, {{ $propiedad->nombre }}</u>).">
-                        <span class="oi oi-envelope-closed m-0 p-0"></span>
-                    </a>
-                @endif (('P' == $propiedad->estatus) || ('C' == $propiedad->estatus))
-                @if ((Auth::user()->is_admin) && !($propiedad->user_borro || $propiedad->deleted_at) &&
+                <a href="{{ route('propiedad.correo', [$propiedad->id, 1]) }}" class="btn btn-link m-0 p-0 mostrarTooltip"
+                        data-toggle="tooltip" data-html="true"
+                        title="Enviar correo de 'Reporte de Cierre' a '<b>{{ (1 == $propiedad->user->id)?'Administrador':$propiedad->user->name }}</b>' sobre esta propiedad (<u>{{ $propiedad->codigo }}, {{ $propiedad->nombre }}</u>).">
+                    <span class="oi oi-envelope-closed m-0 p-0"></span>
+                </a>
+            @endif (('P' == $propiedad->estatus) || ('C' == $propiedad->estatus))
+            @if (('S' != $propiedad->estatus) and
+                 (!file_exists('imgprop/' . $propiedad->codigo . '-' . $propiedad->id . '.'. 'jpeg')) and
+                 (!file_exists('imgprop/' . $propiedad->codigo . '-' . $propiedad->id . '.'. 'png')) and
+                 (!file_exists('imgprop/' . $propiedad->codigo . '-' . $propiedad->id . '.'. 'jpg')) and
+                 (!file_exists('imgprop/' . $propiedad->codigo . '-' . $propiedad->id . '.'. 'gif')) and
+                 (!file_exists('imgprop/' . $propiedad->codigo . '-' . $propiedad->id . '.'. 'svg')))
+                <a href="" class="btn btn-link m-0 p-0 mostrarTooltip cargarimagen"
+                        data-toggle="tooltip" data-html="true" idprop="{{ $propiedad->id }}"
+                        title="Cargar al servidor imagen con foto de la propiedad (<u>{{ $propiedad->codigo.', '.$propiedad->nombre }}</u>)">
+                    <span class="oi oi-data-transfer-upload m-0 py-0 px-1"></span>
+                </a>
+            @endif ('S' != $propiedad->estatus)
+            @if ((Auth::user()->is_admin) && !($propiedad->user_borro || $propiedad->deleted_at) &&
                      !(('P' == $propiedad->estatus) || ('C' == $propiedad->estatus)))
                 <form action="{{ route('propiedades.destroy', $propiedad) }}" method="POST" 
                         class="form-inline mt-0 mt-md-0"
@@ -520,7 +534,7 @@
                         </span>
                     </button>
                 </form>
-                @endif ((Auth::user()->is_admin) && !($propiedad->user_borro || $propiedad->deleted_at) && ...)
+            @endif ((Auth::user()->is_admin) && !($propiedad->user_borro || $propiedad->deleted_at) && ...)
                 {{--@if (Auth::user()->is_admin)
                 <a href="#" class="btn btn-link m-0 p-0 editarCodigo mostrarTooltip" id="{{ $propiedad->id }}"
                     data-toggle="tooltip" data-html="true"

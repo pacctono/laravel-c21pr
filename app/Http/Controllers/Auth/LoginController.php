@@ -115,9 +115,6 @@ class LoginController extends Controller
                 if ('bm' == $tarde) {
                     $alertar = 1;
                 } else $alertar = -2;   // Es necesario que lo coloque tarde, para que pueda conectarse para el turno de la tarde.
-/*                } elseif ('tm' == $tarde) {
-                    $alertar = -2;
-                } else $loginTurno = False;*/
             }
             if ($loginTurno) $turno->update($data);
             if (0 > $alertar) {
@@ -134,6 +131,18 @@ class LoginController extends Controller
         }
         return redirect()->route($this->redirectAsesor, ['alertar' => $alertar]);
     }
+
+    /**
+     *
+     * Logout
+     *
+     */
+    public function logout(Request $request)
+    {
+        Auth::logout();
+        return redirect('/login');
+    }
+
     /**
      * Create a new controller instance.
      *

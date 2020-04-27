@@ -1,6 +1,24 @@
 .bg-suave{
  background-color:#e6ffff
 }
+.colorTexto1 {
+ color:#BEAF86;
+}
+.colorTexto2 {
+ color:#252525;
+}
+.colorTexto3 {
+ color:#818286;
+}
+.colorFondo1 {
+ background-color:#BEAF86;
+}
+.colorFondo2 {
+ background-color:#252525;
+}
+.colorFondo3 {
+ background-color:#818286;
+}
 .borde-arriba{
  border-top:solid 1px #000000
 }

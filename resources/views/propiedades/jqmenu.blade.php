@@ -11,6 +11,14 @@
     }
     @includeIf('include.alertar')
     @includeIf('include.confirmar')
+    var botones = {
+                    confirm: {
+                        label: '<i class="fa fa-check"></i> Confirmar',
+                    },
+                    cancel: {
+                        label: '<i class="fa fa-times"></i> Cancelar',
+                    }
+                };
     $(document).ready(function() {
     @includeWhen((Auth::user()->is_admin) and (!$movil) and
                  (!isset($accion) or ('html' == $accion)), 'propiedades.ajax')
@@ -51,6 +59,7 @@
                 title: `Cambiar el codigo de (${ap.cd}) ${ap.nb}.`,
                 inputType: 'text',
                 value: codigo,
+                buttons: botones,
                 callback: function(res) {
                     if (res) {
                         if (res == codigo) return;
@@ -99,6 +108,7 @@
                 inputType: 'select',
                 value: status,
                 inputOptions: aEstatus,
+                buttons: botones,
                 callback: function(res) {
                     if (res) {
                         nvoUrl = `/propiedades/actualizar/${id}/estatus/${res}`;
@@ -118,6 +128,7 @@
                 title: `Cambiar la fecha de reserva ${creserva}de (${ap.cd}) ${ap.nb}.`,
                 inputType: 'date',
                 value: reserva,
+                buttons: botones,
                 callback: function(res) {
                     if (res) {
                         nvoUrl = `/propiedades/actualizar/${id}/fecha_reserva/${res}`;
@@ -137,6 +148,7 @@
                 title: `Cambiar la fecha de la firma ${cfirma}de (${ap.cd}) ${ap.nb}.`,
                 inputType: 'date',
                 value: firma,
+                buttons: botones,
                 callback: function(res) {
                     if (res) {
                         nvoUrl = `/propiedades/actualizar/${id}/fecha_firma/${res}`;
@@ -147,7 +159,7 @@
         });
         $("td.nombre").click(function(ev) {
             const id = $(this).attr('id').substring(7);
-            const cd = $("#"+id+"-codigo").val();
+            const cd = $("#"+id+"-codigo").text();
             const nb = $(this).text();
             const titulo = `${id}) ${cd} - ${nb}`;
             const fecres = $("#"+id+"-fecres").text();
@@ -193,14 +205,80 @@
                 $t.tooltip('disable');          // Trate $("td.precio").tooltip('enable'), al principio y no funciono.
             }
         });
+        $("a.cargarimagen").click(function(ev) {
+            ev.preventDefault();
+            const that = $(this);
+            const id = that.attr('idprop'); // 'id' de la propiedad.
+            const ap = aPropiedades[id];
+            if (!ap) return
+            const msjHtml = `<div class="row justify-content-center">
+                                <div class="col-md-8">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <form action="{{ route('carga.imagen.propiedad') }}" id="formacargar"
+                                                    class="form align-items-horizontal"
+                                                    method="POST" enctype="multipart/form-data">
+                                                {!! csrf_field() !!}
+                                                <div class="form-group form-inline m-0 py-0 px-1">
+                                                    <input type="file" class="form-control" name="imagen">
+                                                    <input type="hidden" name="id" value="${id}">
+                                                    <input type="hidden" name="codigo" value="${ap.cd}">
 
-        {{--var codigo;
+                                                    <button class="btn btn-success">Cargar</button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>`;
+            var dialogo = bootbox.dialog({
+                size: 'large',
+                title: `Cargar imagen de (${ap.cd}) ${ap.nb}.`,
+                message: msjHtml,
+                onEscape: true,
+                backdrop: true,
+                buttons: false,
+            });
+            $("#formacargar").on('submit', (function(e) {
+                e.preventDefault();
+                dialogo.modal('hide');
+                var forma = new FormData(this);
+
+                $.ajax({
+                    type: 'POST',
+                    url: "{{ route('carga.imagen.propiedad') }}",
+                    data: forma,
+                    contentType: false,
+                    cache: false,
+                    processData: false,
+                    success: function(data) {
+                        //alert(data.success);
+                        bootbox.dialog({
+                            size: 'small',
+                            title: data.success,
+                            message: `<div class="row bg-transparent" style="height:150;overflow:hidden">
+                                        <img class="img-responsive" src="{{ asset('imgprop/') }}/${data.nombreImagen}"
+                                                alt="Propiedad cargada" style="height:150px;">
+                                    </div>`,
+                            onEscape: true,
+                            backdrop: true,
+                            buttons: false,
+                        })
+                    },
+                    error: function(data) {
+                        alert('No se pudo cargar la imagen');
+                    }
+                });
+            }));
+        });
+
+        {{--var codigo;     // Comentarios desde aqui hasta la linea anterior a $("#formulario").submit(function(ev) {
         $("a.editarCodigo").click(function(ev) {
             ev.preventDefault();
             $("input.codigo").prop('disabled', true);
             const id  = $(this).attr('id');        // Tambien $(ev.target).attr('id')
             const entrada = $('#' + id + "-codigo");
-            codigo = entrada.val();
+            codigo = entrada.text();
             const texto = `Desea cambiar al codigo MLS <u>${codigo}</u> de esta ` +
                             `propiedad.`;
             confirmar(texto, 'small', function(accion) {

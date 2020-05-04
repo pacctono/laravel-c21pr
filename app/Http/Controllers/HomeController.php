@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\User;
+use App\Propiedad;
 use App\Texto;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;     // PC
 use Symfony\Component\Process\Process;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Carbon\Carbon;
@@ -13,6 +15,49 @@ use App\MisClases\Fecha;
 
 class HomeController extends Controller
 {
+    protected static function comparar($a, $b) {
+        if ($a['id'] == $b['id']) {
+            if ($a['sec'] == $b['sec']) return 0;
+            return ($a['sec'] < $b['sec']) ? -1 : 1;
+        }
+        return ($a['id'] > $b['id']) ? -1 : 1;
+    }
+    protected function misPropiedades($files)
+    {
+        $propiedad = [];
+// los nombre de archivo tienen que tener la estructura: {propiedad_id}_{codigo}[-{secuencia}].ext        
+        foreach($files as $filename) {
+            if (1 != substr_count($filename, '.')) continue;
+            list($nombre, $extension) = explode('.', $filename);
+            if (1 != substr_count($nombre, '_')) continue;
+            list($propiedad_id, $codigo_sec) = explode('_', $nombre);
+            if (0 == substr_count($codigo_sec, '-')) continue;    // Solo interesa la primera imagen.
+            list($codigo, $sec) = explode('-', $codigo_sec);
+            if (!is_numeric($propiedad_id) or !is_numeric($codigo) or !is_numeric($sec))
+                continue;
+            $prop = Propiedad::findOrFail($propiedad_id);
+            if (!Auth::user()->is_admin and (Auth::user()->id != $prop->asesor_captador_id) and
+                (Auth::user()->id != $prop->asesor_cerrador_id)) continue;
+            if ('A' != $prop->estatus) continue;        // La propiedad no esta activa.
+            $todosNombreProp[] = [
+                'nombreImagen' => $filename,
+                'id' => $propiedad_id,
+                'codigo' => $codigo,
+                'sec' => $sec,
+                'asesor_id' => $prop->asesor_captador_id,
+                'nombre' => $prop->nombre,
+            ];
+            //if (50 <= count($todosNombreProp)) break;
+        }
+        usort($todosNombreProp, "self::comparar");  // Ordenar por id, asc y sec, desc.
+        foreach ($todosNombreProp as $nombre) {     // Suprime nombres duplicados, con diferentes sec, se escoge el de menor sec.
+            $id = $nombre['id'];
+            if (!isset($idant)) $nombreProp[] = $nombre;
+            elseif ($id != $idant) $nombreProp[] = $nombre;
+            $idant = $id;
+        }
+        return collect($nombreProp);
+    }
     /**
      * Create a new controller instance.
      *
@@ -108,7 +153,16 @@ class HomeController extends Controller
             ($hoy == Auth::user()->fecha_nacimiento->format('d-m')))
             $hoyCumpleanos = true && $login;
         //dd($hoy, Auth::user()->fecha_cumpleanos->format('d-m'));
+        $dir = public_path('imgprop');
+        $files = array_diff(scandir($dir, SCANDIR_SORT_DESCENDING), array('..', '.'));  // Cada nombre de imagen comienza con el id de la propiedad. Primero los mayores, los más recientes creados.
+        $misPropiedades = $this->misPropiedades($files);    // Nombre imagen; id, codigo y nombre de propiedad.
+        //dd($files, $misPropiedades, Propiedad::where('asesor_captador_id', 16)->get());
+        $users   = User::get(['id', 'name']);     // Todos los usuarios (asesores), incluso los no activos.
+        $users[0]['name'] = 'Administrador';
+        $asesor = array();
+        foreach($users as $user) $asesor[$user->id] = $user->name;
         return view('home', compact('cumpleanos', 'foto', 'hoyCumpleanos',
-                    'texto1', 'texto2', 'texto3', 'texto4', 'texto5', 'alertar'));
+//                    'texto1', 'texto2', 'texto3', 'texto4', 'texto5',
+                    'asesor', 'misPropiedades', 'alertar'));
     }
 }

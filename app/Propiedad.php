@@ -914,6 +914,21 @@ class Propiedad extends Model
         return $obs??False;
     }
 
+    public function getImagenesAttribute() {    // Arreglo de extensiones de imagen de propiedad para cada generar una sola query, pero asi uso nuevos metodos.
+        $imagenes = [];
+        $extensiones = ['jpeg', 'jpg', 'gif', 'png', 'svg'];
+        $nombreBaseImagen = $this->id . '_' . $this->codigo;
+        for ($i = 0; $i <= 20; $i++) {
+            foreach ($extensiones as $ext) {
+                if (file_exists("imgprop/{$nombreBaseImagen}-{$i}.{$ext}")) {
+                    $imagenes[$i] = $ext;
+                    break;
+                }
+            }
+        };
+        return $imagenes;
+    }
+
     public static function sumaXAsesor($idAsesor, $tipoAsesor, $fecha='fecha_firma',
                                         $fecha_desde=null, $fecha_hasta=null)
     {

@@ -222,18 +222,20 @@
             @if (Auth::user()->is_admin and (!isset($accion) or ('html' == $accion)))
                     reserva ratonApuntador" data-toggle="tooltip"
                     title="Cambiar fecha de reserva, bajo su propia responsabilidad."
-                    id="{{ $propiedad->id }}.{{ $propiedad->fecha_reserva_bd }}
-            @endif (Auth::user()->is_admin and (!isset($accion) or ('html' == $accion)))
+                    id="{{ $propiedad->id }}.{{ $propiedad->fecha_reserva_bd }}">
+            @else
             ">
+            @endif (Auth::user()->is_admin and (!isset($accion) or ('html' == $accion)))
                 {{ $propiedad->fec_res }}
             </td>
             <td class="text-right m-0 py-0 px-1
             @if (Auth::user()->is_admin and (!isset($accion) or ('html' == $accion)))
                     firma ratonApuntador" data-toggle="tooltip"
                     title="Cambiar fecha de firma, bajo su propia responsabilidad."
-                    id="{{ $propiedad->id }}.{{ $propiedad->fecha_firma_bd }}
-            @endif (Auth::user()->is_admin and (!isset($accion) or ('html' == $accion)))
+                    id="{{ $propiedad->id }}.{{ $propiedad->fecha_firma_bd }}">
+            @else
             ">
+            @endif (Auth::user()->is_admin and (!isset($accion) or ('html' == $accion)))
                 {{ $propiedad->fec_fir }}
             </td>
 
@@ -252,7 +254,7 @@
         @endif ((Auth::user()->is_admin) and (!isset($accion) or ('html' == $accion)))
             >
         @endif ($movil)
-            {{ $propiedad->nombre }}
+                {{ $propiedad->nombre }}
             </td>
 
         <?php $propiedad->asesor = Auth::user()->id;  // Usuario conectado. No se para que es esto, pero lo agregua hace mucho tiempo. ?>
@@ -509,18 +511,26 @@
                     <span class="oi oi-envelope-closed m-0 p-0"></span>
                 </a>
             @endif (('P' == $propiedad->estatus) || ('C' == $propiedad->estatus))
-            @if (('S' != $propiedad->estatus) and
-                 (!file_exists('imgprop/' . $propiedad->codigo . '-' . $propiedad->id . '.'. 'jpeg')) and
+            @if (('S' != $propiedad->estatus) and (1 < $propiedad->asesor_captador_id))
+                 {{--(!file_exists('imgprop/' . $propiedad->codigo . '-' . $propiedad->id . '.'. 'jpeg')) and
                  (!file_exists('imgprop/' . $propiedad->codigo . '-' . $propiedad->id . '.'. 'png')) and
                  (!file_exists('imgprop/' . $propiedad->codigo . '-' . $propiedad->id . '.'. 'jpg')) and
                  (!file_exists('imgprop/' . $propiedad->codigo . '-' . $propiedad->id . '.'. 'gif')) and
-                 (!file_exists('imgprop/' . $propiedad->codigo . '-' . $propiedad->id . '.'. 'svg')))
+                 (!file_exists('imgprop/' . $propiedad->codigo . '-' . $propiedad->id . '.'. 'svg')))--}}
                 <a href="" class="btn btn-link m-0 p-0 mostrarTooltip cargarimagen"
                         data-toggle="tooltip" data-html="true" idprop="{{ $propiedad->id }}"
                         title="Cargar al servidor imagen con foto de la propiedad (<u>{{ $propiedad->codigo.', '.$propiedad->nombre }}</u>)">
                     <span class="oi oi-data-transfer-upload m-0 py-0 px-1"></span>
                 </a>
             @endif ('S' != $propiedad->estatus)
+            @if (0 < count($propiedad->imagenes))
+                <a href="" class="btn btn-link m-0 p-0 mostrarTooltip mostrarimagen"
+                        data-toggle="tooltip" data-html="true" nombreBase="{{ $propiedad->id }}_{{ $propiedad->codigo }}"
+                        img="{{ json_encode($propiedad->imagenes) }}"
+                        title="Mostrar imagen(es) con foto de la propiedad (<u>{{ $propiedad->codigo.', '.$propiedad->nombre }}</u>)">
+                    <span class="oi oi-image m-0 py-0 px-1"></span>
+                </a>
+            @endif (0 < count($propiedad->imagenes))
             @if ((Auth::user()->is_admin) && !($propiedad->user_borro || $propiedad->deleted_at) &&
                      !(('P' == $propiedad->estatus) || ('C' == $propiedad->estatus)))
                 <form action="{{ route('propiedades.destroy', $propiedad) }}" method="POST" 

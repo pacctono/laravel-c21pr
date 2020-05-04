@@ -52,14 +52,14 @@
           <img src="{{ (asset('img/c21pr.jpg')) }}" title="C21 Puente Real"
                 alt="C21 Puente Real" style="width:32px;height:31px;">
         </a>
-        <!--button class="navbar-toggler" type="button" data-toggle="collapse"
-                data-target="#navbarCollapse" aria-controls="navbarCollapse"
+        <button class="navbar-toggler" type="button" data-toggle="collapse"   {{-- Permite mostrar menu en pantallas pequeñas --}}
+                data-target="#navbarCollapse" aria-controls="navbarCollapse"  {{-- Por ejemplo, la pantalla de los celulares --}}
                 aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
-        </button-->
+        </button>
         <div class="collapse navbar-collapse" id="navbarCollapse">
         @auth
-          <ul class="navbar-nav mr-auto col-md-10">
+          <ul class="navbar-nav mr-auto col-lg-10">
           @foreach (array('home' => 'Home', 'contactos' => 'Contactos', 'users' => 'Asesores',
                     'turnos' => 'Turnos', 'agenda' => 'Agenda', 'propiedades' => 'Propiedades',
                     'clientes' => 'Clientes')
@@ -165,7 +165,7 @@
             @endif
           </ul>
           @endauth
-          <ul class="navbar-nav ml-auto col-md-2">
+          <ul class="navbar-nav ml-auto col-lg-2">
           @guest
             <li class="nav-item">
               <a class="nav-link" href="{{ route('login') }}">{{ __('Login') }}</a>
@@ -201,7 +201,7 @@
     <!-- Begin page content -->
     <main role="main" class="container"><!-- rem depende del elemento raiz de la pagina, o sea del tamaño fuente del elemento <html> -->
       <div class="row mt-1 ml-0 pl-0 no-gutters">  <!-- margen de arriba (top margin) es 0.25rem -->
-        <div class="col-lg-12 ml-0 pl-0 no-gutters"> <!-- Cambie de sm a lg el 15/09/2019 -->
+        <div class="col-12 ml-0 pl-0 no-gutters"> <!-- Cambie de sm a lg el 15/09/2019 -->
         @auth
           @yield('content')
         @else
@@ -215,18 +215,24 @@
 
 @if (!isset($accion) or ('html' == $accion))
     <footer class="footer">
-      <div class="container">
-        <span class="text-white bg-dark"><!-- text-muted: texto color gris -->
+      <div class="container-fluid">
+        <span class="text-white bg-dark pr-4"><!-- text-muted: texto color gris -->
+@if (!$agent->isMobile())
           Av. Costanera, Centro Comercial Costanera Plaza I, Piso 1, Local P1-02, Nueva Barcelona, frente al CC Camino Real
           <i class="fa fa-phone-alt"></i>0281-416.0885
           <a hre="mailto:c21puentereal@gmail.com" class="btn btn-link m-0 p-0 enlaceFooter"
               data-toggle="tooltip" title="Enviar correo a Puente Real">
             <i class="fa fa-at"></i></a>.
+        </span>
+        <span class="text-white bg-dark pl-4"><!-- text-muted: texto color gris -->
           &copy; Copyright 2019-{{ date('Y') }}
+@else (!$agent->isMobile())
+          Av Costanera, CC Costanera Plaza I, Piso 1
+@endif (!$agent->isMobile())
         </span>
       </div>
     </footer>
-@endif (!isset($accion) or ('html' == $accion))
+@endif ((!isset($accion) or ('html' == $accion)) and !$movil)
     @yield('js')
     <!-- Bootstrap core JavaScript
     ================================================== -->

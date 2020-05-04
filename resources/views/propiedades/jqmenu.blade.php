@@ -20,8 +20,58 @@
                     }
                 };
     $(document).ready(function() {
-    @includeWhen((Auth::user()->is_admin) and (!$movil) and
-                 (!isset($accion) or ('html' == $accion)), 'propiedades.ajax')
+    @includeWhen((!$movil) and (!isset($accion) or ('html' == $accion)), 'propiedades.ajax')
+
+    function promptFecha(cd, nb, fecha, tipoFecha='reserva', cfecha='', funcion=false) {
+        bootbox.prompt({
+            size: 'small',
+            title: `Cambiar la fecha de ${tipoFecha} ${cfecha}de (${cd}) ${nb}.`,
+            inputType: 'date',
+            value: fecha,
+            buttons: botones,
+            callback: function(res) {   // Si se cancela o cierra la ventana devuelve null (res=null).
+                funcion(res);
+            }
+        })
+    }
+    function cambiarConAjax(that, id, col, res, tipoCol) {
+        //let data = {};
+        //data['id'] = id;
+        //data[col] = res;
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+        });
+        $.ajax({
+            type: 'POST',
+            url: "{{ route('propiedades.post.actualizar') }}",
+            //data: data,
+            data: {id: id, [col]: res},
+            success: function(data, estatus, jq) {
+                alertar(data.success, `Cambio de ${tipoCol}`, 'small');
+/*                alertar(`responseText:${jq.responseText}`,
+                        `data:${data}, Estatus:${estatus},
+                            readyState:${jq.readyState}, status:${jq.status}`,
+                        'extra-large'
+                );*/
+                that.html(data.nuevoValor);
+            },
+            error: function(jq, estatus, error) {
+                bootbox.dialog({
+                    size: 'extra-large',
+                    title: `No se pudo actualizar ${tipoCol}:
+                            Estatus:${estatus}, Error:${error}`,
+                    message: `readyState:${jq.readyState}, status:${jq.status},
+                            responseText:${jq.responseText}`,
+                    onEscape: true,
+                    backdrop: true,
+                    scrollable: true,
+                    buttons: false
+                })
+            }
+        });
+    }
 
     @if ((Auth::user()->is_admin) and isset($propRepetidas) and ($propRepetidas->isNotEmpty()))
         var valCodigo, linea = '';
@@ -44,7 +94,8 @@
     @if (0 < $alertar)
         alertar("Le fue enviado el correo con el 'Reporte de Cierre' de la propiedad.");
     @elseif (0 > $alertar)
-        alertar("No fue enviado el correo con el 'Reporte de Cierre' de la propiedad. Probablemente, problemas con Internet! Revise su conexión");
+        alertar("No fue enviado el correo con el 'Reporte de Cierre' de la propiedad. " +
+                "Probablemente, problemas con Internet! Revise su conexión");
     @endif (0 < $alertar)
     @endif (!$movil and (!isset($accion) or ('html' == $accion)))
 
@@ -75,7 +126,7 @@
                                 var st = estatus[ap.st];
                                 var ng = negociaciones[ap.ng];
                             }
-                        }
+                        }   // if (ac)
                         if (ac && ap && st && ng) {
                             alertar(`Otra propiedad con este mismo codigo: <b>${codNuevo}</b>, ` +
                                     `fue creada por <u>${asesores[ap.uid]}</u> ` +
@@ -83,13 +134,14 @@
                                     `<u>${ap.nb}</u> y actualmente, tiene el estatus: ` +
                                     `<u>${st}</u> como una negociacion de <u>${ng}</u>.`);
                             return;
-                        }
-                        nvoUrl = `/propiedades/actualizar/${id}/codigo/${codNuevo}`;
-                        location.href = nvoUrl;
-                    }
-                }
-            });
-        });
+                        }   // if (ac && ap && st && ng)
+                        /*nvoUrl = `/propiedades/actualizar/${id}/codigo/${codNuevo}`;
+                        location.href = nvoUrl;*/
+                        cambiarConAjax(that, id, 'codigo', codNuevo, 'el codigo');
+                    }   // if (res)
+                }   // callback: function(res)
+            });     //  bootbox.prompt
+        });     // FIN cambio de codigo.
         $("td.estatus").click(function(ev) {
             const that = $(this);
             const id = that.attr('id').split('-')[0]; // 'id' de la propiedad.
@@ -116,47 +168,33 @@
                     }
                 }
             });
-        });
+        });     // FIN cambio de estatus.
         $("td.reserva").click(function(ev) {
             const that = $(this);
             const id = that.attr('id').split('.')[0]; // 'id' de la propiedad.
             const reserva = that.attr('id').split('.')[1].trim(); // 'fecha_reserva' de la propiedad.
             const creserva = ('' != reserva)?`(${reserva}) `:'';
             const ap = aPropiedades[id];
-            bootbox.prompt({
-                size: 'small',
-                title: `Cambiar la fecha de reserva ${creserva}de (${ap.cd}) ${ap.nb}.`,
-                inputType: 'date',
-                value: reserva,
-                buttons: botones,
-                callback: function(res) {
-                    if (res) {
-                        nvoUrl = `/propiedades/actualizar/${id}/fecha_reserva/${res}`;
-                        location.href = nvoUrl;
+            if (ap) promptFecha(ap.cd, ap.nb, reserva, 'reserva', creserva, function(res) {
+                    if ((res) || ('' == res)) {
+                        cambiarConAjax(that, id, 'fecha_reserva', res, 'la fecha de reserva');
                     }
                 }
-            });
-        });
+            );
+        });     // FIN cambio fecha de reserva.
         $("td.firma").click(function(ev) {
             const that = $(this);
             const id = that.attr('id').split('.')[0]; // 'id' de la propiedad.
             const firma = that.attr('id').split('.')[1].trim(); // 'fecha_firma' de la propiedad.
             const cfirma = ('' != firma)?`(${firma}) `:'';
             const ap = aPropiedades[id];
-            bootbox.prompt({
-                size: 'small',
-                title: `Cambiar la fecha de la firma ${cfirma}de (${ap.cd}) ${ap.nb}.`,
-                inputType: 'date',
-                value: firma,
-                buttons: botones,
-                callback: function(res) {
-                    if (res) {
-                        nvoUrl = `/propiedades/actualizar/${id}/fecha_firma/${res}`;
-                        location.href = nvoUrl;
+            if (ap) promptFecha(ap.cd, ap.nb, firma, 'la firma', cfirma, function(res) {
+                    if ((res) || ('' == res)) {
+                        cambiarConAjax(that, id, 'fecha_firma', res, 'la fecha de la firma');
                     }
                 }
-            });
-        });
+            );
+        });     // FIN cambio fecha de la firma.
         $("td.nombre").click(function(ev) {
             const id = $(this).attr('id').substring(7);
             const cd = $("#"+id+"-codigo").text();
@@ -184,7 +222,7 @@
                             `<em>Descripcion:</em> <u>${dsc}</u><br>` +
                             `<em>Comentarios:</em> <u>${com}</u>.`;
             alertar(texto, titulo);
-        });
+        });     // Click en nombre.
     @endif (Auth::user()->is_admin)
     @if (Auth::user()->is_admin)
         $("td.observacion,td.precio,td.lados,td.franquicia,td.sanaf,td.neto").click(function(ev) {
@@ -223,6 +261,7 @@
                                                     <input type="file" class="form-control" name="imagen">
                                                     <input type="hidden" name="id" value="${id}">
                                                     <input type="hidden" name="codigo" value="${ap.cd}">
+                                                    <input type="hidden" name="captador" value="${ap.acp}">
 
                                                     <button class="btn btn-success">Cargar</button>
                                                 </div>
@@ -248,11 +287,40 @@
                     type: 'POST',
                     url: "{{ route('carga.imagen.propiedad') }}",
                     data: forma,
-                    contentType: false,
+/*
+ * cache (default: true, false for dataType 'script' and 'jsonp')
+ * If set to false, it will force requested pages not to be cached by the browser. Note: Setting
+ * cache to false will only work correctly with HEAD and GET requests. It works by appending
+ * "_={timestamp}" to the GET parameters. The parameter is not needed for other types of requests,
+ * except in IE8 when a POST is made to a URL that has already been requested by a GET.
+ */                    
                     cache: false,
+/*
+ * contentType (default: 'application/x-www-form-urlencoded; charset=UTF-8')
+ * Type: Boolean or String
+ * When sending data to the server, use this content type. Default is
+ * "application/x-www-form-urlencoded; charset=UTF-8", which is fine for most cases.
+ * If you explicitly pass in a content-type to $.ajax(), then it is always sent to the server
+ * (even if no data is sent). As of jQuery 1.6 you can pass false to tell jQuery to not set
+ * any content type header. Note: The W3C XMLHttpReques specification dictates that the
+ * charset is always UTF-8; specifying another charset will not force the browser to change
+ * the encoding. Note: For cross-domain requests, setting the content type to anything other
+ * than application/x-www-form-urlencoded, multipart/form-data, or text/plain will trigger
+ * the browser to send a preflight OPTIONS request to the server.
+ */                    
+                    contentType: false,
+/*
+ * processData (default true)
+ * By default (true), data passed in to the data option as an object (technically,
+ * anything other than a string) will be processed and transformed into a query string,
+ * fitting to the default content-type "application/x-www-form-urlencoded".
+ * If you want to send a DOMDocument, or other non-processed data, set this option to false.                            
+ */
                     processData: false,
-                    success: function(data) {
-                        //alert(data.success);
+                    success: function(data, estatus, jq) {
+/*                        alert(`data:${data}, Estatus:${estatus},
+                            readyState:${jq.readyState}, status:${jq.status},
+                            responseText:${jq.responseText}`);*/
                         bootbox.dialog({
                             size: 'small',
                             title: data.success,
@@ -265,11 +333,52 @@
                             buttons: false,
                         })
                     },
-                    error: function(data) {
-                        alert('No se pudo cargar la imagen');
+                    error: function(jq, estatus, error) {
+                        bootbox.dialog({
+                            size: 'large',
+                            title: `No se pudo cargar la imagen: Estatus:${estatus}, Error:${error}`,
+                            message: `readyState:${jq.readyState},
+                                    status:${jq.status}, responseText:${jq.responseText}`,
+                            onEscape: true,
+                            backdrop: true,
+                            buttons: botones
+                        })
                     }
                 });
             }));
+        });
+        $("a.mostrarimagen").click(function(ev) {
+            ev.preventDefault();
+            const that = $(this);
+            const nombreBase = that.attr('nombreBase'); // Nombre base sin secuencia, ni extension.
+            const arreglo = nombreBase.split('_');      // id_codigo
+            const id = arreglo[0];
+            const codigo = arreglo[1];         // codigo de la propiedad.
+            const nombre = $("#nombre-"+id).text();         // Nombre de la propiedad.
+            const img = JSON.parse(that.attr('img'));       // extensiones de imagenes. Se pudo usar: $.parseJSON(...)
+            const long = img.length;
+            let msjHtml = `<div id="miCarousel" class="carousel slide" data-ride="carousel" data-interval="false">
+                            <div class="carousel-inner">`;
+            for (let i=0; i<long; i++) {
+                msjHtml += `<div class="carousel-item ` + ((0==i)?'active':'') + `">
+                                    <img class="img-fluid imagenPropiedad"
+                                        src="{{ asset('imgprop/') }}/${nombreBase}-${i}.${img[i]}"
+                                        style="height:300px;">
+                                </div>`;
+            }
+            msjHtml += `</div>`;
+            if (1 < long)
+                msjHtml += `<a class="carousel-control-prev" href="#miCarousel" role="button" data-slide="prev">
+                                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                <span class="sr-only">Anterior</span>
+                                </a>
+                            <a class="carousel-control-next" href="#miCarousel" role="button" data-slide="next">
+                                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                <span class="sr-only">Próximo</span>
+                            </a>`;
+            msjHtml += `</div>`;
+            const titulo = `${id}) ${codigo} ${nombre}`;
+            alertar( msjHtml, titulo, 'large')
         });
 
         {{--var codigo;     // Comentarios desde aqui hasta la linea anterior a $("#formulario").submit(function(ev) {

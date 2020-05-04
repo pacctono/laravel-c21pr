@@ -162,6 +162,7 @@ return [
 
 	ConsoleTVs\Charts\ChartsServiceProvider::class,
 	Jenssegers\Agent\AgentServiceProvider::class,
+        App\Providers\AgentServiceProvider::class,
     ],
 
     /*

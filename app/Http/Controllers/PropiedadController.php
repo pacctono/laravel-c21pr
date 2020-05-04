@@ -19,6 +19,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;        // PC
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\DB;          // PC
+use Illuminate\Support\Facades\Storage;     // PC
 use Carbon\Carbon;                          // PC
 use Jenssegers\Agent\Agent;                 // PC
 use App\MisClases\Fecha;                    // PC
@@ -47,6 +48,24 @@ class PropiedadController extends Controller
         $cdsrep = array_column($repetidas, 'codigo');
         return Propiedad::where('estatus', '!=', 'S')->whereIn('codigo', $cdsrep)
                                 ->get(['id', 'codigo', 'nombre']);
+    }
+    protected function imagenes($propiedades) {    // Podria generar una sola query, pero asi uso nuevos metodos.
+        $imagenes = [];
+        $extensiones = ['jpeg', 'jpg', 'gif', 'png', 'svg'];
+        foreach ($propiedades as $propiedad) {
+            $nombreBaseImagen = $propiedad->id . '_' . $propiedad->codigo;
+            $id = $propiedad->id;
+            $imagenes[$id] = [];
+            for ($i = 0; $i <= 20; $i++) {
+                foreach ($extensiones as $ext) {
+                    if (file_exists("imgprop/{$nombreBaseImagen}-{$i}.{$ext}")) {
+                        $imagenes[$id][$i] = $ext;
+                        break;
+                    }
+                }
+            }
+        };
+        return $imagenes;
     }
     /**
      * Display a listing of the resource.
@@ -207,10 +226,11 @@ class PropiedadController extends Controller
                                     ->orWhereNull('fecha_firma');
                             });
         } else {
-            $propiedades = $propiedades->where(function ($query) use ($fecha_desde, $fecha_hasta) {
+/*            $propiedades = $propiedades->where(function ($query) use ($fecha_desde, $fecha_hasta) {
                                 $query->whereDate('fecha_firma', '<=', now(Fecha::$ZONA)->format('Y-m-d'))
                                     ->orWhereNull('fecha_firma');
-                            });
+                            });*/
+            $propiedades = $propiedades->orWhereNull('fecha_firma');
         }
         if (0 === strpos($orden, 'fecha')) $sentido = 'desc';
         $propiedades = $propiedades->orderBy($orden, $sentido);   // Ordenar los items de las propiedades.
@@ -249,6 +269,8 @@ class PropiedadController extends Controller
                 $tPvrCaptadorPrbrSel + $tPvrCerradorPrbrSel);*/
 //        return view((($movil)?'celular.indexPropiedades':'propiedades.index'),
         $colores = $this->colores();
+        $imagenes = $this->imagenes($propiedades);
+        //dd($imagenes, $propiedades);
         if ('html' == $accion)
             return view('propiedades.index',
                     compact('title', 'users', 'propiedades', 'movil',
@@ -884,10 +906,33 @@ class PropiedadController extends Controller
                                 ['propiedad' => $propiedad, 'correo' => $correo]);
     }
 
-    public function actualizar(Propiedad $propiedad, $columna, $valor)
+    public function actualizar(Propiedad $propiedad=null, $columna=null, $valor=null)   // Los valores por defecto son para el metodo 'POST'.
     {
+        if ('POST' == request()->method()) {    // Solo pueden venir ds valores: id y fecha_reserva/fecha_firma.
+            $data = request()->validate([       // Si ocurre error, laravel nos envia al url anterior.
+                'id' => ['required', 'integer'],
+                'codigo' => ['sometimes', 'nullable', 'digits_between:6,8'],
+                'fecha_reserva' => ['sometimes', 'nullable', 'date'],
+                'fecha_firma' => ['sometimes', 'nullable', 'date'],
+            ], [
+                'id.required' => 'No se paso el parametro id, requerido.',
+                'id.integer' => 'El paramentro id tiene que ser un entero.',
+                'codigo.digits_between' => 'El <codigo> debe contener entre 6 y 8 caracteres.',
+                'fecha_reserva.date' => 'La <fecha de reserva> debe ser una fecha valida.',
+                'fecha_firma.date' => 'La <fecha de la firma> debe ser una fecha valida.',
+            ]);
+            $id = $data['id'];
+            unset($data['id']);     // Solo queda un valor: fecha_reserva o fecha_firma.
+// Los tres siguientes campos vienen en el URL, cuando el metodo es GET. Ver el enunciado de esta funcion.
+            $propiedad = Propiedad::findOrFail($id);
+            $columna = key($data);     // Solo hay un valor: columna = fecha_reserva o fecha_firma.
+//            return response()->json(['success' => "dump", 'columna' => $columna, 'id' => $id]);
+            $valor = $data[$columna];
+//            return response()->json(['success' => "dump", 'columna' => $columna, 'valor' => $valor]);
+        } else {
+            $data[$columna] = $valor;
+        }
         $valorAnterior = $propiedad->$columna;
-        $data[$columna] = $valor;
         $propiedad->update($data);
 
         Bitacora::create([
@@ -898,7 +943,21 @@ class PropiedadController extends Controller
 	        'tx_host' => $_SERVER['REMOTE_ADDR']
         ]);
 
-        return redirect()->route('propiedades.index');
+        if ('POST' == request()->method()) {
+//            return response()->json(['success' => "dump", 'columna' => $columna, 'valorAnterior' => $valorAnterior, 'valor' => $valor]);
+            if (false !== strpos($columna, 'fecha')) {
+                $valorAnteriorBd = (is_null($valorAnterior))?'':$valorAnterior->format('Y-m-d');
+                $valorAnterior = (is_null($valorAnterior))?'<em>valor vacio</em>':$valorAnterior->format('d/m/Y');
+                $valorNuevo = (is_null($valor))?'':(new Carbon($valor))->format('d/m/Y');
+            } else {
+                $valorAnteriorBd = $valorAnterior;
+                $valorNuevo = (is_null($valor))?'':$valor;
+            }
+            $valorNuevoMostrar = (''==$valorNuevo)?'<em>valor vacio</em>':$valorNuevo;  // Esto no pude insertarlo en la siguiente linea.
+            return response()->json(['success' => "Se cambio de {$valorAnterior} a {$valorNuevoMostrar}.",
+                                    $columna => $valorAnteriorBd, 'nuevoValor' => $valorNuevo]);
+        } else
+            return redirect()->route('propiedades.index');
     }
 
     /**
@@ -1021,15 +1080,28 @@ class PropiedadController extends Controller
     {
         //dd($request->all());
         $request->validate([
-            //'image' => '',
             'imagen' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-            //'id' => '',
-            //'codigo' => '',
+            'id' => '',
+            'codigo' => '',
+            'captador' => '',
         ]);
+        //return response()->json(request()->all());
         //dd($request->all());
         $nombreImagenOriginal = $request->imagen->getClientOriginalName();
-        $nombreImagen = $request->codigo . '-' . $request->id . '.' . $request->imagen->getClientOriginalExtension();
-        $request->imagen->move(public_path('imgprop'), $nombreImagen);
+        $nombreBaseImagen = $request->id . '_' . $request->codigo;
+        $extensionImagen = $request->imagen->getClientOriginalExtension();
+        $nombreImagen = $nombreBaseImagen . '.' . $extensionImagen;
+        if (file_exists("imgprop/{$nombreImagen}-0")) {       // if(is_file(public_path('imgprop/' . $nombreImagen)))
+            for ($i = 1; $i <= 20; $i++) {
+                $nombreImagen = "{$nombreBaseImagen}-{$i}.{$extensionImagen}";
+                if (file_exists("imgprop/{$nombreImagen}")) continue;
+                else {
+                    $request->imagen->move(public_path('imgprop'), $nombreImagen);
+                    break;
+                }
+            }
+        } else
+            $request->imagen->move(public_path('imgprop'), $nombreImagen . '-0');
 
         return response()
                     ->json(['success' => "La imagen '$nombreImagenOriginal' se ha cargado satisfactoriamente.",

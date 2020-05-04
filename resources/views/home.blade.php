@@ -3,7 +3,7 @@
 @section('content')
 <div class="container-fluid">
   <div class="row">
-    <div class="col-lg-4">
+    <div class="col-lg-4 col-sm-12">
       <h5>{{ (1 < Auth::user()->id)?Auth::user()->name:'Administrador' }}</h5>
       <!--div class="ximagen">Fake Image</div-->
       <div
@@ -26,126 +26,38 @@
       </div>
       <hr class="d-sm-none"><!-- Solo muestra la raya en sm -->
     </div>
-    <div class="col-lg-7">
+    <div class="col-lg-7 col-sm-12">
       <!--h2>TITLE HEADING</h2-->
-      <h5>Propiedades</h5>
+      <h5>Propiedades: {{ count($misPropiedades) }}</h5>
     @if (Auth::user()->is_admin)
       <div id="miCarousel" class="carousel slide" data-ride="carousel" data-interval="1000">
         <ol class="carousel-indicators"><!-- Indicadors '_____' debajo de la imagen -->
-          <li data-target="#miCarousel" data-slide-to="0" class="active"></li>
-          <li data-target="#miCarousel" data-slide-to="1"></li>
-          <li data-target="#miCarousel" data-slide-to="2"></li>
-          <li data-target="#miCarousel" data-slide-to="3"></li>
-          <li data-target="#miCarousel" data-slide-to="4"></li>
+        @for ($i = 0; $i < count($misPropiedades); $i++)
+          <li data-target="#miCarousel" data-slide-to="{{ $i }}"@if (0==$i) class="active"@endif></li>
+        @endfor ($i = 0; $i < 5; $i++)
         </ol>
         <div class="carousel-inner">
-          <div class="carousel-item active">
-            <img class="first-slide img-fluid"
-                  src="img/imagen0.jpg"
-                    alt="Primera propiedad" style="height:300px;">
-            <!--div class="container"-->
-              <div class="carousel-caption text-left">
-                <!--h1 class="col-lg-6" style="background-color:lightgrey">Hola, Alirio
-                </h1-->
-<?php
-  $tamImagen = getimagesize('img/imagen0.jpg');
-  $razon = round($tamImagen[0]/$tamImagen[1], 3); 
-  $nvoAncho = round($razon * 300, 0);
-?>
-		<div class="bg-info text-dark" style="width:<?php echo round($nvoAncho/2, 0); ?>;">
-                <p>
-<?php
-  echo "ancho de la Imagen: {$tamImagen[0]}, alto: {$tamImagen[1]}, razon: {$razon}, para alto 300, ancho: {$nvoAncho}\n";
-?>
-                </p>
-                </div>
-                <p><a class="btn btn-lg btn-primary" href="" role="button">
-                  A1
+        @foreach ($misPropiedades as $propiedad)
+          <div class="carousel-item @if(0==$loop->index)active @endif">
+            <img class="img-fluid imagenPropiedad" src="{{ asset('imgprop/'.$propiedad['nombreImagen']) }}"
+                data-toggle="tooltip" data-html="true"
+                title="{{ $propiedad['codigo'] }}-{{ $propiedad['nombre'] }} <u>{{ $asesor[$propiedad['asesor_id']] }}</u>"
+                alt="{{ $propiedad['codigo'] }}-{{ $propiedad['nombre'] }}" style="height:300px;">
+            <div class="container">
+              <div class="carousel-caption text-right">
+                <p><a class="btn btn-sm btn-primary"
+                    href="/propiedades/{{ $propiedad['id'] }}" role="button">
+                  Ver Propiedad
                 </a></p>
               </div><!-- carousel-caption -->
-            <!--/div-->
-          </div><!-- Fin de la primera slide 'carousel-item' -->
-          <div class="carousel-item">
-            <img class="second-slide img-fluid" src="img/imagen1.jpg"
-                    alt="Segunda propiedad" style="height:300px;">
-            <div class="container">
-              <div class="carousel-caption">
-                <h6 style="background-color:lightgrey">
-<?php
-  $tamImagen = getimagesize('img/imagen1.jpg');
-  $razon = round($tamImagen[0]/$tamImagen[1], 3); 
-  $nvoAncho = round($razon * 300, 0);
-  echo "ancho de la Imagen: {$tamImagen[0]}, alto: {$tamImagen[1]}, razon: {$razon}, para alto 300, ancho: {$nvoAncho}\n";
-?>
-                </h6>
-                <p><a class="btn btn-lg btn-primary" href="" role="button">
-                  A2
-                </a></p>
-              </div>
             </div>
-          </div>
-          <div class="carousel-item">
-            <img class="third-slide img-fluid" src="img/imagen2.jpg"
-                    alt="Tercera propiedad" style="height:300px;">
-            <div class="container">
-              <div class="carousel-caption text-right">
-                <h6 style="background-color:lightgrey">
-<?php
-  $tamImagen = getimagesize('img/imagen2.jpg');
-  $razon = round($tamImagen[0]/$tamImagen[1], 3); 
-  $nvoAncho = round($razon * 300, 0);
-  echo "ancho de la Imagen: {$tamImagen[0]}, alto: {$tamImagen[1]}, razon: {$razon}, para alto 300, ancho: {$nvoAncho}\n";
-?>
-                </h6>
-                <p><a class="btn btn-lg btn-primary" href="" role="button">
-                  A3
-                </a></p>
-              </div>
-            </div>
-          </div>
-          <div class="carousel-item">
-            <img class="fourth-slide img-fluid" src="img/imagen3.jpg"
-                    alt="Cuarta propiedad" style="height:300px;">
-            <div class="container">
-              <div class="carousel-caption text-right">
-                <h6 style="background-color:lightgrey">
-<?php
-  $tamImagen = getimagesize('img/imagen3.jpg');
-  $razon = round($tamImagen[0]/$tamImagen[1], 3); 
-  $nvoAncho = round($razon * 300, 0);
-  echo "ancho de la Imagen: {$tamImagen[0]}, alto: {$tamImagen[1]}, razon: {$razon}, para alto 300, ancho: {$nvoAncho}\n";
-?>
-                </h6>
-                <p><a class="btn btn-lg btn-primary" href="" role="button">
-                  A4
-                </a></p>
-              </div>
-            </div>
-          </div>
-          <div class="carousel-item">
-            <img class="fith-slide img-fluid" src="img/imagen4.jpg"
-                    alt="Quinta propiedad" style="height:300px;">
-            <div class="container">
-              <div class="carousel-caption text-right">
-                <h6 style="background-color:lightgrey">
-<?php
-  $tamImagen = getimagesize('img/imagen4.jpg');
-  $razon = round($tamImagen[0]/$tamImagen[1], 3); 
-  $nvoAncho = round($razon * 300, 0);
-  echo "ancho de la Imagen: {$tamImagen[0]}, alto: {$tamImagen[1]}, razon: {$razon}, para alto 300, ancho: {$nvoAncho}\n";
-?>
-                </h6>
-                <p><a class="btn btn-lg btn-primary" href="" role="button">
-                  A5
-                </a></p>
-              </div>
-            </div>
-          </div>
-        </div>
+          </div><!-- Fin de la slide 'carousel-item' -->
+        @endforeach ($misPropiedades as $propiedad)
+        </div><!-- Fin de las slides'carousel-inner' -->
 <!-- Inicio de los controles del carousel <slide anterior> y <slide posterior> con etiuetas <a> -->
         <a class="carousel-control-prev" href="#miCarousel" role="button" data-slide="prev">
           <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-          <span class="sr-only">Previo</span>
+          <span class="sr-only">Anterior</span>
         </a>
         <a class="carousel-control-next" href="#miCarousel" role="button" data-slide="next">
           <span class="carousel-control-next-icon" aria-hidden="true"></span>
@@ -155,16 +67,18 @@
 
     @else (Auth::user()->is_admin)
       <div class="row ximagen bg-transparent m-0 p-0">
-          <img class="img-responsive m-0 p-0" src="{{ asset('img/imagen0.jpg') }}" alt="Propiedad" style="height:150px;">
-          <img class="img-responsive m-0 p-0" src="{{ asset('img/imagen1.jpg') }}" alt="Propiedad" style="height:150px;">
-          <img class="img-responsive m-0 p-0" src="{{ asset('img/imagen2.jpg') }}" alt="Propiedad" style="height:150px;">
-          <img class="img-responsive m-0 p-0" src="{{ asset('img/imagen3.jpg') }}" alt="Propiedad" style="height:150px;">
-          <img class="img-responsive m-0 p-0" src="{{ asset('img/imagen4.jpg') }}" alt="Propiedad" style="height:150px;">
-          <img class="img-responsive m-0 p-0" src="{{ asset('img/inauguracion1.jpg') }}" alt="Propiedad" style="height:150px;">
+        @foreach ($misPropiedades as $propiedad)
+          <a class="btn btn-link m-0 p-0" href="/propiedades/{{ $propiedad['id'] }}">
+            <img class="img-responsive m-0 p-0 imagenPropiedad"
+                src="{{ asset('imgprop/'.$propiedad['nombreImagen']) }}"
+                alt="{{ $propiedad['codigo'] }}-{{ $propiedad['nombre'] }}" data-toggle="tooltip"
+                title="{{ $propiedad['codigo'] }}-{{ $propiedad['nombre'] }}" style="height:150px;">
+          <a>
+        @endforeach ($propiedades as $propiedad)
       </div>
     @endif (Auth::user()->is_admin)
     </div>
-    <div class="col-lg-1">
+    <div class="col-lg-1 col-sm-12">
       <h5>Redes</h5>
       <div class="xredes rounded">
         <div class="row justify-content-center">
@@ -173,27 +87,18 @@
                   alt="Instagram" data-toggle="tooltip" title="@c21puentereal" style="width:50px;height:50px;">
           </a>
         </div>
-        <!--div class="row">
-          <img class="rounded-circle mx-auto d-block my-1 enlacesExternos" src="{{ asset('iconos/Instagram.png') }}" alt="Instagram" data-toggle="tooltip" title="@c21puentereal" style="width:50px;height:50px;">
-        </div-->
         <div class="row justify-content-center">
           <a class="btn btn-link m-0 p-0" href="https://twitter.com/c21puentereal">
             <img class="rounded mx-auto d-block my-1 enlacesExternos" src="{{ asset('iconos/Twiter.png') }}"
                   alt="Twiter" data-toggle="tooltip" title="@c21puentereal" style="width:50px;height:50px;">
           </a>
         </div>
-        <!--div class="row text-center">
-          <img class="rounded-circle mx-auto d-block my-1 enlacesExternos" src="{{ asset('iconos/Twiter.png') }}" alt="Twiter" data-toggle="tooltip" title="@c21puentereal" style="width:50px;height:50px;">
-        </div-->
         <div class="row justify-content-center">
           <a class="btn btn-link m-0 p-0" href="https://es-la.facebook.com/c21puentereal/">
             <img class="rounded mx-auto d-block my-1 enlacesExternos" src="{{ asset('iconos/Facebook.png') }}"
                   alt="Facebook" data-toggle="tooltip" title="@c21puentereal" style="width:50px;height:50px;">
           </a>
         </div>
-        <!--div class="row">
-          <img class="rounded-circle mx-auto d-block my-1 enlacesExternos" src="{{ asset('iconos/Facebook.png') }}" alt="Facebook" data-toggle="tooltip" title="@c21puentereal" style="width:50px;height:50px;">
-        </div-->
         <div class="row justify-content-center">
           <a class="btn btn-link m-0 p-0" href="https://web.whatsapp.com/">
             <img class="rounded mx-auto d-block my-1 enlacesExternos" src="{{ asset('iconos/Whatsapp.png') }}"
@@ -215,8 +120,7 @@
       </div>
     </div>
   </div>
-  <div class="row col-lg-11 my-1 justify-content-center bg-transparent" style="height:75px;">
-    <!--img class="border border-dark rounded mx-1" src="{{ asset('botones/crearContacto.png') }}" alt="Crear Contacto" style="border:solid 1px #000000;width:75px;height:75px;"-->
+  <div class="row col-lg-11 col-sm-12 my-1 justify-content-center bg-transparent" style="min-height:75px;">
     <a class="btn btn-link m-0 p-0" href="/contactos/crear">
       <img class="border border-dark rounded-circle mx-1 botones" src="{{ asset('botones/crearContacto.png') }}"
             alt="Crear Contacto" data-toggle="tooltip" title="Crear Contacto inicial" style="width:75px;height:75px;">
@@ -227,7 +131,6 @@
             alt="Crear Asesor" data-toggle="tooltip" title="Crear Asesor" style="width:75px;height:75px;">
     </a>
     @endif (Auth::user()->is_admin)
-    <!--img class="border border-dark rounded mx-1" src="{{ asset('botones/crearCita.png') }}" alt="Crear cita" style="border:solid 1px #000000;width:75px;height:75px;"-->
     <a class="btn btn-link m-0 p-0" href="/agendaPersonal/crear">
       <img class="border border-dark rounded-circle mx-1 botones" src="{{ asset('botones/crearCita.png') }}"
             alt="Crear cita" data-toggle="tooltip" title="Crear Cita Personal" style="width:75px;height:75px;">
@@ -236,7 +139,6 @@
       <img class="border border-dark rounded-circle mx-1 botones" src="{{ asset('botones/crearCliente.png') }}"
             alt="Crear cliente" data-toggle="tooltip" title="Crear Cliente" style="width:75px;height:75px;">
     </a>
-    <!--img class="border border-dark rounded mx-1" src="{{ asset('botones/crearPropiedad.png') }}" alt="crear Propiedad" style="border:solid 1px #000000;width:75px;height:75px;"-->
     <a class="btn btn-link m-0 p-0" href="/propiedades/crear">
       <img class="border border-dark rounded-circle mx-1 botones" src="{{ asset('botones/crearPropiedad.png') }}"
             alt="crear Propiedad" data-toggle="tooltip" title="Crear Propiedad" style="width:75px;height:75px;">
@@ -249,6 +151,7 @@
 
 <script>
   $(function () {
+      $("img.imagenPropiedad").tooltip('enable')
       $("img.enlacesExternos").tooltip('enable')
       $("img.botones").tooltip('enable')
   });

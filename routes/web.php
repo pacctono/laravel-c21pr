@@ -202,6 +202,9 @@ Route::get('/propiedades/actualizar/{propiedad}/{columna}/{codigo}', 'PropiedadC
     ->where('propiedad', '[0-9]+')
     ->name('propiedades.actualizar');
 
+Route::post('/propiedades/actualizar/', 'PropiedadController@actualizar')
+    ->name('propiedades.post.actualizar');
+
 Route::post('/propiedades/cargarimagen/', 'PropiedadController@cargarimagen')
     ->name('carga.imagen.propiedad');
 

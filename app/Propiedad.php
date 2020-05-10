@@ -4,6 +4,7 @@ namespace App;
 
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;     // PC
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 //use Illuminate\Support\Facades\Storage;     // PC
@@ -90,6 +91,7 @@ class Propiedad extends Model
     public $monedaB = true;
     public $espDosP = true;
     public $dosPunB = true;
+    public const DIR_IMG = 'public/imgprop';
     public const COLORES = [
                             'A' => 'success',
                             'I' => 'warning',
@@ -920,7 +922,10 @@ class Propiedad extends Model
         $nombreBaseImagen = $this->id . '_' . $this->codigo;
         for ($i = 0; $i <= 20; $i++) {
             foreach ($extensiones as $ext) {
-                if (file_exists("imgprop/{$nombreBaseImagen}-{$i}.{$ext}")) {
+                //$arreglo = [];
+                if (Storage::exists(self::DIR_IMG . "/{$nombreBaseImagen}-{$i}.{$ext}")) {
+                    //$arreglo[$i] = $ext;
+                    //$imagenes[] = $arreglo;
                     $imagenes[$i] = $ext;
                     break;
                 }

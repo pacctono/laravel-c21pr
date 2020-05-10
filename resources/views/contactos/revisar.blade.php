@@ -7,12 +7,12 @@
     var asesores, precios, vClientes, vCedulas, vTelefonos, vCorreos;
     $.ajax({url: "/clientes/vClientes",
         success: function(resultado) {
-                asesores  = $.parseJSON(resultado[0]);
-                var precios = $.parseJSON(resultado[1]);
-                vClientes = $.parseJSON(resultado[2]);
-                vCedulas = $.parseJSON(resultado[3]);
-                vTelefonos = $.parseJSON(resultado[4]);
-                vCorreos = $.parseJSON(resultado[5]);
+                asesores  = JSON.parse(resultado[0]);	// $.parseJSON ha sido o sera deprecated.
+                var precios = JSON.parse(resultado[1]);	// $.parseJSON ha sido o sera deprecated.
+                vClientes = JSON.parse(resultado[2]);	// $.parseJSON ha sido o sera deprecated.
+                vCedulas = JSON.parse(resultado[3]);	// $.parseJSON ha sido o sera deprecated.
+                vTelefonos = JSON.parse(resultado[4]);	// $.parseJSON ha sido o sera deprecated.
+                vCorreos = JSON.parse(resultado[5]);	// $.parseJSON ha sido o sera deprecated.
                 //alert(vTelefonos[4121030341].nb+';'+vTelefonos[4121030341].uid+';'+asesores[vTelefonos[4121030341].uid]);
     @if (('contactos' == substr($view_name, 0, 9)) && ('crear' == substr($view_name, -5)))
                 $.each(precios, function(idx, val) {

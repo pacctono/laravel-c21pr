@@ -7,10 +7,10 @@
       <h5>{{ (1 < Auth::user()->id)?Auth::user()->name:'Administrador' }}</h5>
       <!--div class="ximagen">Fake Image</div-->
       <div
-      @if (!file_exists($foto))
-          class="bg-info" style="width:100%;height:285px;"
-      @else (!file_exists($foto))
+      @if (file_exists($foto))
           class="bg-transparent"
+      @else (!file_exists($foto))
+          class="bg-info" style="width:100%;height:285px;"
       @endif (!file_exists($foto))
       >
         <img src="{{ asset($foto) }}" alt="Foto">
@@ -39,13 +39,13 @@
         <div class="carousel-inner">
         @foreach ($misPropiedades as $propiedad)
           <div class="carousel-item @if(0==$loop->index)active @endif">
-            <img class="img-fluid imagenPropiedad" src="{{ asset('imgprop/'.$propiedad['nombreImagen']) }}"
+            <img class="img-fluid imagenPropiedad" src="{{ asset('storage/imgprop/'.$propiedad['nombreImagen']) }}"
                 data-toggle="tooltip" data-html="true"
                 title="{{ $propiedad['codigo'] }}-{{ $propiedad['nombre'] }} <u>{{ $asesor[$propiedad['asesor_id']] }}</u>"
                 alt="{{ $propiedad['codigo'] }}-{{ $propiedad['nombre'] }}" style="height:300px;">
             <div class="container">
               <div class="carousel-caption text-right">
-                <p><a class="btn btn-sm btn-primary"
+                <p><a class="btn btn-sm btn-outline-info"
                     href="/propiedades/{{ $propiedad['id'] }}" role="button">
                   Ver Propiedad
                 </a></p>
@@ -69,45 +69,51 @@
       <div class="row ximagen bg-transparent m-0 p-0">
         @foreach ($misPropiedades as $propiedad)
           <a class="btn btn-link m-0 p-0" href="/propiedades/{{ $propiedad['id'] }}">
-            <img class="img-responsive m-0 p-0 imagenPropiedad"
-                src="{{ asset('imgprop/'.$propiedad['nombreImagen']) }}"
+            <img class="img-fluid m-0 p-0 imagenPropiedad"
+                src="{{ asset('storage/imgprop/'.$propiedad['nombreImagen']) }}"
                 alt="{{ $propiedad['codigo'] }}-{{ $propiedad['nombre'] }}" data-toggle="tooltip"
-                title="{{ $propiedad['codigo'] }}-{{ $propiedad['nombre'] }}" style="height:150px;">
-          <a>
+                title="{{ $propiedad['codigo'] }}-{{ $propiedad['nombre'] }}"
+              @if ($agent->isMobile())
+                style="height:75px;">
+              @else ($agent->isMobile())
+                style="height:150px;">
+              @endif ($agent->isMobile())
+          </a>
         @endforeach ($propiedades as $propiedad)
       </div>
     @endif (Auth::user()->is_admin)
+      <hr class="d-sm-none"><!-- Solo muestra la raya en sm -->
     </div>
     <div class="col-lg-1 col-sm-12">
       <h5>Redes</h5>
       <div class="xredes rounded">
         <div class="row justify-content-center">
           <a class="btn btn-link m-0 p-0" href="https://www.instagram.com/c21puentereal/?hl=es-la">
-            <img class="rounded mx-auto d-block my-1 enlacesExternos" src="{{ asset('iconos/Instagram.png') }}"
+            <img class="rounded mx-auto d-block my-1 enlacesExternos" src="{{ asset('iconos/instagram.png') }}"
                   alt="Instagram" data-toggle="tooltip" title="@c21puentereal" style="width:50px;height:50px;">
           </a>
         </div>
         <div class="row justify-content-center">
           <a class="btn btn-link m-0 p-0" href="https://twitter.com/c21puentereal">
-            <img class="rounded mx-auto d-block my-1 enlacesExternos" src="{{ asset('iconos/Twiter.png') }}"
+            <img class="rounded mx-auto d-block my-1 enlacesExternos" src="{{ asset('iconos/twitter.png') }}"
                   alt="Twiter" data-toggle="tooltip" title="@c21puentereal" style="width:50px;height:50px;">
           </a>
         </div>
         <div class="row justify-content-center">
           <a class="btn btn-link m-0 p-0" href="https://es-la.facebook.com/c21puentereal/">
-            <img class="rounded mx-auto d-block my-1 enlacesExternos" src="{{ asset('iconos/Facebook.png') }}"
+            <img class="rounded mx-auto d-block my-1 enlacesExternos" src="{{ asset('iconos/facebook.png') }}"
                   alt="Facebook" data-toggle="tooltip" title="@c21puentereal" style="width:50px;height:50px;">
           </a>
         </div>
         <div class="row justify-content-center">
           <a class="btn btn-link m-0 p-0" href="https://web.whatsapp.com/">
-            <img class="rounded mx-auto d-block my-1 enlacesExternos" src="{{ asset('iconos/Whatsapp.png') }}"
+            <img class="rounded mx-auto d-block my-1 enlacesExternos" src="{{ asset('iconos/whatsapp.png') }}"
                   alt="Whatsapp" data-toggle="tooltip" title="Web de Whatsapp" style="width:50px;height:50px;">
           </a>
         </div>
         <div class="row justify-content-center">
           <a class="btn btn-link m-0 p-0" href="https://web.telegram.org/#/login">
-            <img class="rounded-circle mx-auto d-block my-1 enlacesExternos" src="{{ asset('iconos/Telegram.png') }}"
+            <img class="rounded-circle mx-auto d-block my-1 enlacesExternos" src="{{ asset('iconos/telegram.png') }}"
                 alt="Telegram" data-toggle="tooltip" title="Web de Telegram" style="width:50px;height:50px;">
           </a>
         </div>
@@ -118,6 +124,7 @@
           </a>
         </div>
       </div>
+      <hr class="d-sm-none"><!-- Solo muestra la raya en sm. Se esconde en pantallas superiores a sm -->
     </div>
   </div>
   <div class="row col-lg-11 col-sm-12 my-1 justify-content-center bg-transparent" style="min-height:75px;">
@@ -127,7 +134,7 @@
     </a>
     @if (Auth::user()->is_admin)
     <a class="btn btn-link m-0 p-0" href="/usuarios/nuevo">
-      <img class="border border-dark rounded-circle mx-1 botones" src="{{ asset('botones/crearCliente.png') }}"
+      <img class="border border-dark rounded-circle mx-1 botones" src="{{ asset('botones/crearAsesor.png') }}"
             alt="Crear Asesor" data-toggle="tooltip" title="Crear Asesor" style="width:75px;height:75px;">
     </a>
     @endif (Auth::user()->is_admin)

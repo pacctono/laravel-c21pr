@@ -16,6 +16,39 @@
         //$("input:focus").css("background-color", "lightgrey"); 
 
     @includeif('propiedades.ajax')
+        function borrarImagenConAjax(that, nombreActual, nombreNuevo, idDivImg) {
+            $.ajaxSetup({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                }
+            });
+            $.ajax({
+                type: 'POST',
+                url: "{{ route('propiedades.borrarImagen') }}",
+                data: {nombreActual: nombreActual, nombreNuevo: nombreNuevo},
+                success: function(data, estatus, jq) {
+                    alertar(data.success);
+                    $("#"+idDivImg).remove();
+                },
+                error: function(jq, estatus, error) {
+                    //console.log(jq, jq.responseText, jq.responseJSON.message);
+                    bootbox.dialog({
+                        size: 'extra-large',
+                        title: `No se pudo borrar la imagen:
+                                Estatus:${estatus}, Error:${error}`,
+                        message: `readyState:${jq.readyState}, status:${jq.status}, // jq.responseText es una string, el objeto es responseJSON.
+                                    mensaje:${jq.responseJSON.message},
+                                    exception:${jq.responseJSON.exception},
+                                    file:${jq.responseJSON.file},
+                                    line: ${jq.responseJSON.line}`,
+                        onEscape: true,
+                        backdrop: true,
+                        scrollable: true,
+                        buttons: false
+                    })
+                }
+            });
+        }
     @if ('crear' == substr($view_name, -5))
         if ('X' != $("#cliente_id").val()) {
             $("div.nuevo").hide();          // Clase "nuevo". Solo se muestra, si se va a crear un nuevo cliente.
@@ -52,6 +85,57 @@
             }
         });
     @endif ('crear' == substr($view_name, -5))
+    @if ('editar' == substr($view_name, -6))
+        $("#fotosestaticas").hide();
+        $("#mostrarfotos").click(function(ev) {
+            ev.preventDefault();
+            const that = $(this);
+            if (!$("#fotosestaticas").hasClass("row")) {
+                const nombreBase = that.attr('nombreBase'); // Nombre base sin secuencia, ni extension.
+                const arreglo = nombreBase.split('_');      // id_codigo
+                const id = arreglo[0];
+                const codigo = arreglo[1];         // codigo de la propiedad.
+                const nombre = $("#nombre-"+id).val();         // Nombre de la propiedad.
+                const img = JSON.parse(that.attr('img'));       // extensiones de imagenes. Se pudo usar: $.parseJSON(...)
+                const long = Object.keys(img).length;
+                let divHtml = `<div class="row bg-transparent m-0 p-0" style="height:250">`;
+                for (const i in img) {        // Quite la clase .w-auto, al primer div.
+                    divHtml += `<div id="${nombreBase}-${i}" style="position:relative">
+                            <img class="img-fluid m-0 p-0"
+                                src="{{ asset('storage/imgprop/') }}/${nombreBase}-${i}.${img[i]}"
+                                style="height:250px;">
+                            <div style="position:absolute;right:50px;bottom:10px;">
+                                <a class="btn btn-sm btn-outline-danger imagenPropiedad"
+                                        href="" nombre="${nombreBase}" sec="${i}"
+                                        ext="${img[i]}" role="button">
+                                    Borrar
+                                </a>
+                            </div>
+                        </div>`;
+                }
+                divHtml += `</div>`;
+                $("#fotosestaticas").html(divHtml);
+                $("#fotosestaticas").addClass("row bg-transparent border-top border-dark m-0 p-0");
+                $("a.imagenPropiedad").click(function(ev) {
+                    ev.preventDefault();
+                    const that = $(this);
+                    const nombre = that.attr('nombre');
+                    const sec = that.attr('sec');
+                    const ext = that.attr('ext');
+                    const asesor = {{ Auth::user()->id }};
+                    borrarImagenConAjax(that, `${nombre}-${sec}.${ext}`,
+                                        `${nombre}-${sec}_${asesor}.${ext}`,
+                                        `${nombre}-${sec}`);
+                });
+            }
+            $("#fotosestaticas").toggle();
+            if ($("#fotosestaticas").is(":hidden")) {   // Tambien ":visibility"
+                $("#mostrarfotos").text("Mostrar fotos")
+            } else {
+                $("#mostrarfotos").text("Ocultar fotos")
+            }
+        });
+    @endif ('editar' == substr($view_name, -6))
         $("#datosPropiedad").click(function(ev){         // Id "datosPropiedad"
             $("fieldset.datosPropiedad").children("div").toggle(1000);  // Clase "datosPropiedad"
             ev.preventDefault();

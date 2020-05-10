@@ -20,6 +20,18 @@
                         name="nombre" id="nombre" required
                         value="{{ old('nombre', $propiedad->nombre) }}">
                 </div>
+            @if (0 < count($propiedad->imagenes))
+                <div class="ml-2 p-0">
+                    <button type="button"
+                            class="btn btn-{{ substr($propiedad->estatus_color, strpos($propiedad->estatus_color, '-')+1) }}
+                                btn-sm my-0 mx-1 p-0"
+                            nombreBase="{{ $propiedad->id }}_{{ $propiedad->codigo }}"
+                            img="{{ json_encode($propiedad->imagenes, JSON_FORCE_OBJECT) }}"
+                            id="mostrarfotos" title="Presione para mostrar/esconder las fotos de la propiedad">
+                        Mostrar fotos
+                    </button>
+                </div>
+            @endif (0 < count($propiedad->imagenes))
             </div>
 
             <div class="form-row my-1 mx-0 p-0 bg-suave">
@@ -228,6 +240,11 @@
                         value="{{ old('lados', $propiedad->lados) }}">
                 </div>
             </div>
+
+        @if (0 < count($propiedad->imagenes))
+            <div id="fotosestaticas">
+            </div>
+        @endif (0 < count($propiedad->imagenes))
 
             <fieldset class="datosPropiedad" style="border:solid 2px #000000">
                 <legend>

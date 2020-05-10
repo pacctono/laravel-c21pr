@@ -8,6 +8,7 @@ use App\Texto;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;     // PC
+use Illuminate\Database\Eloquent\ModelNotFoundException;     // PC
 use Symfony\Component\Process\Process;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Carbon\Carbon;
@@ -22,32 +23,44 @@ class HomeController extends Controller
         }
         return ($a['id'] > $b['id']) ? -1 : 1;
     }
-    protected function misPropiedades($files)
+    public function misPropiedades($files)
     {
         $propiedad = [];
 // los nombre de archivo tienen que tener la estructura: {propiedad_id}_{codigo}[-{secuencia}].ext        
         foreach($files as $filename) {
+/*            $filename = basename($filename);
             if (1 != substr_count($filename, '.')) continue;
             list($nombre, $extension) = explode('.', $filename);
             if (1 != substr_count($nombre, '_')) continue;
             list($propiedad_id, $codigo_sec) = explode('_', $nombre);
-            if (0 == substr_count($codigo_sec, '-')) continue;    // Solo interesa la primera imagen.
+            if (1 != substr_count($codigo_sec, '-')) continue;    // Solo interesa la primera imagen.
             list($codigo, $sec) = explode('-', $codigo_sec);
             if (!is_numeric($propiedad_id) or !is_numeric($codigo) or !is_numeric($sec))
-                continue;
-            $prop = Propiedad::findOrFail($propiedad_id);
-            if (!Auth::user()->is_admin and (Auth::user()->id != $prop->asesor_captador_id) and
-                (Auth::user()->id != $prop->asesor_cerrador_id)) continue;
-            if ('A' != $prop->estatus) continue;        // La propiedad no esta activa.
-            $todosNombreProp[] = [
-                'nombreImagen' => $filename,
-                'id' => $propiedad_id,
-                'codigo' => $codigo,
-                'sec' => $sec,
-                'asesor_id' => $prop->asesor_captador_id,
-                'nombre' => $prop->nombre,
-            ];
-            //if (50 <= count($todosNombreProp)) break;
+                continue;*/
+            $n = preg_match('/^(\d{1,4})(?# id de la propiedad)_(\d+)(?# codigo de la propiedad)-(\d{1,2})(?# secuencia)\.([jpegifsvn]{3,4})(?# extension, puede ser: jpeg, jpg, gif, png o svg)$/',
+                            basename($filename), $matches);
+            if ($n) list($filename, $propiedad_id, $codigo, $sec, $ext) = $matches;  // $n === 1.
+            else continue;                                                                      // $n === 0 o $n === false.
+            try {
+                $prop = Propiedad::findOrFail($propiedad_id);   // Si 'findOrFail' falla produce 'ModelNotFoundException'.
+                if (!Auth::user()->is_admin and (Auth::user()->id != $prop->asesor_captador_id) and
+                    (Auth::user()->id != $prop->asesor_cerrador_id)) continue;
+                if ('A' != $prop->estatus) continue;        // La propiedad no esta activa.
+                $todosNombreProp[] = [
+                    'nombreImagen' => $filename,
+                    'id' => $propiedad_id,
+                    'codigo' => $codigo,
+                    'sec' => $sec,
+                    'asesor_id' => $prop->asesor_captador_id,
+                    'nombre' => $prop->nombre,
+                ];
+                //if (50 <= count($todosNombreProp)) break;
+            } catch (ModelNotFoundException $exception) {
+            //} catch (\Exception $exception) {     // namespace '\'.
+                //dd($todosNombreProp, $filename);
+                report($exception);
+                //continue;   // return back()->withError($exception->getMessage())->withInput();
+            }
         }
         usort($todosNombreProp, "self::comparar");  // Ordenar por id, asc y sec, desc.
         foreach ($todosNombreProp as $nombre) {     // Suprime nombres duplicados, con diferentes sec, se escoge el de menor sec.
@@ -55,6 +68,7 @@ class HomeController extends Controller
             if (!isset($idant)) $nombreProp[] = $nombre;
             elseif ($id != $idant) $nombreProp[] = $nombre;
             $idant = $id;
+            if (20 < count($todosNombreProp)) break;    // Solo mostrar las 20 propiedades más recientes.
         }
         return collect($nombreProp);
     }
@@ -138,7 +152,7 @@ class HomeController extends Controller
                 $cumpleanos .= '</div>
                     <div class="col-lg-4">';
                 $cumpleanos .= $cumpleano->fecha_cumpleanos->format('d-m');
-                if ($hoy == $cumpleano->fecha_cumpleanos->format('d-m'))
+                if (($hoy == $cumpleano->fecha_cumpleanos->format('d-m')) and (Auth::user()->id != $cumpleano->id))
                     $cumpleanos .= '<a href="/cumpleano/' . $cumpleano->id . '" class="btn btn-link"
                             title="Enviar correo a ' . "'{$cumpleano->name}'" . ', porque esta de cumpleaños!">
                             <span class="oi oi-envelope-closed"></span>
@@ -153,10 +167,11 @@ class HomeController extends Controller
             ($hoy == Auth::user()->fecha_nacimiento->format('d-m')))
             $hoyCumpleanos = true && $login;
         //dd($hoy, Auth::user()->fecha_cumpleanos->format('d-m'));
-        $dir = public_path('imgprop');
-        $files = array_diff(scandir($dir, SCANDIR_SORT_DESCENDING), array('..', '.'));  // Cada nombre de imagen comienza con el id de la propiedad. Primero los mayores, los más recientes creados.
+        //$dir = public_path('imgprop');
+        //$files = array_diff(scandir($dir, SCANDIR_SORT_DESCENDING), array('..', '.'));  // Cada nombre de imagen comienza con el id de la propiedad. Primero los mayores, los más recientes creados.
+        $files = Storage::files(Propiedad::DIR_IMG);
         $misPropiedades = $this->misPropiedades($files);    // Nombre imagen; id, codigo y nombre de propiedad.
-        //dd($files, $misPropiedades, Propiedad::where('asesor_captador_id', 16)->get());
+        //dd($files, $misPropiedades, storage_path(), Propiedad::where('asesor_captador_id', 16)->get());
         $users   = User::get(['id', 'name']);     // Todos los usuarios (asesores), incluso los no activos.
         $users[0]['name'] = 'Administrador';
         $asesor = array();

@@ -49,7 +49,7 @@
       <!-- Fixed navbar -->
       <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
         <a class="navbar-brand" href="http://www.century21.com.ve/@puenterealbienesraices" target="_blank">
-          <img src="{{ (asset('img/c21pr.jpg')) }}" title="C21 Puente Real"
+          <img src="{{ (asset('img/c21pr.png')) }}" title="C21 Puente Real"
                 alt="C21 Puente Real" style="width:32px;height:31px;">
         </a>
         <button class="navbar-toggler" type="button" data-toggle="collapse"   {{-- Permite mostrar menu en pantallas pequeñas --}}

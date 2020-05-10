@@ -208,6 +208,9 @@ Route::post('/propiedades/actualizar/', 'PropiedadController@actualizar')
 Route::post('/propiedades/cargarimagen/', 'PropiedadController@cargarimagen')
     ->name('carga.imagen.propiedad');
 
+Route::post('/propiedades/borrarimagen/', 'PropiedadController@borrarimagen')
+    ->name('propiedades.borrarImagen');
+
 Route::pattern('propiedades', '[0-9]+');               // Para no crear conflictos con el resource propiedad
 Route::resource('propiedades', 'PropiedadController')
     ->parameters(['propiedades' => 'propiedad']);

@@ -30,6 +30,29 @@
             <div class="mx-1 px-2">
                 Fecha inicial:<span class="alert-info">{{ $propiedad->fec_ini }}</span>
             </div>
+        @if (0 < count($propiedad->imagenes))
+            <div class="ml-2 p-0">
+                <button type="button"
+                        class="btn btn-{{ substr($propiedad->estatus_color, strpos($propiedad->estatus_color, '-')+1) }}
+                            btn-sm my-0 mx-1 p-0"
+                        nombreBase="{{ $propiedad->id }}_{{ $propiedad->codigo }}"
+                        img="{{ json_encode($propiedad->imagenes, JSON_FORCE_OBJECT) }}"
+                        id="mostrarfotos" title="Presione para mostrar/esconder las fotos de la propiedad">
+                    Mostrar fotos
+                </button>
+            </div>
+            <div class="ml-2 p-0">
+                <button type="button"
+                        class="btn btn-{{ substr($propiedad->estatus_color, strpos($propiedad->estatus_color, '-')+1) }}
+                            btn-sm my-0 mx-1 p-0"
+                        nombreBase="{{ $propiedad->id }}_{{ $propiedad->codigo }}"
+                        img="{{ json_encode($propiedad->imagenes, JSON_FORCE_OBJECT) }}"
+                        id="mostrarcarrusel" title="Presione para mostrar/esconder las fotos de la propiedad">
+                    Mostrar Carrusel de fotos
+                </button>
+            </div>
+            <input type="hidden" id="nombre-{{ $propiedad->id }}" value="{{ $propiedad->nombre }}">
+        @endif (0 < count($propiedad->imagenes))
         </div>
 
     	<div class="row my-0 py-0 bg-suave">
@@ -106,13 +129,18 @@
         </div>
         @endif (!Auth::user()->is_admin)
 
+    @if (0 < count($propiedad->imagenes))
+        <div id="fotosestaticas">
+        </div>
+    @endif (0 < count($propiedad->imagenes))
+
         <!--fieldset class="datosPropiedad" style="border:solid 2px #000000">
             <legend>
                 <button id="datosPropiedad" title="Presione para mostrar/esconder los datos de la propiedad">
                     Datos de la propiedad
                 </button>
             </legend-->
-        <div class="row mt-2 mb-0 px-0 borde-arriba">
+        <div class="row mt-2 mb-0 px-0 border-top border-dark">
             <div class="mx-1 px-2">
                 Tipo:<span class="alert-info">{{ $propiedad->tipo->descripcion }}</span>
             </div>
@@ -173,7 +201,7 @@
             </div>
         </div>
 
-        <div class="row mt-0 mb-2 py-0 bg-suave borde-abajo">
+        <div class="row my-0 py-0 bg-suave border-bottom border-dark">
             <div class="mx-1 px-2">
                 Cliente</label>
                 <span class="alert-info">{{ $propiedad->cliente->name }}</span>
@@ -447,4 +475,78 @@
     </p>
     </div>
 </div>
+@endsection
+
+@section('js')
+
+<script>
+    @includeIf('include.alertar')
+    $(document).ready(function() {
+        $("#fotosestaticas").hide();
+        $("#mostrarfotos").click(function(ev) {
+            ev.preventDefault();
+            const that = $(this);
+            if (!$("#fotosestaticas").hasClass("row")) {
+                const nombreBase = that.attr('nombreBase'); // Nombre base sin secuencia, ni extension.
+                const arreglo = nombreBase.split('_');      // id_codigo
+                const id = arreglo[0];
+                const codigo = arreglo[1];         // codigo de la propiedad.
+                const nombre = $("#nombre-"+id).val();         // Nombre de la propiedad.
+                const img = JSON.parse(that.attr('img'));       // extensiones de imagenes. Se pudo usar: $.parseJSON(...)
+                const long = Object.keys(img).length;
+                let divHtml = `<div class="row ximagen bg-transparent m-0 p-0">`;
+                for (const i in img) {
+                    divHtml += `<img class="img-fluid m-0 p-0 imagenPropiedad"
+                            src="{{ asset('storage/imgprop/') }}/${nombreBase}-${i}.${img[i]}"
+                            style="height:300px;">`;
+                }
+                divHtml += `</div>`;
+                $("#fotosestaticas").html(divHtml);
+                $("#fotosestaticas").addClass("row bg-transparent border-top border-dark m-0 p-0");
+            }
+            $("#fotosestaticas").toggle();
+            if ($("#fotosestaticas").is(":hidden")) {
+                $("#mostrarfotos").text("Mostrar fotos")
+            } else {
+                $("#mostrarfotos").text("Ocultar fotos")
+            }
+        });
+        $("#mostrarcarrusel").click(function(ev) {
+            ev.preventDefault();
+            const that = $(this);
+            const nombreBase = that.attr('nombreBase'); // Nombre base sin secuencia, ni extension.
+            const arreglo = nombreBase.split('_');      // id_codigo
+            const id = arreglo[0];
+            const codigo = arreglo[1];         // codigo de la propiedad.
+            const nombre = $("#nombre-"+id).val();         // Nombre de la propiedad.
+            const img = JSON.parse(that.attr('img'));       // extensiones de imagenes. Se pudo usar: $.parseJSON(...)
+            const long = Object.keys(img).length;
+            let activar = true;
+            let msjHtml = `<div id="miCarousel" class="carousel slide" data-ride="carousel" data-interval="false">
+                            <div class="carousel-inner">`;
+            for (const i in img) {
+                msjHtml += `<div class="carousel-item ` + ((activar)?'active':'') + `">
+                                    <img class="img-fluid imagenPropiedad"
+                                        src="{{ asset('storage/imgprop/') }}/${nombreBase}-${i}.${img[i]}"
+                                        style="height:300px;">
+                                </div>`;
+                if (activar) activar = false;
+            }
+            msjHtml += `</div>`;
+            if (1 < long)
+                msjHtml += `<a class="carousel-control-prev" href="#miCarousel" role="button" data-slide="prev">
+                                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                <span class="sr-only">Anterior</span>
+                                </a>
+                            <a class="carousel-control-next" href="#miCarousel" role="button" data-slide="next">
+                                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                <span class="sr-only">Próximo</span>
+                            </a>`;
+            msjHtml += `</div>`;
+            const titulo = `${id}) ${codigo} ${nombre}`;
+            alertar( msjHtml, titulo, 'large')
+        });
+    })
+</script>
+
 @endsection

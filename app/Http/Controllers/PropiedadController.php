@@ -39,8 +39,9 @@ class PropiedadController extends Controller
             else $colores[$k] = 'text-' . $v;
         }
         return $colores;
-    }
-    protected function repetidas() {    // Podria generar una sola query, pero asi uso nuevos metodos.
+    }   // protected function colores()
+    protected function repetidas()  // Podria generar una sola query, pero asi uso nuevos metodos.
+    {
         $propiedades = Propiedad::where('estatus', '!=', 'S')->get();
         $ids = $propiedades->unique('codigo')->modelKeys(); // id's con los 'codigos' no repetidos.
         $repetidas = Propiedad::where('estatus', '!=', 'S')->whereNotIn('id', $ids)
@@ -48,8 +49,16 @@ class PropiedadController extends Controller
         $cdsrep = array_column($repetidas, 'codigo');
         return Propiedad::where('estatus', '!=', 'S')->whereIn('codigo', $cdsrep)
                                 ->get(['id', 'codigo', 'nombre']);
-    }
-    protected function imagenes($propiedades) {    // Podria generar una sola query, pero asi uso nuevos metodos.
+    }   // protected function repetidas()
+    protected function existeArchivo($nombreBase)
+    {
+        $extensiones = ['jpeg', 'jpg', 'gif', 'png', 'svg'];
+        foreach ($extensiones as $ext) {
+            if (Storage::exists(Propiedad::DIR_IMG . "/{$nombreBase}.$ext")) return true;
+        }
+        return false;
+    }   // protected function existeArchivo($nombreBase)
+/*    protected function imagenes($propiedades) {    // Podria generar una sola query, pero asi uso nuevos metodos.
         $imagenes = [];
         $extensiones = ['jpeg', 'jpg', 'gif', 'png', 'svg'];
         foreach ($propiedades as $propiedad) {
@@ -66,7 +75,7 @@ class PropiedadController extends Controller
             }
         };
         return $imagenes;
-    }
+    }*/
     /**
      * Display a listing of the resource.
      *
@@ -269,7 +278,7 @@ class PropiedadController extends Controller
                 $tPvrCaptadorPrbrSel + $tPvrCerradorPrbrSel);*/
 //        return view((($movil)?'celular.indexPropiedades':'propiedades.index'),
         $colores = $this->colores();
-        $imagenes = $this->imagenes($propiedades);
+        //$imagenes = $this->imagenes($propiedades);
         //dd($imagenes, $propiedades);
         if ('html' == $accion)
             return view('propiedades.index',
@@ -303,7 +312,7 @@ class PropiedadController extends Controller
                     'ruta', 'orden', 'paginar', 'alertar', 'colores', 'accion'))
                 ->render();
         General::generarPdf($html, 'propiedades', $accion);
-    }       // Final del metodo index.
+    }   // Final del metodo index.
 
     public function grabarArchivo()
     {
@@ -319,11 +328,11 @@ class PropiedadController extends Controller
 
         //return redirect('/propiedades');
         return redirect()->back();
-    }
+    }   // public function grabarArchivo()
 
     function compararXNombre($cliente1, $cliente2) {
         return strcmp($cliente1->name, $cliente2->name);
-    }
+    }   // function compararXNombre($cliente1, $cliente2) {
 
     /**
      * Show the form for creating a new resource.
@@ -371,7 +380,7 @@ class PropiedadController extends Controller
                     compact('title', 'users', 'forma_pagos', 'tipos', 'ciudades',
                         'caracteristicas', 'municipios', 'estados', 'clientes',
                         'ddns', 'cols', 'tiposC', 'tipoCXDef', 'colores', 'exito'));
-    }
+    }   // public function create()
 
     /**
      * Store a newly created resource in storage.
@@ -632,7 +641,7 @@ class PropiedadController extends Controller
         session(['exito' => "La propiedad '" . $data['codigo'] . ' ' . $data['nombre'] .
                             "' fue agregada con exito."]);
         return redirect()->route('propiedades.create');
-    }
+    }   // public function store(Request $request)
 
     /**
      * Display the specified resource.
@@ -700,7 +709,7 @@ class PropiedadController extends Controller
         } else {
             return redirect()->back();
         }
-    }
+    }   // public function show(Propiedad $propiedad, $rutRetorno='propiedades.orden')
 
     /**
      * Show the form for editing the specified resource.
@@ -753,7 +762,7 @@ class PropiedadController extends Controller
                             'orden', 'colores', 'nroPagina'));
         }
         return redirect('/propiedades');
-    }
+    }   // public function edit(Propiedad $propiedad)
 
     /**
      * Update the specified resource in storage.
@@ -904,7 +913,7 @@ class PropiedadController extends Controller
         }
         return redirect()->route('propiedades.show',
                                 ['propiedad' => $propiedad, 'correo' => $correo]);
-    }
+    }   // public function update(Request $request, Propiedad $propiedad)
 
     public function actualizar(Propiedad $propiedad=null, $columna=null, $valor=null)   // Los valores por defecto son para el metodo 'POST'.
     {
@@ -924,7 +933,7 @@ class PropiedadController extends Controller
             $id = $data['id'];
             unset($data['id']);     // Solo queda un valor: fecha_reserva o fecha_firma.
 // Los tres siguientes campos vienen en el URL, cuando el metodo es GET. Ver el enunciado de esta funcion.
-            $propiedad = Propiedad::findOrFail($id);
+            $propiedad = Propiedad::findOrFail($id);    // Si falla produce 'ModelNotFoundException'.
             $columna = key($data);     // Solo hay un valor: columna = fecha_reserva o fecha_firma.
 //            return response()->json(['success' => "dump", 'columna' => $columna, 'id' => $id]);
             $valor = $data[$columna];
@@ -958,7 +967,7 @@ class PropiedadController extends Controller
                                     $columna => $valorAnteriorBd, 'nuevoValor' => $valorNuevo]);
         } else
             return redirect()->route('propiedades.index');
-    }
+    }   // public function actualizar(Propiedad $propiedad=null, $columna=null, $valor=null)   // Los valores por defecto son para el metodo 'POST'.
 
     /**
      * Remove the specified resource from storage.
@@ -995,7 +1004,7 @@ class PropiedadController extends Controller
         ]);
 
         return redirect()->route('propiedades.index');
-    }
+    }   // public function destroy(Propiedad $propiedad)
 
     public static function correoReporteCierre(Propiedad $propiedad, $ruta=0)
     {
@@ -1073,7 +1082,7 @@ class PropiedadController extends Controller
         return array(json_encode($asesores), json_encode($aPropiedades),
                     json_encode($estatus), json_encode($negociaciones),
                     json_encode($aCodigos));
-    }
+    }   // public function ajaxPropiedades()
 
     public function cargarimagen(Request $request)
     //public function cargarimagen()    // Tendria que usar request() en vez de $request.
@@ -1087,24 +1096,35 @@ class PropiedadController extends Controller
         ]);
         //return response()->json(request()->all());
         //dd($request->all());
+        $dir = Propiedad::DIR_IMG;
         $nombreImagenOriginal = $request->imagen->getClientOriginalName();
         $nombreBaseImagen = $request->id . '_' . $request->codigo;
         $extensionImagen = $request->imagen->getClientOriginalExtension();
-        $nombreImagen = $nombreBaseImagen . '.' . $extensionImagen;
-        if (file_exists("imgprop/{$nombreImagen}-0")) {       // if(is_file(public_path('imgprop/' . $nombreImagen)))
-            for ($i = 1; $i <= 20; $i++) {
+        for ($i = 0; $i <= 20; $i++) {
+            $nombreImagen = "{$nombreBaseImagen}-{$i}";
+            if ($this->existeArchivo($nombreImagen)) continue;
+            else {
                 $nombreImagen = "{$nombreBaseImagen}-{$i}.{$extensionImagen}";
-                if (file_exists("imgprop/{$nombreImagen}")) continue;
-                else {
-                    $request->imagen->move(public_path('imgprop'), $nombreImagen);
-                    break;
-                }
+                //$request->imagen->move(public_path('imgprop'), $nombreImagen);
+                $request->imagen->storeAs($dir, $nombreImagen);   // o Storage::putFileAs($dir, $request->imagen, $nombreImagen);
+                break;
             }
-        } else
-            $request->imagen->move(public_path('imgprop'), $nombreImagen . '-0');
+        }
 
         return response()
                     ->json(['success' => "La imagen '$nombreImagenOriginal' se ha cargado satisfactoriamente.",
                             'nombreImagen' => $nombreImagen]);
-    }
-}
+    } // public function cargarimagen(Request $request)
+
+    public function borrarimagen(Request $request)  // Cambia el nombre del archivo de la imagen.
+    {
+        $request->validate([
+            'nombreActual' => '',
+            'nombreNuevo' => '',
+        ]);
+        Storage::move(Propiedad::DIR_IMG . "/{$request->nombreActual}",
+                        Propiedad::DIR_IMG . "/{$request->nombreNuevo}");
+
+        return response()->json(['success' => "Se borro la imagen"]);
+    } // public function borrarimagen(Request $request)
+} // class PropiedadController

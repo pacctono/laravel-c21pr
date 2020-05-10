@@ -1,6 +1,7 @@
 <script>
     $(function () {
         //$('[data-toggle="tooltip"]').tooltip('enable')
+        $("td.mostrarTooltip").tooltip('enable')
         $("a.mostrarTooltip").tooltip('enable')
         $("span.mostrarTooltip").tooltip('enable')
     });
@@ -22,56 +23,56 @@
     $(document).ready(function() {
     @includeWhen((!$movil) and (!isset($accion) or ('html' == $accion)), 'propiedades.ajax')
 
-    function promptFecha(cd, nb, fecha, tipoFecha='reserva', cfecha='', funcion=false) {
-        bootbox.prompt({
-            size: 'small',
-            title: `Cambiar la fecha de ${tipoFecha} ${cfecha}de (${cd}) ${nb}.`,
-            inputType: 'date',
-            value: fecha,
-            buttons: botones,
-            callback: function(res) {   // Si se cancela o cierra la ventana devuelve null (res=null).
-                funcion(res);
-            }
-        })
-    }
-    function cambiarConAjax(that, id, col, res, tipoCol) {
-        //let data = {};
-        //data['id'] = id;
-        //data[col] = res;
-        $.ajaxSetup({
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            }
-        });
-        $.ajax({
-            type: 'POST',
-            url: "{{ route('propiedades.post.actualizar') }}",
-            //data: data,
-            data: {id: id, [col]: res},
-            success: function(data, estatus, jq) {
-                alertar(data.success, `Cambio de ${tipoCol}`, 'small');
-/*                alertar(`responseText:${jq.responseText}`,
-                        `data:${data}, Estatus:${estatus},
-                            readyState:${jq.readyState}, status:${jq.status}`,
-                        'extra-large'
-                );*/
-                that.html(data.nuevoValor);
-            },
-            error: function(jq, estatus, error) {
-                bootbox.dialog({
-                    size: 'extra-large',
-                    title: `No se pudo actualizar ${tipoCol}:
-                            Estatus:${estatus}, Error:${error}`,
-                    message: `readyState:${jq.readyState}, status:${jq.status},
-                            responseText:${jq.responseText}`,
-                    onEscape: true,
-                    backdrop: true,
-                    scrollable: true,
-                    buttons: false
-                })
-            }
-        });
-    }
+        function promptFecha(cd, nb, fecha, tipoFecha='reserva', cfecha='', funcion=false) {
+            bootbox.prompt({
+                size: 'small',
+                title: `Cambiar la fecha de ${tipoFecha} ${cfecha}de (${cd}) ${nb}.`,
+                inputType: 'date',
+                value: fecha,
+                buttons: botones,
+                callback: function(res) {   // Si se cancela o cierra la ventana devuelve null (res=null).
+                    funcion(res);
+                }
+            })
+        }
+        function cambiarConAjax(that, id, col, res, tipoCol) {
+            //let data = {};
+            //data['id'] = id;
+            //data[col] = res;
+            $.ajaxSetup({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                }
+            });
+            $.ajax({
+                type: 'POST',
+                url: "{{ route('propiedades.post.actualizar') }}",
+                //data: data,
+                data: {id: id, [col]: res},
+                success: function(data, estatus, jq) {
+                    alertar(data.success, `Cambio de ${tipoCol}`, 'small');
+/*                    alertar(`responseText:${jq.responseText}`,
+                            `data:${data}, Estatus:${estatus},
+                                readyState:${jq.readyState}, status:${jq.status}`,
+                            'extra-large'
+                    );*/
+                    that.html(data.nuevoValor);
+                },
+                error: function(jq, estatus, error) {
+                    bootbox.dialog({
+                        size: 'extra-large',
+                        title: `No se pudo actualizar ${tipoCol}:
+                                Estatus:${estatus}, Error:${error}`,
+                        message: `readyState:${jq.readyState}, status:${jq.status},
+                                responseText:${jq.responseText}`,
+                        onEscape: true,
+                        backdrop: true,
+                        scrollable: true,
+                        buttons: false
+                    })
+                }
+            });
+        }
 
     @if ((Auth::user()->is_admin) and isset($propRepetidas) and ($propRepetidas->isNotEmpty()))
         var valCodigo, linea = '';
@@ -325,7 +326,7 @@
                             size: 'small',
                             title: data.success,
                             message: `<div class="row bg-transparent" style="height:150;overflow:hidden">
-                                        <img class="img-responsive" src="{{ asset('imgprop/') }}/${data.nombreImagen}"
+                                        <img class="img-fluid" src="{{ asset('storage/imgprop/') }}/${data.nombreImagen}"
                                                 alt="Propiedad cargada" style="height:150px;">
                                     </div>`,
                             onEscape: true,
@@ -356,15 +357,18 @@
             const codigo = arreglo[1];         // codigo de la propiedad.
             const nombre = $("#nombre-"+id).text();         // Nombre de la propiedad.
             const img = JSON.parse(that.attr('img'));       // extensiones de imagenes. Se pudo usar: $.parseJSON(...)
-            const long = img.length;
+            const long = Object.keys(img).length;           // Object.keys(img): arreglo numerico de llaves de img: [k0, k1, ..., kn].
+            //alert(`long: ${long}`);
             let msjHtml = `<div id="miCarousel" class="carousel slide" data-ride="carousel" data-interval="false">
                             <div class="carousel-inner">`;
-            for (let i=0; i<long; i++) {
-                msjHtml += `<div class="carousel-item ` + ((0==i)?'active':'') + `">
+            let activar = true;
+            for (const i in img) {
+                msjHtml += `<div class="carousel-item ` + ((activar)?'active':'') + `">
                                     <img class="img-fluid imagenPropiedad"
-                                        src="{{ asset('imgprop/') }}/${nombreBase}-${i}.${img[i]}"
+                                        src="{{ asset('storage/imgprop/') }}/${nombreBase}-${i}.${img[i]}"
                                         style="height:300px;">
                                 </div>`;
+                if (activar) activar = false;
             }
             msjHtml += `</div>`;
             if (1 < long)

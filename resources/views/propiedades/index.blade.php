@@ -173,9 +173,10 @@
         @if (!isset($accion) or ('html' == $accion))
             <td class="text-right m-0 p-0 codigo
         @if (Auth::user()->is_admin)
-                        ratonApuntador" data-toggle="tooltip" data-html="true"
+                        ratonApuntador mostrarTooltip"
+                    data-toggle="tooltip" data-html="true"
                     id="{{ $propiedad->id }}-{{ $propiedad->codigo }}"
-                    title="Cambiaar el c&oacute;digo MLS de esta propiedad.
+                    title="Cambiar el c&oacute;digo MLS de esta propiedad.
         @else (Auth::user()->is_admin)
                         ratonAyuda" data-toggle="tooltip" data-html="true"
                     titulo="<u>{{ $propiedad->id }}</u>)
@@ -257,7 +258,7 @@
                 {{ $propiedad->nombre }}
             </td>
 
-        <?php $propiedad->asesor = Auth::user()->id;  // Usuario conectado. No se para que es esto, pero lo agregua hace mucho tiempo. ?>
+        <?php $propiedad->asesor = Auth::user()->id;  // Usuario conectado. No se para que es esto, pero lo agregue hace mucho tiempo. ?>
         <?php $propiedad->mMoZero = false;  // Si el monto es 0, mostrar 'espacio vacio'. ?>
         <?php $propiedad->espMonB = false;  // Eliminar espacio entre simbolo de la moneda y el monto. ?>
 
@@ -512,11 +513,6 @@
                 </a>
             @endif (('P' == $propiedad->estatus) || ('C' == $propiedad->estatus))
             @if (('S' != $propiedad->estatus) and (1 < $propiedad->asesor_captador_id))
-                 {{--(!file_exists('imgprop/' . $propiedad->codigo . '-' . $propiedad->id . '.'. 'jpeg')) and
-                 (!file_exists('imgprop/' . $propiedad->codigo . '-' . $propiedad->id . '.'. 'png')) and
-                 (!file_exists('imgprop/' . $propiedad->codigo . '-' . $propiedad->id . '.'. 'jpg')) and
-                 (!file_exists('imgprop/' . $propiedad->codigo . '-' . $propiedad->id . '.'. 'gif')) and
-                 (!file_exists('imgprop/' . $propiedad->codigo . '-' . $propiedad->id . '.'. 'svg')))--}}
                 <a href="" class="btn btn-link m-0 p-0 mostrarTooltip cargarimagen"
                         data-toggle="tooltip" data-html="true" idprop="{{ $propiedad->id }}"
                         title="Cargar al servidor imagen con foto de la propiedad (<u>{{ $propiedad->codigo.', '.$propiedad->nombre }}</u>)">
@@ -526,7 +522,7 @@
             @if (0 < count($propiedad->imagenes))
                 <a href="" class="btn btn-link m-0 p-0 mostrarTooltip mostrarimagen"
                         data-toggle="tooltip" data-html="true" nombreBase="{{ $propiedad->id }}_{{ $propiedad->codigo }}"
-                        img="{{ json_encode($propiedad->imagenes) }}"
+                        img="{{ json_encode($propiedad->imagenes, JSON_FORCE_OBJECT) }}"
                         title="Mostrar imagen(es) con foto de la propiedad (<u>{{ $propiedad->codigo.', '.$propiedad->nombre }}</u>)">
                     <span class="oi oi-image m-0 py-0 px-1"></span>
                 </a>

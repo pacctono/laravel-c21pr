@@ -7,6 +7,7 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use App\MisClases\Fecha;
 use App\Propiedad;
 
@@ -66,6 +67,9 @@ class User extends Authenticatable
         'puntosCaptador', 'puntosCerrador', 'puntos',
         'borrado', 'creado', 'actualizado',
     ];
+
+    public const DIR_STOIMG = 'public/fotos/';
+    public const DIR_PUBIMG = 'storage/fotos/';
 
     public function contactos()    // user_id
     {
@@ -540,5 +544,19 @@ class User extends Authenticatable
         if ('C' == $this->estado_civil) return 'Casad' . $ultLetra;
         elseif ('S' == $this->estado_civil) return 'Solter' . $ultLetra;
         else return 'Ninguno';
+    }
+
+    public function getFotoAttribute()
+    {
+        $extensiones = ['jpeg', 'jpg', 'gif', 'png', 'svg'];
+        $nombreBase  = substr($this->email, 0, strpos($this->email, '@'));
+        $foto = false;
+        foreach ($extensiones as $ext) {
+            if (Storage::exists(self::DIR_STOIMG . "{$nombreBase}.{$ext}")) {
+                $foto = "{$nombreBase}.{$ext}";
+                break;
+            }
+        }
+        return $foto;
     }
 }

@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Storage;     // PC
 use Carbon\Carbon;
 use Jenssegers\Agent\Agent;                 // PC
 use Mpdf\Mpdf;
@@ -313,6 +314,33 @@ class UserController extends Controller
 
         return redirect()->route('users');app/VistaCliente.php;
     } // Final del metodo destroy(User $user)
+
+    public function cargarimagen(Request $request)      // Esta se ejecuta POST.
+    //public function cargarimagen()    // Tendria que usar request() en vez de $request.
+    {
+        //dd($request->all());
+        $request->validate([
+            'imagen' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'id' => '',
+            'cedula' => '',
+        ]);
+        $dir = User::DIR_STOIMG;
+        $nombreImagenOriginal = $request->imagen->getClientOriginalName();
+        $user = User::findOrFail($request->id);
+        if ($user->foto) {
+            Storage::move($dir . "/{$user->foto}", $dir . '/' . 
+                            pathinfo($user->foto, PATHINFO_FILENAME) .
+                            '_' . Auth::user()->id . '.' .
+                            pathinfo($user->foto, PATHINFO_EXTENSION));
+        }
+        $nombreBaseImagen = substr($user->email, 0, strpos($user->email, '@'));
+        $nombreImagen = "{$nombreBaseImagen}." . $request->imagen->getClientOriginalExtension();
+        $request->imagen->storeAs($dir, $nombreImagen);   // o Storage::putFileAs($dir, $request->imagen, $nombreImagen);
+
+        return response()
+                    ->json(['success' => "La imagen '$nombreImagenOriginal' se ha cargado satisfactoriamente.",
+                            'nombreImagen' => $nombreImagen]);
+    } // public function cargarimagen(Request $request)
 
     public function avisos(User $user)
     {

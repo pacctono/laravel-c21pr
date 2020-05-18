@@ -11,9 +11,11 @@
 |
 */
 
-Route::get('/', function () {
+/*Route::get('/', function () {
     return view('welcome');
-});
+});*/
+Route::get('/', 'WelcomeController@welcome')
+    ->name('welcome');
 
 Auth::routes();
 
@@ -54,6 +56,9 @@ Route::put('/usuarios/{user}', 'UserController@update');
 Route::delete('/usuarios/{user}', 'UserController@destroy')
     ->name('users.destroy')
     ->middleware('admin');
+
+Route::post('/usuarios/cargarimagen/', 'UserController@cargarimagen')
+    ->name('carga.imagen.user');
 
 Route::get('/contactos/orden/{orden}/accion/{accion?}', 'ContactoController@index')
     ->where('orden', '[a-zA-Z]+[a-zA-Z0-9_]+(?<!nuevo|crear)')

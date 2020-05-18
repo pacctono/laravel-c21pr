@@ -1,4 +1,4 @@
-<div style="font-size:0.75rem">
+<div class="bg-light" style="font-size:0.75rem">
   <div @if(!isset($accion) or ('html'==$accion)) class="row my-0 py-0 mx-1 px-1"
       @else style="border:1px solid #000;" @endif>
     TOT.$s: {{ $filas }} props

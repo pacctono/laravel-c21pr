@@ -7,6 +7,7 @@
   body {
     /* Margin bottom by footer height */
     margin-bottom: 60px;
+    background-color:#BEAF86;
   }
   .footer {
     position: absolute;
@@ -63,7 +64,15 @@
     overflow: hidden;
   }
   .xredes {
-    min-height: 250px;
-    width:54;
+    min-height: 200px;
+    width:60;
+    background-color: #cccccc;
+  }
+  .iredes {
+    top:25%;
+    min-height: 200px;
+    width:60;
+    right:10px;
+    z-index:100;
     background-color: #cccccc;
   }

@@ -7,15 +7,16 @@
       <h5>{{ (1 < Auth::user()->id)?Auth::user()->name:'Administrador' }}</h5>
       <!--div class="ximagen">Fake Image</div-->
       <div
-      @if (file_exists($foto))
+      @if ($foto)
           class="bg-transparent"
       @else (!file_exists($foto))
-          class="bg-info" style="width:100%;height:285px;"
+          class="bg-info w-100" style="height:285px;"
       @endif (!file_exists($foto))
       >
-        <img src="{{ asset($foto) }}" alt="Foto">
+        <img src="{{ asset(Auth::user()::DIR_PUBIMG . $foto) }}"
+            alt="Foto de {{ (1 < Auth::user()->id)?Auth::user()->name:'Administrador' }}">
       </div>
-      <div class="m-0 p-0" style="width:340;">
+      <div class="m-0 p-0 w-100">
         <div class="row bg-transparent justify-content-center mt-1 mb-0 mx-0 p-0">
           <!--p><span class="oi oi-phone m-0 p-0"></span> 0424-3002814</p-->
           <p class="m-0 p-0"><i class="fa fa-mobile-alt m-0 p-0"></i> {{ Auth::user()->telefono_f }}</p>
@@ -26,7 +27,7 @@
       </div>
       <hr class="d-sm-none"><!-- Solo muestra la raya en sm -->
     </div>
-    <div class="col-lg-7 col-sm-12">
+    <div class="col-lg-8 col-sm-12">
       <!--h2>TITLE HEADING</h2-->
       <h5>Propiedades: {{ count($misPropiedades) }}</h5>
     @if (Auth::user()->is_admin)
@@ -84,9 +85,11 @@
     @endif (Auth::user()->is_admin)
       <hr class="d-sm-none"><!-- Solo muestra la raya en sm -->
     </div>
-    <div class="col-lg-1 col-sm-12">
+    {{--<div class="col-lg-1 col-sm-12">
       <h5>Redes</h5>
       <div class="xredes rounded">
+      <div class="position-fixed rounded"
+              style="top:25%;min-height:200px;width:60px;right:10px;z-index:100;background-color:#cccccc;">
         <div class="row justify-content-center">
           <a class="btn btn-link m-0 p-0" href="https://www.instagram.com/c21puentereal/?hl=es-la">
             <img class="rounded mx-auto d-block my-1 enlacesExternos" src="{{ asset('iconos/instagram.png') }}"
@@ -125,9 +128,9 @@
         </div>
       </div>
       <hr class="d-sm-none"><!-- Solo muestra la raya en sm. Se esconde en pantallas superiores a sm -->
-    </div>
+    </div>--}}
   </div>
-  <div class="row col-lg-11 col-sm-12 my-1 justify-content-center bg-transparent" style="min-height:75px;">
+  <div class="row col-lg-12 col-sm-12 my-1 justify-content-center bg-transparent" style="min-height:75px;">
     <a class="btn btn-link m-0 p-0" href="/contactos/crear">
       <img class="border border-dark rounded-circle mx-1 botones" src="{{ asset('botones/crearContacto.png') }}"
             alt="Crear Contacto" data-toggle="tooltip" title="Crear Contacto inicial" style="width:75px;height:75px;">

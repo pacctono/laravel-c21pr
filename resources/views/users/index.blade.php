@@ -198,64 +198,94 @@
         @endif (Auth::user()->is_admin)
         @if (!isset($accion) or ('html' == $accion))
             <td class="d-flex align-items-end m-0 py-0 px-1">
-                <a href="{{ route('users.show', $user) }}" class="btn btn-link my-0 py-0 mx-0 px-0"
-                        title="Motrar los datos personales de {{ $user->name }}">
+                <a href="{{ route('users.show', $user) }}" class="btn btn-link my-0 py-0 mx-0 px-0 mostrarTooltip"
+                        data-toggle="tooltip" data-html="true"
+                        title="Motrar los datos personales de {{ $user->nombre }}">
                     <span class="oi oi-eye my-0 py-0 ml-0 mr-1 pl-0 pr-0"></span>
                 </a>
-                @if (Auth::user()->is_admin)
-                    @if (1 < $user->id)
-                    <a href="{{ route('users.edit', $user) }}" class="btn btn-link my-0 py-0 mx-0 px-0"
-                            title="Editar los datos personales de {{ $user->name }}">
-                        <span class="oi oi-pencil my-0 py-0 mx-1 px-0"></span>
-                    </a>
-                    <a href="" id="{{ $user->id }}"
-                            class="btn btn-link desAct my-0 py-0 mx-0 px-0"
-                    @if ($user->activo)
-                            title="Desactivar al asesor {{ $user->name }}">
-                        <span class="oi oi-thumb-down my-0 py-0 mx-1 px-0"></span>
-                    @else ($user->activo)
-                            title="Activar al asesor {{ $user->name }}">
-                        <span class="oi oi-thumb-up my-0 py-0 mx-1 px-0"></span>
-                    @endif ($user->activo)
-                    </a>
+            @if (Auth::user()->is_admin)
+            @if (1 < $user->id)
+                <a href="{{ route('users.edit', $user) }}" class="btn btn-link my-0 py-0 mx-0 px-0 mostrarTooltip"
+                        data-toggle="tooltip" data-html="true"
+                        title="Editar los datos personales de {{ $user->nombre }}">
+                    <span class="oi oi-pencil my-0 py-0 mx-1 px-0"></span>
+                </a>
+                <a href="" id="{{ $user->id }}"
+                        class="btn btn-link desAct my-0 py-0 mx-0 px-0 mostrarTooltip"
+                        data-toggle="tooltip" data-html="true"
+                @if ($user->activo)
+                        title="Desactivar al asesor {{ $user->nombre }}">
+                    <span class="oi oi-thumb-down my-0 py-0 mx-1 px-0"></span>
+                @else ($user->activo)
+                        title="Activar al asesor {{ $user->nombre }}">
+                    <span class="oi oi-thumb-up my-0 py-0 mx-1 px-0"></span>
+                @endif ($user->activo)
+                </a>
+
+                <a href="" class="btn btn-link m-0 p-0 mostrarTooltip cargarimagen"
+                        iduser="{{ $user->id }}" cedula="{{ $user->cedula }}" nombre="{{ $user->nombre }}"
+                        nombreBase="{{ substr($user->email, 0, strpos($user->email, '@')) }}"
+                        data-toggle="tooltip" data-html="true"
+                        title="Cargar al servidor foto del asesor(a) (<u>{{ $user->cedula_f.', '.$user->nombre }}</u>)">
+                    <span class="oi oi-data-transfer-upload m-0 py-0 px-1"></span>
+                </a>
+            @if ($user->foto)
+                <a href="" class="btn btn-link m-0 p-0 mostrarTooltip mostrarimagen"
+                        iduser="{{ $user->id }}" cedula="{{ $user->cedula }}" nombre="{{ $user->nombre }}"
+                        nombreBase="{{ substr($user->email, 0, strpos($user->email, '@')) }}"
+                        ext="{{ pathinfo($user->foto, PATHINFO_EXTENSION) }}"
+                        data-toggle="tooltip" data-html="true"
+                        title="Mostrar la foto del asesor(a) (<u>{{ $user->cedula_f.', '.$user->nombre }}</u>)">
+                    <span class="oi oi-image m-0 py-0 px-1"></span>
+                </a>
+            @endif ($user->foto)
                 <form action="{{ route('users.destroy', $user) }}" method="POST"
-                        class="form-inline my-0 py-0"
-                        onSubmit="return estaSeguro({{ $user->id }})">
+                        class="form-inline my-0 py-0 formaBorrar" iduser="{{ $user->id }}">
                     {{ csrf_field() }}
                     {{ method_field('DELETE') }}
-                    <input type="hidden" name="contactos" id="contactos.{{ $user->id }}"
+                    <input type="hidden" name="contactos" id="contactos{{ $user->id }}"
                             value="{{ $user->contactos->count()-$user->contactosBorrados->count() }}">
                     <input type="hidden" name="contactosBorrados"
-                            id="contactosBorrados.{{ $user->id }}"
+                            id="contactosBorrados{{ $user->id }}"
                             value="{{ $user->contactosBorrados->count() }}">
                     <input type="hidden" id="nombre{{ $user->id }}"
                             value="{{ $user->name }}">
                     <input type="hidden" id="activo{{ $user->id }}"
                             value="{{ ($user->activo)?'A':'D' }}">
-                    <button class="btn btn-link my-0 py-0 mx-0 px-0"
-                            title="Borrar este asesor. Mucho cuidado!!!">
+                    <button class="btn btn-link my-0 py-0 mx-0 px-0 mostrarTooltip"
+                            data-toggle="tooltip" data-html="true"
+                        @if (0 < ($user->contactos->count()-$user->contactosBorrados->count()))
+                            title="Este asesor no podrá ser borrado!"
+                        @else (0 < ($user->contactos->count()-$user->contactosBorrados->count()))
+                            title="Borrar este asesor. Mucho cuidado!!!"
+                        @endif (0 < ($user->contactos->count()-$user->contactosBorrados->count()))
+                            >
                         <span class="oi oi-trash my-0 py-0 mx-1 px-0"></span>
                     </button>
                 </form>
-                    @if (0 < $user->citas()->count())
-                    <a href="{{ route('agenda.correoCitas', $user) }}" class="btn btn-link my-0 py-0 mx-0 px-0"
-                            title="Enviar correo a '{{ $user->name }}' con sus citas.">
-                        <span class="oi oi-envelope-closed my-0 py-0 mx-1 px-0"></span>
-                    </a>
-                    @endif (0 < $user->citas()->count())
-                    @if ((0 < $user->contactos->count()) or (0 < $user->clientes->count()))
-                    <a href="{{ route('reporte.contactosUser', [$user->id, 'id']) }}"
-                        class="btn btn-link my-0 py-0 mx-0 px-0"
+            @if (0 < $user->citas()->count())
+                <a href="{{ route('agenda.correoCitas', $user) }}"
+                        class="btn btn-link my-0 py-0 mx-0 px-0 mostrarTooltip"
+                        data-toggle="tooltip" data-html="true"
+                        title="Enviar correo a '{{ $user->nombre }}' con sus citas.">
+                    <span class="oi oi-envelope-closed my-0 py-0 mx-1 px-0"></span>
+                </a>
+                @endif (0 < $user->citas()->count())
+                @if ((0 < $user->contactos->count()) or (0 < $user->clientes->count()))
+                <a href="{{ route('reporte.contactosUser', [$user->id, 'id']) }}"
+                        class="btn btn-link my-0 py-0 mx-0 px-0 mostrarTooltip"
+                        data-toggle="tooltip" data-html="true"
                         title="Mostrar reporte de contactos y clientes del asesor.">
-                        <span class="oi oi-people my-0 py-0 mx-1 px-0"></span>
-                    </a>
-                    @endif ((0 < $user->contactos->count()) or (0 < $user->clientes->count()))
-                    @if (0 < $user->avisos()->count())
-                    <a href="" class="btn btn-link my-0 py-0 mx-0 px-0 aviso"
-                            id="aviso{{ $user->id }}"
-                            title="'{{ $user->name }}' tiene {{ $user->avisos()->count() }} aviso(s).">
-                        <span class="oi oi-bell my-0 py-0 ml-1 mr-0 px-0"></span>
-                    </a>
+                    <span class="oi oi-people my-0 py-0 mx-1 px-0"></span>
+                </a>
+            @endif ((0 < $user->contactos->count()) or (0 < $user->clientes->count()))
+            @if (0 < $user->avisos()->count())
+                <a href="" class="btn btn-link my-0 py-0 mx-0 px-0 aviso mostrarTooltip"
+                        id="aviso{{ $user->id }}"
+                        data-toggle="tooltip" data-html="true"
+                        title="'{{ $user->nombre }}' tiene {{ $user->avisos()->count() }} aviso(s).">
+                    <span class="oi oi-bell my-0 py-0 ml-1 mr-0 px-0"></span>
+                </a>
                     <!--div id="div{{ $user->id }}"></div-->
                     {{-- <input type="hidden" id="numAvisos{{ $user->id }}"
                             value="{{ $user->avisos()->count() }}">
@@ -267,9 +297,9 @@
                         <input type="hidden" id="descripcion{{ $user->id }}_{{ $loop->index }}"
                                 value="{{ $aviso->descripcion }}">
                     @endForeach --}}
-                    @endif (0 < $user->citas()->count())
-                    @endif (1 < $user->id)
-                @endif (Auth::user()->is_admin)
+            @endif (0 < $user->citas()->count())
+            @endif (1 < $user->id)
+            @endif (Auth::user()->is_admin)
             </td>
         @endif ('html' == $accion)
         @endif (!$movil)

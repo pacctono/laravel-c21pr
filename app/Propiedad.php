@@ -4,10 +4,11 @@ namespace App;
 
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;     // PC
+use Illuminate\Database\Eloquent\ModelNotFoundException;     // PC
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-//use Illuminate\Support\Facades\Storage;     // PC
 use App\MisClases\Fecha;
 use App\MisClases\General;                  // PC
 
@@ -1138,6 +1139,56 @@ class Propiedad extends Model
         //dd($arrRetorno);
         return $arrRetorno;
     }   // totales
+
+    protected static function comparar($a, $b) {
+        if ($a['id'] == $b['id']) {
+            if ($a['sec'] == $b['sec']) return 0;
+            return ($a['sec'] < $b['sec']) ? -1 : 1;
+        }
+        return ($a['id'] > $b['id']) ? -1 : 1;
+    }
+    public static function misPropiedades($files=null)
+    {
+        $propiedad = [];
+        $files = $file??Storage::files(self::DIR_IMG);
+// los nombre de archivo tienen que tener la estructura: {propiedad_id}_{codigo}[-{secuencia}].ext        
+        foreach($files as $filename) {
+            $n = preg_match('/^(\d{1,4})(?# id de la propiedad)_(\d+)(?# codigo de la propiedad)-(\d{1,2})(?# secuencia)\.([jpegifsvn]{3,4})(?# extension, puede ser: jpeg, jpg, gif, png o svg)$/',
+                            basename($filename), $matches);
+            if ($n) list($filename, $propiedad_id, $codigo, $sec, $ext) = $matches;  // $n === 1.
+            else continue;                                                                      // $n === 0 o $n === false.
+            try {
+                $prop = self::findOrFail($propiedad_id);   // Si 'findOrFail' falla produce 'ModelNotFoundException'.
+                if (Auth::check() and !Auth::user()->is_admin and
+                    (Auth::user()->id != $prop->asesor_captador_id) and
+                    (Auth::user()->id != $prop->asesor_cerrador_id)) continue;
+                if ('A' != $prop->estatus) continue;        // La propiedad no esta activa.
+                $todosNombreProp[] = [
+                    'nombreImagen' => $filename,
+                    'id' => $propiedad_id,
+                    'codigo' => $codigo,
+                    'sec' => $sec,
+                    'asesor_id' => $prop->asesor_captador_id,
+                    'nombre' => $prop->nombre,
+                ];
+                //if (50 <= count($todosNombreProp)) break;
+            } catch (ModelNotFoundException $exception) {
+            //} catch (\Exception $exception) {     // namespace '\'.
+                //dd($todosNombreProp, $filename);
+                report($exception);
+                //continue;   // return back()->withError($exception->getMessage())->withInput();
+            }
+        }
+        usort($todosNombreProp, "self::comparar");  // Ordenar por id, asc y sec, desc.
+        foreach ($todosNombreProp as $nombre) {     // Suprime nombres duplicados, con diferentes sec, se escoge el de menor sec.
+            $id = $nombre['id'];
+            if (!isset($idant)) $nombreProp[] = $nombre;
+            elseif ($id != $idant) $nombreProp[] = $nombre;
+            $idant = $id;
+            if (20 < count($todosNombreProp)) break;    // Solo mostrar las 20 propiedades más recientes.
+        }
+        return collect($nombreProp);
+    }   // public static function misPropiedades($files=null)
 
     public function getCreadoAttribute()
     {

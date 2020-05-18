@@ -523,7 +523,7 @@
                 <a href="" class="btn btn-link m-0 p-0 mostrarTooltip mostrarimagen"
                         data-toggle="tooltip" data-html="true" nombreBase="{{ $propiedad->id }}_{{ $propiedad->codigo }}"
                         img="{{ json_encode($propiedad->imagenes, JSON_FORCE_OBJECT) }}"
-                        title="Mostrar imagen(es) con foto de la propiedad (<u>{{ $propiedad->codigo.', '.$propiedad->nombre }}</u>)">
+                        title="Mostrar {{ count($propiedad->imagenes) }} imagen(es) con foto de la propiedad (<u>{{ $propiedad->codigo.', '.$propiedad->nombre }}</u>)">
                     <span class="oi oi-image m-0 py-0 px-1"></span>
                 </a>
             @endif (0 < count($propiedad->imagenes))

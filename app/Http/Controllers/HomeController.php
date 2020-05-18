@@ -23,9 +23,10 @@ class HomeController extends Controller
         }
         return ($a['id'] > $b['id']) ? -1 : 1;
     }
-    public function misPropiedades($files)
+    public function misPropiedades($files=null)
     {
         $propiedad = [];
+        $files = $file??Storage::files(Propiedad::DIR_IMG);
 // los nombre de archivo tienen que tener la estructura: {propiedad_id}_{codigo}[-{secuencia}].ext        
         foreach($files as $filename) {
 /*            $filename = basename($filename);
@@ -71,7 +72,7 @@ class HomeController extends Controller
             if (20 < count($todosNombreProp)) break;    // Solo mostrar las 20 propiedades más recientes.
         }
         return collect($nombreProp);
-    }
+    }   // public function misPropiedades($files)
     /**
      * Create a new controller instance.
      *
@@ -116,8 +117,7 @@ class HomeController extends Controller
                 else $alertar = 'Disculpe! Esta notificación no debería existir.';
             }
         }
-        $foto = substr(Auth::user()->email, 0, strpos(Auth::user()->email, '@')) . '.jpg';
-        $foto = 'fotos/' . $foto;
+        $foto = Auth::user()->foto;
 /* Usando 'system'.
         $nLineas = 0;
         $fortuna = '';
@@ -169,8 +169,7 @@ class HomeController extends Controller
         //dd($hoy, Auth::user()->fecha_cumpleanos->format('d-m'));
         //$dir = public_path('imgprop');
         //$files = array_diff(scandir($dir, SCANDIR_SORT_DESCENDING), array('..', '.'));  // Cada nombre de imagen comienza con el id de la propiedad. Primero los mayores, los más recientes creados.
-        $files = Storage::files(Propiedad::DIR_IMG);
-        $misPropiedades = $this->misPropiedades($files);    // Nombre imagen; id, codigo y nombre de propiedad.
+        $misPropiedades = Propiedad::misPropiedades();    // Nombre imagen; id, codigo y nombre de propiedad.
         //dd($files, $misPropiedades, storage_path(), Propiedad::where('asesor_captador_id', 16)->get());
         $users   = User::get(['id', 'name']);     // Todos los usuarios (asesores), incluso los no activos.
         $users[0]['name'] = 'Administrador';
@@ -179,5 +178,5 @@ class HomeController extends Controller
         return view('home', compact('cumpleanos', 'foto', 'hoyCumpleanos',
 //                    'texto1', 'texto2', 'texto3', 'texto4', 'texto5',
                     'asesor', 'misPropiedades', 'alertar'));
-    }
+    }   // public function index($alert=0)
 }

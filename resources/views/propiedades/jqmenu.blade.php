@@ -1,9 +1,10 @@
 <script>
     $(function () {
         //$('[data-toggle="tooltip"]').tooltip('enable')
-        $("td.mostrarTooltip").tooltip('enable')
-        $("a.mostrarTooltip").tooltip('enable')
-        $("span.mostrarTooltip").tooltip('enable')
+        //$("td.mostrarTooltip").tooltip('enable')
+        //$("a.mostrarTooltip").tooltip('enable')
+        $(".mostrarTooltip").tooltip('enable')
+        //$("span.mostrarTooltip").tooltip('enable')
     });
     $.fn.renombrar = function(nombAtrNuevo, nombAtrActual) {
         let $t = $(this);
@@ -359,7 +360,7 @@
             const img = JSON.parse(that.attr('img'));       // extensiones de imagenes. Se pudo usar: $.parseJSON(...)
             const long = Object.keys(img).length;           // Object.keys(img): arreglo numerico de llaves de img: [k0, k1, ..., kn].
             //alert(`long: ${long}`);
-            let msjHtml = `<div id="miCarousel" class="carousel slide" data-ride="carousel" data-interval="false">
+            let msjHtml = `<div id="miCarousel" class="carousel slide colorFondo1" data-ride="carousel" data-interval="false">
                             <div class="carousel-inner">`;
             let activar = true;
             for (const i in img) {
@@ -373,11 +374,11 @@
             msjHtml += `</div>`;
             if (1 < long)
                 msjHtml += `<a class="carousel-control-prev" href="#miCarousel" role="button" data-slide="prev">
-                                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                <span class="carousel-control-prev-icon" aria-hidden="true" style="color:black"></span>
                                 <span class="sr-only">Anterior</span>
                                 </a>
                             <a class="carousel-control-next" href="#miCarousel" role="button" data-slide="next">
-                                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                <span class="carousel-control-next-icon" aria-hidden="true" style="color:black"></span>
                                 <span class="sr-only">Próximo</span>
                             </a>`;
             msjHtml += `</div>`;

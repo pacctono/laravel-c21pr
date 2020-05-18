@@ -37,7 +37,7 @@ class TurnoController extends Controller
             if ($ultSemanaCreada = ($ultSemanaCreada and !$noExiste))
                 if ($lunes > now(Fecha::$ZONA)) $ultimaSemana = $turno;
         }
-        return [$semanas, $ultimaSemana->first()];
+        return [$semanas, (is_null($ultimaSemana))?$ultimaSemana:$ultimaSemana->first()];
     }
     protected static function turnoNuevo($semana, $index, $hora, $nroId) {
         return [

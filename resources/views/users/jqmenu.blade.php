@@ -1,6 +1,11 @@
 <script>
+    $(function () {
+        $(".mostrarTooltip").tooltip('enable')
+    });
     @includeIf('include.alertar')
     @includeIf('include.confirmar')
+    @includeIf('include.botonesDialog')
+
     $(document).ready(function() {
         $('a.desAct').click(function(ev) {
             ev.preventDefault();
@@ -38,22 +43,45 @@
                         alertar(resultado, nombre);   // Mientras se resuelve donde desplegar la tabla.
                     }});
         });
+    @includeIf('users.cargarFoto')
+        $("a.mostrarimagen").click(function(ev) {
+            ev.preventDefault();
+            const that = $(this);
+            const nombreBase = that.attr('nombreBase'); // Nombre base, ni extension.
+            const id = that.attr('iduser');
+            const cedula = that.attr('cedula');         // cedula del user.
+            const nombre = that.attr('nombre');         // Nombre del user (asesor).
+            const ext = that.attr('ext');       // extension de la foto.
+            let msjHtml = `<div class="row bg-transparent">
+                        <img class="img-fluid" src="{{ asset('storage/fotos/') }}/${nombreBase}.${ext}"
+                                alt="Foto del asesor(a)" style="height:285;">
+                    </div>`;
+            const titulo = `${id}) ${cedula} ${nombre}`;
+            alertar( msjHtml, titulo, 'small')
+        });
+        $(".formaBorrar").submit(function(ev) {
+            const that = $(this);
+            const id = that.attr('iduser');
+            const nroContactos = $('#contactos'+id).val();
+            const nroContactosBorrados = $('#contactosBorrados'+id).val();
+            if (0 < nroContactos) {
+                alert('Este asesor ha creado ' + nroContactos +
+                                    ' contactos iniciales, por lo tanto, no puede borrar sus datos.');
+                ev.preventDefault();
+                return;
+            }
+            if (0 < nroContactosBorrados) {
+                if (confirm('Este asesor tiene ' + nroContactosBorrados +
+                                    " 'Contactos Iniciales borrados', " +
+                                    'esta seguro de querer borrar sus datos de la base de datos?')) {
+                    ev.preventDefault();
+                    return;
+                }
+            }
+            if (confirm('Realmente, desea borrar los datos de este asesor de la base de datos?')) {
+                ev.preventDefault();
+                return;
+            }
+        });
     });
-function estaSeguro(id) {
-    var nroContactos         = document.getElementById('contactos.'+id).value;
-    var nroContactosBorrados = document.getElementById('contactosBorrados.'+id).value;
-
-    if (0 < nroContactos) {
-        alert('Este asesor ha creado ' + nroContactos +
-                            ' contactos iniciales, por lo tanto, no puede borrar sus datos.');
-        return false;
-    }
-    if (0 < nroContactosBorrados) {
-        return confirm('Este asesor tiene ' + nroContactosBorrados +
-                            " 'Contactos Iniciales borrados', " +
-                            'esta seguro de querer borrar sus datos de la base de datos?');
-    }
-    return confirm('Realmente, desea borrar los datos de este asesor de la base de datos?')
-//  submit();
-}
 </script>

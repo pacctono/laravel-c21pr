@@ -118,6 +118,51 @@
                         <span class="{{ $clase }} m-0 p-0">{{ $user->puntos }}</span>
                     </div>
                 </div>
+
+                @if ((isset($user->wa)) or (isset($user->te)))
+                <div class="row my-1 mx-0 p-0">
+                @if (isset($user->wa))
+                    <div class="my-0 mx-1 py-0 px-2">
+                        Whatsapp:
+                        <span class="{{ $clase }} m-0 p-0">{{ $user->wa_f }}</span>
+                    </div>
+                @endif (isset($user->wa))
+                @if (isset($user->te))
+                    <div class="my-0 mx-1 py-0 px-2">
+                        Telegram:
+                        <span class="{{ $clase }} m-0 p-0">{{ $user->te_f }}</span>
+                    </div>
+                @endif (isset($user->te))
+                </div>
+                @endif ((isset($user->wa)) or (isset($user->te)))
+
+                @if (isset($user->ig))
+                <div class="row my-1 mx-0 p-0">
+                    <div class="my-0 mx-1 py-0 px-2">
+                        Instagram:
+                        <span class="{{ $clase }} m-0 p-0">{{ $user->ig }}</span>
+                    </div>
+                </div>
+                @endif (isset($user->ig))
+
+                @if (isset($user->tw))
+                <div class="row my-1 mx-0 p-0">
+                    <div class="my-0 mx-1 py-0 px-2">
+                        Twitter:
+                        <span class="{{ $clase }} m-0 p-0">{{ $user->tw }}</span>
+                    </div>
+                </div>
+                @endif (isset($user->tw))
+
+                @if (isset($user->fb))
+                <div class="row my-1 mx-0 p-0">
+                    <div class="my-0 mx-1 py-0 px-2">
+                        Facebook:
+                        <span class="{{ $clase }} m-0 p-0">{{ $user->fb }}</span>
+                    </div>
+                </div>
+                @endif (isset($user->fb))
+
                 @if (null != $fechaUltLogin)
                 <div class="row my-1 mx-0 p-0">
                     <div class="my-0 mx-1 py-0 px-2">
@@ -125,7 +170,7 @@
                         <span class="{{ $clase }} m-0 p-0">{{ $fechaUltLogin }}</span>
                     </div>
                 </div>
-                @endif
+                @endif (null != $fechaUltLogin)
 
                 <div class="row my-1 mx-0 p-0">
                     <div class="my-0 mx-1 py-0 px-2">
@@ -150,12 +195,12 @@
                 iduser="{{ $user->id }}" cedula="{{ $user->cedula }}" nombre="{{ $user->nombre }}"
                 nombreBase="{{ substr($user->email, 0, strpos($user->email, '@')) }}"
                 data-toggle="tooltip" data-html="true"
-                title="Actualizar foto del asesor(a) (<u>{{ $user->cedula_f.', '.$user->nombre }}</u>)">
+                id="foto" title="Actualizar foto del asesor(a) (<u>{{ $user->cedula_f.', '.$user->nombre }}</u>)">
         @if ($user->foto)
             <img class="img-fluid d-block mx-auto" src="{{ asset($user::DIR_PUBIMG . $user->foto) }}"
                     alt="Foto del asesor(a)" style="height:285px">
         @else ($user->foto)
-            <img class="img-fluid d-block mx-auto" src="{{ asset('storage/fotos/fotoPorCrear.jpg') }}"
+            <img class="img-fluid d-block mx-auto" src="{{ asset('storage/fotos/fotoPorCrear.png') }}"
                     alt="Foto del asesor(a)" style="height:285px">
         @endif ($user->foto)
         </a>

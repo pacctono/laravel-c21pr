@@ -30,10 +30,10 @@
                 alt="Telegram" data-toggle="tooltip" title="Web de Telegram" style="width:50px;height:50px;">
           </a>
         </div>
-        <div class="row justify-content-center">
+        <!--div class="row justify-content-center">
           <a class="btn btn-link m-0 p-0" href="" target="_blank">
             <img class="rounded mx-auto d-block my-1 enlacesExternos" src="{{ asset('iconos/Chat.png') }}"
                 alt="Chat" data-toggle="tooltip" title="Chat (no aplicado aun)" style="width:50px;height:50px;">
           </a>
-        </div>
+        </div-->
       </div>

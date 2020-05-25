@@ -7,7 +7,7 @@
             <div class="card">
                 <div class="card-header">{{ __('Login') }}</div>
 
-                <div class="card-body"
+                <div class="card-body fondoLogin"
                     style="background-image:url('img/fachada0.jpg');border:0;">
                     {{--style="background-image:url('img/fondoInicio.jpg');border:0;">--}}
                     <form method="POST" action="{{ route('login') }}">

@@ -8,6 +8,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use App\MisClases\General;
 use App\MisClases\Fecha;
 use App\Propiedad;
 
@@ -40,7 +41,7 @@ class User extends Authenticatable
     protected $fillable = [
         'cedula', 'name', 'telefono', 'email', 'email_c21', 'licencia_mls',
 	    'fecha_ingreso', 'fecha_nacimiento', 'sexo', 'estado_civil', 'profesion',
-        'direccion', 'password', 'activo'
+        'direccion', 'redes_sociales', 'password', 'activo'
     ];
     /**
      * The attributes that should be hidden for arrays.
@@ -48,7 +49,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $hidden = [
-        'password', 'remember_token',
+        'redes_sociales', 'password', 'remember_token',
         'created_at', 'updated_at', 'deleted_at'
     ];
     protected $dates = [
@@ -65,6 +66,7 @@ class User extends Authenticatable
         'comisionCaptador', 'comisionCerrador', 'comision',
         'pvrCaptador', 'pvrCerrador', 'precioVentaReal',
         'puntosCaptador', 'puntosCerrador', 'puntos',
+        'wa', 'te', 'ig', 'tw', 'fb',
         'borrado', 'creado', 'actualizado',
     ];
 
@@ -216,9 +218,7 @@ class User extends Authenticatable
     
     public function getTelefonoFAttribute()     // Telefono formateado.
     {
-        $value = $this->telefono;
-        if (null == $value) return '';
-        return '0' . substr($value, 0, 3) . '-' . substr($value, 3, 3) . '-' . substr($value, 6);
+        return General::telefonoF($this->telefono);
     }
 
     public static function contactosXAsesor($fecha_desde, $fecha_hasta)
@@ -558,5 +558,56 @@ class User extends Authenticatable
             }
         }
         return $foto;
+    }
+
+    protected function redesSociales()
+    {
+        If (is_null($this->redes_sociales)) return [];
+        return json_decode($this->redes_sociales, true);
+    }
+
+    public function getWaAttribute()
+    {
+        $rs = $this->redesSociales();
+        if (isset($rs['wa'])) return $rs['wa'];
+        else return null;
+    }
+
+    public function getWaFAttribute()     // Telefono Whatsapp formateado.
+    {
+        return General::telefonoF($this->wa);
+    }
+
+    public function getTeAttribute()
+    {
+        $rs = $this->redesSociales();
+        if (isset($rs['te'])) return $rs['te'];
+        else return null;
+    }
+
+    public function getTeFAttribute()     // Telefono Telegram formateado.
+    {
+        return General::telefonoF($this->te);
+    }
+
+    public function getIgAttribute()
+    {
+        $rs = $this->redesSociales();
+        if (isset($rs['ig'])) return $rs['ig'];
+        else return null;
+    }
+
+    public function getTwAttribute()
+    {
+        $rs = $this->redesSociales();
+        if (isset($rs['tw'])) return $rs['tw'];
+        else return null;
+    }
+
+    public function getFbAttribute()
+    {
+        $rs = $this->redesSociales();
+        if (isset($rs['fb'])) return $rs['fb'];
+        else return null;
     }
 }

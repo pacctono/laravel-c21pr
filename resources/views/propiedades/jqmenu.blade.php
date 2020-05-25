@@ -250,7 +250,7 @@
             const that = $(this);
             const id = that.attr('idprop'); // 'id' de la propiedad.
             const ap = aPropiedades[id];
-            if (!ap) return
+            if (!ap) return;
             const msjHtml = `<div class="row justify-content-center">
                                 <div class="col-md-8">
                                     <div class="card">

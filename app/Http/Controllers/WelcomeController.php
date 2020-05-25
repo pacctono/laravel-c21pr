@@ -16,7 +16,14 @@ class WelcomeController extends Controller
         //dd($users);
         $propiedades = Propiedad::misPropiedades();
         //dd($propiedades);
+        $hayFotos = false;
+        foreach ($users as $user) {
+            if ($user->foto) {
+                $hayFotos = true;
+                break;
+            }
+        }
 
-        return view('welcome', compact('users', 'propiedades'));
+        return view('welcome', compact('users', 'hayFotos', 'propiedades'));
     }
 }

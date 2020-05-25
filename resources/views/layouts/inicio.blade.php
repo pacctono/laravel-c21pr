@@ -10,8 +10,8 @@
       <!-- Fixed navbar -->
       <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
         <a class="navbar-brand" href="http://www.century21.com.ve/@puenterealbienesraices" target="_blank">
-          <img src="{{ (asset('img/logoC21pr.jpg')) }}" title="C21 Puente Real"
-                alt="C21 Puente Real" style="height:30px;">
+          <img src="{{ (asset('img/logoC21prNohalo.png')) }}" title="C21 Puente Real"
+                alt="C21 Puente Real" style="height:12px;">
         </a>
         <button class="navbar-toggler" type="button" data-toggle="collapse"   {{-- Permite mostrar menu en pantallas pequeñas --}}
                 data-target="#navbarCollapse" aria-controls="navbarCollapse"  {{-- Por ejemplo, la pantalla de los celulares --}}
@@ -21,8 +21,8 @@
         <div class="collapse navbar-collapse" id="navbarCollapse">
           <ul class="navbar-nav mx-auto my-0 p-0">
           @foreach (array('' => 'INICIO', '#propiedades' => 'PROPIEDADES', '#asesores' => 'ASESORES',
-                    'buscar' => 'BUSCAR INMUEBLES', 'blog' => 'BLOG', 'suscripcion' => 'SUSCRIPCIÓN',
-                    'contactanos' => 'CONTACTANOS')
+                    '#inicio' => 'BUSCAR INMUEBLES', '#blog' => 'BLOG', '#contactanos' => 'CONTACTANOS',
+                    '#ubicacion' => 'UBICACIÓN')
                     as $hMenu => $muestraMenu)
             <li class="nav-item mr-2
             @if ($hMenu == substr($view_name, 0, 
@@ -78,9 +78,10 @@
         </span>
       </div>
     </footer>
-@endif ((!isset($accion) or ('html' == $accion)) and !$movil)
+@endif (!isset($accion) or ('html' == $accion))
 
-@includeWhen((!$agent->isMobile()), 'layouts.botonesExternos')
+@includeWhen(((!isset($accion) or ('html' == $accion)) and (!$agent->isMobile())),
+                'layouts.botonesExternos')
 
     @yield('js')
     <!-- Bootstrap core JavaScript

@@ -186,16 +186,108 @@
 
                 <div class="form-row my-1 mx-0 p-0">
                     <div class="form-group form-inline m-0 py-0 px-1">
-                        <label class="control-label m-0 p-0" for="password">
-                            Contrase&ntilde;a
+                        <label class="control-label m-0 p-0" for="wa">
+                            Whatsapp
                         </label>
-                        <input class="form-control m-0 py-0 px-1" type="password"
-                                name="password" id=password
-                                placeholder="Mayor a 6 caracteres">
+                        <div class="form-check ml-1 mr-3" title="Copiar el numero personal del asesor">
+                            <input class="form-check-input ml-0 mr-1 my-0 p-0 chequeado"
+                                    type="checkbox" name="cpwa" id="cpwa"
+                                    @if (($user->telefono) and ($user->wa == $user->telefono)) checked @endif>
+                            <label class="form-check-label m-0 p-0" for="cpwa" style="font-size:0.75em">
+                                Copiar
+                            </label>
+                        </div>
+                        0<select class="form-control m-0 py-0 py-1" name="ddnwa" id="ddnwa">
+                        @foreach ($ddns as $ddn)
+                        @if (old('ddnwa', (isset($user->wa))?substr($user->wa, 0, 3):'414') == $ddn->ddn)
+                        <option value="{{ $ddn->ddn }}" selected>{{ $ddn->ddn }}</option>
+                        @else
+                        <option value="{{ $ddn->ddn }}">{{ $ddn->ddn }}</option>
+                        @endif
+                        @endforeach
+                        </select>
+                        <input class="form-control m-0 py-0 px-1" type="text" size="7"
+                                maxlength="7" minlength="7" name="wa" id="wa"
+                                placeholder="# sin area" value="{{ old('wa', substr($user->wa, 3)) }}">
                     </div>
                 </div>
 
                 <div class="form-row bg-suave my-1 mx-0 p-0">
+                    <div class="form-group form-inline m-0 py-0 px-1">
+                        <label class="control-label m-0 p-0" for="te">
+                            Telegram
+                        </label>
+                        <div class="form-check ml-1 mr-3" title="Copiar el numero personal del asesor">
+                            <input class="form-check-input ml-0 mr-1 my-0 p-0 chequeado"
+                                    type="checkbox" name="cpte" id="cpte"
+                                    @if (($user->telefono) and ($user->wa == $user->telefono)) checked @endif>
+                            <label class="form-check-label m-0 p-0" for="cpte" style="font-size:0.75em">
+                                Copiar
+                            </label>
+                        </div>
+                        0<select class="form-control m-0 py-0 py-1" name="ddnte" id="ddnte">
+                        @foreach ($ddns as $ddn)
+                        @if (old('ddnte', (isset($user->te))?substr($user->te, 0, 3):'414') == $ddn->ddn)
+                        <option value="{{ $ddn->ddn }}" selected>{{ $ddn->ddn }}</option>
+                        @else
+                        <option value="{{ $ddn->ddn }}">{{ $ddn->ddn }}</option>
+                        @endif
+                        @endforeach
+                        </select>
+                        <input class="form-control m-0 py-0 px-1" type="text" size="7"
+                                maxlength="7" minlength="7" name="te" id="te"
+                                placeholder="# sin area" value="{{ old('te', substr($user->te, 3)) }}">
+                    </div>
+                </div>
+
+                <div class="form-row my-1 mx-0 p-0">
+                    <div class="form-group form-inline m-0 py-0 px-1">
+                        <label class="control-label m-0 p-0" for="ig">
+                            Instagram
+                        </label>
+                        <input class="form-control m-0 py-0 px-1" type="text" size="60"
+                                    autocomplete="off" maxlength="160" name="ig" id="ig"
+                                    placeholder="Instagram del asesor"
+                                    value="{{ old('ig', $user->ig) }}">
+                    </div>
+                </div>
+
+                <div class="form-row bg-suave my-1 mx-0 p-0">
+                    <div class="form-group form-inline m-0 py-0 px-1">
+                        <label class="control-label m-0 p-0" for="tw">
+                            Twitter
+                        </label>
+                        <input class="form-control m-0 py-0 px-1" type="text" size="60"
+                                    autocomplete="off" maxlength="160" name="tw" id="tw"
+                                    placeholder="Twitter del asesor"
+                                    value="{{ old('tw', $user->tw) }}">
+                    </div>
+                </div>
+
+                <div class="form-row my-1 mx-0 p-0">
+                    <div class="form-group form-inline m-0 py-0 px-1">
+                        <label class="control-label m-0 p-0" for="fb">
+                            Facebook
+                        </label>
+                        <input class="form-control m-0 py-0 px-1" type="text" size="60"
+                                    autocomplete="off" maxlength="160" name="fb" id="fb"
+                                    placeholder="Facebook del asesor"
+                                    value="{{ old('fb', $user->fb) }}">
+                    </div>
+                </div>
+
+                <div class="form-row bg-suave my-1 mx-0 p-0">
+                    <div class="form-group form-inline m-0 py-0 px-1">
+                        <label class="control-label m-0 p-0" for="password">
+                            Contrase&ntilde;a
+                        </label>
+                        <input class="form-control m-0 py-0 px-1" type="password"
+                                autocomplete="off" name="password" id=password
+                                placeholder="Mayor a 6 caracteres">
+                    </div>
+                </div>
+
+                <div class="form-row my-1 mx-0 p-0">
                     <div class="form-group form-inline m-0 py-0 px-1">
                         <label class="control-label m-0 p-0" for="activo">Activo</label>
                         <input type="checkbox" class="form-control m0 py-0 px-1"
@@ -204,7 +296,7 @@
                     </div>
                 </div>
 
-                <div class="form-row my-1 mx-0 p-0">
+                <div class="form-row bg-suave my-1 mx-0 p-0">
                     <div class="form-group form-inline m-0 py-0 px-1">
                         <button class="btn btn-primary m-0 p-1">Actualizar Asesor</button>
                         @if (auth()->user()->is_admin)
@@ -229,12 +321,12 @@
                 iduser="{{ $user->id }}" cedula="{{ $user->cedula }}" nombre="{{ $user->nombre }}"
                 nombreBase="{{ substr($user->email, 0, strpos($user->email, '@')) }}"
                 data-toggle="tooltip" data-html="true"
-                title="Actualizar foto del asesor(a) (<u>{{ $user->cedula_f.', '.$user->nombre }}</u>)">
+                id="foto" title="Actualizar foto del asesor(a) (<u>{{ $user->cedula_f.', '.$user->nombre }}</u>)">
         @if ($user->foto)
             <img class="img-fluid d-block mx-auto" src="{{ asset($user::DIR_PUBIMG . $user->foto) }}"
                     alt="Foto del asesor(a)" style="height:285px">
         @else ($user->foto)
-            <img class="img-fluid d-block mx-auto" src="{{ asset('storage/fotos/fotoPorCrear.jpg') }}"
+            <img class="img-fluid d-block mx-auto" src="{{ asset('storage/fotos/fotoPorCrear.png') }}"
                     alt="Foto del asesor(a)" style="height:285px">
         @endif ($user->foto)
         </a>
@@ -255,6 +347,7 @@
 
     $(document).ready(function() {
     @includeIf("users.cargarFoto")
+    @includeIf("users.copiarNumero")
     })
 </script>
 

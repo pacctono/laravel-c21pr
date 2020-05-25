@@ -5,7 +5,7 @@
             const nombreBase = that.attr('nombreBase'); // nombreBase de la foto: id_cedula.ext
             const cedula = that.attr('cedula'); // nombreBase de la foto: id_cedula.ext
             const nombre = that.attr('nombre');         // Nombre del user (asesor).
-            if ((!id) || (!cedula) || (!nombreBase)) return
+            if ((!id) || (!nombreBase)) return
             const msjHtml = `<div class="row justify-content-center">
                                 <div class="col-md-8">
                                     <div class="card">
@@ -89,6 +89,12 @@
                             backdrop: true,
                             buttons: false,
                         })
+                        if (("#foto").length) {     // Existe el selector (length > 0) "#foto". Por ahora, solo 'show' y 'editar'.
+                            $("#foto").empty();
+                            $("#foto").prepend(`<img class="img-fluid d-block mx-auto"
+                                                        src="{{ asset($user::DIR_PUBIMG) }}/${data.nombreImagen}"
+                                                        alt="Foto del asesor(a)" style="height:285px">`);
+                        }
                     },
                     error: function(jq, estatus, error) {
                         bootbox.dialog({

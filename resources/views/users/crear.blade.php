@@ -56,7 +56,7 @@
                         </select>
                         <input type="text" class="form-control m-0 py-0 px-1" size="7"
                                 maxlength="7" minlength="7" required name="telefono"
-                                id="telefono" placeholder="telefono sin area"
+                                id="telefono" placeholder="# sin area"
                                 value="{{ old('telefono') }}">
                     </div>
                 </div>
@@ -182,15 +182,108 @@
 
                 <div class="form-row my-1 mx-0 p-0">
                     <div class="form-group form-inline m-0 py-0 px-1">
+                        <label class="control-label m-0 p-0" for="wa">
+                            Whatsapp
+                        </label>
+                        <div class="form-check ml-1 mr-3" title="Copiar el numero personal del asesor">
+                            <input class="form-check-input ml-0 mr-1 my-0 p-0 chequeado"
+                                    type="checkbox" name="cpwa" id="cpwa">
+                            <label class="form-check-label m-0 p-0" for="cpwa" style="font-size:0.75em">
+                                Copiar
+                            </label>
+                        </div>
+                        0<select class="form-control m-0 py-0 py-1" name="ddnwa" id="ddnwa">
+                        <option value="">ddn</option>
+                        @foreach ($ddns as $ddn)
+                        @if (old('ddnwa', '414') == $ddn->ddn)
+                        <option value="{{ $ddn->ddn }}" selected>{{ $ddn->ddn }}</option>
+                        @else
+                        <option value="{{ $ddn->ddn }}">{{ $ddn->ddn }}</option>
+                        @endif
+                        @endforeach
+                        </select>
+                        <input class="form-control m-0 py-0 px-1" type="text" size="7"
+                                maxlength="7" minlength="7" name="wa" id="wa"
+                                placeholder="# sin area" value="{{ old('wa') }}">
+                    </div>
+                </div>
+
+                <div class="form-row bg-suave my-1 mx-0 p-0">
+                    <div class="form-group form-inline m-0 py-0 px-1">
+                        <label class="control-label m-0 p-0" for="te">
+                            Telegram
+                        </label>
+                        <div class="form-check ml-1 mr-3" title="Copiar el numero personal del asesor">
+                            <input class="form-check-input ml-0 mr-1 my-0 p-0 chequeado"
+                                    type="checkbox" name="cpte" id="cpte">
+                            <label class="form-check-label m-0 p-0" for="cpte" style="font-size:0.75em">
+                                Copiar
+                            </label>
+                        </div>
+                        0<select class="form-control m-0 py-0 py-1" name="ddnte" id="ddnte">
+                        <option value="">ddn</option>
+                        @foreach ($ddns as $ddn)
+                        @if (old('ddnte', '414') == $ddn->ddn)
+                        <option value="{{ $ddn->ddn }}" selected>{{ $ddn->ddn }}</option>
+                        @else
+                        <option value="{{ $ddn->ddn }}">{{ $ddn->ddn }}</option>
+                        @endif
+                        @endforeach
+                        </select>
+                        <input class="form-control m-0 py-0 px-1" type="text" size="7"
+                                maxlength="7" minlength="7" name="te" id="te"
+                                placeholder="# sin area" value="{{ old('te') }}">
+                    </div>
+                </div>
+
+                <div class="form-row my-1 mx-0 p-0">
+                    <div class="form-group form-inline m-0 py-0 px-1">
+                        <label class="control-label m-0 p-0" for="ig">
+                            Instagram
+                        </label>
+                        <input class="form-control m-0 py-0 px-1" type="email" size="60"
+                                autocomplete="off" maxlength="160" name="ig" id="ig"
+                                placeholder="Instagram del asesor"
+                                value="{{ old('ig') }}">
+                    </div>
+                </div>
+
+                <div class="form-row bg-suave my-1 mx-0 p-0">
+                    <div class="form-group form-inline m-0 py-0 px-1">
+                        <label class="control-label m-0 p-0" for="tw">
+                            Twitter
+                        </label>
+                        <input class="form-control m-0 py-0 px-1" type="email" size="60"
+                                autocomplete="off" maxlength="160" name="tw" id="tw"
+                                placeholder="Twitter del asesor"
+                                value="{{ old('tw') }}">
+                    </div>
+                </div>
+
+                <div class="form-row my-1 mx-0 p-0">
+                    <div class="form-group form-inline m-0 py-0 px-1">
+                        <label class="control-label m-0 p-0" for="fb">
+                            Facebook
+                        </label>
+                        <input class="form-control m-0 py-0 px-1" type="email" size="60"
+                                autocomplete="off" maxlength="160" name="fb" id="fb"
+                                placeholder="Facebook del asesor"
+                                value="{{ old('fb') }}">
+                    </div>
+                </div>
+
+                <div class="form-row bg-suave my-1 mx-0 p-0">
+                    <div class="form-group form-inline m-0 py-0 px-1">
                         <label class="control-label m-0 p-0" for="password">
                             Contrase&ntilde;a
                         </label>
                         <input type="password" class="form-control m-0 py-0 px-1" required
-                                name="password" id=password placeholder="Mayor a 6 cars">
+                                autocomplete="off" name="password" id=password
+                                placeholder="Mayor a 6 cars">
                     </div>
                 </div>
 
-                <div class="form-row bg-suave my-0 mx-0 p-0">
+                <div class="form-row my-0 mx-0 p-0">
                     <div class="form-group form-inline m-0 py-0 px-1">
                         <button type="submit" class="btn btn-primary m-0 p-1">
                             Crear Usuario
@@ -204,34 +297,31 @@
             </div><!--div class="card-body my-1 mx-0 p-0"-->
         </div><!--div class="card"-->
     </div><!--div class="col-lg-8"-->
-    <div class="col-lg-4 justify-content-center bg-light">
+    <div class="col-lg-4 justify-content-center bg-light" id="foto">
         {{--<a href="" class="m-0 p-0 mostrarTooltip cargarimagen"
                 iduser="{{ $user->id }}" cedula="{{ $user->cedula }}" nombre="{{ $user->nombre }}"
                 nombreBase="{{ substr($user->email, 0, strpos($user->email, '@')) }}"
                 data-toggle="tooltip" data-html="true"
                 title="Actualizar foto del asesor(a) (<u>{{ $user->cedula_f.', '.$user->nombre }}</u>)">--}}
-        <img class="img-fluid d-block mx-auto" src="{{ asset('storage/fotos/fotoPorCrear.jpg') }}"
+        <img class="img-fluid d-block mx-auto" src="{{ asset('storage/fotos/fotoPorCrear.png') }}"
                 alt="Foto del asesor(a)" style="height:285px">
         {{--</a>--}}
     </div><!--div class="col-lg-4 justify-content-center bg-light"-->
 </div><!--div class="row no-gutters"-->
 @endsection
 
-{{--@if (!isset($accion) or ('html' == $accion))
+@if (!isset($accion) or ('html' == $accion))
 @section('js')
 
 <script>
     $(function () {
         $(".mostrarTooltip").tooltip('enable')
     });
-    @includeIf('include.alertar')
-    @includeIf('include.confirmar')
-    @includeIf('include.botonesDialog')
 
     $(document).ready(function() {
-    @includeIf("users.cargarFoto")
+    @includeIf("users.copiarNumero")
     })
 </script>
 
 @endsection
-@endif (!isset($accion) or ('html' == $accion))--}}
+@endif (!isset($accion) or ('html' == $accion))

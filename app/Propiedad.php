@@ -1149,7 +1149,7 @@ class Propiedad extends Model
     }
     public static function misPropiedades($files=null)
     {
-        $propiedad = [];
+        $todosNombreProp = [];
         $files = $file??Storage::files(self::DIR_IMG);
 // los nombre de archivo tienen que tener la estructura: {propiedad_id}_{codigo}[-{secuencia}].ext        
         foreach($files as $filename) {
@@ -1179,14 +1179,17 @@ class Propiedad extends Model
                 //continue;   // return back()->withError($exception->getMessage())->withInput();
             }
         }
-        usort($todosNombreProp, "self::comparar");  // Ordenar por id, asc y sec, desc.
-        foreach ($todosNombreProp as $nombre) {     // Suprime nombres duplicados, con diferentes sec, se escoge el de menor sec.
-            $id = $nombre['id'];
-            if (!isset($idant)) $nombreProp[] = $nombre;
-            elseif ($id != $idant) $nombreProp[] = $nombre;
-            $idant = $id;
-            if (20 < count($todosNombreProp)) break;    // Solo mostrar las 20 propiedades más recientes.
-        }
+
+        if (0 < count($todosNombreProp)) {
+            usort($todosNombreProp, "self::comparar");  // Ordenar por id, asc y sec, desc.
+            foreach ($todosNombreProp as $nombre) {     // Suprime nombres duplicados, con diferentes sec, se escoge el de menor sec.
+                $id = $nombre['id'];
+                if (!isset($idant)) $nombreProp[] = $nombre;
+                elseif ($id != $idant) $nombreProp[] = $nombre;
+                $idant = $id;
+                if (20 < count($todosNombreProp)) break;    // Solo mostrar las 20 propiedades más recientes.
+            }
+        } else $nombreProp = [];
         return collect($nombreProp);
     }   // public static function misPropiedades($files=null)
 

@@ -142,6 +142,13 @@ class UserController extends Controller
             'estado_civil' => ['sometimes', 'nullable'],
             'profesion' => ['sometimes', 'nullable'],
             'direccion' => ['sometimes', 'nullable'],
+            'ddnwa' => '',
+            'wa' => '',
+            'ddnte' => '',
+            'te' => '',
+            'ig' => '',
+            'tw' => '',
+            'fb' => '',
             'activo' => '',
             'password' => ['required']
         ], [
@@ -166,6 +173,19 @@ class UserController extends Controller
             $data['telefono'] = '';
         }
         unset($data['ddn']);
+        $rs = [];
+        foreach (['wa', 'te'] as $app) {
+            if ((null != $data[$app]) and ('' != $data[$app])) {
+                $rs[$app] = $data['ddn'.$app] . $data[$app];
+            } else $rs[$app] = null;
+            unset($data['ddn'.$app], $data[$app]);
+        }
+        foreach (['ig', 'tw', 'fb'] as $app) {
+            if ((null != $data[$app]) and ('' != $data[$app])) {
+                $rs[$app] = $data[$app];
+            } else $rs[$app] = null;
+            unset($data[$app]);
+        }
         if (!array_key_exists('sexo', $data)) $data['sexo'] = null;
         if (!array_key_exists('estado_civil', $data)) $data['estado_civil'] = null;
         //dd($data);
@@ -182,6 +202,7 @@ class UserController extends Controller
             'estado_civil' => $data['estado_civil'],
             'direccion' => $data['direccion'],
             'activo' => (isset($data['activo']) and ('on' == $data['activo'])),
+            'redes_sociales' => json_encode($rs, JSON_FORCE_OBJECT),
             'password' => bcrypt($data['password'])
         ]);
 
@@ -218,6 +239,13 @@ class UserController extends Controller
             'estado_civil' => ['sometimes', 'nullable'],
             'profesion' => ['sometimes', 'nullable'],
             'direccion' => ['sometimes', 'nullable'],
+            'ddnwa' => '',
+            'wa' => '',
+            'ddnte' => '',
+            'te' => '',
+            'ig' => '',
+            'tw' => '',
+            'fb' => '',
             'activo' => '',
             'password' => 'nullable|min:7'
         ], [
@@ -247,6 +275,23 @@ class UserController extends Controller
         }
         unset($data['ddn']);
 
+        $rs = [];
+        foreach (['wa', 'te'] as $app) {
+            if ((null != $data[$app]) and ('' != $data[$app])) {
+                $rs[$app] = $data['ddn'.$app] . $data[$app];
+            } else $rs[$app] = null;
+            unset($data['ddn'.$app], $data[$app]);
+        }
+        foreach (['ig', 'tw', 'fb'] as $app) {
+            if ((null != $data[$app]) and ('' != $data[$app])) {
+                $rs[$app] = $data[$app];
+            } else $rs[$app] = null;
+            unset($data[$app]);
+        }
+        $data['redes_sociales'] = json_encode($rs, JSON_FORCE_OBJECT);
+
+        if (!array_key_exists('sexo', $data)) $data['sexo'] = null;
+        if (!array_key_exists('estado_civil', $data)) $data['estado_civil'] = null;
         if (!array_key_exists('activo', $data)) {
             $data['activo'] = false;
             $data['password'] = bcrypt('Century21_Puente*Real');

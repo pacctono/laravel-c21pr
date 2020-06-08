@@ -214,6 +214,10 @@ class ContactoController extends Controller
      */
     public function store(Request $request)
     {
+        if (!Auth::check() and (!isset($request->web))) {
+            return redirect('login');
+        }
+        $web = (isset($request->web))?$request->web:false;
         //dd($request);
         $data = $request->validate([   // Si ocurre error, laravel nos envia al url anterior.
             'cedula' => ['sometimes', 'nullable', 'digits_between:6,8'],
@@ -283,7 +287,7 @@ class ContactoController extends Controller
             'telefono' => $data['telefono'],
             'veces_telefono' => $data['veces_telefono'],
             'otro_telefono' => $data['otro_telefono']??null,
-            'user_id' => Auth::user()->id,
+            'user_id' => (Auth::check())?Auth::user()->id:'1',  // 'user_id' sera '1', si y solo si, el origen es la web. VER inicio de esta funcion.
             'email' => $data['email'],
             'veces_email' => $data['veces_email'],
             'direccion' => $data['direccion'],
@@ -297,7 +301,8 @@ class ContactoController extends Controller
             'observaciones' => $data['observaciones']
         ]);
 
-        $exito = "El contacto inicial '" . $data['name'] . "' fue agregado con exito.";
+        if ($web) $exito = "Gracias por contactarnos, {$data['name']}!";
+        else $exito = "El contacto inicial '" . $data['name'] . "' fue agregado con exito.";
         if (($data['email']) and            // Se suministró un email.
             ((2 == $data['deseo_id']) or (4 == $data['deseo_id']))) { // Vende o da en alquiler.
             $correo = self::correoOfertaServicio($contacto, 0);
@@ -305,6 +310,8 @@ class ContactoController extends Controller
             else $exito .= " Pero, no pudo enviarsele";
             $exito .= " la 'Oferta de Servicio'.";
         }       
+
+        if ($web) return response()->json(['exito' => $exito]);
 
         session(['exito' => $exito]);
         return redirect()->route('contactos.show', $contacto);
@@ -496,6 +503,7 @@ class ContactoController extends Controller
 
     public static function correoOfertaServicio(Contacto $contacto, $ruta=0)
     {
+        // $ruta = 0:enviado desde 'store' (creando contacto), 1:solicitado desde index, 2:solicitado desde otro.
         $host = env('MAIL_HOST');
         if (!($ip = gethostbyname($host)) or ($ip == $host)) { // No hay conexon a Internet.
             //dd($id, $ruta, $host, $ip);
@@ -511,7 +519,8 @@ class ContactoController extends Controller
 //        $correoCopiar = \App\User::CORREO_COPIAR;
         $correoCopiar = \App\User::CORREO_SOCIOS;
 
-        $user = User::find(Auth::user()->id);
+        if (0 == $ruta) $user = User::find(1);
+        else $user = User::find(Auth::user()->id);
         //dd($contacto, $user);
         Mail::to($contacto->email, $contacto->name)
                 ->cc($user->email, $user->name)

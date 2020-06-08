@@ -2,25 +2,43 @@
 
 @section('content')
                 <div class="container-fluid">
-                    <div id="inicio" class="divInicio" style="background-image:url({{ asset('img/fondoInicio.jpg') }})">
+                    <div id="inicio" class="divInicio m-0 pt-5 pb-0 px"
+                            style="background-image:url({{ asset('img/fondoInicio.jpg') }})">
                         <!--img src="{{ (asset('img/fondoInicio.jpg')) }}"
                                 alt="Conectado a la web de Century21 Puente Real"
                                 class="w-100"-->
                         <div class="textoInicio">
-                            <h1 class="mt-0 mb-2 mx-0 p-0">¡BIENVENIDO!</h1>
-                            <h2 class="my-1 mx-0 p-0">¿QUÉ ESTÁS BUSCANDO?</h2>
-                            <div class="row my-1 mx-0 p-0">
-                                <button id="ciudadc" class="ml-0 mr-1 my-0 p-1">CIUDAD DONDE DESEA EL INMUEBLE</button>
-                                <button id="negociacion" class="mx-1 my-0 p-1">COMPRA O ALQUILER</button>
-                                <button id="tipoc" class="mx-1 my-0 p-1">CASA, APARTAMENTO, TOWNHOUSE, TERRENO</button>
+                            <h1 class="mt-0 mb-2 d-block mx-auto p-0">¡BIENVENIDO!</h1>
+                            <h2 class="my-1 d-block mx-auto p-0">¿QUÉ ESTÁS BUSCANDO?</h2>
+                            <div class="row my-1 d-block mx-auto p-0">
+                                <button id="ciudadC" class="ml-0 mr-1 my-0 p-1">CIUDAD DONDE DESEA EL INMUEBLE
+                                    <span id="ciudadCspan" class="m-0 p-0" style="font-size:0.5rem"></span>
+                                </button>
+                                <button id="negociacionC" class="mx-1 my-0 p-1">COMPRA O ALQUILER
+                                    <span id="negociacionCspan" class="m-0 p-0" style="font-size:0.5rem"></span>
+                                </button>
+                                <button id="tipoC" class="mx-1 my-0 p-1">CASA, APARTAMENTO, TERRENO
+                                    <span id="tipoCspan" class="m-0 p-0" style="font-size:0.5rem"></span>
+                                </button>
                                 <button id="comprar" class="bg-dark text-light ml-2 mr-0 my-0 p-2">BUSCAR</button>
                             </div>
-                            <h2 class="mt-2 mb-0 mx-0 p-1">DESEO VENDER MI PROPIEDAD</h2>
-                            <div class="row my-1 mx-0 p-0">
-                                <button id="ciudadv" class="ml-0 mr-1 my-0 p-1">¿CIUDAD?</button>
-                                <button id="nombre" class="mx-1 my-0 p-1">NOMBRE Y APELLIDO</button>
-                                <button id="tipov" class="mx-1 my-0 p-1">¿QUÉ DESEA VENDER?</button>
-                                <button id="telefono" class="mx-1 my-0 p-1">NÚMERO DE CONTACTO</button>
+                            <h2 class="mt-2 mb-0 d-block mx-auto p-1">DESEO VENDER O DAR EN ALQUILER MI PROPIEDAD</h2>
+                            <div class="row my-1 d-block mx-auto p-0">
+                                <button id="ciudadV" class="ml-0 mr-1 my-0 p-1">¿CIUDAD?
+                                    <span id="ciudadVspan" style="font-size:0.5rem"></span>
+                                </button>
+                                <button id="nombre" class="mx-1 my-0 p-1">NOMBRE Y APELLIDO
+                                    <span id="nombrespan" class="m-0 p-0" style="font-size:0.5rem"></span>
+                                </button>
+                                <button id="negociacionV" class="mx-1 my-0 p-1">VENDER O<small> dar en </small>ALQUILER
+                                    <span id="negociacionVspan" class="m-0 p-0" style="font-size:0.5rem"></span>
+                                </button>
+                                <button id="tipoV" class="mx-1 my-0 p-1">¿QUÉ DESEA VENDER O DAR EN ALQUILER?
+                                    <span id="tipoVspan" class="m-0 p-0" style="font-size:0.5rem"></span>
+                                </button>
+                                <button id="telefono" class="mx-1 my-0 p-1">NÚMERO DE CONTACTO
+                                    <span id="telefonospan" class="m-0 p-0" style="font-size:0.5rem"></span>
+                                </button>
                                 <button id="enviar" class="bg-dark text-light ml-2 mr-0 my-0 p-2">ENVIAR MENSAJE</button>
                             </div>
                         </div>
@@ -33,8 +51,8 @@
                     </div>
                     <div id="ultPropiedades" class="row w-100 colorFondo1 m-0 p-0"-->
                     <div id="propiedades" class="card m-0 p-0">
-                        <h4 class="card-header m-0 p-0">PROPIEDADES</h4>
-                        <div class="row card-body fondoPropiedades m-0 p-0"
+                        <h4 class="card-header m-0 pt-3 pb-0 px-0 colorFondo1">PROPIEDADES</h4>
+                        <div class="row card-body fondoPropiedades m-0 pt-3 pb-0 px-0"
                             style="background-image:url({{ asset('img/fondoPropiedadesLR.jpg') }})">
                         @foreach ($propiedades as $propiedad)
                             <div class="col-lg-3">
@@ -44,9 +62,9 @@
                                         title="{{ $propiedad['codigo'] }}-{{ $propiedad['nombre'] }}">
                                 <div class="m-0 p-0 {{--border border-dark--}}">
                                     <div class="row colorFondo1 justify-content-center m-0 p-0">
-                                    <p class="m-0 p-0">
-                                        {{ $propiedad['nombre'] }}
-                                    </p>
+                                        <p class="m-0 p-0">
+                                            {{ $propiedad['nombre'] }}
+                                        </p>
                                     </div>
                                     <div class="row colorFondo1 justify-content-center m-0 p-0">
                                         <a class="m-0 p-0" href="/propiedades/{{ $propiedad['id'] }}">
@@ -60,8 +78,8 @@
                     </div>
                     <div id="asesores" class="card m-0 p-0">
                     @if ($hayFotos)
-                        <h4 class="card-header m-0 p-0">ASESORES</h4>
-                        <div class="row card-body fondoAsesores m-0 p-0"
+                        <h4 class="card-header m-0 pt-3 pb-0 px-0 colorFondo1">ASESORES</h4>
+                        <div class="row card-body fondoAsesores m-0 pt-3 pb-0 px-0"
                             style="background-image:url({{ asset('img/fondoAsesoresKR.jpg') }})">
                         @foreach ($users as $user)
                             <div class="col-lg-3">
@@ -100,7 +118,7 @@
                                     <div class="row colorFondo1 justify-content-center m-0 p-0">
                                     @if (isset($user->ig))
                                         <a class="btn btn-link ml-0 mr-1 my-0 p-0 mostrarTooltip"
-                                                href="https://www.instagram.com/c21puentereal/?hl=es-la"
+                                                href="https://www.instagram.com/{{ $user->ig }}/?hl=es-la"
                                                 target="_blank" data-toggle="tooltip"
                                                 title="Ver instagram de {{ $user->nombre }}">
                                             <i class="fab fa-instagram fa-lg" style="color:salmon"></i>
@@ -108,7 +126,7 @@
                                     @endif (isset($user->ig))
                                     @if (isset($user->tw))
                                         <a class="btn btn-link ml-0 mr-1 my-0 p-0 mostrarTooltip"
-                                                href="https://twitter.com/c21puentereal"
+                                                href="https://twitter.com/{{ $user->tw }}"
                                                 targe="_blank" data-toggle="tooltip"
                                                 title="Ver twitter de {{ $user->nombre }}">
                                             <i class="fab fa-twitter fa-lg" style="color:blue"></i>
@@ -116,7 +134,7 @@
                                     @endif (isset($user->tw))
                                     @if (isset($user->fb))
                                         <a class="btn btn-link ml-0 mr-1 my-0 p-0 mostrarTooltip"
-                                                href="https://es-la.facebook.com/c21puentereal/"
+                                                href="https://es-la.facebook.com/{{ $user->fb }}/"
                                                 target="_blank" data-toggle="tooltip"
                                                 title="Ver Facebook de {{ $user->nombre }}">
                                             <i class="fab fa-facebook fa-lg" style="color:red"></i>
@@ -124,7 +142,7 @@
                                     @endif (isset($user->fb))
                                     @if (isset($user->wa))
                                         <a class="btn btn-link ml-0 mr-1 my-0 p-0 mostrarTooltip"
-                                                href="https://web.whatsapp.com/"
+                                                href="https://api.whatsapp.com/send?phone=58{{ $user->telefono }}"
                                                 target="_blank" data-toggle="tooltip"
                                                 title="Enviar whatsapp a {{ $user->nombre }}">
                                             <i class="fab fa-whatsapp fa-lg" style="color:green"></i>
@@ -151,15 +169,136 @@
                     @endif ($hayFotos)
                     </div>
                     <div id="blog" class="card m-0 p-0">
-                        <h4 class="card-header m-0 p-0">BLOG</h4>
-                        <div class="row card-body fondoBlog m-0 p-0"
+                        <h4 class="card-header m-0 pt-3 pb-0 px-0 colorFondo1">BLOG</h4>
+                        <div class="row card-body fondoBlog m-0 pt-3 pb-0 py-0"
                             style="background-image:url({{ asset('img/fondoBlogBR.jpg') }})">
                         </div>
                     </div>
                     <div id="contactanos" class="card m-0 p-0">
-                        <h4 class="card-header m-0 p-0">CONTACTO</h4>
-                        <div class="row card-body fondoContacto m-0 p-0"
-                            style="background-image:url({{ asset('img/fondoContacto.jpg') }})">
+                        <h4 class="card-header pt-3 pb-0 px-0 m-0 colorFondo1">CONTACTO</h4>
+                        <div class="row card-body fondoContacto m-0 pt-3 pb-0 px-0"
+                                style="background-image:url({{ asset('img/fondoContacto.jpg') }})">
+                        <form method="POST" class="form" id="formulario" action="{{ url('contactos') }}">
+                            {!! csrf_field() !!}
+
+                            <div class="form-group row m-0 p-0">
+                                <div class="col-lg-2 mr-1 ml-0 my-0 p-0">
+                                    <label class="control-label colorFondo1 m-0 p-0"
+                                            style="font-size:0.5rem" for="cedula">
+                                        C&eacute;dula
+                                    </label>
+                                    <input type="text" class="form-control input-lg m-0 p-0"
+                                            size="8" maxlength="8" minlength="6" name="cedula"
+                                            id="cedula" placeholder="# CI"
+                                            value="{{ old('cedula') }}">
+                                </div>
+                                <div class="col-lg-6 m-0 p-0">
+                                    <label class="control-label colorFondo1 m-0 p-0"
+                                            style="font-size:0.5rem" for="name">
+                                        Nombre
+                                    </label>
+                                    <input type="text" class="form-control input-lg m-0 p-0"
+                                            required size="40" maxlength="100" name="name" id="name"
+                                            placeholder="Nombre y Apellido" value="{{ old('name') }}">
+                                </div>
+                            </div>
+
+                            <div class="form-group row m-0 p-0">
+                                <div class="col-lg-3 mr-1 ml-0 my-0 p-0">
+                                    <label class="control-label colorFondo1 m-0 p-0"
+                                            style="font-size:0.5rem" for="telefono">Teléfono</label>
+                                    <div class="form-inline m-0 p-0">
+                                        <select class="form-control input-sm m-0 p-0" name="ddn" id="ddn">
+                                            <option class="m-0 p-0" value="">ddn</option>
+                                        </select>
+                                        <input class="form-control input-lg m-0 p-0" type="text" size="7"
+                                                maxlength="7" name="telefono" id="telefonoCI"
+                                                placeholder="# sin area" value="{{ old('telefono') }}">
+                                    </div>
+                                </div>
+                                <div class="col-lg-3 mr-1 ml-0 my-0 p-0">
+                                    <label class="control-label colorFondo1 m-0 p-0" 
+                                            style="font-size:0.5rem" for="otro_telefono">Otro teléfono
+                                    </label>
+                                    <input type="text" class="form-control input-lg m-0 p-0"
+                                            size="14" maxlength="14" name="otro_telefono"
+                                            id="otro_telefono" placeholder="Otro # de contacto"
+                                            value="{{ old('otro_telefono') }}">
+                                </div>
+                                <div class="col-lg-3 m-0 p-0">
+                                    <label class="control-label colorFondo1 m-0 p-0"
+                                            style="font-size:0.5rem" for="deseo">Desea</label>
+                                    <select class="form-control input-lg m-0 p-0" name="deseo_id" id="deseo">
+                                        <option value="">Qué desea?</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-group m-0 p-0">
+                                <label class="control-label colorFondo1 m-0 p-0"
+                                        style="font-size:0.5rem" for="email">
+                                    Correo electr&oacute;nico
+                                </label>
+                            </div>
+                            <div class="form-group col-lg-6 m-0 p-0">
+                                <input type="email" class="form-control input-lg m-0 p-0"
+                                        size="40" maxlength="100" name="email" id="email"
+                                        placeholder="correo electronico" value="{{ old('email') }}">
+                            </div>
+
+                            <div class="form-group m-0 p-0">
+                                <label class="control-label colorFondo1 m-0 p-0"
+                                        style="font-size:0.5rem" for="direccion">
+                                    Direcci&oacute;n
+                                </label>
+                            </div>
+                            <div class="form-group col-lg-9 m-0 p-0">
+                                <textarea class="form-control input-lg m-0 p-0" rows="2"
+                                    cols="50" maxlength="160" name="direccion" id="direccion"
+                                    placeholder="Calle, Casa, Apto, Edificio, Barrio, Ciudad">{{ old('direccion') }}</textarea>
+                            </div>
+
+                            <div class="form-group row m-0 p-0">
+                                <div class="col-lg-3 mr-1 ml-0 my-0 p-0">
+                                    <label class="control-label colorFondo1 m-0 p-0"
+                                            style="font-size:0.5rem" for="tipo">Tipo de inmueble</label>
+                                    <select class="form-control input-lg m-0 p-0" name="tipo_id" id="tipo">
+                                        <option value="">Qué tipo de inmueble?</option>
+                                    </select>
+                                </div>
+                                <div class="col-lg-3 mr-1 ml-0 my-0 p-0">
+                                    <label class="control-label colorFondo1 m-0 p-0"
+                                            style="font-size:0.5rem" for="precio">Costo aproximado del inmueble</label>
+                                    <select class="form-control input-lg m-0 p-0" name="precio_id" id="precio">
+                                        <option value="">Costo aproximado?</option>
+                                    </select>
+                                </div>
+                                <div class="col-lg-3 m-0 p-0">
+                                    <label class="control-label colorFondo1 m-0 p-0"
+                                            style="font-size:0.5rem" for="zona">Zona donde se encontraría el inmueble</label>
+                                    <select class="form-control input-lg m-0 p-0" name="zona_id" id="zona">
+                                        <option value="">En Qué zona?</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-group m-0 p-0">
+                                <label class="control-label colorFondo1 m-0 p-0"
+                                        style="font-size:0.5rem" for="observaciones">Observaciones</label>
+                            </div>
+                            <div class="form-group col-lg-9 m-0 p-0">
+                                <textarea class="form-control form-control-sm" rows="2"
+                                        maxlength="190" cols="95"
+                                        name="observaciones" id="observaciones" 
+                                        placeholder="Escriba alguna otra información que desee suministrar.">{{ old('observaciones') }}</textarea>
+                            </div>
+
+                            <div class="form-row my-1 mx-0 p-0">
+                                <button id="contacto" type="submit" class="btn btn-success col-lg-5 m-0 py-0 px-1">
+                                    Enviar
+                                </button>
+                            </div>
+                        </form>
                         </div>
                     </div>
                     <div id="ubicacion" class="row m-0 p-0" style="overflow:hidden;{{--width:700px;--}}position:relative;">

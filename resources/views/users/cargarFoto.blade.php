@@ -97,15 +97,13 @@
                         }
                     },
                     error: function(jq, estatus, error) {
-                        bootbox.dialog({
-                            size: 'large',
-                            title: `No se pudo cargar la imagen: Estatus:${estatus}, Error:${error}`,
-                            message: `readyState:${jq.readyState},
-                                    status:${jq.status}, responseText:${jq.responseText}`,
-                            onEscape: true,
-                            backdrop: true,
-                            buttons: botones
-                        })
+                        alertar(`readyState:${jq.readyState}, status:${jq.status},
+                                    mensaje:${jq.responseJSON.message},
+                                    exception:${jq.responseJSON.exception},
+                                    file:${jq.responseJSON.file}, line: ${jq.responseJSON.line}`,
+                                `No se pudo cargar la imagen: Estatus:${estatus}, Error:${error}`,
+                                'large'
+                        )
                     }
                 });
             }));

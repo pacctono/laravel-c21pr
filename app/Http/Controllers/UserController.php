@@ -372,11 +372,12 @@ class UserController extends Controller
         $dir = User::DIR_STOIMG;
         $nombreImagenOriginal = $request->imagen->getClientOriginalName();
         $user = User::findOrFail($request->id);
-        if ($user->foto) {
-            Storage::move($dir . "/{$user->foto}", $dir . '/' . 
-                            pathinfo($user->foto, PATHINFO_FILENAME) .
-                            '_' . Auth::user()->id . '.' .
-                            pathinfo($user->foto, PATHINFO_EXTENSION));
+        if ($user->foto) {  // Guarda la foto agregando _userConectadoId-[0...] al nombre y mantiene la extension.
+            $nuevoNombre = pathinfo($user->foto, PATHINFO_FILENAME) . '_' . Auth::user()->id;
+            $nuevaExt    = pathinfo($user->foto, PATHINFO_EXTENSION);
+            $seq = 0;
+            while (Storage::exists("$dir/{$nuevoNombre}-{$seq}.$nuevaExt")) $seq++;
+            Storage::move("$dir/{$user->foto}", "${dir}/${nuevoNombre}-{$seq}.{$nuevaExt}");
         }
         $nombreBaseImagen = substr($user->email, 0, strpos($user->email, '@'));
         $nombreImagen = "{$nombreBaseImagen}." . $request->imagen->getClientOriginalExtension();

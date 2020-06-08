@@ -23,7 +23,7 @@
           </div>
           <div class="form-group col-lg-9 d-flex m-0 py-0 px-1">
             <label class="control-label" for="name">Nombre</label>
-            <input type="text" class="form-control form-control-sm" required size="30" maxlength="30" 
+            <input type="text" class="form-control form-control-sm" required size="30" maxlength="100" 
                     name="name" id="name" placeholder="Nombre del contacto inicial" value="{{ old('name') }}">
           </div>
         </div>
@@ -46,7 +46,7 @@
           </div>
           <div class="form-group col-lg-8 d-flex m-0 py-0 px-1">
             <label class="control-label" for="email">Correo electr&oacute;nico</label>
-            <input type="email" class="form-control form-control-sm col-lg-6" size="30" maxlength="30" name="email" 
+            <input type="email" class="form-control form-control-sm col-lg-6" size="30" maxlength="100" name="email"
                     id="email" placeholder="correo electronico" value="{{ old('email') }}">
           </div>
         </div>

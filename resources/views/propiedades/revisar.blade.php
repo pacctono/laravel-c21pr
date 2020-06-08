@@ -31,21 +31,13 @@
                     $("#"+idDivImg).remove();
                 },
                 error: function(jq, estatus, error) {
-                    //console.log(jq, jq.responseText, jq.responseJSON.message);
-                    bootbox.dialog({
-                        size: 'extra-large',
-                        title: `No se pudo borrar la imagen:
-                                Estatus:${estatus}, Error:${error}`,
-                        message: `readyState:${jq.readyState}, status:${jq.status}, // jq.responseText es una string, el objeto es responseJSON.
-                                    mensaje:${jq.responseJSON.message},
-                                    exception:${jq.responseJSON.exception},
-                                    file:${jq.responseJSON.file},
-                                    line: ${jq.responseJSON.line}`,
-                        onEscape: true,
-                        backdrop: true,
-                        scrollable: true,
-                        buttons: false
-                    })
+                    alertar(`readyState:${jq.readyState}, status:${jq.status}, // jq.responseText es una string, el objeto es responseJSON.
+                                mensaje:${jq.responseJSON.message},
+                                exception:${jq.responseJSON.exception},
+                                file:${jq.responseJSON.file}, line: ${jq.responseJSON.line}`,
+                            `No se pudo borrar la imagen: Estatus:${estatus}, Error:${error}`,
+                            'extra-large'
+                    )
                 }
             });
         }

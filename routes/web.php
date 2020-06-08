@@ -17,6 +17,12 @@
 Route::get('/', 'WelcomeController@welcome')
     ->name('welcome');
 
+Route::get('/welcome/ajax/', 'WelcomeController@ajaxWelcome')
+    ->name('ajaxwelcome');
+
+Route::get('/welcome/propiedades/{deseo}/{ciudad}/{tipo}', 'WelcomeController@propiedades')
+    ->name('inicio.propiedades');
+
 Auth::routes();
 
 Route::get('logout', '\App\Http\Controllers\Auth\LoginController@logout');

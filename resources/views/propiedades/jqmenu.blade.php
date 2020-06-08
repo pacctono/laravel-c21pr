@@ -13,14 +13,8 @@
     }
     @includeIf('include.alertar')
     @includeIf('include.confirmar')
-    var botones = {
-                    confirm: {
-                        label: '<i class="fa fa-check"></i> Confirmar',
-                    },
-                    cancel: {
-                        label: '<i class="fa fa-times"></i> Cancelar',
-                    }
-                };
+    @includeIf('include.botonesDialog')
+
     $(document).ready(function() {
     @includeWhen((!$movil) and (!isset($accion) or ('html' == $accion)), 'propiedades.ajax')
 
@@ -49,7 +43,7 @@
                 type: 'POST',
                 url: "{{ route('propiedades.post.actualizar') }}",
                 //data: data,
-                data: {id: id, [col]: res},
+                data: {id: id, [col]: res},         // la variable 'col' contiene el nombre de la columna a modificar.
                 success: function(data, estatus, jq) {
                     alertar(data.success, `Cambio de ${tipoCol}`, 'small');
 /*                    alertar(`responseText:${jq.responseText}`,
@@ -336,15 +330,13 @@
                         })
                     },
                     error: function(jq, estatus, error) {
-                        bootbox.dialog({
-                            size: 'large',
-                            title: `No se pudo cargar la imagen: Estatus:${estatus}, Error:${error}`,
-                            message: `readyState:${jq.readyState},
-                                    status:${jq.status}, responseText:${jq.responseText}`,
-                            onEscape: true,
-                            backdrop: true,
-                            buttons: botones
-                        })
+                        alertar(`readyState:${jq.readyState}, status:${jq.status},
+                                    mensaje:${jq.responseJSON.message},
+                                    exception:${jq.responseJSON.exception},
+                                    file:${jq.responseJSON.file}, line: ${jq.responseJSON.line}`,
+                                `No se pudo cargar la imagen: Estatus:${estatus}, Error:${error}`,
+                                'large'
+                        )
                     }
                 });
             }));

@@ -935,6 +935,14 @@ class Propiedad extends Model
         return $imagenes;
     }
 
+    public function getImagenAttribute() {  // Devuelve la primera foto del inmueble.
+        $imagenes = $this->getImagenesAttribute();
+        if (0 >= count($imagenes)) return '';
+        $i = 0;
+        while (!array_key_exists ($i, $imagenes)) $i++;
+        return "{$this->id}_{$this->codigo}-{$i}.{$imagenes[$i]}";
+    } // public function getImagenAttribute() {
+
     public static function sumaXAsesor($idAsesor, $tipoAsesor, $fecha='fecha_firma',
                                         $fecha_desde=null, $fecha_hasta=null)
     {

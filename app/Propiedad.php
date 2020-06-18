@@ -92,7 +92,8 @@ class Propiedad extends Model
     public $monedaB = true;
     public $espDosP = true;
     public $dosPunB = true;
-    public const DIR_IMG = 'public/imgprop';
+    public const DIR_STOIMG = 'public/imgprop';             // A partir de storage/app/.
+    public const DIR_PUBIMG = 'storage/imgprop/';           // A partir de public/.
     public const COLORES = [
                             'A' => 'success',
                             'I' => 'warning',
@@ -924,7 +925,7 @@ class Propiedad extends Model
         for ($i = 0; $i <= 20; $i++) {
             foreach ($extensiones as $ext) {
                 //$arreglo = [];
-                if (Storage::exists(self::DIR_IMG . "/{$nombreBaseImagen}-{$i}.{$ext}")) {
+                if (Storage::exists(self::DIR_STOIMG . "/{$nombreBaseImagen}-{$i}.{$ext}")) {
                     //$arreglo[$i] = $ext;
                     //$imagenes[] = $arreglo;
                     $imagenes[$i] = $ext;
@@ -1158,7 +1159,7 @@ class Propiedad extends Model
     public static function misPropiedades($files=null)
     {
         $todosNombreProp = [];
-        $files = $file??Storage::files(self::DIR_IMG);
+        $files = $file??Storage::files(self::DIR_STOIMG);
 // los nombre de archivo tienen que tener la estructura: {propiedad_id}_{codigo}[-{secuencia}].ext        
         foreach($files as $filename) {
             $n = preg_match('/^(\d{1,4})(?# id de la propiedad)_(\d+)(?# codigo de la propiedad)-(\d{1,2})(?# secuencia)\.([jpegifsvn]{3,4})(?# extension, puede ser: jpeg, jpg, gif, png o svg)$/',

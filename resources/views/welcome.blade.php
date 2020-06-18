@@ -2,7 +2,7 @@
 
 @section('content')
                 <div class="container-fluid">
-                    <div id="inicio" class="divInicio m-0 pt-5 pb-0 px"
+                    <div id="inicio" class="divInicio rounded m-0 pt-5 pb-0 px"
                             style="background-image:url({{ asset('img/fondoInicio.jpg') }})">
                         <!--img src="{{ (asset('img/fondoInicio.jpg')) }}"
                                 alt="Conectado a la web de Century21 Puente Real"
@@ -12,32 +12,32 @@
                             <h2 class="my-1 d-block mx-auto p-0">¿QUÉ ESTÁS BUSCANDO?</h2>
                             <div class="row my-1 d-block mx-auto p-0">
                                 <button id="ciudadC" class="ml-0 mr-1 my-0 p-1">CIUDAD DONDE DESEA EL INMUEBLE
-                                    <span id="ciudadCspan" class="m-0 p-0" style="font-size:0.5rem"></span>
+                                    <!--span id="ciudadCspan" class="m-0 p-0" style="font-size:0.5rem"></span-->
                                 </button>
                                 <button id="negociacionC" class="mx-1 my-0 p-1">COMPRA O ALQUILER
-                                    <span id="negociacionCspan" class="m-0 p-0" style="font-size:0.5rem"></span>
+                                    <!--span id="negociacionCspan" class="m-0 p-0" style="font-size:0.5rem"></span-->
                                 </button>
                                 <button id="tipoC" class="mx-1 my-0 p-1">CASA, APARTAMENTO, TERRENO
-                                    <span id="tipoCspan" class="m-0 p-0" style="font-size:0.5rem"></span>
+                                    <!--span id="tipoCspan" class="m-0 p-0" style="font-size:0.5rem"></span-->
                                 </button>
                                 <button id="comprar" class="bg-dark text-light ml-2 mr-0 my-0 p-2">BUSCAR</button>
                             </div>
                             <h2 class="mt-2 mb-0 d-block mx-auto p-1">DESEO VENDER O DAR EN ALQUILER MI PROPIEDAD</h2>
                             <div class="row my-1 d-block mx-auto p-0">
                                 <button id="ciudadV" class="ml-0 mr-1 my-0 p-1">¿CIUDAD?
-                                    <span id="ciudadVspan" style="font-size:0.5rem"></span>
+                                    <!--span id="ciudadVspan" style="font-size:0.5rem"></span-->
                                 </button>
                                 <button id="nombre" class="mx-1 my-0 p-1">NOMBRE Y APELLIDO
-                                    <span id="nombrespan" class="m-0 p-0" style="font-size:0.5rem"></span>
+                                    <!--span id="nombrespan" class="m-0 p-0" style="font-size:0.5rem"></span-->
                                 </button>
                                 <button id="negociacionV" class="mx-1 my-0 p-1">VENDER O<small> dar en </small>ALQUILER
-                                    <span id="negociacionVspan" class="m-0 p-0" style="font-size:0.5rem"></span>
+                                    <!--span id="negociacionVspan" class="m-0 p-0" style="font-size:0.5rem"></span-->
                                 </button>
                                 <button id="tipoV" class="mx-1 my-0 p-1">¿QUÉ DESEA VENDER O DAR EN ALQUILER?
-                                    <span id="tipoVspan" class="m-0 p-0" style="font-size:0.5rem"></span>
+                                    <!--span id="tipoVspan" class="m-0 p-0" style="font-size:0.5rem"></span-->
                                 </button>
                                 <button id="telefono" class="mx-1 my-0 p-1">NÚMERO DE CONTACTO
-                                    <span id="telefonospan" class="m-0 p-0" style="font-size:0.5rem"></span>
+                                    <!--span id="telefonospan" class="m-0 p-0" style="font-size:0.5rem"></span-->
                                 </button>
                                 <button id="enviar" class="bg-dark text-light ml-2 mr-0 my-0 p-2">ENVIAR MENSAJE</button>
                             </div>
@@ -50,25 +50,28 @@
                                 class="card-body w-100 m-0 p-0">
                     </div>
                     <div id="ultPropiedades" class="row w-100 colorFondo1 m-0 p-0"-->
-                    <div id="propiedades" class="card m-0 p-0">
-                        <h4 class="card-header m-0 pt-3 pb-0 px-0 colorFondo1">PROPIEDADES</h4>
-                        <div class="row card-body fondoPropiedades m-0 pt-3 pb-0 px-0"
+                    <div id="propiedades" class="m-0 p-0">
+                        <h4 class="m-0 pt-3 pb-0 px-0 colorFondo1">PROPIEDADES</h4>
+                        <div class="row justify-content-center fondoPropiedades rounded m-0 pt-3 pb-0 px-0"
                             style="background-image:url({{ asset('img/fondoPropiedadesLR.jpg') }})">
                         @foreach ($propiedades as $propiedad)
-                            <div class="col-lg-3">
-                                <img class="img-fluid m-0 p-0 imagenPropiedad"
+                            <div class="col-lg-3 mx-0 my-1 pl-0 pr-1 py-0">
+                                <img class="img-fluid rounded m-0 p-0 imagenPropiedad"
                                         src="{{ asset('storage/imgprop/'.$propiedad['nombreImagen']) }}"
                                         alt="{{ $propiedad['codigo'] }}-{{ $propiedad['nombre'] }}" data-toggle="tooltip"
                                         title="{{ $propiedad['codigo'] }}-{{ $propiedad['nombre'] }}">
                                 <div class="m-0 p-0 {{--border border-dark--}}">
-                                    <div class="row colorFondo1 justify-content-center m-0 p-0">
-                                        <p class="m-0 p-0">
+                                    <div class="row bg-transparent justify-content-center m-0 p-0">
+                                        <p class="rounded colorFondo1 m-0 p-0">
                                             {{ $propiedad['nombre'] }}
                                         </p>
                                     </div>
-                                    <div class="row colorFondo1 justify-content-center m-0 p-0">
-                                        <a class="m-0 p-0" href="/propiedades/{{ $propiedad['id'] }}">
-                                            <button class="btn btn-sm m-0 p-0">Ver inmueble</button>
+                                    <div class="row bg-transparent justify-content-center m-0 p-0">
+                                        <a class="m-0 p-0" href="">
+                                            <button class="btn btn-sm m-0 p-0 verInmueble"
+                                                    idprop="{{ $propiedad['id'] }}">
+                                                Ver inmueble
+                                            </button>
                                         </a>
                                     </div>
                                 </div>
@@ -76,35 +79,35 @@
                         @endforeach ($propiedades as $propiedad)
                         </div>
                     </div>
-                    <div id="asesores" class="card m-0 p-0">
+                    <div id="asesores" class="m-0 p-0">
                     @if ($hayFotos)
-                        <h4 class="card-header m-0 pt-3 pb-0 px-0 colorFondo1">ASESORES</h4>
-                        <div class="row card-body fondoAsesores m-0 pt-3 pb-0 px-0"
+                        <h4 class="m-0 pt-3 pb-0 px-0 colorFondo1">ASESORES</h4>
+                        <div class="row justify-content-center fondoAsesores rounded m-0 pt-3 pb-0 px-0"
                             style="background-image:url({{ asset('img/fondoAsesoresKR.jpg') }})">
                         @foreach ($users as $user)
-                            <div class="col-lg-3">
+                            <div class="col-lg-3 mx-0 my-1 pl-0 pr-1 py-0">
                             @if ($user->foto)
-                                <img class="d-block mx-auto @if(5>$loop->iteration) rounded-circle @endif img-fluid my-0 p-0 fotoAsesor"
+                                <img class="d-block mx-auto @if(7>$loop->iteration) rounded-circle @else rounded @endif img-fluid my-0 p-0 fotoAsesor"
                                         alt="{{ $user->nombre }}" title="{{ $user->nombre }}"
                                         src="{{ asset($user::DIR_PUBIMG . $user->foto) }}">
                             @else ($foto)
-                                <div class="w-100 h-75 m-0 p-1 colorFondo1">
+                                <div class="w-100 h-75 rounded m-0 p-1 colorFondo1">
                                     Foto de {{ $user->nombre }}
                                 </div>
                             @endif ($foto)
                                 <div class="m-0 p-0 {{--border border-dark--}}">
-                                    <div class="row colorFondo1 justify-content-center m-0 p-0">
+                                    <div class="row rounded colorFondo1 justify-content-center m-0 p-0">
                                         <p class="m-0 p-0">
                                             {{ $user->nombre }}
                                         </p>
                                     </div>
-                                    <div class="row colorFondo1 justify-content-center m-0 p-0">
+                                    <div class="row rounded colorFondo1 justify-content-center m-0 p-0">
                                         <p class="m-0 p-0">
                                             <i class="fas fa-mobile-alt m-0 p-0"></i>
                                             {{ $user->telefono_f }}
                                         </p>
                                     </div>
-                                    <div class="row colorFondo1 justify-content-center m-0 p-0">
+                                    <div class="row rounded colorFondo1 justify-content-center m-0 p-0">
                                         <p class="m-0 p-0">
                                             <a class="btn btn-link m-0 p-0 mostrarTooltip"
                                                     href="mailto://{{ $user->email }}"
@@ -115,7 +118,7 @@
                                             <small class="text-muted m-0 p-0">{{ $user->email }}</small>
                                         </p>
                                     </div>
-                                    <div class="row colorFondo1 justify-content-center m-0 p-0">
+                                    <div class="row rounded colorFondo1 justify-content-center m-0 p-0">
                                     @if (isset($user->ig))
                                         <a class="btn btn-link ml-0 mr-1 my-0 p-0 mostrarTooltip"
                                                 href="https://www.instagram.com/{{ $user->ig }}/?hl=es-la"
@@ -157,26 +160,31 @@
                                         </a>
                                     @endif (isset($user->te))
                                     </div>
-                                    <div class="row colorFondo1 justify-content-center m-0 p-0">
+                                @if (0 < count($user->propiedadesCaptadas->where('estatus', 'A')))
+                                    <div class="row rounded colorFondo1 justify-content-center m-0 p-0">
                                         <a class="m-0 p-0" href="">
-                                            <button class="btn btn-sm m-0 p-0">Ver inmuebles</button>
+                                            <button class="btn btn-sm m-0 p-0 verInmuebles"
+                                                    idasesor="{{ $user->id }}">
+                                                Ver inmuebles
+                                            </button>
                                         </a>
                                     </div>
+                                @endif ($user->propiedadesCaptadas->where('estatus', 'A'))
                                 </div>
                             </div>
                         @endforeach
                         </div>
                     @endif ($hayFotos)
                     </div>
-                    <div id="blog" class="card m-0 p-0">
-                        <h4 class="card-header m-0 pt-3 pb-0 px-0 colorFondo1">BLOG</h4>
-                        <div class="row card-body fondoBlog m-0 pt-3 pb-0 py-0"
+                    <div id="blog" class="m-0 p-0">
+                        <h4 class="m-0 pt-3 pb-0 px-0 colorFondo1">BLOG</h4>
+                        <div class="row fondoBlog rounded m-0 pt-3 pb-0 py-0"
                             style="background-image:url({{ asset('img/fondoBlogBR.jpg') }})">
                         </div>
                     </div>
-                    <div id="contactanos" class="card m-0 p-0">
-                        <h4 class="card-header pt-3 pb-0 px-0 m-0 colorFondo1">CONTACTO</h4>
-                        <div class="row card-body fondoContacto m-0 pt-3 pb-0 px-0"
+                    <div id="contactanos" class="m-0 p-0">
+                        <h4 class="pt-3 pb-0 px-0 m-0 colorFondo1">CONTACTO</h4>
+                        <div class="row fondoContacto rounded m-0 pt-3 pb-0 px-0"
                                 style="background-image:url({{ asset('img/fondoContacto.jpg') }})">
                         <form method="POST" class="form" id="formulario" action="{{ url('contactos') }}">
                             {!! csrf_field() !!}
@@ -256,6 +264,7 @@
                                 <textarea class="form-control input-lg m-0 p-0" rows="2"
                                     cols="50" maxlength="160" name="direccion" id="direccion"
                                     placeholder="Calle, Casa, Apto, Edificio, Barrio, Ciudad">{{ old('direccion') }}</textarea>
+                                <div class="colorFondo1">Quedan <span id="numCarsdireccion">160</span> caracteres</div>
                             </div>
 
                             <div class="form-group row m-0 p-0">
@@ -291,6 +300,8 @@
                                         maxlength="190" cols="95"
                                         name="observaciones" id="observaciones" 
                                         placeholder="Escriba alguna otra información que desee suministrar.">{{ old('observaciones') }}</textarea>
+                                <div id=""></div>
+                                <div class="colorFondo1">Quedan <span id="numCarsobservaciones">190</span> caracteres</div>
                             </div>
 
                             <div class="form-row my-1 mx-0 p-0">
@@ -304,7 +315,7 @@
                     <div id="ubicacion" class="row m-0 p-0" style="overflow:hidden;{{--width:700px;--}}position:relative;">
                         <div class="col-lg-6 justify-content-center m-0 p-0">
                             <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3927.241471782326!2d-64.69448888583257!3d10.161017073030552!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8c2d734571e53301%3A0x83a8afacb4d93044!2sCentro%20Comercial%20Costanera%20Plaza%20I!5e0!3m2!1ses!2sve!4v1589509717551!5m2!1ses!2sve"
-                                    class="d-block mx-auto" width="600" height="400" frameborder="0" style="border:0;"
+                                    class="d-block mx-auto rounded" width="600" height="400" frameborder="0" style="border:0;"
                                     allowfullscreen="" aria-hidden="false" tabindex="0">
                             </iframe>
                             {{--<iframe width="600" height="400"
@@ -333,7 +344,7 @@
                         </div>
                         <div class="col-lg-6 justify-content-center m-0 p-0">
                             <img src="{{ (asset('img/ccCostaneraPlazaI.jpg')) }}"
-                                    class="d-block mx-auto" alt="Centro Comercial Costanera Plaza I"
+                                    class="d-block mx-auto rounded" alt="Centro Comercial Costanera Plaza I"
                                     {{--class="m-0 p-1"--}} style="height:400px;">
                         </div>
                     </div>

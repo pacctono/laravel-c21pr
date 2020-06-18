@@ -36,18 +36,22 @@
             if (-1 !== id.indexOf('ciudad')) {
                 texto = `la ciudad donde desea comprar o alquilar.`;
                 arreglo = prepararArreglo(ciudades);
+                mensaje = 'CIUDAD: ';
                 arrOrg = ciudades;
             } else if (-1 !== id.indexOf('negociacionC')) {
                 texto = 'el tipo de negociacion.';
                 arreglo = prepararArreglo(deseosC);
+                mensaje = '';
                 arrOrg = deseosC;
             } else if (-1 !== id.indexOf('negociacionV')) {
                 texto = 'el tipo de negociacion.';
                 arreglo = prepararArreglo(deseosV);
+                mensaje = '';
                 arrOrg = deseosV;
             } else if (-1 !== id.indexOf('tipo')) {
                 texto = 'el tipo de inmueble.';
                 arreglo = prepararArreglo(tipos);
+                mensaje = 'TIPO: ';
                 arrOrg = tipos;
             } else return;
             const valor = (obj[id])?obj[id]:arreglo[0]['value'];
@@ -60,8 +64,9 @@
                 buttons: botones,
                 callback: function(res) {
                     if (res) {
-                        if (0 >= $("#"+id + " > br").length) $("span", "#"+id).before("<br>");
-                        $("span", "#"+id).text(arrOrg[res]);
+                        /*if (0 >= $("#"+id + " > br").length) $("span", "#"+id).before("<br>");
+                        $("span", "#"+id).text(arrOrg[res]);*/
+                        $("#"+id).text(mensaje + arrOrg[res]);
                         obj[id] = res;
 /*                        for (let i=0, l=arreglo.length; i<l; i++) {
                             if (res == arreglo[i].value) {
@@ -80,14 +85,17 @@
  * ciudad: Nombre de la ciudad donde desea vender. 'text'
  * nombre: Nombre del vendedor. 'text'
  */
-        $("#ciudad,#nombre").click(function(ev) {
+        $("#ciudadV,#nombre").click(function(ev) {
             const that = $(this);
             const id = that.attr('id');
             let texto;
-            if (-1 !== id.indexOf('ciudad'))
-                texto = 'la ciudad adonde desea vender o dar en alquiler su inmueble';
-            else if (-1 !== id.indexOf('nombre')) texto = 'su nombre, por favor';
-            else return;
+            if (-1 !== id.indexOf('ciudad')) {
+                texto = 'la ciudad donde desea vender o dar en alquiler su inmueble';
+                mensaje = 'CIUDAD: ';
+            } else if (-1 !== id.indexOf('nombre')) {
+                texto = 'su nombre, por favor';
+                mensaje = '';
+            } else return;
             const valor = (obj[id])?obj[id]:'';
             bootbox.prompt({
                 size: 'small',
@@ -97,8 +105,9 @@
                 buttons: botones,
                 callback: function(res) {
                     if (res) {
-                        if (0 >= $("#"+id + " > br").length) $("span", "#"+id).before("<br>");
-                        $("span", "#"+id).text(res);
+                        /*if (0 >= $("#"+id + " > br").length) $("span", "#"+id).before("<br>");
+                        $("span", "#"+id).text(res);*/
+                        $("#"+id).text(mensaje + res);
                         obj[id] = res;
                     }
                 }
@@ -117,7 +126,7 @@
                 size: 'small',
                 title: 'Seleccione el código de área.',
                 inputType: 'select',
-                value: (valor)?valor.substr(1, 3):'414',
+                value: (valor)?valor.substr(0, 3):'414',
                 inputOptions: prepararArreglo(ddns, false),
                 buttons: botones,
                 callback: function(res) {
@@ -126,16 +135,18 @@
                         bootbox.prompt({
                             size: 'large',
                             title: titulo,
-                            inputType: 'number',
-                            min: 0000001,
-                            max: 9999999,
-                            value: (valor)?valor.substr(4):'',
+                            inputType: 'text',
+                            pattern: '[0-9]{7}',
+                            placeholder: '9999999',
+                            maxlength: 7,
+                            value: (valor)?valor.substr(3):'',
                             buttons: botones,
                             callback: function(res) {
                                 if (res) {
-                                    res = '0' + codarea + res;
-                                    if (0 >= $("#"+id + " > br").length) $("span", "#"+id).before("<br>");
-                                    $("span", "#"+id).text(res);
+                                    res = codarea + res;
+                                    /*if (0 >= $("#"+id + " > br").length) $("span", "#"+id).before("<br>");
+                                    $("span", "#"+id).text(res);*/
+                                    $("#"+id).text('0' + res);
                                     obj[id] = res;
                                 }
                             }
@@ -159,20 +170,66 @@
                 } else titulo = false;
             }
             else if (-1 !== id.indexOf('enviar'))
-                if (obj['negociacionV'] && obj['ciudad'] && obj['nombre'] &&
+                if (obj['negociacionV'] && obj['ciudadV'] && obj['nombre'] &&
                         obj['tipoV'] && obj['telefono']) {
                     titulo = deseos[obj['negociacionV']];
-                    texto = `Ciudad: ${ciudades[obj['ciudad']]}, Tipo de imueble: ${tipos[obj['tipoV']]},
+                    texto = `Ciudad: ${obj['ciudadV']}, Tipo de imueble: ${tipos[obj['tipoV']]},
                             Nombre: ${obj['nombre']}, Teléfono: ${obj['telefono']}.`;
                 } else titulo = false;
             else return;
             if (titulo) {
+            @if (config('app.debug'))
                 alertar(texto, titulo);
-                if ('comprar' == id)    // Mostrar las propiedades con los datos seleccionados, anteriormente.
+            @endif (config('app.debug'))
+                if ('comprar' == id)    // Mostrar las propiedades (inicio.propiedades) con los datos seleccionados, anteriormente.
                     location.href = `/welcome/propiedades/${obj['negociacionC']}/${obj['ciudadC']}/${obj['tipoC']}`;
+                else {      // Enviar correo para 'vender' o 'dar en alquiler' con los datos suministrados, anteriormente.
+                    $.ajax({
+                        url: "/enviarcorreo",       // @ajaxWelcome
+                        success: function(data, estatus, jq) {
+                            alertar(data.exito, 'Gracias por su confianza');
+                        },
+                        method: "get",
+                        data: {
+                            'deseo': obj['negociacionV'],
+                            'ciudad': obj['ciudadV'],
+                            'nombre': obj['nombre'],
+                            'tipo': obj['tipoV'],
+                            'telefono': obj['telefono'],
+                        },
+                        error: function(jq, estatus, error) {
+                        @if (config('app.debug'))
+                            alertar(`readyState:${jq.readyState}, status:${jq.status},
+                                        mensaje:${jq.responseJSON.message}, exception:${jq.responseJSON.exception},
+                                        file:${jq.responseJSON.file}, line: ${jq.responseJSON.line}`,
+                                    `No se pudo cargar este contacto inicial: Estatus:${estatus}, Error:${error}`,
+                                    'large'
+                            )
+                        @else (config('app.debug'))
+                            alertar("Problemas con la red");
+                        @endif (config('app.debug'))
+                        }
+                    });
+                }
             }
             else alertar('Faltan datos! Por favor, incluya los datos presionando los botones a la izquierda.',
                             'NOTIFICACIÓN', 'small');
+        })
+
+// Propiedades.
+        $(".verInmueble").click(function(ev) {
+            ev.preventDefault();
+            const that = $(this);
+            const idprop = that.attr('idprop');
+            location.href = `/welcome/propiedades/P/${idprop}`;
+        })
+
+// Asesores.
+        $(".verInmuebles").click(function(ev) {
+            ev.preventDefault();
+            const that = $(this);
+            const idasesor = that.attr('idasesor');
+            location.href = `/welcome/propiedades/A/${idasesor}`;
         })
 
 // Contactanos.
@@ -211,6 +268,21 @@
                 return;
             }
         })
+        $("#direccion,#observaciones").on("input", function(){
+            const that = $(this);
+            const maxlength = that.attr("maxlength");
+            const longitud = that.val().length;
+            const idNumCars = "numCars" + that.attr("id");
+
+            /*if (longitud >= maxlength) {
+                $("#"+idNumCars).text('Ya introdujo el máximo de caractres, permitidos!');
+            } else {
+                const numCars = maxlength - longitud;
+                $("#"+idNumCars).text('' + numCars);
+            }*/
+            const numCars = maxlength - longitud;
+            $("#"+idNumCars).text('' + numCars);
+        });
         $("#formulario").on('submit', (function(ev) {
             ev.preventDefault();
             const that = $(this);

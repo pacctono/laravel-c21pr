@@ -11,8 +11,10 @@ use App\Ciudad;
 use App\Zona;
 use App\Venezueladdn;
 use App\Texto;
+use App\Mail\ContactoInicial;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 use App\MisClases\General;              // PC
 use Jenssegers\Agent\Agent;             // PC
 
@@ -40,20 +42,32 @@ class WelcomeController extends Controller
  * Propiedades que un comprador desea comprar o alquilar.
  * La propiedad tiene que estar siendo negociada como Venta o Alquiler.
  */
-    public function propiedades($deseo, $ciudad, $tipo)
+    public function propiedades($deseo, $ciudad, $tipo=null)
     {
-        $negociacion = ('3' == $deseo)?'A':'V';
-        $ciudad = $ciudad;    // Aqui hay un problema grave. Ciudad != Zona.
-        $propiedades = Propiedad::where('estatus', 'A')
-                                    ->where('ciudad_id', $ciudad)
-                                    ->where('negociacion', $negociacion)
-                                    ->where('tipo_id', $tipo)->get();
+        $asesor = null;
+        if (is_numeric($deseo)) {   // El visitante busca inmuebles por deseo, ciudad y tipo
+            $negociacion = ('3' == $deseo)?'A':'V';
+            //$ciudad = $ciudad;    // Aqui hay un problema grave. Ciudad != Zona.
+            $propiedades = Propiedad::where('estatus', 'A')
+                                        ->where('ciudad_id', $ciudad)
+                                        ->where('negociacion', $negociacion)
+                                        ->where('tipo_id', $tipo)->get();
 // $propiedades = Propiedad::where('estatus', 'A')->where('ciudad_id', 3)->where('negociacion', 'V')->where('tipo_id', 2)->get();                                    
 // foreach ($propiedades as $p) if (0 < count($p->imagenes)) foreach ($p->imagenes as $i=>$e) echo $p->id, " $i => $e\n"; else echo $p->id, " vacio\n";
+        } elseif ('A' == $deseo) {  // El visitante ha solicitado inmuebles de un asesor especifico.
+            $asesor_captador_id = $ciudad;
+            $asesor =  User::findOrFail($asesor_captador_id);
+            $propiedades = Propiedad::where('estatus', 'A')
+                                        ->where('asesor_captador_id', $asesor_captador_id)->get();
+        } elseif ('P' == $deseo) {  // El visitante ha solicitado ver un inmueble especifico.
+            $id = $ciudad;
+            $propiedades = Propiedad::where('id', $id)->get();  // No se usa find (findOrFail) para crear arreglo de objetos. Aunque es uno solo.
+        } else return redirect('welcome');
 
         $agente = new Agent();
         $movil  = $agente->isMobile() and true;         // Fuerzo booleana. No funciona al usar el metodo directamente.
-        return view('inicio.propiedades', compact('propiedades', 'movil'));
+        $tipo = $deseo;
+        return view('inicio.propiedades', compact('asesor', 'propiedades', 'movil', 'tipo'));
     }   // public function propiedades($zona, $deseo, $tipo)
     public function ajaxWelcome()
     {
@@ -98,4 +112,29 @@ class WelcomeController extends Controller
                     json_encode($tipos), json_encode($preciosV), json_encode($preciosA),
                     json_encode($ciudades), json_encode($zonas), json_encode($ddns));
     }   // public function ajaxWelcome()
+    public function correo()
+    {
+        $host = env('MAIL_HOST');
+        if (!($ip = gethostbyname($host)) or ($ip == $host)) { // No hay conexon a Internet.
+            return response()->json(['exito' => 'Problemas con la red']);
+        }
+
+        $correoSocios = 'pacctono@gmail.com';
+        //$correoSocios = \App\User::CORREO_SOCIOS;
+        $deseo = (isset($_GET['deseo']))?$_GET['deseo']:2;
+        $ciudad = (isset($_GET['ciudad']))?$_GET['ciudad']:'';
+        $nombre = (isset($_GET['nombre']))?$_GET['nombre']:'';
+        $tipo = (isset($_GET['tipo']))?$_GET['tipo']:'';
+        $telefono = (isset($_GET['telefono']))?$_GET['telefono']:'';
+        $datos['negociacion'] = ('4' == $deseo)?'A':'V';
+        $datos['tipo'] = Tipo::findOrFail($tipo);
+        $datos['ciudad'] = $ciudad;
+        $datos['nombre'] = $nombre;
+        $datos['telefono'] = $telefono;
+
+        Mail::to($correoSocios)
+                ->send(new ContactoInicial($datos));
+
+        return response()->json(['exito' => 'La información fue enviada.']);
+    }   // Final del metodo correo.
 }

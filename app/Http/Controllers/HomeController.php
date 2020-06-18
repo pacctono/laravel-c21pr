@@ -26,7 +26,7 @@ class HomeController extends Controller
     public function misPropiedades($files=null)
     {
         $propiedad = [];
-        $files = $file??Storage::files(Propiedad::DIR_IMG);
+        $files = $file??Storage::files(Propiedad::DIR_STOIMG);
 // los nombre de archivo tienen que tener la estructura: {propiedad_id}_{codigo}[-{secuencia}].ext        
         foreach($files as $filename) {
 /*            $filename = basename($filename);

@@ -42,7 +42,7 @@
             @endforeach
             </select>
             <input class="form-control form-control-sm" type="text" size="7" maxlength="7" name="telefono"
-                    id="telefono" placeholder="numero sin area" value="{{ old('telefono') }}">
+                    id="telefono" placeholder="numero sin area" value="{{ old('telefono') }}" pattern="[0-9]{7}">
           </div>
           <div class="form-group col-lg-8 d-flex m-0 py-0 px-1">
             <label class="control-label" for="email">Correo electr&oacute;nico</label>
@@ -54,7 +54,7 @@
           <div class="form-group col-lg-8 d-flex m-0 py-0 px-1">
             <label class="control-label" for="otro_telefono">Otro telefono</label>
             <input type="text" class="form-control form-control-sm col-lg-6" size="20" maxlength="20"
-                    name="otro_telefono" id="otro_telefono"
+                    name="otro_telefono" id="otro_telefono" pattern="+?[0-9\-]{10,20}"
                     placeholder="Quizas internacional" value="{{ old('otro_telefono') }}">
           </div>
         </div>

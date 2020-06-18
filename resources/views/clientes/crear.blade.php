@@ -65,7 +65,7 @@
                 </select>
                 <input type="text" class="form-control form-control-sm" size="7"
                         maxlength="7" minlength="7" name="telefono" id="telefono"
-                        value="{{ old('telefono') }}">
+                        pattern="[0-9]{7}" value="{{ old('telefono') }}">
             </div>
             <div class="form-group form-inline my-0 mx-2 py-0 px-1">
                 <label class="control-label" for="email">Correo electr&oacute;nico</label>
@@ -86,7 +86,7 @@
           <div class="form-group form-inline my-0 mx-2 py-0 px-1">
             <label class="control-label" for="otro_telefono">Otro telefono</label>
             <input type="text" class="form-control form-control-sm"
-                    size="20" maxlength="20"
+                    size="20" maxlength="20" pattern="+?[0-9\-]{10,20}"
                     name="otro_telefono" id="otro_telefono"
                     placeholder="Quizas internacional"
                     value="{{ old('otro_telefono') }}">

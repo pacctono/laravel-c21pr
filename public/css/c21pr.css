@@ -42,6 +42,10 @@
     font-size: 80%;
   }
   
+#slides {
+  background-color:#818286;
+}
+
   .ratonApuntador {
     cursor:pointer;
   }

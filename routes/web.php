@@ -20,8 +20,14 @@ Route::get('/', 'WelcomeController@welcome')
 Route::get('/welcome/ajax/', 'WelcomeController@ajaxWelcome')
     ->name('ajaxwelcome');
 
-Route::get('/welcome/propiedades/{deseo}/{ciudad}/{tipo}', 'WelcomeController@propiedades')
+Route::get('/welcome/propiedades/{deseo}/{ciudad}/{tipo?}', 'WelcomeController@propiedades')
+    ->where('deseo', '[13AP]')
+    ->where('ciudad', '[0-9]+')
     ->name('inicio.propiedades');
+
+Route::get('/enviarcorreo', 'WelcomeController@correo')
+    ->where('deseo', '[24]')
+    ->name('welcome.correo');
 
 Auth::routes();
 

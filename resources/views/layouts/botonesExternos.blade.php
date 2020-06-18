@@ -22,7 +22,7 @@
         @auth
           <a class="btn btn-link m-0 p-0" href="https://web.whatsapp.com/" target="_blank">
         @else
-          <a class="btn btn-link m-0 p-0" href="https://api.whatsapp.com/send?phone=+582814180885" target="_blank">
+          <a class="btn btn-link m-0 p-0" href="https://api.whatsapp.com/send?phone=+582814160885" target="_blank">
         @endauth
             <img class="rounded mx-auto d-block my-1 enlacesExternos" src="{{ asset('iconos/whatsapp.png') }}"
                   alt="Whatsapp" data-toggle="tooltip" title="Web de Whatsapp" style="width:50px;height:50px;">

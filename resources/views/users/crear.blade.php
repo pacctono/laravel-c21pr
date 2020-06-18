@@ -56,7 +56,7 @@
                         </select>
                         <input type="text" class="form-control m-0 py-0 px-1" size="7"
                                 maxlength="7" minlength="7" required name="telefono"
-                                id="telefono" placeholder="# sin area"
+                                id="telefono" placeholder="# sin area" pattern="[0-9]{7}"
                                 value="{{ old('telefono') }}">
                     </div>
                 </div>
@@ -203,7 +203,7 @@
                         @endforeach
                         </select>
                         <input class="form-control m-0 py-0 px-1" type="text" size="7"
-                                maxlength="7" minlength="7" name="wa" id="wa"
+                                maxlength="7" minlength="7" name="wa" id="wa" pattern="[0-9]{7}"
                                 placeholder="# sin area" value="{{ old('wa') }}">
                     </div>
                 </div>
@@ -231,7 +231,7 @@
                         @endforeach
                         </select>
                         <input class="form-control m-0 py-0 px-1" type="text" size="7"
-                                maxlength="7" minlength="7" name="te" id="te"
+                                maxlength="7" minlength="7" name="te" id="te" pattern="[0-9]{7}"
                                 placeholder="# sin area" value="{{ old('te') }}">
                     </div>
                 </div>
@@ -241,7 +241,7 @@
                         <label class="control-label m-0 p-0" for="ig">
                             Instagram
                         </label>
-                        <input class="form-control m-0 py-0 px-1" type="email" size="60"
+                        <input class="form-control m-0 py-0 px-1" type="text" size="60"
                                 autocomplete="off" maxlength="160" name="ig" id="ig"
                                 placeholder="Instagram del asesor"
                                 value="{{ old('ig') }}">
@@ -253,7 +253,7 @@
                         <label class="control-label m-0 p-0" for="tw">
                             Twitter
                         </label>
-                        <input class="form-control m-0 py-0 px-1" type="email" size="60"
+                        <input class="form-control m-0 py-0 px-1" type="text" size="60"
                                 autocomplete="off" maxlength="160" name="tw" id="tw"
                                 placeholder="Twitter del asesor"
                                 value="{{ old('tw') }}">
@@ -265,7 +265,7 @@
                         <label class="control-label m-0 p-0" for="fb">
                             Facebook
                         </label>
-                        <input class="form-control m-0 py-0 px-1" type="email" size="60"
+                        <input class="form-control m-0 py-0 px-1" type="text" size="60"
                                 autocomplete="off" maxlength="160" name="fb" id="fb"
                                 placeholder="Facebook del asesor"
                                 value="{{ old('fb') }}">

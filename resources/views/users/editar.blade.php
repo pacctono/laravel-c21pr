@@ -61,7 +61,7 @@
                         </select>
                         <input class="form-control m-0 py-0 px-1" type="text" size="7"
                                 maxlength="7" minlength="7" required name="telefono"
-                                id="telefono" placeholder="numero sin area" 
+                                id="telefono" placeholder="# sin area" pattern="[0-9]{7}"
                                 value="{{ old('telefono', substr($user->telefono, 3)) }}">
                     </div>
                 </div>
@@ -207,7 +207,7 @@
                         @endforeach
                         </select>
                         <input class="form-control m-0 py-0 px-1" type="text" size="7"
-                                maxlength="7" minlength="7" name="wa" id="wa"
+                                maxlength="7" minlength="7" name="wa" id="wa" pattern="[0-9]{7}"
                                 placeholder="# sin area" value="{{ old('wa', substr($user->wa, 3)) }}">
                     </div>
                 </div>
@@ -235,7 +235,7 @@
                         @endforeach
                         </select>
                         <input class="form-control m-0 py-0 px-1" type="text" size="7"
-                                maxlength="7" minlength="7" name="te" id="te"
+                                maxlength="7" minlength="7" name="te" id="te" pattern="[0-9]{7}"
                                 placeholder="# sin area" value="{{ old('te', substr($user->te, 3)) }}">
                     </div>
                 </div>

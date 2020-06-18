@@ -60,7 +60,7 @@
                     @endforeach
                     </select>
                     <input class="form-control m-0 py-0 px-1" type="text" size="7"
-                        id="telefono" maxlength="7" name="telefono"
+                        id="telefono" maxlength="7" name="telefono" pattern="[0-9]{7}"
                         placeholder="numero sin area"
                         value="{{ old('telefono', substr($contacto->telefono, 3)) }}">
                 </div>
@@ -80,7 +80,7 @@
                     </label>
                     <input type="text" class="form-control col-lg-6 m-0 py-0 px-1" size="20"
                         maxlength="20" name="otro_telefono" id="otro_telefono"
-                        placeholder="Quizas internacional"
+                        placeholder="Quizas internacional" pattern="+?[0-9\-]{10,20}"
                         value="{{ old('otro_telefono', $contacto->otro_telefono) }}">
                 </div>
             </div>

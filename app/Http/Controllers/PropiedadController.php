@@ -54,7 +54,7 @@ class PropiedadController extends Controller
     {
         $extensiones = ['jpeg', 'jpg', 'gif', 'png', 'svg'];
         foreach ($extensiones as $ext) {
-            if (Storage::exists(Propiedad::DIR_IMG . "/{$nombreBase}.$ext")) return true;
+            if (Storage::exists(Propiedad::DIR_STOIMG . "/{$nombreBase}.$ext")) return true;
         }
         return false;
     }   // protected function existeArchivo($nombreBase)
@@ -1096,7 +1096,7 @@ class PropiedadController extends Controller
         ]);
         //return response()->json(request()->all());
         //dd($request->all());
-        $dir = Propiedad::DIR_IMG;
+        $dir = Propiedad::DIR_STOIMG;
         $nombreImagenOriginal = $request->imagen->getClientOriginalName();
         $nombreBaseImagen = $request->id . '_' . $request->codigo;
         $extensionImagen = $request->imagen->getClientOriginalExtension();
@@ -1122,8 +1122,8 @@ class PropiedadController extends Controller
             'nombreActual' => '',
             'nombreNuevo' => '',
         ]);
-        Storage::move(Propiedad::DIR_IMG . "/{$request->nombreActual}",
-                        Propiedad::DIR_IMG . "/{$request->nombreNuevo}");
+        Storage::move(Propiedad::DIR_STOIMG . "/{$request->nombreActual}",
+                        Propiedad::DIR_STOIMG . "/{$request->nombreNuevo}");
 
         return response()->json(['success' => "Se borro la imagen"]);
     } // public function borrarimagen(Request $request)

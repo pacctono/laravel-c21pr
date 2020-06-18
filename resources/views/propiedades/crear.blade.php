@@ -434,7 +434,7 @@
                 </select>
                 <input type="text" class="form-control form-control-sm" size="7" minlength="7" 
                         name="telefono" id="telefono" placeholder="telefono sin area" 
-                        value="{{ old('telefono') }}">
+                        pattern="[0-9]{7}" value="{{ old('telefono') }}">
             </div>
             <div class="form-group form-inline mx-1 px-1 nuevo">
                 <label class="control-label" for="email">Correo electr&oacute;nico</label>

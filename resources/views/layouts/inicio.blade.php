@@ -80,8 +80,13 @@
     </footer>
 @endif (!isset($accion) or ('html' == $accion))
 
-@includeWhen(((!isset($accion) or ('html' == $accion)) and (!$agent->isMobile())),
-                'layouts.botonesExternos')
+@if (!isset($accion) or ('html' == $accion))
+  @if ($agent->isMobile())
+    @includeIf('layouts.botonesExternos', ['mobile' => 'mobile', 'minAltoDiv' => 150, 'minAnchoDiv' => 50, 'tamBoton' => 40])
+  @else ($agent->isMobile())
+    @includeIf('layouts.botonesExternos', ['mobile' => 'www', 'minAltoDiv' => 200, 'minAnchoDiv' => 60, 'tamBoton' => 50])
+  @endif ($agent->isMobile())
+@endif (!isset($accion) or ('html' == $accion))
 
     @yield('js')
     <!-- Bootstrap core JavaScript

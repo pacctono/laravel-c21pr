@@ -125,7 +125,7 @@ class UserController extends Controller
         return view('users.crear', compact('title', 'ddns'));
     }
 
-    public function store()
+    public function store(Request $request)
     {
 //        $data = request()->all();   // all() ---> only(campos requeridos separados por ,)
         $data = $request->validate([   // Si ocurre error, laravel nos envia al url anterior.
@@ -208,7 +208,7 @@ class UserController extends Controller
 
         session(['exito' => "El asesor '" . $data['name'] .
                             "' fue agregado con exito."]);
-        return redirect()->route('users.crear');
+        return redirect()->route('users.create');
         //return redirect('usuarios');
         //return redirect()->route('users');
     }
